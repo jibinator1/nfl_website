@@ -141,14 +141,30 @@ The script will automatically:
 5. **Vercel automatically detects the push and redeploys your live website with the updated stats!**
 
 ### 3. (Optional) Run Automatically Every Day via Mac Cron
-To have your Mac run the update and deploy to Vercel automatically every morning at 6:00 AM:
+To have your Mac sync data and deploy to Vercel automatically every morning at 6:00 AM:
 
-1. Open your Mac Terminal and edit your crontab:
-   ```bash
-   crontab -e
-   ```
-2. Add this line (replace `/Users/yourusername/nfl_website` with your actual Mac folder path):
+#### Option A: Quick 1-Line Setup (Recommended - No Text Editor Needed)
+In your Mac terminal inside the `nfl_website` directory, paste this single command and press **Enter**:
+```bash
+(crontab -l 2>/dev/null; echo "0 6 * * * cd \"$PWD\" && ./daily_update.sh >> update.log 2>&1") | crontab -
+```
+
+#### Option B: Using `crontab -e` (Interactive `vi` Editor)
+If you prefer editing crontab manually:
+1. Run `crontab -e` in your terminal.
+2. Press the **`i`** key to enter **INSERT** mode (you will see `-- INSERT --` at the bottom left).
+3. Paste the cron command:
    ```cron
-   0 6 * * * cd "/Users/yourusername/nfl_website" && ./daily_update.sh >> update.log 2>&1
+   0 6 * * * cd "$PWD" && ./daily_update.sh >> update.log 2>&1
    ```
-3. Save and exit (`:wq` in vim). Your Mac will now keep your live Vercel site automatically updated with fresh NFL data every day!
+4. Press **`Esc`**, then type **`:wq`** and press **Enter** to save and quit.
+
+#### Verify Your Active Cron Schedule
+To confirm your automated schedule is active:
+```bash
+crontab -l
+```
+You will see:
+`0 6 * * * cd "/Users/.../nfl_website" && ./daily_update.sh >> update.log 2>&1`
+
+Your Mac will now pull fresh stats and update Vercel automatically every morning at 6:00 AM!
