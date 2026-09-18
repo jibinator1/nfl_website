@@ -52,6 +52,14 @@ os.makedirs(FRONTEND_DIR, exist_ok=True)
 
 # Initialize Data Loader singleton (seasons 2023–2026)
 engine = NFLDataLoader(seasons=[2023, 2024, 2025, 2026])
+_data_lock = threading.Lock()
+
+def ensure_data_loaded():
+    """Ensures data is loaded before processing any serverless request on Vercel."""
+    if not engine.is_loaded:
+        with _data_lock:
+            if not engine.is_loaded:
+                engine.load_data()
 
 
 @app.on_event("startup")
@@ -81,6 +89,7 @@ async def serve_index():
 @app.get("/api/status")
 async def get_status():
     """Returns data ingestion and system status."""
+    ensure_data_loaded()
     return {
         'is_loaded': engine.is_loaded,
         'seasons': engine.seasons,
@@ -97,6 +106,7 @@ async def get_team_stats(
     start_date: str = Query(None, description="Start date YYYY-MM-DD"),
     end_date: str = Query(None, description="End date YYYY-MM-DD")
 ):
+    ensure_data_loaded()
     """Returns 32-team rankings and volume x efficiency statistics overview."""
     try:
         overview = compute_team_stat_overview(
@@ -114,6 +124,7 @@ async def get_team_highlights(
     end_date: str = Query(None, description="End date YYYY-MM-DD"),
     team: str = Query(None, description="Filter by team code (e.g. KC, BAL)")
 ):
+    ensure_data_loaded()
     """Returns matchup trends, tactical vulnerabilities, and explosive unit alerts."""
     try:
         res = compute_matchup_highlights(
@@ -136,6 +147,7 @@ async def get_team_highlights(
 @app.get("/api/schedule-weeks")
 async def get_schedule_weeks(season: int = Query(2026, description="NFL Season")):
     """Returns all weeks and calendar dates in the schedule for dropdown filtering."""
+    ensure_data_loaded()
     if engine.schedules is None:
         raise HTTPException(status_code=503, detail="Schedules data not yet loaded")
     s = engine.schedules[(engine.schedules['season'] == season) & (engine.schedules['game_type'] == 'REG')].copy()

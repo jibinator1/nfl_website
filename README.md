@@ -85,3 +85,20 @@ nfl_website/
 
 ## 📄 License
 MIT License. Open-source and free for non-commercial sports analytics.
+
+---
+
+## Deploy to Vercel
+
+This repository is pre-configured for instant deployment on Vercel Serverless Functions (`@vercel/python`).
+
+### Option 1: Automatic Deploy via GitHub (Recommended)
+1. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
+2. Select your GitHub repository: **`jibinator1/nfl_website`**.
+3. Keep default settings (Framework Preset: Other, Root Directory: `./`).
+4. Click **Deploy**. Vercel will install `requirements.txt` and launch your live serverless app with a free HTTPS domain!
+
+### Option 2: Deploy from Command Line
+Run either:
+* Double-click `deploy.bat` (Windows)
+* Run `npx vercel --prod` in the project directory

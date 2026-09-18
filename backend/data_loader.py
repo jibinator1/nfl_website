@@ -14,10 +14,12 @@ import pandas as pd
 import numpy as np
 import nflreadpy as nfl
 
-from backend.pbp_features import get_advanced_pbp_features
+from backend.pbp_features import load_pbp_features
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 MANUAL_OVERRIDES_FILE = os.path.join(DATA_DIR, 'manual_overrides.json')
+WEEKLY_CACHE_PATH = os.path.join(DATA_DIR, 'weekly_cache.parquet')
+SCHEDULES_CACHE_PATH = os.path.join(DATA_DIR, 'schedules_cache.parquet')
 
 
 class NFLDataLoader:
@@ -52,7 +54,24 @@ class NFLDataLoader:
             return {'trade_overrides': {}, 'injury_overrides': {}, 'player_blacklist': []}
 
     def load_data(self):
-        """Loads player stats and schedules via nflreadpy."""
+        """Loads player stats, schedules, and advanced metrics (cache-first for instant Vercel startup)."""
+        # 1. Instant Cache Path (0.05s cold start on Vercel)
+        if os.path.exists(WEEKLY_CACHE_PATH) and os.path.exists(SCHEDULES_CACHE_PATH):
+            try:
+                print("Loading NFL data from local pre-baked cache...")
+                self.weekly = pd.read_parquet(WEEKLY_CACHE_PATH)
+                self.schedules = pd.read_parquet(SCHEDULES_CACHE_PATH)
+                try:
+                    self.pbp_feats = load_pbp_features(self.seasons)
+                except Exception as pe:
+                    print(f"Note loading PBP features: {pe}")
+                self.is_loaded = True
+                print(f"NFL Data Engine ready (cached)! Loaded {len(self.weekly)} player games and {len(self.schedules)} matchups.")
+                return
+            except Exception as e:
+                print(f"Note loading parquet cache, falling back to network: {e}")
+
+        # 2. Network Fallback Path via nflreadpy
         print(f"Loading NFL data for seasons {self.seasons} via nflreadpy...")
         weekly_dfs = []
         sched_dfs = []
@@ -117,9 +136,16 @@ class NFLDataLoader:
         self.weekly['team_spread'] = pd.to_numeric(self.weekly['team_spread'], errors='coerce').fillna(0)
         self.weekly['implied_team_total'] = pd.to_numeric(self.weekly['implied_team_total'], errors='coerce').fillna(22.0)
 
-        # Load advanced play-by-play features (PROE, explosive rates, pressure generation)
+        # Cache freshly fetched datasets
         try:
-            self.pbp_feats = get_advanced_pbp_features(self.seasons)
+            self.weekly.to_parquet(WEEKLY_CACHE_PATH, index=False)
+            self.schedules.to_parquet(SCHEDULES_CACHE_PATH, index=False)
+            print("Saved updated data to local parquet cache.")
+        except Exception as se:
+            print(f"Note caching datasets: {se}")
+
+        try:
+            self.pbp_feats = load_pbp_features(self.seasons)
             print("Advanced PBP features loaded successfully.")
         except Exception as e:
             print(f"Note loading PBP features: {e}")

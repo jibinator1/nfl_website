@@ -1,0 +1,13 @@
+{
+  "name": "nfl-analytics-hub",
+  "version": "2.0.0",
+  "description": "Interactive NFL statistics, volume x efficiency team rankings, matchup lab (H2H), and 18-week schedule explorer.",
+  "scripts": {
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
+    "start": "python run_app.py"
+  },
+  "keywords": ["nfl", "football", "analytics", "fastapi", "sports-stats"],
+  "author": "jibinator1",
+  "license": "MIT"
+}
