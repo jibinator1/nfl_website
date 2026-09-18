@@ -102,3 +102,53 @@ This repository is pre-configured for instant deployment on Vercel Serverless Fu
 Run either:
 * Double-click `deploy.bat` (Windows)
 * Run `npx vercel --prod` in the project directory
+---
+
+## 🍏 Daily Data Updates on Mac (Auto-Deploy to Vercel)
+
+Because Vercel serverless functions have a read-only filesystem and execution time limits, fresh NFL stats are pulled locally from your computer using [`daily_update.py`](daily_update.py) or [`daily_update.sh`](daily_update.sh). The script automatically fetches new games, recomputes the parquet cache, commits to GitHub, and triggers Vercel to automatically redeploy your live website!
+
+### 1. Initial Setup on Your Mac (One-Time)
+Open Terminal on your Mac and run:
+```bash
+# Clone the repository
+git clone https://github.com/jibinator1/nfl_website.git
+cd nfl_website
+
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Make runner script executable
+chmod +x daily_update.sh
+```
+
+### 2. Run Manually Whenever You Want Fresh Stats
+In your Mac Terminal, simply run:
+```bash
+./daily_update.sh
+```
+*(Or run `python3 daily_update.py`)*
+
+The script will automatically:
+1. Pull fresh weekly player stats, game scores, and spread/total lines via `nflreadpy`.
+2. Recompute team totals, weather, and rest adjustments.
+3. Update `api/data/weekly_cache.parquet` and `api/data/schedules_cache.parquet`.
+4. Run `git commit` and `git push origin main`.
+5. **Vercel automatically detects the push and redeploys your live website with the updated stats!**
+
+### 3. (Optional) Run Automatically Every Day via Mac Cron
+To have your Mac run the update and deploy to Vercel automatically every morning at 6:00 AM:
+
+1. Open your Mac Terminal and edit your crontab:
+   ```bash
+   crontab -e
+   ```
+2. Add this line (replace `/Users/yourusername/nfl_website` with your actual Mac folder path):
+   ```cron
+   0 6 * * * cd "/Users/yourusername/nfl_website" && ./daily_update.sh >> update.log 2>&1
+   ```
+3. Save and exit (`:wq` in vim). Your Mac will now keep your live Vercel site automatically updated with fresh NFL data every day!
