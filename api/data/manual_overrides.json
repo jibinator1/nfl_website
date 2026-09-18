@@ -1,0 +1,20 @@
+{
+  "trade_overrides": [
+    {
+      "player": "tank bigsby",
+      "player_id": "00-0038555",
+      "team": "PHI",
+      "expires_on": "2027-03-01",
+      "reason": "Recent trade/roster move to PHI"
+    }
+  ],
+  "injury_overrides": [
+    {
+      "player": "christian mccaffrey",
+      "status": "ACTIVE",
+      "expires_on": "2027-01-01",
+      "reason": "Active for 2026 season, cleared from 2025 historical injury report list"
+    }
+  ],
+  "player_blacklist": []
+}

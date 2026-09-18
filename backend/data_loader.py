@@ -16,7 +16,20 @@ import nflreadpy as nfl
 
 from backend.pbp_features import load_pbp_features
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+# Determine data directory (check api/data first for Vercel, then root data/)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CANDIDATE_DATA_DIRS = [
+    os.path.join(ROOT_DIR, 'api', 'data'),
+    os.path.join(ROOT_DIR, 'data'),
+    os.path.join(os.getcwd(), 'api', 'data'),
+    os.path.join(os.getcwd(), 'data'),
+]
+DATA_DIR = os.path.join(ROOT_DIR, 'data')
+for c in CANDIDATE_DATA_DIRS:
+    if os.path.exists(os.path.join(c, 'weekly_cache.parquet')):
+        DATA_DIR = c
+        break
+
 MANUAL_OVERRIDES_FILE = os.path.join(DATA_DIR, 'manual_overrides.json')
 WEEKLY_CACHE_PATH = os.path.join(DATA_DIR, 'weekly_cache.parquet')
 SCHEDULES_CACHE_PATH = os.path.join(DATA_DIR, 'schedules_cache.parquet')
@@ -58,7 +71,7 @@ class NFLDataLoader:
         # 1. Instant Cache Path (0.05s cold start on Vercel)
         if os.path.exists(WEEKLY_CACHE_PATH) and os.path.exists(SCHEDULES_CACHE_PATH):
             try:
-                print("Loading NFL data from local pre-baked cache...")
+                print(f"Loading NFL data from cache at {DATA_DIR}...")
                 self.weekly = pd.read_parquet(WEEKLY_CACHE_PATH)
                 self.schedules = pd.read_parquet(SCHEDULES_CACHE_PATH)
                 try:

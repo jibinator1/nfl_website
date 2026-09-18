@@ -64,12 +64,7 @@ def ensure_data_loaded():
 
 @app.on_event("startup")
 def startup_event():
-    print("=" * 60)
-    print("STARTING NFL ANALYTICS & MATCHUP HUB")
-    print("Data Source: nflreadpy (Zero API Keys Required)")
-    print("=" * 60)
-    engine.load_data()
-    print("Data loaded & analytics ready! Dashboard live at http://127.0.0.1:8000")
+    print("NFL Analytics Hub API initialized.")
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -79,11 +74,16 @@ async def favicon():
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
-    index_path = os.path.join(FRONTEND_DIR, "index.html")
-    if os.path.exists(index_path):
-        with open(index_path, "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    return HTMLResponse("<h1>Dashboard loading... please check frontend/index.html</h1>")
+    candidates = [
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html"),
+        os.path.join(FRONTEND_DIR, "index.html"),
+        "index.html",
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                return HTMLResponse(content=f.read())
+    return HTMLResponse("<h1>Dashboard loading... please refresh in a moment.</h1>")
 
 
 @app.get("/api/status")
