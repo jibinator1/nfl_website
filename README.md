@@ -144,14 +144,19 @@ The script will automatically:
 To have your Mac sync data and deploy to Vercel automatically every morning at 6:00 AM:
 
 #### Option A: Quick 1-Line Setup (Recommended - No Text Editor Needed)
-In your Mac terminal inside the `nfl_website` directory, paste this single command and press **Enter**:
-```bash
-(crontab -l 2>/dev/null; echo "0 6 * * * cd \"$PWD\" && ./daily_update.sh >> update.log 2>&1") | crontab -
-```
+1. **Navigate into your project folder first** (make sure your terminal prompt says `nfl_website %`, not `~ %`):
+   ```bash
+   cd nfl_website
+   ```
+2. Paste this single command and press **Enter**:
+   ```bash
+   (crontab -l 2>/dev/null | grep -v "daily_update.sh"; echo "0 6 * * * cd \"$PWD\" && ./daily_update.sh >> update.log 2>&1") | crontab -
+   ```
+   *(The `grep -v` ensures no duplicate entries are created if re-run).*
 
 #### Option B: Using `crontab -e` (Interactive `vi` Editor)
 If you prefer editing crontab manually:
-1. Run `crontab -e` in your terminal.
+1. Navigate into `nfl_website` and run `crontab -e` in your terminal.
 2. Press the **`i`** key to enter **INSERT** mode (you will see `-- INSERT --` at the bottom left).
 3. Paste the cron command:
    ```cron
@@ -164,7 +169,9 @@ To confirm your automated schedule is active:
 ```bash
 crontab -l
 ```
-You will see:
-`0 6 * * * cd "/Users/.../nfl_website" && ./daily_update.sh >> update.log 2>&1`
+You should see the path ending in your project folder:
+```
+0 6 * * * cd "/Users/yourusername/.../nfl_website" && ./daily_update.sh >> update.log 2>&1
+```
 
 Your Mac will now pull fresh stats and update Vercel automatically every morning at 6:00 AM!
