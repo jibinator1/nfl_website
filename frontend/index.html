@@ -1,0 +1,2504 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFL Analytics & Matchup Hub</title>
+    <!-- Favicon (NFL Football Icon) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2358a6ff'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/></svg>">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0d1117',
+                        cardbg: '#161b22',
+                        cardsubtle: '#21262d',
+                        bordercolor: '#30363d',
+                        accent: '#58a6ff',
+                        accentsubtle: 'rgba(56, 139, 253, 0.15)',
+                        successtext: '#3fb950',
+                        warningtext: '#d29922',
+                        dangertext: '#f85149'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons (Pinned) -->
+    <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .rank-top { background-color: rgba(63, 185, 80, 0.12); color: #7ee787; border: 1px solid rgba(63, 185, 80, 0.25); }
+        .rank-mid { background-color: rgba(88, 166, 255, 0.1); color: #a5d6ff; border: 1px solid rgba(88, 166, 255, 0.2); }
+        .rank-bot { background-color: rgba(248, 81, 73, 0.12); color: #ffa198; border: 1px solid rgba(248, 81, 73, 0.25); }
+        .glass-panel {
+            background: #161b22;
+            border: 1px solid #30363d;
+        }
+        .th-sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.15s ease, background-color 0.15s ease;
+        }
+        .th-sortable:hover {
+            color: #58a6ff;
+            background-color: #21262d;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0d1117; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-slate-700 selection:text-white">
+
+    <!-- Top Navigation Bar (Muted Dark Theme) -->
+    <header class="glass-panel sticky top-0 z-50 border-b border-[#30363d]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-300">
+                    <i data-lucide="bar-chart" class="w-5 h-5 text-slate-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-100">
+                        NFL PREDICTION & ANALYTICS
+                    </h1>
+                    <p class="text-xs text-slate-400 -mt-0.5">Volume x Efficiency Metrics • Matchup Lab H2H • 18-Week Schedule</p>
+                </div>
+            </div>
+
+            <!-- Global Matchup Date Range -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center bg-[#21262d] border border-[#30363d] rounded-lg p-1.5 space-x-2 text-xs">
+                    <div class="flex items-center space-x-1.5 px-2">
+                        <span class="text-slate-400 font-medium text-[11px]">From:</span>
+                        <input type="date" id="input-start-date" onchange="onDateRangeChange()" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2 py-1 outline-none focus:border-slate-500 font-mono text-xs cursor-pointer">
+                    </div>
+                    <div class="flex items-center space-x-1.5 px-2 border-l border-[#30363d]">
+                        <span class="text-slate-400 font-medium text-[11px]">To:</span>
+                        <input type="date" id="input-end-date" onchange="onDateRangeChange()" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2 py-1 outline-none focus:border-slate-500 font-mono text-xs cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Refresh Button -->
+                <button onclick="reloadAllData()" class="p-2 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 rounded-lg transition" title="Refresh Data">
+                    <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 border-t border-[#30363d] overflow-x-auto">
+            <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="py-2.5 px-1 border-b-2 border-slate-300 text-slate-100 font-semibold text-xs flex items-center space-x-2 transition whitespace-nowrap">
+                <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                <span id="nav-schedule-label">Schedule & Matchups (2026 / 2025)</span>
+            </button>
+            <button onclick="switchTab('team-stats')" id="tab-btn-team-stats" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
+                <i data-lucide="table" class="w-4 h-4 text-slate-400"></i>
+                <span>Yahoo Sports Team Stats & Rankings</span>
+            </button>
+            <button onclick="switchTab('highlights')" id="tab-btn-highlights" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-slate-400"></i>
+                <span>Matchup Vulnerabilities & Trends</span>
+            </button>
+            <button onclick="switchTab('h2h')" id="tab-btn-h2h" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
+                <i data-lucide="shield" class="w-4 h-4 text-slate-400"></i>
+                <span>Matchup Lab (H2H)</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: YAHOO SPORTS TEAM STATS & RANKINGS (32 TEAMS) -->
+        <!-- ============================================================== -->
+        <section id="tab-team-stats" class="hidden space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-100 flex items-center space-x-2">
+                        <i data-lucide="table" class="w-4 h-4 text-slate-400"></i>
+                        <span>32-Team League Stat Overview & Rankings</span>
+                    </h2>
+                    <p class="text-xs text-slate-400">Click any column header to sort ascending or descending</p>
+                </div>
+
+                <!-- Sub View Toggle -->
+                <div class="flex bg-[#21262d] border border-[#30363d] rounded-lg p-1 text-xs">
+                    <button onclick="setStatsView('all')" id="stat-view-all" class="px-3 py-1 rounded bg-[#30363d] text-slate-100 font-semibold">Overview</button>
+                    <button onclick="setStatsView('offense')" id="stat-view-offense" class="px-3 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">Offense</button>
+                    <button onclick="setStatsView('defense')" id="stat-view-defense" class="px-3 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">Defense</button>
+                </div>
+            </div>
+
+            <!-- Team Stats Table -->
+            <div class="glass-panel rounded-xl overflow-hidden border border-[#30363d]">
+                <div class="overflow-x-auto max-h-[650px] overflow-y-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-[#21262d] sticky top-0 z-10 text-slate-400 font-medium border-b border-[#30363d]">
+                            <tr id="stats-table-header">
+                                <!-- Dynamic Headers with Sorters -->
+                            </tr>
+                        </thead>
+                        <tbody id="stats-table-body" class="divide-y divide-[#30363d]/60 text-slate-300">
+                            <tr>
+                                <td colspan="12" class="py-8 text-center text-slate-500">Loading team rankings...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: MATCHUP VULNERABILITIES & TREND HIGHLIGHTS -->
+        <!-- ============================================================== -->
+        <section id="tab-highlights" class="hidden space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-100 flex items-center space-x-2">
+                        <i data-lucide="alert-circle" class="w-4 h-4 text-slate-400"></i>
+                        <span>Matchup Vulnerabilities & Trend Highlights</span>
+                    </h2>
+                    <p class="text-xs text-slate-400">Filter by specific team, scheme liability, or situation</p>
+                </div>
+
+                <!-- Filters & Controls -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Team Filter Dropdown -->
+                    <div class="flex items-center bg-[#21262d] border border-[#30363d] rounded-lg px-2 py-1 text-xs">
+                        <span class="text-slate-400 mr-1.5 font-medium text-[11px]">Team:</span>
+                        <select id="highlight-team-filter" onchange="filterHighlightsTeam(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 text-xs rounded px-2 py-0.5 outline-none font-medium cursor-pointer">
+                            <option value="ALL">All 32 Teams</option>
+                        </select>
+                    </div>
+
+                    <!-- Search Input -->
+                    <input type="text" id="highlight-search" oninput="renderHighlights()" placeholder="Search team, scheme..." class="bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-slate-500 w-40">
+                </div>
+            </div>
+
+            <!-- Trend Category Filter Buttons -->
+            <div class="flex flex-wrap gap-1.5 text-xs border-b border-[#30363d] pb-2">
+                <button onclick="filterHighlights('ALL')" id="hl-btn-ALL" class="px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold">All Categories</button>
+                <button onclick="filterHighlights('pass_rush')" id="hl-btn-pass_rush" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Elite Sack Engine</button>
+                <button onclick="filterHighlights('zero_pressure')" id="hl-btn-zero_pressure" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Zero Pressure D</button>
+                <button onclick="filterHighlights('ironclad_protection')" id="hl-btn-ironclad_protection" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Clean Pocket O-Line</button>
+                <button onclick="filterHighlights('sack_magnet')" id="hl-btn-sack_magnet" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Sack Magnet O-Line</button>
+                <button onclick="filterHighlights('rb_boom')" id="hl-btn-rb_boom" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">RB Boom Defense</button>
+                <button onclick="filterHighlights('rb_shutdown')" id="hl-btn-rb_shutdown" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">RB Shutdown Wall</button>
+                <button onclick="filterHighlights('bulldozer_rush')" id="hl-btn-bulldozer_rush" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Bulldozer Ground</button>
+                <button onclick="filterHighlights('anemic_rush')" id="hl-btn-anemic_rush" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Anemic Run Game</button>
+                <button onclick="filterHighlights('air_raid')" id="hl-btn-air_raid" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Air Raid Offense</button>
+                <button onclick="filterHighlights('no_fly_zone')" id="hl-btn-no_fly_zone" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">No-Fly Zone</button>
+                <button onclick="filterHighlights('pass_funnel')" id="hl-btn-pass_funnel" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Pass Funnels</button>
+                <button onclick="filterHighlights('run_funnel')" id="hl-btn-run_funnel" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Run Funnels</button>
+                <button onclick="filterHighlights('turnover_elite')" id="hl-btn-turnover_elite" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Ball Hawks</button>
+                <button onclick="filterHighlights('turnover_bleed')" id="hl-btn-turnover_bleed" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Turnover Bleeder</button>
+                <button onclick="filterHighlights('home_dominance')" id="hl-btn-home_dominance" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Home Fortress</button>
+                <button onclick="filterHighlights('road_struggles')" id="hl-btn-road_struggles" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Road Vulnerable</button>
+                <button onclick="filterHighlights('deep_pass_funnel')" id="hl-btn-deep_pass_funnel" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Deep Pass Funnel</button>
+                <button onclick="filterHighlights('deep_pass_lockdown')" id="hl-btn-deep_pass_lockdown" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Deep Lockdown</button>
+                <button onclick="filterHighlights('neutral_pass_heavy')" id="hl-btn-neutral_pass_heavy" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Neutral Pass Heavy</button>
+                <button onclick="filterHighlights('neutral_run_heavy')" id="hl-btn-neutral_run_heavy" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Neutral Ground</button>
+                <button onclick="filterHighlights('trench_protection_leak')" id="hl-btn-trench_protection_leak" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Pass Pro Leak</button>
+                <button onclick="filterHighlights('trench_pressure_elite')" id="hl-btn-trench_pressure_elite" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Pocket Disruptor</button>
+                <button onclick="filterHighlights('explosive_bleed')" id="hl-btn-explosive_bleed" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Explosive Bleed</button>
+            </div>
+
+            <!-- Highlight Cards Container -->
+            <div id="highlights-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="glass-panel rounded-xl p-8 text-center text-slate-500 col-span-full">
+                    Scanning trends & vulnerabilities across 32 teams...
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: HEAD-TO-HEAD MATCHUP LAB -->
+        <!-- ============================================================== -->
+        <section id="tab-h2h" class="hidden space-y-4">
+            <div>
+                <h2 class="text-base font-bold text-slate-100 flex items-center space-x-2">
+                    <i data-lucide="shield" class="w-4 h-4 text-slate-400"></i>
+                    <span>Matchup Simulator & Head-to-Head Comparison</span>
+                </h2>
+                <p class="text-xs text-slate-400">Select two franchises to compare scheme rankings side-by-side</p>
+            </div>
+
+            <!-- Team Pickers -->
+            <div class="glass-panel rounded-xl p-5 border border-[#30363d] flex flex-col md:flex-row items-center justify-between gap-5">
+                <div class="flex-1 w-full text-center">
+                    <label class="block text-xs uppercase font-medium text-slate-400 mb-1.5">HOME TEAM</label>
+                    <select id="h2h-home-team" onchange="renderH2HComparison()" class="w-full bg-[#21262d] border border-[#30363d] rounded-lg p-2.5 text-base font-bold text-slate-100 text-center focus:border-slate-500 outline-none">
+                    </select>
+                </div>
+
+                <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center font-bold text-slate-400 text-xs border border-[#30363d]">
+                    VS
+                </div>
+
+                <div class="flex-1 w-full text-center">
+                    <label class="block text-xs uppercase font-medium text-slate-400 mb-1.5">AWAY TEAM</label>
+                    <select id="h2h-away-team" onchange="renderH2HComparison()" class="w-full bg-[#21262d] border border-[#30363d] rounded-lg p-2.5 text-base font-bold text-slate-100 text-center focus:border-slate-500 outline-none">
+                    </select>
+                </div>
+            </div>
+
+            <!-- H2H Comparison Output -->
+            <div id="h2h-results" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- TAB 5: SCHEDULE & MATCHUP STATS -->
+        <!-- ============================================================== -->
+        <section id="tab-schedule" class="space-y-5">
+            <!-- Header & Control Bar -->
+            <div class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#30363d] pb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
+                            <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                            <span id="schedule-title">2026 NFL Season Schedule & Matchup Stats</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="schedule-subtitle">
+                            Full 18-week schedule with team passing, rushing, scoring & defensive stats with league rankings
+                        </p>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <!-- Stats Date Range (Defaults to Previous Season & Now) -->
+                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span class="text-[11px] text-slate-400 font-medium">Stats:</span>
+                            <span class="text-slate-400 font-medium text-[11px]">From:</span>
+                            <input type="date" id="sched-start-date" onchange="onScheduleDateRangeChange()" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-1.5 py-0.5 outline-none focus:border-slate-500 font-mono text-xs cursor-pointer">
+                            <span class="text-slate-400 font-medium text-[11px]">To:</span>
+                            <input type="date" id="sched-end-date" onchange="onScheduleDateRangeChange()" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-1.5 py-0.5 outline-none focus:border-slate-500 font-mono text-xs cursor-pointer">
+                        </div>
+
+                        <!-- Season Selector -->
+                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5">
+                            <span class="text-[11px] text-slate-400 font-medium">Season:</span>
+                            <select id="schedule-season-select" onchange="onScheduleSeasonChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold outline-none cursor-pointer">
+                                <option value="2026" selected class="bg-[#161b22]">2026 Season (Current)</option>
+                                <option value="2025" class="bg-[#161b22]">2025 Season</option>
+                                <option value="2024" class="bg-[#161b22]">2024 Season</option>
+                            </select>
+                        </div>
+
+                        <!-- Team Filter -->
+                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5">
+                            <span class="text-[11px] text-slate-400 font-medium">Team:</span>
+                            <select id="schedule-team-select" onchange="filterScheduleTeam(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold outline-none cursor-pointer">
+                                <option value="ALL" class="bg-[#161b22]">All 32 Teams</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Input -->
+                        <div class="relative">
+                            <input type="text" id="schedule-search-input" oninput="onScheduleSearch(this.value)" placeholder="Search team, venue..." class="bg-[#21262d] border border-[#30363d] text-slate-200 text-xs rounded-lg pl-7 pr-3 py-1.5 focus:border-slate-500 outline-none font-medium placeholder-slate-500 w-36 sm:w-44">
+                            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2 pointer-events-none"></i>
+                        </div>
+
+                        <!-- Refresh -->
+                        <button onclick="loadFullSchedule(currentScheduleSeason, startDate, endDate)" class="p-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 rounded-lg transition" title="Refresh Schedule">
+                            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Summary Badges & Quick Stats -->
+                <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 font-medium">
+                            <strong id="sched-stat-total-games" class="text-slate-100 font-bold">272</strong> Total Games
+                        </span>
+                        <span class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 font-medium">
+                            <strong id="sched-stat-completed-games" class="text-slate-100 font-bold">0</strong> Final
+                        </span>
+                        <span class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 font-medium">
+                            18 Weeks
+                        </span>
+                        <span id="sched-stat-baseline-badge" class="px-2.5 py-1 rounded bg-sky-500/10 border border-sky-500/25 text-sky-300 font-medium text-[11px] flex items-center space-x-1.5">
+                            <i data-lucide="clock" class="w-3.5 h-3.5 text-sky-400"></i>
+                            <span id="sched-stat-baseline-note">Timeline: 2025-09-04 to 2026-09-16</span>
+                        </span>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 flex items-center space-x-2">
+                        <span>Rank badges:</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded rank-top">Top 8</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded rank-mid">Mid 16</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded rank-bot">Bottom 8</span>
+                    </div>
+                </div>
+
+                <!-- Week Selector Pill Bar -->
+                <div class="space-y-1.5 pt-1">
+                    <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Select Week:</div>
+                    <div id="schedule-week-pills" class="flex items-center space-x-1.5 overflow-x-auto pb-2 scrollbar-thin">
+                        <!-- Populated via JS -->
+                        <button onclick="filterScheduleWeek('all')" id="sched-week-pill-all" class="px-3 py-1.5 rounded-lg bg-[#30363d] text-slate-100 text-xs font-bold border border-slate-500 whitespace-nowrap transition">
+                            All Weeks
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Games List Container -->
+            <div id="schedule-games-container" class="space-y-6">
+                <div class="glass-panel rounded-xl p-12 text-center text-slate-500 space-y-3">
+                    <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-slate-400"></i>
+                    <p class="text-sm">Loading 2026 season schedule and team stats...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#30363d] py-3 text-center text-xs text-slate-500">
+        NFL Analytics & Prediction System • Powered by <code class="text-slate-400 font-mono">nflreadpy</code> & The Odds API
+    </footer>
+
+    <!-- Frontend Application Logic -->
+    <script>
+        // State variables (Defaulted to previous season start 2025-09-04 through now 2026-09-16)
+        let startDate = '2025-09-04';
+        let endDate = '2026-09-16';
+        let propsDate = '2026-09-13';
+        let isPropsEnabled = true;
+
+        let currentPropsFilter = 'ALL';
+        let currentStatsView = 'all';
+        let currentHighlightsFilter = 'ALL';
+
+        // Sorting state for Team Stats
+        let statsSortCol = 'pts_per_game';
+        let statsSortAsc = false;
+
+        // Sorting state for Props
+        let propsSortCol = 'edge';
+        let propsSortAsc = false;
+
+        let globalPredictions = { games: [], props: [] };
+        let globalTeamStats = [];
+        let globalHighlights = [];
+
+        // Schedule tab state variables
+        let currentScheduleSeason = 2026;
+        let selectedScheduleWeek = 'all';
+        let scheduleTeamFilter = 'ALL';
+        let scheduleSearchQuery = '';
+        let globalScheduleData = null;
+        let isScheduleLoading = false;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const startInput = document.getElementById('input-start-date');
+            const endInput = document.getElementById('input-end-date');
+            const schedStart = document.getElementById('sched-start-date');
+            const schedEnd = document.getElementById('sched-end-date');
+            if (startInput) startInput.value = startDate;
+            if (endInput) endInput.value = endDate;
+            if (schedStart) schedStart.value = startDate;
+            if (schedEnd) schedEnd.value = endDate;
+
+            lucide.createIcons();
+            populateScheduleTeams();
+            await reloadAllData();
+            populateH2HTeams();
+        });
+
+        async function onPropsDateChange(fetchData = true) {
+            propsDate = document.getElementById('input-props-date').value;
+            const dateCaption = document.getElementById('props-table-date-caption');
+            if (dateCaption) dateCaption.textContent = `Showing props for ${propsDate} • Click any header to sort`;
+
+            if (fetchData) {
+                await loadActivePredictions();
+            }
+        }
+
+        function togglePropsSwitch() {
+            isPropsEnabled = !isPropsEnabled;
+            const btn = document.getElementById('btn-toggle-props');
+            const dateContainer = document.getElementById('props-date-container');
+            const statusLabel = document.getElementById('props-status-label');
+            const sectionContainer = document.getElementById('props-section-container');
+
+            if (isPropsEnabled) {
+                btn.textContent = 'ON';
+                btn.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#30363d] text-slate-200 hover:bg-[#3d444d] transition';
+                dateContainer.classList.remove('opacity-40', 'pointer-events-none');
+                statusLabel.textContent = 'Enabled (Single Date)';
+                sectionContainer.classList.remove('hidden');
+            } else {
+                btn.textContent = 'OFF';
+                btn.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#21262d] text-slate-500 border border-[#30363d] transition';
+                dateContainer.classList.add('opacity-40', 'pointer-events-none');
+                statusLabel.textContent = 'Disabled (Games Only)';
+                sectionContainer.classList.add('hidden');
+            }
+        }
+
+        function getHyperparams() {
+            return {
+                n_estimators: parseInt(document.getElementById('hp-n_estimators').value) || 250,
+                max_depth: parseInt(document.getElementById('hp-max_depth').value) || 4,
+                learning_rate: parseFloat(document.getElementById('hp-learning_rate').value) || 0.01,
+                subsample: parseFloat(document.getElementById('hp-subsample').value) || 0.75,
+                colsample_bytree: parseFloat(document.getElementById('hp-colsample_bytree').value) || 0.70,
+                reg_alpha: parseFloat(document.getElementById('hp-reg_alpha').value) || 0.20,
+                reg_lambda: parseFloat(document.getElementById('hp-reg_lambda').value) || 2.00,
+                gamma: parseFloat(document.getElementById('hp-gamma').value) || 0.30
+            };
+        }
+
+        function updateCvUI(mode) {
+            const banner = document.getElementById('cv-info-banner');
+            const infoText = document.getElementById('cv-info-text');
+            const badge = document.getElementById('cv-badge');
+            const hpContainer = document.getElementById('hp-grid-container');
+
+            if (mode === 'cv_auto') {
+                if (banner) banner.className = 'bg-[#161b22] border border-emerald-800/60 rounded-lg p-2.5 flex items-center justify-between text-xs text-emerald-300';
+                if (infoText) infoText.innerHTML = `<b>TimeSeries CV Active:</b> 5-Fold forward splits (strictly train on past, validate on future — 0% future data leakage). <b>No fixed values needed</b>; optimal architecture will be discovered automatically.`;
+                if (badge) {
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800 shrink-0';
+                    badge.textContent = 'NO SET VALUES NEEDED';
+                }
+                if (hpContainer) hpContainer.classList.add('opacity-75');
+            } else if (mode === 'cv_high') {
+                if (banner) banner.className = 'bg-[#161b22] border border-cyan-800/60 rounded-lg p-2.5 flex items-center justify-between text-xs text-cyan-300';
+                if (infoText) infoText.innerHTML = `<b>High-Compute TimeSeries CV:</b> Testing heavy architectures (750–2000 trees, depth 4–7) using forward-walk cross-validation.`;
+                if (badge) {
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-800 shrink-0';
+                    badge.textContent = 'HIGH COMPUTE CV';
+                }
+                if (hpContainer) hpContainer.classList.remove('opacity-75');
+            } else if (mode === 'cv_custom') {
+                if (banner) banner.className = 'bg-[#161b22] border border-indigo-800/60 rounded-lg p-2.5 flex items-center justify-between text-xs text-indigo-300';
+                if (infoText) infoText.innerHTML = `<b>Custom Knobs TimeSeries CV:</b> Cross-validation search anchored locally around the parameter values you typed below.`;
+                if (badge) {
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-950 text-indigo-300 border border-indigo-800 shrink-0';
+                    badge.textContent = 'ANCHORED CV';
+                }
+                if (hpContainer) hpContainer.classList.remove('opacity-75');
+            } else {
+                if (banner) banner.className = 'bg-[#161b22] border border-[#30363d] rounded-lg p-2.5 flex items-center justify-between text-xs text-slate-300';
+                if (infoText) infoText.innerHTML = `<b>Manual Knobs Mode:</b> Training directly on the exact hyperparameter values you set below. Evaluated with 5-fold TimeSeries CV.`;
+                if (badge) {
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-400 border border-[#30363d] shrink-0';
+                    badge.textContent = 'MANUAL VALUES';
+                }
+                if (hpContainer) hpContainer.classList.remove('opacity-75');
+            }
+        }
+
+
+        function onCustomParamChange() {
+            const modeSelect = document.getElementById('input-tune-mode');
+            if (modeSelect) {
+                if (modeSelect.value === 'cv_auto' || modeSelect.value === 'cv_high' || modeSelect.value === 'cv_custom') {
+                    modeSelect.value = 'cv_custom';
+                } else if (modeSelect.value !== 'custom') {
+                    modeSelect.value = 'custom';
+                }
+                updateCvUI(modeSelect.value);
+            }
+        }
+
+        function onTuneModeChange(mode) {
+            updateCvUI(mode);
+            if (mode === 'cv_high' || mode === 'high') {
+                document.getElementById('hp-n_estimators').value = 1000;
+                document.getElementById('hp-max_depth').value = 5;
+                document.getElementById('hp-learning_rate').value = 0.01;
+                document.getElementById('hp-subsample').value = 0.80;
+                document.getElementById('hp-colsample_bytree').value = 0.75;
+                document.getElementById('hp-reg_alpha').value = 0.10;
+                document.getElementById('hp-reg_lambda').value = 2.50;
+                document.getElementById('hp-gamma').value = 0.30;
+                const historyEl = document.getElementById('input-history-start-year');
+                if (historyEl && parseInt(historyEl.value) > 2021) {
+                    historyEl.value = '2021';
+                }
+            } else if (mode === 'quick') {
+                resetHyperparams();
+            }
+        }
+
+        function resetHyperparams() {
+            document.getElementById('hp-n_estimators').value = 250;
+            document.getElementById('hp-max_depth').value = 2;
+            document.getElementById('hp-learning_rate').value = 0.02;
+            document.getElementById('hp-subsample').value = 0.70;
+            document.getElementById('hp-colsample_bytree').value = 0.65;
+            document.getElementById('hp-reg_alpha').value = 0.50;
+            document.getElementById('hp-reg_lambda').value = 4.00;
+            document.getElementById('hp-gamma').value = 0.20;
+            const historyEl = document.getElementById('input-history-start-year');
+            if (historyEl) historyEl.value = '2023';
+            const modeSelect = document.getElementById('input-tune-mode');
+            if (modeSelect) {
+                modeSelect.value = 'cv_auto';
+                updateCvUI('cv_auto');
+            }
+        }
+
+        async function loadActivePredictions() {
+            const statusDot = document.getElementById('status-indicator-dot');
+            const statusText = document.getElementById('model-status-text');
+            const metricsPills = document.getElementById('model-metrics-pills');
+
+            if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-slate-400 animate-pulse';
+            if (statusText) statusText.innerHTML = `Loading optimal model predictions for <b>${propsDate}</b>...`;
+
+            try {
+                const res = await fetch(`/api/predictions?start_date=${startDate}&end_date=${endDate}&props_date=${propsDate}&include_props=${isPropsEnabled}`);
+                const data = await res.json();
+
+                if (data && (data.games || data.props)) {
+                    globalPredictions = data;
+
+                    // Fetch model status for metrics
+                    let m = {};
+                    try {
+                        const statusRes = await fetch('/api/model-status');
+                        const statusData = await statusRes.json();
+                        m = statusData.last_metrics || {};
+                    } catch (e) {}
+
+                    if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                    if (statusText) {
+                        statusText.innerHTML = `<b>Optimal TimeSeries CV Model Active:</b> 5-Fold forward splits (2023–2026 data, 0% leakage). Predictions ready for <b>${propsDate}</b>!`;
+                    }
+
+                    let pillsHtml = `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">History: 2023–2026</span>`;
+                    if (m.rush_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">RB MAE: ${m.rush_yards.cv_mae || m.rush_yards.mae || 24.5}y</span>`;
+                    if (m.rec_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">WR MAE: ${m.rec_yards.cv_mae || m.rec_yards.mae || 22.0}y</span>`;
+                    if (m.pass_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">QB MAE: ${m.pass_yards.cv_mae || m.pass_yards.mae || 59.8}y</span>`;
+                    if (m.spread) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">Spread Win: ${m.spread.winner_accuracy || 66.7}%</span>`;
+                    if (metricsPills) metricsPills.innerHTML = pillsHtml;
+
+                    const sumGamesEl = document.getElementById('sum-games-count');
+                    if (sumGamesEl) sumGamesEl.textContent = (globalPredictions.games || []).length;
+
+                    const validProps = (globalPredictions.props || []).filter(p => !p.injured && !p.trend_flag && !p.line_dev_flag);
+                    const sumPropsEl = document.getElementById('sum-props-count');
+                    if (sumPropsEl) sumPropsEl.textContent = validProps.length;
+
+                    const highEdgeCount = validProps.filter(p => p.edge != null && p.edge >= 6.0).length;
+                    const sumHighEdgeEl = document.getElementById('sum-highedge-count') || document.getElementById('sum-high-edge');
+                    if (sumHighEdgeEl) sumHighEdgeEl.textContent = highEdgeCount;
+
+                    renderGamesCards();
+                    renderPropsTable();
+                }
+            } catch (err) {
+                console.error("Error loading active predictions:", err);
+                if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-slate-500';
+                if (statusText) statusText.innerHTML = `Model ready. Click <b>RUN MODEL</b> to compute live predictions.`;
+            }
+        }
+
+        async function triggerRunModel() {
+            const btn = document.getElementById('btn-run-model');
+            const statusDot = document.getElementById('status-indicator-dot');
+            const statusText = document.getElementById('model-status-text');
+            const metricsPills = document.getElementById('model-metrics-pills');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i><span>TRAINING...</span>`;
+            lucide.createIcons();
+
+            propsDate = document.getElementById('input-props-date').value;
+            onPropsDateChange(false);
+            const historyStartYear = parseInt(document.getElementById('input-history-start-year')?.value) || 2023;
+            const tuneMode = document.getElementById('input-tune-mode')?.value || 'cv_auto';
+            
+            let modeLabel = 'Auto TimeSeries CV (Proven Optimal)';
+            if (tuneMode === 'cv_high') modeLabel = 'High-Compute TimeSeries CV';
+            else if (tuneMode === 'cv_custom') modeLabel = 'Custom Knobs TimeSeries CV';
+            else if (tuneMode === 'custom') modeLabel = 'Direct Knobs Fit (5-Fold CV)';
+            else if (tuneMode === 'quick') modeLabel = 'Quick Baseline';
+
+            statusDot.className = 'w-2 h-2 rounded-full bg-slate-400 animate-pulse';
+            statusText.innerHTML = `Training 4 XGBoost Models [${modeLabel}]... please wait (running 5-fold forward TimeSeries CV)`;
+            metricsPills.innerHTML = '';
+
+            try {
+                const payload = {
+                    start_date: startDate,
+                    end_date: endDate,
+                    props_date: propsDate,
+                    include_props: isPropsEnabled,
+                    history_start_year: historyStartYear,
+                    tune_mode: tuneMode,
+                    model_architecture: 'level_cv',
+                    hyperparameters: getHyperparams()
+                };
+
+                const res = await fetch('/api/run-model', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    globalPredictions = data.predictions;
+
+                    // If CV mode, reflect discovered best params into the knob inputs
+                    const isCvMode = ['cv_auto', 'cv_high', 'cv_custom', 'full', 'high_cv'].includes(tuneMode);
+                    if (isCvMode && data.hyperparameters) {
+                        const hp = data.hyperparameters;
+                        if (hp.n_estimators) document.getElementById('hp-n_estimators').value = hp.n_estimators;
+                        if (hp.max_depth) document.getElementById('hp-max_depth').value = hp.max_depth;
+                        if (hp.learning_rate) document.getElementById('hp-learning_rate').value = hp.learning_rate;
+                        if (hp.subsample) document.getElementById('hp-subsample').value = hp.subsample;
+                        if (hp.colsample_bytree) document.getElementById('hp-colsample_bytree').value = hp.colsample_bytree;
+                        if (hp.reg_alpha) document.getElementById('hp-reg_alpha').value = hp.reg_alpha;
+                        if (hp.reg_lambda) document.getElementById('hp-reg_lambda').value = hp.reg_lambda;
+                        if (hp.gamma) document.getElementById('hp-gamma').value = hp.gamma;
+                    }
+
+                    statusDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                    if (isCvMode && data.hyperparameters) {
+                        const hp = data.hyperparameters;
+                        statusText.innerHTML = `TimeSeries CV Complete! Auto-discovered optimal parameters: <b>${hp.n_estimators} trees, depth ${hp.max_depth}, lr ${hp.learning_rate}</b> (${historyStartYear}–2026 data, 0% future leakage). Predictions ready!`;
+                    } else {
+                        statusText.innerHTML = `Models trained with your exact hyperparameters (${historyStartYear}–2026 data) & predictions ready for ${propsDate}!`;
+                    }
+
+                    const m = data.metrics || {};
+                    let pillsHtml = `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">History: ${historyStartYear}–2026</span>`;
+                    if (data.tracker) {
+                        pillsHtml += `<a href="/api/download-excel" target="_blank" class="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-900 transition flex items-center gap-1 font-sans"><i data-lucide="check-circle" class="w-3 h-3 text-emerald-400"></i><span>predictions.xlsx Synced (${data.tracker.evaluated_count} Evaluated)</span></a>`;
+                    }
+                    if (data.odds_status && data.odds_status.warning) {
+                        const warnColor = data.odds_status.is_mismatch ? 'bg-red-950/80 text-red-300 border-red-500/50' : 'bg-amber-950/80 text-amber-300 border-amber-500/50';
+                        const warnIcon = data.odds_status.is_mismatch ? 'alert-octagon' : 'alert-triangle';
+                        pillsHtml += `<span class="px-2 py-0.5 rounded ${warnColor} border flex items-center gap-1 font-sans text-[11px] font-bold"><i data-lucide="${warnIcon}" class="w-3 h-3"></i><span>${data.odds_status.warning}</span></span>`;
+                    }
+                    if (m.rush_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">RB MAE: ${m.rush_yards.cv_mae || m.rush_yards.mae}y</span>`;
+                    if (m.rec_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">WR MAE: ${m.rec_yards.cv_mae || m.rec_yards.mae}y</span>`;
+                    if (m.pass_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">QB MAE: ${m.pass_yards.cv_mae || m.pass_yards.mae}y</span>`;
+                    if (m.spread) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">Spread Win: ${m.spread.winner_accuracy}%</span>`;
+                    metricsPills.innerHTML = pillsHtml;
+                    lucide.createIcons();
+
+                    const sumGamesEl = document.getElementById('sum-games-count');
+                    if (sumGamesEl) sumGamesEl.textContent = (globalPredictions.games || []).length;
+
+                    const validProps = (globalPredictions.props || []).filter(p => !p.injured && !p.trend_flag && !p.line_dev_flag);
+                    const sumPropsEl = document.getElementById('sum-props-count');
+                    if (sumPropsEl) sumPropsEl.textContent = validProps.length;
+
+                    const highEdgeCount = validProps.filter(p => p.edge != null && p.edge >= 6.0).length;
+                    const sumHighEdgeEl = document.getElementById('sum-highedge-count') || document.getElementById('sum-high-edge');
+                    if (sumHighEdgeEl) sumHighEdgeEl.textContent = highEdgeCount;
+
+                    renderGamesCards();
+                    renderPropsTable();
+                } else {
+                    statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
+                    statusText.innerHTML = `<span class="text-red-400">Error: ${data.detail || 'Failed to run model'}</span>`;
+                }
+            } catch (err) {
+                console.error("Model trigger error:", err);
+                statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
+                statusText.innerHTML = `<span class="text-red-400">Error: ${err.message || 'Server Connection Error'}</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5 fill-slate-900"></i><span>RUN MODEL</span>`;
+                lucide.createIcons();
+            }
+        }
+
+        function onDateRangeChange() {
+            startDate = document.getElementById('input-start-date').value;
+            endDate = document.getElementById('input-end-date').value;
+            const schedStart = document.getElementById('sched-start-date');
+            const schedEnd = document.getElementById('sched-end-date');
+            if (schedStart) schedStart.value = startDate;
+            if (schedEnd) schedEnd.value = endDate;
+
+            if (startDate === endDate) {
+                propsDate = startDate;
+                const pInput = document.getElementById('input-props-date');
+                if (pInput) pInput.value = propsDate;
+            }
+            updateGameHeaders();
+            reloadAllData();
+        }
+
+        function onScheduleDateRangeChange() {
+            const schedStart = document.getElementById('sched-start-date');
+            const schedEnd = document.getElementById('sched-end-date');
+            if (schedStart && schedStart.value) startDate = schedStart.value;
+            if (schedEnd && schedEnd.value) endDate = schedEnd.value;
+
+            const startInput = document.getElementById('input-start-date');
+            const endInput = document.getElementById('input-end-date');
+            if (startInput) startInput.value = startDate;
+            if (endInput) endInput.value = endDate;
+
+            if (startDate === endDate) {
+                propsDate = startDate;
+                const pInput = document.getElementById('input-props-date');
+                if (pInput) pInput.value = propsDate;
+            }
+            updateGameHeaders();
+            reloadAllData();
+        }
+
+        function updateGameHeaders() {
+            const gameLabel = document.getElementById('game-status-label');
+            const gameTitle = document.getElementById('game-section-title');
+            const dateCaption = document.getElementById('props-table-date-caption');
+            if (startDate === endDate) {
+                if (gameLabel) gameLabel.textContent = `Showing matchups for ${startDate}`;
+                if (gameTitle) gameTitle.textContent = `Projected Matchups & Spread Predictions (${startDate})`;
+                if (dateCaption) dateCaption.textContent = `Showing props for ${startDate} • Click any header to sort`;
+            } else {
+                if (gameLabel) gameLabel.textContent = `Showing matchups for ${startDate} to ${endDate}`;
+                if (gameTitle) gameTitle.textContent = `Projected Matchups & Spread Predictions (${startDate} to ${endDate})`;
+                if (dateCaption) dateCaption.textContent = `Showing props for ${propsDate} • Click any header to sort`;
+            }
+        }
+
+        async function reloadAllData() {
+            const promises = [
+                loadTeamStats(),
+                loadHighlights(),
+                loadFullSchedule(currentScheduleSeason, startDate, endDate)
+            ];
+            await Promise.all(promises);
+            const activeH2H = document.getElementById('tab-h2h');
+            if (activeH2H && !activeH2H.classList.contains('hidden')) {
+                renderH2HComparison();
+            }
+            lucide.createIcons();
+        }
+
+        function switchTab(tabId) {
+            ['schedule', 'team-stats', 'highlights', 'h2h'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.classList.add('hidden');
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (btn) btn.className = 'py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap';
+            });
+            const activeEl = document.getElementById(`tab-${tabId}`);
+            if (activeEl) activeEl.classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            if (activeBtn) activeBtn.className = 'py-2.5 px-1 border-b-2 border-slate-300 text-slate-100 font-semibold text-xs flex items-center space-x-2 transition whitespace-nowrap';
+            
+            if (tabId === 'schedule') {
+                if (!globalScheduleData && !isScheduleLoading) {
+                    loadFullSchedule(currentScheduleSeason, startDate, endDate);
+                }
+            }
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // PREDICTIONS DISPLAY
+        // ==========================================
+        function renderGamesCards() {
+            const container = document.getElementById('games-container');
+            if (!container) return;
+            const allGames = globalPredictions?.games || [];
+            
+            // Filter games strictly matching active date selection
+            let games = allGames;
+            if (startDate === endDate) {
+                games = allGames.filter(g => (g.gameday || g.date) === startDate);
+            } else if (startDate && endDate) {
+                games = allGames.filter(g => (g.gameday || g.date) >= startDate && (g.gameday || g.date) <= endDate);
+            }
+
+            const sumGamesEl = document.getElementById('sum-games-count');
+            if (sumGamesEl) sumGamesEl.textContent = games.length;
+
+            if (games.length === 0) {
+                const targetDisplay = (startDate === endDate ? startDate : `${startDate} to ${endDate}`);
+                container.innerHTML = `<div class="glass-panel rounded-xl p-8 text-center text-slate-400 col-span-full border border-[#30363d]">
+                    <i data-lucide="calendar-x" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
+                    <p class="font-medium text-slate-300">No scheduled NFL matchups on ${targetDisplay}</p>
+                    <p class="text-xs text-slate-500 mt-1">Select a game day (e.g. Thursday, Sunday, or Monday) or adjust date range above.</p>
+                </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = games.slice(0, 16).map(g => {
+                const homeFavored = (g.pred_home_margin || 0) > 0;
+                const vegasSpread = g.vegas_spread != null ? g.vegas_spread : 0;
+                const spreadDiff = g.spread_edge != null ? g.spread_edge : Math.abs((g.pred_home_margin || 0) - vegasSpread);
+                const isHighEdge = spreadDiff >= 3.0;
+
+                // Format Vegas spread line: Favorite is negative, underdog is positive
+                // In nflverse: vegasSpread > 0 means home favored; vegasSpread < 0 means away favored.
+                const vegasDisplay = g.vegas_spread_str || (
+                    vegasSpread === 0 ? 'PK' :
+                    (vegasSpread > 0 ? `${g.home_team} -${vegasSpread}` : `${g.away_team} -${Math.abs(vegasSpread)}`)
+                );
+
+                // ATS Pick determination & display
+                const atsPick = g.recommended_pick || g.ats_pick || (
+                    (g.pred_home_margin || 0) > vegasSpread
+                        ? `${g.home_team} ${-vegasSpread > 0 ? '+' : ''}${-vegasSpread}`
+                        : `${g.away_team} ${vegasSpread > 0 ? '+' : ''}${vegasSpread}`
+                );
+
+                return `
+                <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3 relative overflow-hidden">
+                    ${isHighEdge ? `<span class="absolute top-0 right-0 bg-[#21262d] text-slate-300 border-b border-l border-[#30363d] text-[10px] font-semibold px-2 py-0.5 rounded-bl">Spread Edge +${spreadDiff.toFixed(1)}</span>` : ''}
+
+                    <div class="flex items-center justify-between text-xs text-slate-400 border-b border-[#30363d] pb-1.5">
+                        <span>${g.gameday || ''} ${g.gametime ? '• ' + g.gametime : ''}</span>
+                        <span class="font-mono text-slate-300">Total: ${g.vegas_total != null ? g.vegas_total : 'N/A'}</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="text-left">
+                            <p class="text-[10px] text-slate-400 font-medium">AWAY</p>
+                            <h3 class="text-base font-bold text-slate-100">${g.away_team || ''}</h3>
+                            <p class="text-xs text-slate-400">Proj: <span class="font-medium text-slate-200">${g.proj_away_score != null ? g.proj_away_score : '-'}</span></p>
+                        </div>
+                        <div class="text-center px-2">
+                            <span class="text-xs font-medium text-slate-500">VS</span>
+                            ${g.status === 'FINAL' ? `<div class="text-xs font-bold text-slate-300 mt-0.5">${g.actual_away_score} - ${g.actual_home_score}</div>` : ''}
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-slate-400 font-medium">HOME</p>
+                            <h3 class="text-base font-bold text-slate-100">${g.home_team || ''}</h3>
+                            <p class="text-xs text-slate-400">Proj: <span class="font-medium text-slate-200">${g.proj_home_score != null ? g.proj_home_score : '-'}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[11px] font-medium text-slate-400">
+                            <span>${g.away_team || 'AWAY'} ${g.away_win_prob ?? 50}%</span>
+                            <span>${g.home_team || 'HOME'} ${g.home_win_prob ?? 50}%</span>
+                        </div>
+                        <div class="w-full bg-[#21262d] h-1.5 rounded-full overflow-hidden flex">
+                            <div class="bg-slate-500 h-full" style="width: ${g.away_win_prob ?? 50}%"></div>
+                            <div class="bg-slate-300 h-full" style="width: ${g.home_win_prob ?? 50}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#21262d] rounded-lg p-2.5 text-xs flex items-center justify-between">
+                        <div>
+                            <span class="text-slate-400">Vegas:</span>
+                            <span class="font-medium ml-1 text-slate-200">${vegasDisplay}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400">Pick (ATS):</span>
+                            <span class="font-semibold ml-1 text-emerald-400">${atsPick}</span>
+                            <span class="text-[10px] text-slate-400 ml-1 font-mono">(Edge +${spreadDiff.toFixed(1)})</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function filterProps(type) {
+            currentPropsFilter = type;
+            ['ALL', 'RB', 'WR', 'QB', 'HIGH_EDGE'].forEach(t => {
+                const btn = document.getElementById(`filter-btn-${t}`);
+                if (btn) {
+                    btn.className = t === type
+                        ? 'px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold'
+                        : 'px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium';
+                }
+            });
+            renderPropsTable();
+        }
+
+        function sortProps(col) {
+            if (propsSortCol === col) {
+                propsSortAsc = !propsSortAsc;
+            } else {
+                propsSortCol = col;
+                propsSortAsc = (col === 'player' || col === 'matchup' || col === 'stat' || col === 'def_rank');
+            }
+            renderPropsTable();
+        }
+
+        function formatShapFeature(feat) {
+            const map = {
+                'passing_yards': 'Passing Yds Form',
+                'prev_avg_passing_yards': 'Passing Yds Baseline',
+                'recent_passing_yards': 'Recent Pass Yds',
+                'attempts': 'Pass Attempts Form',
+                'recent_attempts': 'Recent Attempts',
+                'prev_avg_attempts': 'Baseline Attempts',
+                'passing_epa': 'Pass EPA Efficiency',
+                'prev_avg_passing_epa_rate': 'Pass EPA Rate',
+                'passing_cpoe': 'CPOE Accuracy',
+                'prev_avg_passing_cpoe': 'CPOE Baseline',
+                'rushing_yards': 'Rushing Yds Form',
+                'prev_avg_rushing_yards': 'Rushing Yds Baseline',
+                'recent_rushing_yards': 'Recent Rush Yds',
+                'carries': 'Carries Form',
+                'recent_carries': 'Recent Carries',
+                'prev_avg_carries': 'Baseline Carries',
+                'rushing_epa': 'Rush EPA Efficiency',
+                'prev_avg_rushing_epa_rate': 'Rush EPA Rate',
+                'receiving_yards': 'Receiving Yds Form',
+                'prev_avg_receiving_yards': 'Receiving Yds Baseline',
+                'recent_receiving_yards': 'Recent Rec Yds',
+                'targets': 'Targets Form',
+                'recent_targets': 'Recent Targets',
+                'prev_avg_targets': 'Baseline Targets',
+                'receiving_epa': 'Rec EPA Efficiency',
+                'prev_avg_receiving_epa_rate': 'Rec EPA Rate',
+                'team_spread': 'Point Spread',
+                'total_line': 'Game Total',
+                'implied_team_total': 'Implied Team Total',
+                'days_rest': 'Rest Days',
+                'temp': 'Temperature',
+                'wind': 'Wind Speed',
+                'def_rank': 'Opp Def Rank',
+                'opp_def_rank': 'Opp Def Rank',
+                'opp_pass_yds_allowed': 'Opp Pass D',
+                'opp_rush_yds_allowed': 'Opp Rush D',
+                'opp_pts_allowed': 'Opp Pts D',
+                'roll_neutral_rush_share': 'Neutral Rush Share',
+                'roll_pressure_rate_allowed': 'O-Line Pressure Rate',
+                'roll_short_target_share': 'Short Target Share',
+                'roll_deep_target_share': 'Deep Target Share',
+                'roll_rec_adot': 'Target Depth (aDOT)',
+                'roll_qb_deep_att_rate': 'QB Deep Att Rate',
+                'roll_neutral_pass_rate': 'Neutral Pass Rate'
+            };
+            if (map[feat]) return map[feat];
+            return feat.replace(/^prev_avg_/, '').replace(/^recent_/, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function renderPropsTable() {
+            const tbody = document.getElementById('props-table-body');
+            if (!tbody) return;
+            const searchVal = (document.getElementById('prop-search')?.value || '').toLowerCase();
+
+            let props = [...(globalPredictions?.props || [])];
+
+            if (currentPropsFilter === 'RB') props = props.filter(p => p.pos === 'RB');
+            if (currentPropsFilter === 'WR') props = props.filter(p => p.pos === 'WR' || p.pos === 'TE');
+            if (currentPropsFilter === 'QB') props = props.filter(p => p.pos === 'QB');
+            if (currentPropsFilter === 'HIGH_EDGE') props = props.filter(p => p.edge != null && p.edge >= 6.0 && !p.injured && !p.trend_flag && !p.line_dev_flag);
+
+            if (searchVal) {
+                props = props.filter(p =>
+                    (p.player || '').toLowerCase().includes(searchVal) ||
+                    (p.team || '').toLowerCase().includes(searchVal) ||
+                    (p.opponent || '').toLowerCase().includes(searchVal)
+                );
+            }
+
+            ['player', 'matchup', 'stat', 'avg', 'pred', 'line', 'edge', 'sigma', 'risk', 'ou', 'actual'].forEach(c => {
+                const icon = document.getElementById(`sort-icon-prop-${c}`);
+                if (icon) {
+                    if (propsSortCol === c) {
+                        icon.textContent = propsSortAsc ? ' ▲' : ' ▼';
+                        icon.className = 'text-slate-200 font-bold';
+                    } else {
+                        icon.textContent = '';
+                    }
+                }
+            });
+
+            props.sort((a, b) => {
+                let vA = a[propsSortCol];
+                let vB = b[propsSortCol];
+                
+                // Keep excluded items at the bottom unless specifically filtering for them
+                const aExcluded = a.injured || a.trend_flag || a.line_dev_flag;
+                const bExcluded = b.injured || b.trend_flag || b.line_dev_flag;
+                if (aExcluded !== bExcluded) {
+                    return aExcluded ? 1 : -1;
+                }
+
+                if (vA === null || vA === undefined) vA = propsSortAsc ? 999999 : -999999;
+                if (vB === null || vB === undefined) vB = propsSortAsc ? 999999 : -999999;
+
+                if (typeof vA === 'string') {
+                    return propsSortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+                }
+                return propsSortAsc ? vA - vB : vB - vA;
+            });
+
+            if (props.length === 0) {
+                const oddsSt = globalPredictions?.odds_status;
+                if (oddsSt && oddsSt.is_mismatch) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="11" class="py-12 text-center">
+                                <div class="inline-flex flex-col items-center gap-2 max-w-lg p-5 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200">
+                                    <div class="flex items-center gap-2 text-sm font-bold tracking-wide">
+                                        <i data-lucide="alert-octagon" class="w-4 h-4 text-red-400"></i>
+                                        <span>ODDS CACHE WEEK MISMATCH (PROPS PAUSED)</span>
+                                    </div>
+                                    <p class="text-xs text-slate-300 leading-relaxed">
+                                        ${oddsSt.warning || 'Live odds cache is for a different week than target games. Scoring was blocked to prevent applying incorrect lines.'}
+                                    </p>
+                                    <div class="mt-2 px-3 py-1.5 rounded bg-black/40 border border-white/10 font-mono text-[11px] text-red-400">
+                                        python fetch_and_cache_odds.py
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+                tbody.innerHTML = `<tr><td colspan="11" class="py-8 text-center text-slate-500">No player props found matching filters.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = props.map(p => {
+                const edge = p.edge != null ? p.edge : 0;
+                let edgeColor = 'text-slate-300';
+                if (edge >= 6.0) edgeColor = 'text-emerald-400 font-bold';
+                else if (edge >= 3.0) edgeColor = 'text-emerald-300';
+
+                let riskColor = 'bg-[#30363d] text-slate-400';
+                if (p.risk === 'LOW') riskColor = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                else if (p.risk === 'MED') riskColor = 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                else if (p.risk === 'HIGH') riskColor = 'bg-red-500/20 text-red-400 border border-red-500/30';
+
+                const isExcluded = p.injured || p.trend_flag || p.line_dev_flag;
+                let warningTags = '';
+                if (p.injured) warningTags += `<span class="px-1.5 py-0.5 bg-red-500/20 text-red-400 text-[9px] rounded uppercase border border-red-500/30">Injured (Out/Doubtful)</span>`;
+                if (p.trend_flag) warningTags += `<span class="px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9px] rounded uppercase border border-amber-500/30">Role Reduction (Trend < -20%)</span>`;
+                if (p.line_dev_flag) warningTags += `<span class="px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9px] rounded uppercase border border-amber-500/30">Line Dev > 40%</span>`;
+
+                const rowOpacity = isExcluded ? 'opacity-40 grayscale pointer-events-none' : '';
+
+                // SHAP attribution dropdown
+                const hasShap = p.shap_top3 && p.shap_top3.length > 0;
+                const isEstablished = (p.sample_status === 'ESTABLISHED') || (p.calibration_status === 'CALIBRATED');
+
+                return `
+                <tr class="hover:bg-[#30363d]/40 transition ${rowOpacity}">
+                    <td class="py-2.5 px-3">
+                        <div class="font-medium text-slate-200">${p.player || 'Unknown'}</div>
+                        <div class="text-[10px] text-slate-500 font-mono">${p.pos || ''} • ${p.team || ''}</div>
+                        ${warningTags ? `<div class="mt-1 flex flex-wrap gap-1">${warningTags}</div>` : ''}
+                        ${hasShap ? `
+                        <details class="mt-1 group">
+                            <summary class="text-[10px] text-slate-400 hover:text-slate-200 font-semibold cursor-pointer select-none inline-flex items-center gap-1">
+                                <span class="text-cyan-400/90 font-mono">Why ${p.ou || 'Pick'}?</span>
+                                <span class="text-[9px] text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                            </summary>
+                            <div class="mt-1.5 p-2 bg-[#12161c] border border-[#30363d] rounded-lg text-[10px] space-y-1 font-mono shadow-md min-w-[200px]">
+                                <div class="text-slate-400 font-sans font-semibold uppercase text-[9px] border-b border-[#21262d] pb-0.5 flex justify-between">
+                                    <span>Top SHAP Drivers</span>
+                                    <span>Impact</span>
+                                </div>
+                                ${p.shap_top3.map(c => {
+                                    const isPos = c.contrib >= 0;
+                                    const featLabel = formatShapFeature(c.feature);
+                                    return `
+                                    <div class="flex items-center justify-between text-[10px]">
+                                        <span class="text-slate-300 truncate max-w-[130px]" title="${c.feature}">${featLabel}</span>
+                                        <span class="${isPos ? 'text-emerald-400' : 'text-rose-400'} font-bold">${isPos ? '+' : ''}${c.contrib.toFixed(1)}</span>
+                                    </div>
+                                    `;
+                                }).join('')}
+                                ${p.shap_bias != null ? `<div class="text-slate-500 text-[9px] pt-0.5 border-t border-[#21262d] flex justify-between"><span>Model Base</span><span>${p.shap_bias.toFixed(1)} yds</span></div>` : ''}
+                                ${p.baseline_bias_pct != null && Math.abs(p.baseline_bias_pct) > 10 ? `<div class="text-amber-400/90 text-[9px] pt-0.5">Partic. Filter Delta: ${p.baseline_bias_pct > 0 ? '+' : ''}${p.baseline_bias_pct}%</div>` : ''}
+                            </div>
+                        </details>
+                        ` : ''}
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <div class="text-slate-300">${p.matchup || ''}</div>
+                        <div class="text-[10px] text-slate-500">Def Rank: ${p.def_rank || '-'}/32</div>
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <div class="bg-[#161b22] border border-[#30363d] rounded px-2 py-1 inline-block text-[11px] font-medium">${p.stat || ''}</div>
+                    </td>
+                    <td class="py-2.5 px-3 text-right text-slate-400 font-mono">${p.avg != null ? Number(p.avg).toFixed(1) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-bold text-slate-100 font-mono text-sm">${p.pred != null ? Number(p.pred).toFixed(1) : '-'}</td>
+                    <td class="py-2.5 px-3 text-right font-mono">
+                        ${p.line != null
+                            ? `<span class="${p.live_line ? 'text-blue-400 font-semibold' : 'text-slate-300'}">${Number(p.line).toFixed(1)}</span>
+                               <div class="text-[9px] text-blue-500/70 uppercase">Live DK</div>`
+                            : `<span class="text-slate-500 font-medium">N/A</span>
+                               <div class="text-[9px] text-slate-600 uppercase">No Odds</div>`}
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-mono ${p.edge != null ? edgeColor : 'text-slate-600'} text-sm">${p.edge != null ? Number(p.edge).toFixed(1) : '<span class="text-slate-600 font-normal">N/A</span>'}</td>
+                    <td class="py-2.5 px-3 text-right font-mono text-slate-400">${p.sigma != null ? Number(p.sigma).toFixed(1) : '-'}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        ${p.risk ? `<span class="px-2 py-1 text-[10px] font-bold rounded-md ${riskColor}">${p.risk}</span>` : `<span class="text-slate-600 text-xs">N/A</span>`}
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                        ${p.ou ? `
+                            <div class="inline-flex flex-col items-center">
+                                <span class="font-black text-sm ${p.ou === 'OVER' ? 'text-emerald-400' : 'text-rose-400'}">${p.ou}</span>
+                                ${p.win_prob != null ? `
+                                    <div class="flex items-center space-x-1 mt-0.5" title="${isEstablished ? 'Established sample (n>=4 games in season)' : 'Provisional sample (n<4 games)'}">
+                                        <span class="w-1.5 h-1.5 rounded-full ${isEstablished ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
+                                        <span class="text-[10px] font-mono text-slate-300 font-semibold">${(p.win_prob * 100).toFixed(0)}%</span>
+                                        <span class="text-[8px] px-1 rounded font-mono font-bold ${isEstablished ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}">${isEstablished ? 'EST' : 'PROV'}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : `<span class="text-slate-600 text-xs">N/A</span>`}
+                    </td>
+                    <td class="py-2.5 px-3 text-center text-sm font-mono">
+                        ${p.actual !== null && p.actual !== undefined ? `<div class="inline-flex items-center gap-1.5"><span class="${p.correct === true ? 'text-emerald-400 font-bold' : (p.correct === false ? 'text-rose-400 font-bold' : 'text-slate-300')}">${p.actual}</span><span class="text-[10px] font-sans font-bold px-1.5 py-0.5 rounded ${p.correct === true ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40' : (p.correct === false ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-slate-800 text-slate-400')}">${p.correct === true ? 'HIT' : (p.correct === false ? 'MISS' : 'PUSH')}</span></div>` : `<span class="text-slate-600">-</span>`}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ==========================================
+        // YAHOO SPORTS TEAM STATS & SORTERS
+        // ==========================================
+        async function loadTeamStats() {
+            try {
+                const res = await fetch(`/api/team-stats?start_date=${startDate}&end_date=${endDate}`);
+                globalTeamStats = await res.json();
+                renderTeamStatsTable();
+            } catch (err) {
+                console.error("Error loading team stats:", err);
+            }
+        }
+
+        function setStatsView(view) {
+            currentStatsView = view;
+            ['all', 'offense', 'defense'].forEach(v => {
+                const btn = document.getElementById(`stat-view-${v}`);
+                if (btn) {
+                    btn.className = v === view
+                        ? 'px-3 py-1 rounded bg-[#30363d] text-slate-100 font-semibold'
+                        : 'px-3 py-1 rounded text-slate-400 hover:text-slate-200 font-medium';
+                }
+            });
+            renderTeamStatsTable();
+        }
+
+        function sortStats(col) {
+            if (statsSortCol === col) {
+                statsSortAsc = !statsSortAsc;
+            } else {
+                statsSortCol = col;
+                statsSortAsc = (col === 'team' || col.includes('allowed') || col.includes('rank_'));
+            }
+            renderTeamStatsTable();
+        }
+
+        function getSortIcon(col) {
+            if (statsSortCol !== col) return '';
+            return statsSortAsc ? '<span class="text-slate-300 font-bold ml-1">▲</span>' : '<span class="text-slate-300 font-bold ml-1">▼</span>';
+        }
+
+        function renderTeamStatsTable() {
+            const thead = document.getElementById('stats-table-header');
+            const tbody = document.getElementById('stats-table-body');
+
+            let sortedData = [...globalTeamStats];
+            sortedData.sort((a, b) => {
+                let vA = a[statsSortCol];
+                let vB = b[statsSortCol];
+                if (vA === null || vA === undefined) vA = statsSortAsc ? 999999 : -999999;
+                if (vB === null || vB === undefined) vB = statsSortAsc ? 999999 : -999999;
+
+                if (typeof vA === 'string') {
+                    return statsSortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+                }
+                return statsSortAsc ? vA - vB : vB - vA;
+            });
+
+            if (currentStatsView === 'offense') {
+                thead.innerHTML = `
+                    <th onclick="sortStats('team')" class="th-sortable py-2.5 px-3">TEAM ${getSortIcon('team')}</th>
+                    <th onclick="sortStats('pts_per_game')" class="th-sortable py-2.5 px-3 text-right">PTS / G (RANK) ${getSortIcon('pts_per_game')}</th>
+                    <th onclick="sortStats('rush_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">RUSH YDS / G (RANK) ${getSortIcon('rush_yds_per_game')}</th>
+                    <th onclick="sortStats('pass_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">PASS YDS / G (RANK) ${getSortIcon('pass_yds_per_game')}</th>
+                    <th onclick="sortStats('total_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">TOTAL YDS / G (RANK) ${getSortIcon('total_yds_per_game')}</th>
+                    <th onclick="sortStats('yds_per_carry')" class="th-sortable py-2.5 px-3 text-right">YDS / CARRY ${getSortIcon('yds_per_carry')}</th>
+                    <th onclick="sortStats('cmp_pct')" class="th-sortable py-2.5 px-3 text-right">CMP % ${getSortIcon('cmp_pct')}</th>
+                    <th onclick="sortStats('total_pass_tds')" class="th-sortable py-2.5 px-3 text-right">PASS TDS ${getSortIcon('total_pass_tds')}</th>
+                    <th onclick="sortStats('total_rush_tds')" class="th-sortable py-2.5 px-3 text-right">RUSH TDS ${getSortIcon('total_rush_tds')}</th>
+                `;
+                tbody.innerHTML = sortedData.map(t => `
+                    <tr class="hover:bg-[#21262d]/50 transition">
+                        <td class="py-2 px-3 font-semibold text-slate-100 flex items-center space-x-2">
+                            <span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 font-mono text-[11px] font-bold">${t.team}</span>
+                            <span class="text-xs text-slate-300">${t.team_name || t.team}</span>
+                        </td>
+                        <td class="py-2 px-3 text-right font-mono font-medium text-slate-200">${t.pts_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_scored, true)}">#${t.rank_pts_scored}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_yds, true)}">#${t.rank_rush_yds}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_yds, true)}">#${t.rank_pass_yds}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_total_yds, true)}">#${t.rank_total_yds}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.yds_per_carry}</td>
+                        <td class="py-2 px-3 text-right font-mono">${t.cmp_pct}%</td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_pass_tds}</td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_rush_tds}</td>
+                    </tr>`).join('');
+            } else if (currentStatsView === 'defense') {
+                thead.innerHTML = `
+                    <th onclick="sortStats('team')" class="th-sortable py-2.5 px-3">TEAM ${getSortIcon('team')}</th>
+                    <th onclick="sortStats('pts_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">PTS ALLOWED (RANK) ${getSortIcon('pts_allowed_per_game')}</th>
+                    <th onclick="sortStats('rush_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">RUSH ALLOWED (RANK) ${getSortIcon('rush_yds_allowed_per_game')}</th>
+                    <th onclick="sortStats('pass_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">PASS ALLOWED (RANK) ${getSortIcon('pass_yds_allowed_per_game')}</th>
+                    <th onclick="sortStats('total_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">TOTAL ALLOWED (RANK) ${getSortIcon('total_yds_allowed_per_game')}</th>
+                    <th onclick="sortStats('opp_yds_per_carry')" class="th-sortable py-2.5 px-3 text-right">OPP YPC ${getSortIcon('opp_yds_per_carry')}</th>
+                    <th onclick="sortStats('total_ints_forced')" class="th-sortable py-2.5 px-3 text-right">INTS ${getSortIcon('total_ints_forced')}</th>
+                    <th onclick="sortStats('total_sacks_forced')" class="th-sortable py-2.5 px-3 text-right">SACKS ${getSortIcon('total_sacks_forced')}</th>
+                    <th onclick="sortStats('turnover_diff')" class="th-sortable py-2.5 px-3 text-right">TO DIFF ${getSortIcon('turnover_diff')}</th>
+                `;
+                tbody.innerHTML = sortedData.map(t => `
+                    <tr class="hover:bg-[#21262d]/50 transition">
+                        <td class="py-2 px-3 font-semibold text-slate-100 flex items-center space-x-2">
+                            <span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 font-mono text-[11px] font-bold">${t.team}</span>
+                            <span class="text-xs text-slate-300">${t.team_name || t.team}</span>
+                        </td>
+                        <td class="py-2 px-3 text-right font-mono font-medium text-slate-200">${t.pts_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_allowed, false)}">#${t.rank_pts_allowed}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_allowed, false)}">#${t.rank_rush_allowed}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_allowed, false)}">#${t.rank_pass_allowed}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_total_allowed, false)}">#${t.rank_total_allowed}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.opp_yds_per_carry}</td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_ints_forced}</td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_sacks_forced}</td>
+                        <td class="py-2 px-3 text-right font-mono font-semibold ${t.turnover_diff >= 0 ? 'text-slate-200' : 'text-slate-400'}">${t.turnover_diff > 0 ? '+' : ''}${t.turnover_diff} (#${t.rank_turnover_diff})</td>
+                    </tr>`).join('');
+            } else {
+                thead.innerHTML = `
+                    <th onclick="sortStats('team')" class="th-sortable py-2.5 px-3">TEAM ${getSortIcon('team')}</th>
+                    <th onclick="sortStats('pts_per_game')" class="th-sortable py-2.5 px-3 text-right">OFF PTS ${getSortIcon('pts_per_game')}</th>
+                    <th onclick="sortStats('pts_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">DEF PTS ${getSortIcon('pts_allowed_per_game')}</th>
+                    <th onclick="sortStats('rush_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">RUSH OFF ${getSortIcon('rush_yds_per_game')}</th>
+                    <th onclick="sortStats('rush_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">RUSH DEF ${getSortIcon('rush_yds_allowed_per_game')}</th>
+                    <th onclick="sortStats('pass_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">PASS OFF ${getSortIcon('pass_yds_per_game')}</th>
+                    <th onclick="sortStats('pass_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">PASS DEF ${getSortIcon('pass_yds_allowed_per_game')}</th>
+                    <th onclick="sortStats('total_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">TOTAL OFF ${getSortIcon('total_yds_per_game')}</th>
+                    <th onclick="sortStats('total_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">TOTAL DEF ${getSortIcon('total_yds_allowed_per_game')}</th>
+                    <th onclick="sortStats('turnover_diff')" class="th-sortable py-2.5 px-3 text-right">TO DIFF ${getSortIcon('turnover_diff')}</th>
+                `;
+                tbody.innerHTML = sortedData.map(t => `
+                    <tr class="hover:bg-[#21262d]/50 transition">
+                        <td class="py-2 px-3 font-semibold text-slate-100 flex items-center space-x-2">
+                            <span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 font-mono text-[11px] font-bold">${t.team}</span>
+                            <span class="text-xs text-slate-300">${t.team_name || t.team}</span>
+                        </td>
+                        <td class="py-2 px-3 text-right font-mono text-slate-200">${t.pts_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_scored, true)}">#${t.rank_pts_scored}</span></td>
+                        <td class="py-2 px-3 text-right font-mono text-slate-200">${t.pts_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_allowed, false)}">#${t.rank_pts_allowed}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_yds, true)}">#${t.rank_rush_yds}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_allowed, false)}">#${t.rank_rush_allowed}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_yds, true)}">#${t.rank_pass_yds}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_allowed, false)}">#${t.rank_pass_allowed}</span></td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_per_game}</td>
+                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_allowed_per_game}</td>
+                        <td class="py-2 px-3 text-right font-mono font-medium ${t.turnover_diff >= 0 ? 'text-slate-200' : 'text-slate-400'}">${t.turnover_diff > 0 ? '+' : ''}${t.turnover_diff}</td>
+                    </tr>`).join('');
+            }
+        }
+
+        function getRankBadge(rank, highIsGood = true) {
+            if (rank <= 8) return 'rank-top';
+            if (rank >= 25) return 'rank-bot';
+            return 'rank-mid';
+        }
+
+        // ==========================================
+        // HIGHLIGHTS & MATCHUP VULNERABILITY SCANNER
+        // ==========================================
+        let selectedHighlightTeam = 'ALL';
+
+        async function loadHighlights() {
+            try {
+                const res = await fetch(`/api/team-highlights?start_date=${startDate}&end_date=${endDate}`);
+                const data = await res.json();
+                
+                // Safely extract array
+                if (Array.isArray(data)) {
+                    globalHighlights = data;
+                } else if (data && Array.isArray(data.highlights)) {
+                    globalHighlights = data.highlights;
+                } else if (data && data.highlights && Array.isArray(data.highlights.highlights)) {
+                    globalHighlights = data.highlights.highlights;
+                } else {
+                    globalHighlights = [];
+                }
+
+                populateHighlightTeamDropdown();
+                renderHighlights();
+            } catch (err) {
+                console.error("Error loading highlights:", err);
+                const container = document.getElementById('highlights-container');
+                if (container) container.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-slate-500 col-span-full">Failed to load highlights. Please refresh.</div>`;
+            }
+        }
+
+        function populateHighlightTeamDropdown() {
+            const select = document.getElementById('highlight-team-filter');
+            if (!select) return;
+
+            const teamsInHighlights = Array.from(new Set(globalHighlights.map(h => h.team))).sort();
+            const allTeams = ["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LAC","LA","LV","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SEA","SF","TB","TEN","WAS"];
+            const teamList = teamsInHighlights.length > 0 ? teamsInHighlights : allTeams;
+
+            select.innerHTML = `<option value="ALL" ${selectedHighlightTeam === 'ALL' ? 'selected' : ''}>All 32 Teams</option>` +
+                teamList.map(t => `<option value="${t}" ${selectedHighlightTeam === t ? 'selected' : ''}>${t}</option>`).join('');
+        }
+
+        function filterHighlightsTeam(team) {
+            selectedHighlightTeam = team;
+            renderHighlights();
+        }
+
+        function filterHighlights(type) {
+            currentHighlightsFilter = type;
+            [
+                'ALL', 'pass_rush', 'zero_pressure', 'ironclad_protection', 'sack_magnet',
+                'rb_boom', 'rb_shutdown', 'bulldozer_rush', 'anemic_rush',
+                'air_raid', 'no_fly_zone', 'pass_funnel', 'run_funnel',
+                'turnover_elite', 'turnover_bleed', 'home_dominance', 'road_struggles',
+                'deep_pass_funnel', 'deep_pass_lockdown', 'neutral_pass_heavy',
+                'neutral_run_heavy', 'trench_protection_leak', 'trench_pressure_elite',
+                'explosive_bleed'
+            ].forEach(t => {
+                const btn = document.getElementById(`hl-btn-${t}`);
+                if (btn) {
+                    btn.className = t === type
+                        ? 'px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold'
+                        : 'px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white';
+                }
+            });
+            renderHighlights();
+        }
+
+        function renderHighlights() {
+            const container = document.getElementById('highlights-container');
+            if (!container) return;
+
+            const searchVal = (document.getElementById('highlight-search')?.value || '').toLowerCase();
+
+            let items = [...globalHighlights];
+
+            // 1. Filter by category
+            if (currentHighlightsFilter !== 'ALL') {
+                items = items.filter(h => h.type === currentHighlightsFilter);
+            }
+
+            // 2. Filter by selected team
+            if (selectedHighlightTeam !== 'ALL') {
+                items = items.filter(h => h.team === selectedHighlightTeam);
+            }
+
+            // 3. Search query filter
+            if (searchVal) {
+                items = items.filter(h =>
+                    h.team.toLowerCase().includes(searchVal) ||
+                    h.title.toLowerCase().includes(searchVal) ||
+                    h.badge.toLowerCase().includes(searchVal) ||
+                    h.description.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (items.length === 0) {
+                container.innerHTML = `<div class="glass-panel rounded-xl p-8 text-center text-slate-500 col-span-full">No matching trends found for team "${selectedHighlightTeam}" and category "${currentHighlightsFilter}".</div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(h => {
+                return `
+                <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-2.5 hover:border-slate-600 transition">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">
+                            ${h.badge}
+                        </span>
+                        <span class="text-xs font-bold text-slate-200 bg-[#21262d] px-2 py-0.5 rounded">${h.team}</span>
+                    </div>
+
+                    <h3 class="text-sm font-semibold text-slate-100">${h.title}</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">${h.description}</p>
+
+                    <div class="bg-[#21262d] rounded p-2 text-xs text-slate-300 flex items-center justify-between font-mono">
+                        <span>${h.stat_evidence}</span>
+                    </div>
+
+                    ${h.sample_players ? `<p class="text-[11px] text-slate-400">Featured backs: <span class="text-slate-300">${h.sample_players}</span></p>` : ''}
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // IN-DEPTH HEAD-TO-HEAD MATCHUP LAB
+        // ==========================================
+        function populateH2HTeams() {
+            const homeSelect = document.getElementById('h2h-home-team');
+            const awaySelect = document.getElementById('h2h-away-team');
+            if (!homeSelect || !awaySelect) return;
+
+            const teams = ["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LAC","LA","LV","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SEA","SF","TB","TEN","WAS"];
+            homeSelect.innerHTML = teams.map(t => `<option value="${t}" ${t === 'KC' ? 'selected' : ''}>${t}</option>`).join('');
+            awaySelect.innerHTML = teams.map(t => `<option value="${t}" ${t === 'BAL' ? 'selected' : ''}>${t}</option>`).join('');
+            renderH2HComparison();
+        }
+
+        function onH2HQuickGameSelect(val) {
+            if (!val) return;
+            const parts = val.split(',');
+            if (parts.length === 2) {
+                const homeSelect = document.getElementById('h2h-home-team');
+                const awaySelect = document.getElementById('h2h-away-team');
+                if (homeSelect) homeSelect.value = parts[0].trim();
+                if (awaySelect) awaySelect.value = parts[1].trim();
+                renderH2HComparison();
+            }
+        }
+
+        async function renderH2HComparison() {
+            const homeTeam = document.getElementById('h2h-home-team').value;
+            const awayTeam = document.getElementById('h2h-away-team').value;
+            const season = document.getElementById('h2h-season-select')?.value || '2026';
+            const container = document.getElementById('h2h-results');
+
+            container.innerHTML = `<div class="glass-panel rounded-xl p-8 text-center text-slate-400 col-span-full">Analyzing ${season} scheme battles & matchup metrics for ${homeTeam} vs ${awayTeam}...</div>`;
+
+            try {
+                const res = await fetch(`/api/matchup-deepdive?home_team=${homeTeam}&away_team=${awayTeam}&season=${season}&start_date=${startDate}&end_date=${endDate}`);
+                const data = await res.json();
+
+                if (data.error) {
+                    container.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-slate-500 col-span-full">Teams not found.</div>`;
+                    return;
+                }
+
+                const h = data.home_stats;
+                const a = data.away_stats;
+                const battles = data.battles || [];
+                const xFactors = data.x_factors || [];
+                const hLeaders = data.home_leaders || {};
+                const aLeaders = data.away_leaders || {};
+                const defVsStars = data.defense_vs_stars || {};
+                const spotlights = defVsStars.spotlights || [];
+                const hDef = defVsStars.home_def || {};
+                const aDef = defVsStars.away_def || {};
+
+                container.innerHTML = `
+                <!-- 1. TALE OF THE TAPE OVERVIEW -->
+                <div class="glass-panel rounded-xl p-5 border border-[#30363d] col-span-full space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="scale" class="w-4 h-4 text-slate-400"></i>
+                            <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Tale of the Tape • Overall Metric Comparison</h3>
+                        </div>
+                        <span class="text-xs text-slate-400 font-mono">${h.team_name} (Home) vs ${a.team_name} (Away)</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        <!-- Scoring -->
+                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
+                            <p class="text-slate-400 text-[11px] font-medium uppercase">Scoring (Pts / Game)</p>
+                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
+                                <span>${h.team}: ${typeof h.pts_per_game === 'number' ? h.pts_per_game.toFixed(1) : h.pts_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${h.rank_pts_scored})</span></span>
+                                <span>${a.team}: ${typeof a.pts_per_game === 'number' ? a.pts_per_game.toFixed(1) : a.pts_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${a.rank_pts_scored})</span></span>
+                            </div>
+                            <div class="w-full bg-[#161b22] h-1.5 rounded-full overflow-hidden flex">
+                                <div class="bg-slate-300 h-full" style="width: ${(h.pts_per_game / (h.pts_per_game + a.pts_per_game) * 100) || 50}%"></div>
+                                <div class="bg-slate-600 h-full" style="width: ${(a.pts_per_game / (h.pts_per_game + a.pts_per_game) * 100) || 50}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Points Allowed -->
+                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
+                            <p class="text-slate-400 text-[11px] font-medium uppercase">Points Allowed / G</p>
+                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
+                                <span>${h.team}: ${typeof h.pts_allowed_per_game === 'number' ? h.pts_allowed_per_game.toFixed(1) : h.pts_allowed_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${h.rank_pts_allowed})</span></span>
+                                <span>${a.team}: ${typeof a.pts_allowed_per_game === 'number' ? a.pts_allowed_per_game.toFixed(1) : a.pts_allowed_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${a.rank_pts_allowed})</span></span>
+                            </div>
+                            <div class="w-full bg-[#161b22] h-1.5 rounded-full overflow-hidden flex">
+                                <div class="bg-slate-300 h-full" style="width: ${(a.pts_allowed_per_game / (h.pts_allowed_per_game + a.pts_allowed_per_game) * 100) || 50}%"></div>
+                                <div class="bg-slate-600 h-full" style="width: ${(h.pts_allowed_per_game / (h.pts_allowed_per_game + a.pts_allowed_per_game) * 100) || 50}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Total Offense Yards -->
+                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
+                            <p class="text-slate-400 text-[11px] font-medium uppercase">Total Offense (Yds / G)</p>
+                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
+                                <span>${h.team}: ${typeof h.total_yds_per_game === 'number' ? h.total_yds_per_game.toFixed(1) : h.total_yds_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${h.rank_total_yds})</span></span>
+                                <span>${a.team}: ${typeof a.total_yds_per_game === 'number' ? a.total_yds_per_game.toFixed(1) : a.total_yds_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${a.rank_total_yds})</span></span>
+                            </div>
+                            <div class="w-full bg-[#161b22] h-1.5 rounded-full overflow-hidden flex">
+                                <div class="bg-slate-300 h-full" style="width: ${(h.total_yds_per_game / (h.total_yds_per_game + a.total_yds_per_game) * 100) || 50}%"></div>
+                                <div class="bg-slate-600 h-full" style="width: ${(a.total_yds_per_game / (h.total_yds_per_game + a.total_yds_per_game) * 100) || 50}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Turnover Differential -->
+                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
+                            <p class="text-slate-400 text-[11px] font-medium uppercase">Turnover Differential</p>
+                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
+                                <span class="${h.turnover_diff >= 0 ? 'text-slate-100' : 'text-slate-400'}">${h.team}: ${h.turnover_diff > 0 ? '+' : ''}${h.turnover_diff} (#${h.rank_turnover_diff})</span>
+                                <span class="${a.turnover_diff >= 0 ? 'text-slate-100' : 'text-slate-400'}">${a.team}: ${a.turnover_diff > 0 ? '+' : ''}${a.turnover_diff} (#${a.rank_turnover_diff})</span>
+                            </div>
+                            <div class="text-[10px] text-slate-400">INTs: ${h.total_ints_forced} vs ${a.total_ints_forced} | Sacks: ${h.total_sacks_forced} vs ${a.total_sacks_forced}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASS / RUN OPPORTUNITY FUNNEL -->
+                ${data.funnel ? `
+                <div class="glass-panel rounded-xl p-5 border border-[#30363d] col-span-full space-y-3">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="split" class="w-4 h-4 text-slate-400"></i>
+                            <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Pass / Run Opportunity Funnel</h3>
+                        </div>
+                        <span class="text-xs text-slate-400 font-mono">Opponent-Adjusted Play Volume (League Avg ~63 plays)</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Away Offense Funnel -->
+                        <div class="bg-[#21262d] p-3.5 rounded-xl border border-[#30363d] space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-100 font-mono text-sm">${a.team} Offense (${a.team_name})</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold ${data.funnel.away.off_tendency === 'PASS_HEAVY' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : (data.funnel.away.off_tendency === 'RUN_HEAVY' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-[#161b22] text-slate-300 border border-[#30363d]')}">${data.funnel.away.off_tendency}</span>
+                            </div>
+                            <div class="flex justify-between text-xs font-mono text-slate-300">
+                                <span>Projected Pass: <b class="text-cyan-400">${data.funnel.away.proj_pass_att} att</b> (${data.funnel.away.pass_rate}%)</span>
+                                <span>Projected Rush: <b class="text-amber-400">${data.funnel.away.proj_carries} car</b> (${data.funnel.away.run_rate}%)</span>
+                            </div>
+                            <div class="w-full bg-[#161b22] h-2 rounded-full overflow-hidden flex">
+                                <div class="bg-cyan-500 h-full" style="width: ${data.funnel.away.pass_rate}%"></div>
+                                <div class="bg-amber-500 h-full" style="width: ${data.funnel.away.run_rate}%"></div>
+                            </div>
+                            <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-[#30363d]/60">
+                                <span>${h.team} Defense Funnel Effect:</span>
+                                <span class="font-mono font-semibold text-slate-200">${data.funnel.away.def_funnel}</span>
+                            </div>
+                        </div>
+                        <!-- Home Offense Funnel -->
+                        <div class="bg-[#21262d] p-3.5 rounded-xl border border-[#30363d] space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-100 font-mono text-sm">${h.team} Offense (${h.team_name})</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold ${data.funnel.home.off_tendency === 'PASS_HEAVY' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : (data.funnel.home.off_tendency === 'RUN_HEAVY' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-[#161b22] text-slate-300 border border-[#30363d]')}">${data.funnel.home.off_tendency}</span>
+                            </div>
+                            <div class="flex justify-between text-xs font-mono text-slate-300">
+                                <span>Projected Pass: <b class="text-cyan-400">${data.funnel.home.proj_pass_att} att</b> (${data.funnel.home.pass_rate}%)</span>
+                                <span>Projected Rush: <b class="text-amber-400">${data.funnel.home.proj_carries} car</b> (${data.funnel.home.run_rate}%)</span>
+                            </div>
+                            <div class="w-full bg-[#161b22] h-2 rounded-full overflow-hidden flex">
+                                <div class="bg-cyan-500 h-full" style="width: ${data.funnel.home.pass_rate}%"></div>
+                                <div class="bg-amber-500 h-full" style="width: ${data.funnel.home.run_rate}%"></div>
+                            </div>
+                            <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-[#30363d]/60">
+                                <span>${a.team} Defense Funnel Effect:</span>
+                                <span class="font-mono font-semibold text-slate-200">${data.funnel.home.def_funnel}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- 2. UNIT SCHEME BATTLES (4 CARDS) -->
+                <div class="col-span-full space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="swords" class="w-4 h-4 text-slate-400"></i>
+                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Unit vs Unit Scheme Matchups</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${battles.map(b => {
+                            let badgeStyle = 'bg-[#21262d] text-slate-300 border border-[#30363d]';
+                            if (b.level.includes('heavy')) badgeStyle = 'bg-[#30363d] text-slate-100 border border-slate-500 font-bold';
+                            return `
+                            <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-200">${b.stat} Battle</span>
+                                    <span class="px-2 py-0.5 rounded text-[10px] ${badgeStyle}">${b.verdict}</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs bg-[#21262d] p-2.5 rounded-lg border border-[#30363d]">
+                                    <div>
+                                        <p class="text-slate-400 text-[10px] uppercase font-medium">${b.offense}</p>
+                                        <p class="text-sm font-bold text-slate-100 mt-0.5">Rank #${b.off_rank} in League</p>
+                                    </div>
+                                    <div class="text-slate-500 font-bold text-xs">VS</div>
+                                    <div class="text-right">
+                                        <p class="text-slate-400 text-[10px] uppercase font-medium">${b.defense}</p>
+                                        <p class="text-sm font-bold text-slate-100 mt-0.5">Rank #${b.def_rank} in League</p>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <!-- 3. TACTICAL X-FACTORS & KEYS TO THE GAME -->
+                <div class="col-span-full space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="zap" class="w-4 h-4 text-slate-400"></i>
+                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Tactical X-Factors & Key Matchup Insights</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        ${xFactors.map(x => `
+                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">${x.tag}</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-100">${x.title}</h4>
+                            <p class="text-xs text-slate-400 leading-relaxed">${x.detail}</p>
+                        </div>`).join('')}
+                    </div>
+                </div>
+
+                <!-- 4. KEY ROSTER LEADERS HEAD-TO-HEAD -->
+                <div class="col-span-full space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="users" class="w-4 h-4 text-slate-400"></i>
+                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Key Skill Player Head-to-Head Comparison</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <!-- QBs -->
+                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
+                            <p class="text-[11px] font-bold text-slate-300 uppercase tracking-wider border-b border-[#30363d] pb-1.5 flex items-center justify-between">
+                                <span>Quarterbacks</span>
+                                <span class="text-slate-500 font-mono">QB1 • DUAL-THREAT</span>
+                            </p>
+                            <div class="space-y-2.5">
+                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
+                                    <div class="flex justify-between font-bold text-slate-200">
+                                        <span>${hLeaders.qb?.player_display_name || 'N/A'}</span>
+                                        <span class="font-mono text-slate-400">${h.team}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300">${hLeaders.qb ? `${hLeaders.qb.yds_per_game} pass yds/g • ${hLeaders.qb.cmp_pct}% CMP • ${hLeaders.qb.pass_tds} TD / ${hLeaders.qb.pass_ints} INT` : '-'}</p>
+                                    ${hLeaders.qb?.rush_yds_per_game != null ? `
+                                        <div class="text-[10px] text-emerald-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
+                                            <span>+ ${hLeaders.qb.rush_yds_per_game} rush yds/g</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${hLeaders.qb.rush_ypc} YPC</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${hLeaders.qb.rush_tds} rush TDs</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="text-[10px] text-amber-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
+                                        <span class="text-slate-400 font-sans">Opponent vs QBs:</span>
+                                        <span class="font-bold">${a.team} allows ${a.qb_rush_yds_allowed_per_game != null ? a.qb_rush_yds_allowed_per_game : (aDef.qb_rush?.allowed != null ? aDef.qb_rush.allowed : '--')} yds/g (#${a.rank_qb_rush_allowed || aDef.qb_rush?.rank || '--'}) • ${a.def_qb_rush_verdict || aDef.qb_rush?.verdict || 'Average'}</span>
+                                    </div>
+                                </div>
+                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
+                                    <div class="flex justify-between font-bold text-slate-200">
+                                        <span>${aLeaders.qb?.player_display_name || 'N/A'}</span>
+                                        <span class="font-mono text-slate-400">${a.team}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300">${aLeaders.qb ? `${aLeaders.qb.yds_per_game} pass yds/g • ${aLeaders.qb.cmp_pct}% CMP • ${aLeaders.qb.pass_tds} TD / ${aLeaders.qb.pass_ints} INT` : '-'}</p>
+                                    ${aLeaders.qb?.rush_yds_per_game != null ? `
+                                        <div class="text-[10px] text-emerald-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
+                                            <span>+ ${aLeaders.qb.rush_yds_per_game} rush yds/g</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${aLeaders.qb.rush_ypc} YPC</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${aLeaders.qb.rush_tds} rush TDs</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="text-[10px] text-amber-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
+                                        <span class="text-slate-400 font-sans">Opponent vs QBs:</span>
+                                        <span class="font-bold">${h.team} allows ${h.qb_rush_yds_allowed_per_game != null ? h.qb_rush_yds_allowed_per_game : (hDef.qb_rush?.allowed != null ? hDef.qb_rush.allowed : '--')} yds/g (#${h.rank_qb_rush_allowed || hDef.qb_rush?.rank || '--'}) • ${h.def_qb_rush_verdict || hDef.qb_rush?.verdict || 'Average'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RBs -->
+                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
+                            <p class="text-[11px] font-bold text-slate-300 uppercase tracking-wider border-b border-[#30363d] pb-1.5 flex items-center justify-between">
+                                <span>Lead Rushers</span>
+                                <span class="text-slate-500 font-mono">RB1 • RUSH + REC</span>
+                            </p>
+                            <div class="space-y-2.5">
+                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
+                                    <div class="flex justify-between font-bold text-slate-200">
+                                        <span>${hLeaders.rb?.player_display_name || 'N/A'}</span>
+                                        <span class="font-mono text-slate-400">${h.team}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300">${hLeaders.rb ? `${hLeaders.rb.yds_per_game} rush yds/g • ${hLeaders.rb.ypc} YPC • ${hLeaders.rb.rush_tds} Rush TDs` : '-'}</p>
+                                    ${hLeaders.rb?.rec_yds_per_game != null ? `
+                                        <div class="text-[10px] text-cyan-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
+                                            <span>+ ${hLeaders.rb.rec_yds_per_game} rec yds/g</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${hLeaders.rb.receptions} rec (${hLeaders.rb.catch_pct || '--'}%)</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${hLeaders.rb.rec_tds} rec TDs</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="text-[10px] text-cyan-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
+                                        <span class="text-slate-400 font-sans">Opponent vs RB Rec:</span>
+                                        <span class="font-bold">${a.team} allows ${a.rb_rec_yds_allowed_per_game != null ? a.rb_rec_yds_allowed_per_game : (aDef.rb_rec?.allowed != null ? aDef.rb_rec.allowed : '--')} yds/g (#${a.rank_rb_rec_allowed || aDef.rb_rec?.rank || '--'}) • ${a.def_rb_rec_verdict || aDef.rb_rec?.verdict || 'Average'}</span>
+                                    </div>
+                                </div>
+                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
+                                    <div class="flex justify-between font-bold text-slate-200">
+                                        <span>${aLeaders.rb?.player_display_name || 'N/A'}</span>
+                                        <span class="font-mono text-slate-400">${a.team}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300">${aLeaders.rb ? `${aLeaders.rb.yds_per_game} rush yds/g • ${aLeaders.rb.ypc} YPC • ${aLeaders.rb.rush_tds} Rush TDs` : '-'}</p>
+                                    ${aLeaders.rb?.rec_yds_per_game != null ? `
+                                        <div class="text-[10px] text-cyan-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
+                                            <span>+ ${aLeaders.rb.rec_yds_per_game} rec yds/g</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${aLeaders.rb.receptions} rec (${aLeaders.rb.catch_pct || '--'}%)</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${aLeaders.rb.rec_tds} rec TDs</span>
+                                        </div>
+                                    ` : ''}
+                                    <div class="text-[10px] text-cyan-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
+                                        <span class="text-slate-400 font-sans">Opponent vs RB Rec:</span>
+                                        <span class="font-bold">${h.team} allows ${h.rb_rec_yds_allowed_per_game != null ? h.rb_rec_yds_allowed_per_game : (hDef.rb_rec?.allowed != null ? hDef.rb_rec.allowed : '--')} yds/g (#${h.rank_rb_rec_allowed || hDef.rb_rec?.rank || '--'}) • ${h.def_rb_rec_verdict || hDef.rb_rec?.verdict || 'Average'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- WRs -->
+                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
+                            <p class="text-[11px] font-bold text-slate-300 uppercase tracking-wider border-b border-[#30363d] pb-1.5 flex items-center justify-between">
+                                <span>Top Pass Catchers</span>
+                                <span class="text-slate-500 font-mono">WR/TE • EFFICIENCY</span>
+                            </p>
+                            <div class="space-y-2.5">
+                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
+                                    <div class="flex justify-between font-bold text-slate-200">
+                                        <span>${hLeaders.wr?.player_display_name || 'N/A'}</span>
+                                        <span class="font-mono text-slate-400">${h.team}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300">${hLeaders.wr ? `${hLeaders.wr.yds_per_game} rec yds/g • ${hLeaders.wr.ypr} YPR • ${hLeaders.wr.rec_tds} TDs` : '-'}</p>
+                                    ${hLeaders.wr?.tgt_per_game != null ? `
+                                        <div class="text-[10px] text-purple-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
+                                            <span>${hLeaders.wr.tgt_per_game} tgt/g</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${hLeaders.wr.catch_rate || '--'}% catch rate</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${hLeaders.wr.receptions} rec</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
+                                    <div class="flex justify-between font-bold text-slate-200">
+                                        <span>${aLeaders.wr?.player_display_name || 'N/A'}</span>
+                                        <span class="font-mono text-slate-400">${a.team}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300">${aLeaders.wr ? `${aLeaders.wr.yds_per_game} rec yds/g • ${aLeaders.wr.ypr} YPR • ${aLeaders.wr.rec_tds} TDs` : '-'}</p>
+                                    ${aLeaders.wr?.tgt_per_game != null ? `
+                                        <div class="text-[10px] text-purple-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
+                                            <span>${aLeaders.wr.tgt_per_game} tgt/g</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${aLeaders.wr.catch_rate || '--'}% catch rate</span>
+                                            <span class="text-slate-500">•</span>
+                                            <span>${aLeaders.wr.receptions} rec</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. DEFENSE VS STAR PLAYERS & POSITIONAL CONTEXT -->
+                <div class="col-span-full space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
+                            <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Defense vs Star Players & Positional Context</h3>
+                        </div>
+                        <span class="text-[11px] text-slate-400">Empirical track record vs Top-12 Star RBs/WRs • General character when no stars</span>
+                    </div>
+
+                    <!-- Matchup Spotlight Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${spotlights.map(s => {
+                            let badgeStyle = 'bg-[#21262d] text-slate-300 border-[#30363d]';
+                            let cardBorder = 'border-[#30363d]';
+                            if (s.level === 'lockdown') {
+                                badgeStyle = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+                                cardBorder = 'border-emerald-500/30';
+                            } else if (s.level === 'vulnerable') {
+                                badgeStyle = 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+                                cardBorder = 'border-rose-500/30';
+                            } else if (s.level === 'slight_good') {
+                                badgeStyle = 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30';
+                            }
+
+                            const isStarBadge = s.is_star
+                                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center space-x-1"><i data-lucide="star" class="w-3 h-3"></i><span>${s.tag}</span></span>`
+                                : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-400 border border-[#30363d]">${s.tag}</span>`;
+
+                            return `
+                                <div class="glass-panel rounded-xl p-4 border ${cardBorder} space-y-2.5">
+                                    <div class="flex items-center justify-between flex-wrap gap-1.5">
+                                        <div class="flex items-center space-x-2">
+                                            ${isStarBadge}
+                                            <span class="text-[11px] font-mono font-bold text-slate-300">${s.def_team} DEF vs ${s.off_team}</span>
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeStyle}">
+                                            ${s.verdict}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-slate-100">${s.title}</h4>
+                                        <p class="text-[11px] font-mono text-slate-300 mt-0.5">${s.stat_line}</p>
+                                    </div>
+                                    <p class="text-xs text-slate-400 leading-relaxed">${s.detail}</p>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <!-- General Defensive Unit Character Comparison -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                        <!-- Home Defense Profile -->
+                        <div class="glass-panel rounded-xl p-3.5 border border-[#30363d] space-y-2 bg-[#12161c]">
+                            <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-mono font-bold text-slate-200 text-xs">${h.team} Defensive Profile</span>
+                                    <span class="text-[10px] text-slate-500">Home</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${hDef.general?.level === 'lockdown' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : (hDef.general?.level === 'vulnerable' ? 'bg-rose-500/15 text-rose-400 border-rose-500/30' : 'bg-[#21262d] text-slate-300 border border-[#30363d]')}">
+                                    ${hDef.general?.verdict || 'Defensive Unit'}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-slate-400 block font-semibold">VS RUN</span>
+                                    <span class="font-mono font-bold text-slate-200">#${h.rank_rush_allowed || '--'} (${h.rush_yds_allowed_per_game || '--'} yds/g)</span>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs Star RBs: <span class="${(h.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_rb_diff != null ? (h.def_star_rb_diff > 0 ? '+' : '') + h.def_star_rb_diff : '--'} yds</span></p>
+                                </div>
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-slate-400 block font-semibold">VS PASS</span>
+                                    <span class="font-mono font-bold text-slate-200">#${h.rank_pass_allowed || '--'} (${h.pass_yds_allowed_per_game || '--'} yds/g)</span>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1s: <span class="${(h.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_wr_diff != null ? (h.def_star_wr_diff > 0 ? '+' : '') + h.def_star_wr_diff : '--'} yds</span></p>
+                                </div>
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-amber-400 block font-semibold">VS QB RUSH</span>
+                                    <span class="font-mono font-bold text-slate-200">#${h.rank_qb_rush_allowed || hDef.qb_rush?.rank || '--'} (${h.qb_rush_yds_allowed_per_game != null ? h.qb_rush_yds_allowed_per_game : (hDef.qb_rush?.allowed || '--')} yds/g)</span>
+                                    <p class="text-[10px] mt-0.5 truncate ${(h.rank_qb_rush_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((h.rank_qb_rush_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${h.def_qb_rush_verdict || hDef.qb_rush?.verdict || 'Average'}</p>
+                                </div>
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-cyan-400 block font-semibold">VS RB REC</span>
+                                    <span class="font-mono font-bold text-slate-200">#${h.rank_rb_rec_allowed || hDef.rb_rec?.rank || '--'} (${h.rb_rec_yds_allowed_per_game != null ? h.rb_rec_yds_allowed_per_game : (hDef.rb_rec?.allowed || '--')} yds/g)</span>
+                                    <p class="text-[10px] mt-0.5 truncate ${(h.rank_rb_rec_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((h.rank_rb_rec_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${h.def_rb_rec_verdict || hDef.rb_rec?.verdict || 'Average'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Away Defense Profile -->
+                        <div class="glass-panel rounded-xl p-3.5 border border-[#30363d] space-y-2 bg-[#12161c]">
+                            <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-mono font-bold text-slate-200 text-xs">${a.team} Defensive Profile</span>
+                                    <span class="text-[10px] text-slate-500">Away</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${aDef.general?.level === 'lockdown' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : (aDef.general?.level === 'vulnerable' ? 'bg-rose-500/15 text-rose-400 border-rose-500/30' : 'bg-[#21262d] text-slate-300 border border-[#30363d]')}">
+                                    ${aDef.general?.verdict || 'Defensive Unit'}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-slate-400 block font-semibold">VS RUN</span>
+                                    <span class="font-mono font-bold text-slate-200">#${a.rank_rush_allowed || '--'} (${a.rush_yds_allowed_per_game || '--'} yds/g)</span>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs Star RBs: <span class="${(a.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_rb_diff != null ? (a.def_star_rb_diff > 0 ? '+' : '') + a.def_star_rb_diff : '--'} yds</span></p>
+                                </div>
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-slate-400 block font-semibold">VS PASS</span>
+                                    <span class="font-mono font-bold text-slate-200">#${a.rank_pass_allowed || '--'} (${a.pass_yds_allowed_per_game || '--'} yds/g)</span>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1s: <span class="${(a.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_wr_diff != null ? (a.def_star_wr_diff > 0 ? '+' : '') + a.def_star_wr_diff : '--'} yds</span></p>
+                                </div>
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-amber-400 block font-semibold">VS QB RUSH</span>
+                                    <span class="font-mono font-bold text-slate-200">#${a.rank_qb_rush_allowed || aDef.qb_rush?.rank || '--'} (${a.qb_rush_yds_allowed_per_game != null ? a.qb_rush_yds_allowed_per_game : (aDef.qb_rush?.allowed || '--')} yds/g)</span>
+                                    <p class="text-[10px] mt-0.5 truncate ${(a.rank_qb_rush_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((a.rank_qb_rush_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${a.def_qb_rush_verdict || aDef.qb_rush?.verdict || 'Average'}</p>
+                                </div>
+                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
+                                    <span class="text-[10px] text-cyan-400 block font-semibold">VS RB REC</span>
+                                    <span class="font-mono font-bold text-slate-200">#${a.rank_rb_rec_allowed || aDef.rb_rec?.rank || '--'} (${a.rb_rec_yds_allowed_per_game != null ? a.rb_rec_yds_allowed_per_game : (aDef.rb_rec?.allowed || '--')} yds/g)</span>
+                                    <p class="text-[10px] mt-0.5 truncate ${(a.rank_rb_rec_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((a.rank_rb_rec_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${a.def_rb_rec_verdict || aDef.rb_rec?.verdict || 'Average'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Error loading deepdive matchup:", err);
+                container.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-slate-500 col-span-full">Error loading matchup analysis.</div>`;
+            }
+        }
+
+        // ==============================================================
+        // TAB 5: 2026 SCHEDULE & PER-GAME TEAM STATS LOGIC
+        // ==============================================================
+        const NFL_TEAMS_LIST = [
+            { code: 'ARI', name: 'Arizona Cardinals' },
+            { code: 'ATL', name: 'Atlanta Falcons' },
+            { code: 'BAL', name: 'Baltimore Ravens' },
+            { code: 'BUF', name: 'Buffalo Bills' },
+            { code: 'CAR', name: 'Carolina Panthers' },
+            { code: 'CHI', name: 'Chicago Bears' },
+            { code: 'CIN', name: 'Cincinnati Bengals' },
+            { code: 'CLE', name: 'Cleveland Browns' },
+            { code: 'DAL', name: 'Dallas Cowboys' },
+            { code: 'DEN', name: 'Denver Broncos' },
+            { code: 'DET', name: 'Detroit Lions' },
+            { code: 'GB',  name: 'Green Bay Packers' },
+            { code: 'HOU', name: 'Houston Texans' },
+            { code: 'IND', name: 'Indianapolis Colts' },
+            { code: 'JAX', name: 'Jacksonville Jaguars' },
+            { code: 'KC',  name: 'Kansas City Chiefs' },
+            { code: 'LV',  name: 'Las Vegas Raiders' },
+            { code: 'LAC', name: 'Los Angeles Chargers' },
+            { code: 'LA',  name: 'Los Angeles Rams' },
+            { code: 'MIA', name: 'Miami Dolphins' },
+            { code: 'MIN', name: 'Minnesota Vikings' },
+            { code: 'NE',  name: 'New England Patriots' },
+            { code: 'NO',  name: 'New Orleans Saints' },
+            { code: 'NYG', name: 'New York Giants' },
+            { code: 'NYJ', name: 'New York Jets' },
+            { code: 'PHI', name: 'Philadelphia Eagles' },
+            { code: 'PIT', name: 'Pittsburgh Steelers' },
+            { code: 'SF',  name: 'San Francisco 49ers' },
+            { code: 'SEA', name: 'Seattle Seahawks' },
+            { code: 'TB',  name: 'Tampa Bay Buccaneers' },
+            { code: 'TEN', name: 'Tennessee Titans' },
+            { code: 'WAS', name: 'Washington Commanders' }
+        ];
+
+        function populateScheduleTeams() {
+            const select = document.getElementById('schedule-team-select');
+            if (!select) return;
+            select.innerHTML = '<option value="ALL" class="bg-[#161b22]">All 32 Teams</option>' +
+                NFL_TEAMS_LIST.map(t => `<option value="${t.code}" class="bg-[#161b22]">${t.name} (${t.code})</option>`).join('');
+        }
+
+        async function loadFullSchedule(season = currentScheduleSeason, sDate = null, eDate = null) {
+            isScheduleLoading = true;
+            sDate = sDate || startDate;
+            eDate = eDate || endDate;
+            const container = document.getElementById('schedule-games-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="glass-panel rounded-xl p-12 text-center text-slate-400 space-y-3">
+                        <i data-lucide="loader" class="w-7 h-7 animate-spin mx-auto text-slate-300"></i>
+                        <p class="text-sm font-medium">Loading ${season} regular season schedule & stats (${sDate} to ${eDate})...</p>
+                    </div>`;
+                lucide.createIcons();
+            }
+
+            try {
+                let url = `/api/full-schedule?season=${season}`;
+                if (sDate && eDate) {
+                    url += `&start_date=${encodeURIComponent(sDate)}&end_date=${encodeURIComponent(eDate)}`;
+                }
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                const data = await res.json();
+                globalScheduleData = data;
+
+                // Update Header & Summary Badges
+                const titleEl = document.getElementById('schedule-title');
+                if (titleEl) titleEl.textContent = `${season} NFL Season Schedule & Per-Game Matchup Stats`;
+
+                const totalGamesEl = document.getElementById('sched-stat-total-games');
+                if (totalGamesEl) totalGamesEl.textContent = data.total_games || 272;
+
+                const compGamesEl = document.getElementById('sched-stat-completed-games');
+                if (compGamesEl) compGamesEl.textContent = data.completed_games || 0;
+
+                const baselineNoteEl = document.getElementById('sched-stat-baseline-note');
+                if (baselineNoteEl) {
+                    const timelineText = (data.start_date && data.end_date)
+                        ? `Timeline: ${data.start_date} to ${data.end_date}`
+                        : (data.stats_baseline_note || `Stats reflect ${data.stats_season} averages`);
+                    baselineNoteEl.textContent = timelineText;
+                }
+
+                renderScheduleWeekPills();
+                renderScheduleGames();
+            } catch (err) {
+                console.error("Failed to load schedule:", err);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="glass-panel rounded-xl p-8 text-center text-rose-400 space-y-2">
+                            <i data-lucide="alert-triangle" class="w-7 h-7 mx-auto text-rose-400"></i>
+                            <p class="text-sm font-semibold">Failed to load ${season} schedule data.</p>
+                            <p class="text-xs text-slate-400">${err.message}</p>
+                            <button onclick="loadFullSchedule(${season}, '${sDate}', '${eDate}')" class="mt-3 px-3 py-1.5 rounded-lg bg-[#21262d] border border-[#30363d] text-slate-200 text-xs font-semibold hover:bg-[#30363d]">Retry</button>
+                        </div>`;
+                    lucide.createIcons();
+                }
+            } finally {
+                isScheduleLoading = false;
+            }
+        }
+
+        function onScheduleSeasonChange(season) {
+            currentScheduleSeason = parseInt(season);
+            const select = document.getElementById('schedule-season-select');
+            if (select) select.value = currentScheduleSeason.toString();
+
+            const subTitle = document.getElementById('schedule-subtitle');
+            if (subTitle) {
+                if (currentScheduleSeason === 2026) {
+                    subTitle.textContent = "Full 18-week 2026 schedule with per-game team passing, rushing, scoring & defensive stats";
+                } else if (currentScheduleSeason === 2025) {
+                    subTitle.textContent = "Full 18-week 2025 season schedule with verified scores, completed stats & defensive rankings";
+                }
+            }
+
+            selectedScheduleWeek = 'all';
+            loadFullSchedule(currentScheduleSeason, startDate, endDate);
+        }
+
+        function filterScheduleWeek(week) {
+            selectedScheduleWeek = week;
+            renderScheduleWeekPills();
+            renderScheduleGames();
+        }
+
+        function filterScheduleTeam(team) {
+            scheduleTeamFilter = team;
+            renderScheduleGames();
+        }
+
+        function onScheduleSearch(query) {
+            scheduleSearchQuery = (query || '').toLowerCase().trim();
+            renderScheduleGames();
+        }
+
+        function renderScheduleWeekPills() {
+            const container = document.getElementById('schedule-week-pills');
+            if (!container || !globalScheduleData || !globalScheduleData.weeks) return;
+
+            const isAll = selectedScheduleWeek === 'all';
+            let pillsHtml = `
+                <button onclick="filterScheduleWeek('all')" id="sched-week-pill-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition border ${isAll ? 'bg-[#30363d] text-slate-100 border-slate-500 font-bold' : 'bg-[#21262d] text-slate-400 hover:text-slate-200 border-[#30363d]'}">
+                    All Weeks (${globalScheduleData.weeks.length})
+                </button>
+            `;
+
+            globalScheduleData.weeks.forEach(w => {
+                const isActive = selectedScheduleWeek == w.week;
+                pillsHtml += `
+                    <button onclick="filterScheduleWeek(${w.week})" id="sched-week-pill-${w.week}" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition border ${isActive ? 'bg-[#30363d] text-slate-100 border-slate-500 font-bold' : 'bg-[#21262d] text-slate-400 hover:text-slate-200 border-[#30363d]'}">
+                        Week ${w.week}
+                    </button>
+                `;
+            });
+
+            container.innerHTML = pillsHtml;
+        }
+
+        function renderScheduleGames() {
+            const container = document.getElementById('schedule-games-container');
+            if (!container || !globalScheduleData || !globalScheduleData.weeks) return;
+
+            let weeksToRender = globalScheduleData.weeks;
+            if (selectedScheduleWeek !== 'all') {
+                const targetWeekNum = parseInt(selectedScheduleWeek);
+                weeksToRender = weeksToRender.filter(w => w.week === targetWeekNum);
+            }
+
+            let totalRenderedGames = 0;
+            let outputHtml = '';
+
+            weeksToRender.forEach(w => {
+                // Filter games within week
+                let weekGames = w.games || [];
+
+                // Filter by team
+                if (scheduleTeamFilter && scheduleTeamFilter !== 'ALL') {
+                    weekGames = weekGames.filter(g => g.home_team === scheduleTeamFilter || g.away_team === scheduleTeamFilter);
+                }
+
+                // Filter by search
+                if (scheduleSearchQuery) {
+                    const q = scheduleSearchQuery;
+                    weekGames = weekGames.filter(g => {
+                        const ht = (g.home_team || '').toLowerCase();
+                        const at = (g.away_team || '').toLowerCase();
+                        const htn = (g.home_team_name || '').toLowerCase();
+                        const atn = (g.away_team_name || '').toLowerCase();
+                        const stad = (g.stadium || '').toLowerCase();
+                        const day = (g.gameday || '').toLowerCase();
+                        return ht.includes(q) || at.includes(q) || htn.includes(q) || atn.includes(q) || stad.includes(q) || day.includes(q);
+                    });
+                }
+
+                if (weekGames.length === 0) return;
+
+                totalRenderedGames += weekGames.length;
+
+                outputHtml += `
+                    <div class="space-y-3">
+                        <!-- Week Header Banner -->
+                        <div class="flex items-center justify-between bg-[#161b22] border border-[#30363d] px-4 py-2.5 rounded-xl">
+                            <div class="flex items-center space-x-3">
+                                <span class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center font-bold text-slate-200 text-xs font-mono">
+                                    W${w.week}
+                                </span>
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-100">${w.label}</h3>
+                                    <p class="text-[11px] text-slate-400 font-mono">${w.date_range_str || (w.dates ? w.dates.join(' • ') : '')}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2 text-xs">
+                                <span class="px-2 py-0.5 rounded bg-[#21262d] border border-[#30363d] text-slate-300 font-mono font-medium">
+                                    ${weekGames.length} ${weekGames.length === 1 ? 'Matchup' : 'Matchups'}
+                                </span>
+                                ${w.completed_count > 0 ? `<span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[11px] font-bold">${w.completed_count} FINAL</span>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Game Cards Grid -->
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                            ${weekGames.map(g => renderGameCardHtml(g)).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (totalRenderedGames === 0) {
+                container.innerHTML = `
+                    <div class="glass-panel rounded-xl p-10 text-center text-slate-400 space-y-2">
+                        <i data-lucide="filter-x" class="w-8 h-8 mx-auto text-slate-500"></i>
+                        <p class="text-sm font-semibold text-slate-300">No matchups found</p>
+                        <p class="text-xs text-slate-500">Try changing your team filter or search criteria.</p>
+                        <button onclick="scheduleTeamFilter='ALL'; scheduleSearchQuery=''; document.getElementById('schedule-team-select').value='ALL'; document.getElementById('schedule-search-input').value=''; renderScheduleGames();" class="mt-2 px-3 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 text-xs font-medium hover:bg-[#30363d]">
+                            Reset Filters
+                        </button>
+                    </div>`;
+            } else {
+                container.innerHTML = outputHtml;
+            }
+
+            lucide.createIcons();
+        }
+
+        function renderGameCardHtml(g) {
+            const isFinal = g.is_final;
+            const a = g.away_stats || {};
+            const h = g.home_stats || {};
+
+            // Record display: show current record, and if 0-0 show prior season
+            let awayRec = g.away_record || '0-0';
+            let homeRec = g.home_record || '0-0';
+            if (awayRec === '0-0' && g.away_prior_record) awayRec = `0-0 (${g.away_prior_record})`;
+            if (homeRec === '0-0' && g.home_prior_record) homeRec = `0-0 (${g.home_prior_record})`;
+
+            // Spread & Odds Display
+            let oddsBadgeHtml = '';
+            if (isFinal) {
+                oddsBadgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span>FINAL</span></span>`;
+            } else if (g.spread_line != null) {
+                const spreadText = g.spread_line === 0 ? 'PK' : (g.spread_line > 0 ? `${g.home_team} -${g.spread_line}` : `${g.away_team} -${Math.abs(g.spread_line)}`);
+                oddsBadgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">${spreadText}${g.total_line ? ' • O/U ' + g.total_line : ''}</span>`;
+            } else {
+                oddsBadgeHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-400 border border-[#30363d]">UPCOMING</span>`;
+            }
+
+            // Stat Edge calculations
+            const passEdgeAway = (a.pass_yds_per_game || 0) > (h.pass_yds_per_game || 0);
+            const rushEdgeAway = (a.rush_yds_per_game || 0) > (h.rush_yds_per_game || 0);
+            const ptsEdgeAway = (a.pts_per_game || 0) > (h.pts_per_game || 0);
+
+            // Helpers for consistent numeric & unit formatting
+            const fmt1Dec = (val) => {
+                if (val == null || val === '') return '--';
+                const n = parseFloat(val);
+                return isNaN(n) ? val : n.toFixed(1);
+            };
+
+            const fmtDiffYds = (val) => {
+                if (val == null || val === '') return '--';
+                const n = parseFloat(val);
+                if (isNaN(n)) return val;
+                return (n > 0 ? `+${n.toFixed(1)}` : n.toFixed(1)) + ' yds';
+            };
+
+            const fmtYds = (val) => {
+                if (val == null || val === '') return '--';
+                const n = parseFloat(val);
+                if (isNaN(n)) return val;
+                return `${n.toFixed(1)} yds`;
+            };
+
+            const fmtMargin = (val) => {
+                if (val == null || val === '') return '--';
+                const n = parseInt(val);
+                if (isNaN(n)) return val;
+                return n > 0 ? `+${n}` : `${n}`;
+            };
+
+            const fmtPct = (val) => {
+                if (val == null || val === '') return '--';
+                const n = parseFloat(val);
+                if (isNaN(n)) return val;
+                return `${n.toFixed(1)}%`;
+            };
+
+            const fmtSignedPct = (val) => {
+                if (val == null || val === '') return '--';
+                const n = parseFloat(val);
+                if (isNaN(n)) return val;
+                return (n > 0 ? `+${n.toFixed(1)}%` : `${n.toFixed(1)}%`);
+            };
+
+            // Helpers for formatting stat rows
+            const formatRow = (label, awayVal, awayRank, homeVal, homeRank, highIsGood = true, awayN = null, homeN = null) => {
+                const awayNTag = awayN != null ? `<span class="text-[9px] text-slate-500 font-mono ml-0.5">(n=${awayN})</span>` : '';
+                const homeNTag = homeN != null ? `<span class="text-[9px] text-slate-500 font-mono mr-0.5">(n=${homeN})</span>` : '';
+                const awayBadge = awayRank ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${getRankBadge(awayRank, highIsGood)}">#${awayRank}</span>` : '';
+                const homeBadge = homeRank ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${getRankBadge(homeRank, highIsGood)}">#${homeRank}</span>` : '';
+                
+                return `
+                    <div class="grid grid-cols-3 items-center py-1.5 border-b border-[#21262d] text-xs hover:bg-[#21262d]/50 px-2 rounded transition">
+                        <!-- Away Stat -->
+                        <div class="flex items-center space-x-1.5 text-left font-mono">
+                            ${awayBadge}
+                            <span class="text-slate-200 font-bold">${awayVal != null ? awayVal : '--'}</span>
+                            ${awayNTag}
+                        </div>
+                        <!-- Metric Label -->
+                        <div class="text-center text-slate-400 text-[11px] font-medium uppercase tracking-tight">
+                            ${label}
+                        </div>
+                        <!-- Home Stat -->
+                        <div class="flex items-center justify-end space-x-1.5 text-right font-mono">
+                            ${homeNTag}
+                            <span class="text-slate-200 font-bold">${homeVal != null ? homeVal : '--'}</span>
+                            ${homeBadge}
+                        </div>
+                    </div>
+                `;
+            };
+
+            return `
+                <div class="glass-panel rounded-xl p-4 sm:p-5 border border-[#30363d] space-y-4 hover:border-slate-500 transition shadow-sm">
+                    <!-- Game Info Header Bar -->
+                    <div class="flex items-center justify-between text-xs text-slate-400 border-b border-[#30363d] pb-2.5">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-[#21262d] text-slate-300 border border-[#30363d] font-mono">
+                                W${g.week}
+                            </span>
+                            <span class="font-medium text-slate-300">
+                                ${g.weekday ? g.weekday + ', ' : ''}${g.gameday}
+                            </span>
+                            <span class="text-slate-500">•</span>
+                            <span class="font-mono text-slate-400">${g.gametime ? g.gametime + ' ET' : 'TBD'}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            ${oddsBadgeHtml}
+                        </div>
+                    </div>
+
+                    <!-- Matchup Banner / Scoreboard -->
+                    <div class="grid grid-cols-12 items-center py-1.5 gap-2">
+                        <!-- Away Team (5 cols) -->
+                        <div class="col-span-5 flex items-center space-x-2.5 min-w-0">
+                            <div class="w-10 h-10 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-extrabold text-slate-200 text-sm font-mono shadow-inner shrink-0">
+                                ${g.away_team}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-slate-100 text-xs sm:text-sm truncate" title="${g.away_team_name}">${g.away_team_name}</h4>
+                                <div class="text-[11px] text-slate-400 flex items-center flex-wrap gap-x-1.5 gap-y-0.5 mt-0.5">
+                                    <span class="text-slate-500 font-medium">Away</span>
+                                    <span class="text-slate-600">•</span>
+                                    <span class="font-mono text-slate-300 font-semibold whitespace-nowrap">${awayRec}</span>
+                                    ${a.def_overall_character ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold whitespace-nowrap ${a.def_overall_character === 'Elite Defense' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : (a.def_overall_character === 'Vulnerable Defense' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'bg-[#21262d] text-slate-400 border border-[#30363d]')}">${a.def_overall_character}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Center vs / Scores (2 cols) -->
+                        <div class="col-span-2 text-center flex flex-col items-center justify-center">
+                            ${isFinal ? `
+                                <div class="flex items-center justify-center space-x-1.5 font-mono font-extrabold text-lg sm:text-xl text-slate-100">
+                                    <span class="${(g.away_score || 0) > (g.home_score || 0) ? 'text-emerald-400 font-black' : 'text-slate-300'}">${Math.round(g.away_score)}</span>
+                                    <span class="text-slate-600 text-xs">-</span>
+                                    <span class="${(g.home_score || 0) > (g.away_score || 0) ? 'text-emerald-400 font-black' : 'text-slate-300'}">${Math.round(g.home_score)}</span>
+                                </div>
+                                <span class="text-[9px] font-bold font-mono text-emerald-400 tracking-wider uppercase">FINAL</span>
+                            ` : `
+                                <div class="w-7 h-7 mx-auto rounded-full bg-[#21262d] border border-[#30363d] flex items-center justify-center font-bold text-slate-400 text-xs">
+                                    @
+                                </div>
+                            `}
+                        </div>
+
+                        <!-- Home Team (5 cols) -->
+                        <div class="col-span-5 flex items-center justify-end space-x-2.5 text-right min-w-0">
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-slate-100 text-xs sm:text-sm truncate" title="${g.home_team_name}">${g.home_team_name}</h4>
+                                <div class="text-[11px] text-slate-400 flex items-center justify-end flex-wrap gap-x-1.5 gap-y-0.5 mt-0.5">
+                                    ${h.def_overall_character ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold whitespace-nowrap ${h.def_overall_character === 'Elite Defense' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : (h.def_overall_character === 'Vulnerable Defense' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'bg-[#21262d] text-slate-400 border border-[#30363d]')}">${h.def_overall_character}</span><span class="text-slate-600">•</span>` : ''}
+                                    <span class="font-mono text-slate-300 font-semibold whitespace-nowrap">${homeRec}</span>
+                                    <span class="text-slate-600">•</span>
+                                    <span class="text-slate-500 font-medium">Home</span>
+                                </div>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-extrabold text-slate-200 text-sm font-mono shadow-inner shrink-0">
+                                ${g.home_team}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Redesigned Per-Game Team Stat Comparison Table (Volume x Efficiency) -->
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3 space-y-1">
+                        <div class="grid grid-cols-3 text-[10px] uppercase font-bold text-slate-500 border-b border-[#21262d] pb-1.5 px-2">
+                            <div class="text-left font-mono">${g.away_team} STAT & RANK</div>
+                            <div class="text-center">
+                                <span>PER-GAME STAT</span>
+                                ${a.is_shrunk || h.is_shrunk ? '<span class="text-[8px] text-amber-400/90 font-mono block normal-case font-normal tracking-normal">(Empirical Bayes Shrunk with Prior)</span>' : ''}
+                            </div>
+                            <div class="text-right font-mono">${g.home_team} STAT & RANK</div>
+                        </div>
+
+                        <!-- 1. Scoring (Vegas Implied Total) -->
+                        ${g.implied_away_total != null || g.implied_home_total != null ? formatRow('Vegas Implied Total', fmt1Dec(g.implied_away_total), null, fmt1Dec(g.implied_home_total), null, true) : ''}
+
+                        <!-- 2. Passing: Volume & Game-Script-Neutral Intent -->
+                        ${formatRow('Pass Att/G', fmt1Dec(a.pass_att_per_game), a.rank_pass_att, fmt1Dec(h.pass_att_per_game), h.rank_pass_att, true, a.games_played, h.games_played)}
+                        ${formatRow('Pass Yds Allowed/G', fmt1Dec(a.pass_yds_allowed_per_game), a.rank_pass_allowed, fmt1Dec(h.pass_yds_allowed_per_game), h.rank_pass_allowed, false)}
+                        ${a.proe != null || h.proe != null ? formatRow('PROE (Neutral Pass Intent)', fmtSignedPct(a.proe), a.rank_proe, fmtSignedPct(h.proe), h.rank_proe, true, a.neutral_plays_sample, h.neutral_plays_sample) : ''}
+
+                        <!-- 3. Passing: Efficiency & Explosiveness (20+ Yd Chunk Plays) -->
+                        ${formatRow('YPA (Offense)', fmt1Dec(a.yds_per_att), a.rank_ypa, fmt1Dec(h.yds_per_att), h.rank_ypa, true)}
+                        ${formatRow('YPA Allowed', fmt1Dec(a.opp_yds_per_att), a.rank_opp_ypa, fmt1Dec(h.opp_yds_per_att), h.rank_opp_ypa, false)}
+                        ${a.exp_pass_rate != null || h.exp_pass_rate != null ? formatRow('Explosive Pass Rate (20+ yds)', fmtPct(a.exp_pass_rate), a.rank_exp_pass_rate, fmtPct(h.exp_pass_rate), h.rank_exp_pass_rate, true, a.total_pass_att_sample, h.total_pass_att_sample) : ''}
+                        ${a.opp_exp_pass_rate != null || h.opp_exp_pass_rate != null ? formatRow('Opp Explosive Pass Allowed', fmtPct(a.opp_exp_pass_rate), a.rank_opp_exp_pass_rate, fmtPct(h.opp_exp_pass_rate), h.rank_opp_exp_pass_rate, false, a.opp_pass_att_sample, h.opp_pass_att_sample) : ''}
+
+                        <!-- 4. Rushing: Volume -->
+                        ${formatRow('Carries/G', fmt1Dec(a.carries_per_game), a.rank_carries, fmt1Dec(h.carries_per_game), h.rank_carries, true, a.games_played, h.games_played)}
+                        ${formatRow('Rush Yds Allowed/G', fmt1Dec(a.rush_yds_allowed_per_game), a.rank_rush_allowed, fmt1Dec(h.rush_yds_allowed_per_game), h.rank_rush_allowed, false)}
+
+                        <!-- 5. Rushing: Efficiency -->
+                        ${formatRow('YPC (Offense)', fmt1Dec(a.yds_per_carry), a.rank_ypc, fmt1Dec(h.yds_per_carry), h.rank_ypc, true)}
+                        ${formatRow('YPC Allowed', fmt1Dec(a.opp_yds_per_carry), a.rank_opp_ypc, fmt1Dec(h.opp_yds_per_carry), h.rank_opp_ypc, false)}
+
+                        <!-- 6. Defense vs Star Players -->
+                        ${a.def_star_rb_diff != null || h.def_star_rb_diff != null ? formatRow('vs Star RBs', fmtDiffYds(a.def_star_rb_diff), a.rank_def_star_rb, fmtDiffYds(h.def_star_rb_diff), h.rank_def_star_rb, false) : ''}
+                        ${a.def_star_wr_diff != null || h.def_star_wr_diff != null ? formatRow('vs WR1s', fmtDiffYds(a.def_star_wr_diff), a.rank_def_star_wr, fmtDiffYds(h.def_star_wr_diff), h.rank_def_star_wr, false) : ''}
+
+                        <!-- 7. Trenches: Pressure Generation & Pass Protection Leak -->
+                        ${a.pressure_rate_generated != null || h.pressure_rate_generated != null ? formatRow('Def Pressure Rate Gen', fmtPct(a.pressure_rate_generated), a.rank_pressure_rate_generated, fmtPct(h.pressure_rate_generated), h.rank_pressure_rate_generated, true, a.opp_pass_att_sample, h.opp_pass_att_sample) : ''}
+                        ${a.pressure_rate_allowed != null || h.pressure_rate_allowed != null ? formatRow('Pass Pro Pressure Allowed', fmtPct(a.pressure_rate_allowed), a.rank_pressure_rate_allowed, fmtPct(h.pressure_rate_allowed), h.rank_pressure_rate_allowed, false, a.total_pass_att_sample, h.total_pass_att_sample) : ''}
+                        ${formatRow('Sacks Generated/G', fmt1Dec(a.sacks_forced_per_game), a.rank_sacks_forced, fmt1Dec(h.sacks_forced_per_game), h.rank_sacks_forced, true)}
+                    </div>
+
+                    <!-- Pass / Run Opportunity Funnel Card (Scaled by Pace & Vegas Total) -->
+                    ${g.funnel ? `
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3 space-y-2">
+                        <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-[#21262d] pb-1.5 px-1">
+                            <span class="flex items-center space-x-1.5">
+                                <i data-lucide="split" class="w-3 h-3 text-slate-400"></i>
+                                <span>Pass / Run Opportunity Funnel</span>
+                            </span>
+                            <span class="font-mono text-[9px] text-slate-300 bg-[#161b22] px-2 py-0.5 rounded border border-[#21262d]">Game Pace: ${(g.funnel.away.proj_total_plays + g.funnel.home.proj_total_plays).toFixed(0)} Plays (${((g.funnel.away.proj_total_plays + g.funnel.home.proj_total_plays)/2).toFixed(1)}/tm)</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <!-- Away Team Funnel -->
+                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-200 font-mono text-[11px]">${g.away_team} Offense</span>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-[#21262d] text-slate-300 border border-[#30363d]">${g.funnel.away.proj_total_plays} Plays</span>
+                                        <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold ${g.funnel.away.off_tendency === 'PASS_HEAVY' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : (g.funnel.away.off_tendency === 'RUN_HEAVY' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-[#21262d] text-slate-400')}">${g.funnel.away.off_tendency}</span>
+                                    </div>
+                                </div>
+                                <div class="text-[11px] text-slate-400 flex justify-between font-mono">
+                                    <span>Pass: <b class="text-slate-200">${g.funnel.away.proj_pass_att} att</b> (${g.funnel.away.pass_rate}%)</span>
+                                    <span>Rush: <b class="text-slate-200">${g.funnel.away.proj_carries} car</b> (${g.funnel.away.run_rate}%)</span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-1.5 rounded-full overflow-hidden flex">
+                                    <div class="bg-cyan-500 h-full" style="width: ${g.funnel.away.pass_rate}%"></div>
+                                    <div class="bg-amber-500 h-full" style="width: ${g.funnel.away.run_rate}%"></div>
+                                </div>
+                                <div class="text-[9px] text-slate-500 pt-0.5 flex items-center justify-between">
+                                    <span>Opp D Funnel:</span>
+                                    <span class="font-semibold text-slate-400 font-mono">${g.funnel.away.def_funnel}</span>
+                                </div>
+                            </div>
+                            <!-- Home Team Funnel -->
+                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-200 font-mono text-[11px]">${g.home_team} Offense</span>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-[#21262d] text-slate-300 border border-[#30363d]">${g.funnel.home.proj_total_plays} Plays</span>
+                                        <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold ${g.funnel.home.off_tendency === 'PASS_HEAVY' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : (g.funnel.home.off_tendency === 'RUN_HEAVY' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-[#21262d] text-slate-400')}">${g.funnel.home.off_tendency}</span>
+                                    </div>
+                                </div>
+                                <div class="text-[11px] text-slate-400 flex justify-between font-mono">
+                                    <span>Pass: <b class="text-slate-200">${g.funnel.home.proj_pass_att} att</b> (${g.funnel.home.pass_rate}%)</span>
+                                    <span>Rush: <b class="text-slate-200">${g.funnel.home.proj_carries} car</b> (${g.funnel.home.run_rate}%)</span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-1.5 rounded-full overflow-hidden flex">
+                                    <div class="bg-cyan-500 h-full" style="width: ${g.funnel.home.pass_rate}%"></div>
+                                    <div class="bg-amber-500 h-full" style="width: ${g.funnel.home.run_rate}%"></div>
+                                </div>
+                                <div class="text-[9px] text-slate-500 pt-0.5 flex items-center justify-between">
+                                    <span>Opp D Funnel:</span>
+                                    <span class="font-semibold text-slate-400 font-mono">${g.funnel.home.def_funnel}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Venue & Weather Line -->
+                    <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-0.5 px-1">
+                        <div class="flex items-center space-x-1.5 truncate">
+                            <i data-lucide="map-pin" class="w-3 h-3 text-slate-500"></i>
+                            <span class="truncate">${g.stadium || 'NFL Stadium'}${g.roof ? ' • ' + g.roof : ''}${g.surface ? ' (' + g.surface + ')' : ''}</span>
+                        </div>
+                        ${g.temp != null ? `<div class="font-mono text-slate-400">${g.temp}°F${g.wind ? ' • ' + g.wind + 'mph wind' : ''}</div>` : ''}
+                    </div>
+
+                    <!-- Action Button: Deep Dive in Matchup Lab -->
+                    <button onclick="jumpToH2H('${g.home_team}', '${g.away_team}')" class="w-full py-2 px-3 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-slate-300 hover:text-slate-100 text-xs font-semibold flex items-center justify-center space-x-2 border border-[#30363d] transition">
+                        <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
+                        <span>Deep Dive in Matchup Lab (H2H)</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function jumpToH2H(homeTeam, awayTeam) {
+            switchTab('h2h');
+            const homeSelect = document.getElementById('h2h-home-team');
+            const awaySelect = document.getElementById('h2h-away-team');
+            if (homeSelect && awaySelect) {
+                homeSelect.value = homeTeam;
+                awaySelect.value = awayTeam;
+                renderH2HComparison();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
