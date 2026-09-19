@@ -7,7 +7,17 @@
     "deploy:preview": "vercel",
     "start": "python run_app.py"
   },
-  "keywords": ["nfl", "football", "analytics", "fastapi", "sports-stats"],
+  "keywords": [
+    "nfl",
+    "football",
+    "analytics",
+    "fastapi",
+    "sports-stats"
+  ],
   "author": "jibinator1",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0"
+  }
 }
