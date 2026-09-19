@@ -32,17 +32,12 @@ class VercelPathMiddleware:
             if not matched_path:
                 matched_path = headers.get(b"x-vercel-matched-path", b"").decode("utf-8", errors="ignore")
             
-            if matched_path:
+            # If x-matched-path contains the real client route (e.g. /api/status or /api/full-schedule?season=2026)
+            if matched_path and not matched_path.endswith("index.py"):
                 parsed = urlparse(matched_path)
                 scope["path"] = parsed.path
                 if parsed.query and not scope.get("query_string"):
                     scope["query_string"] = parsed.query.encode("utf-8")
-            elif scope.get("path", "").startswith("/api/index.py"):
-                sub = scope["path"][len("/api/index.py"):]
-                scope["path"] = sub if sub.startswith("/") else ("/" + sub if sub else "/")
-            elif scope.get("path", "").startswith("/index.py"):
-                sub = scope["path"][len("/index.py"):]
-                scope["path"] = sub if sub.startswith("/") else ("/" + sub if sub else "/")
                 
         await self.app(scope, receive, send)
 
