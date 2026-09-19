@@ -2,16 +2,20 @@
 """
 NFL Analytics Hub - Daily Data Ingestion & Auto-Deploy Pipeline
 ==============================================================
-Designed to run on Mac / Linux / Windows terminal or via cron.
-1. Pulls the latest regular season player stats & game schedules via nflreadpy.
-2. Recomputes implied team totals, rest days, and weather factors.
-3. Updates pre-baked parquet caches in both api/data/ (Vercel) and data/ (local).
-4. Synchronizes PBP feature caches.
-5. Automatically commits and pushes to GitHub to trigger an instant Vercel redeploy.
+Designed to run on Windows startup, terminal, or via cron.
+1. Checks if the pipeline has already executed today (bypassed with --force).
+2. Syncs with remote GitHub repository.
+3. Pulls the latest regular season player stats & game schedules via nflreadpy.
+4. Recomputes implied team totals, rest days, and weather factors.
+5. Updates pre-baked parquet caches in both api/data/ (Vercel) and data/ (local).
+6. Synchronizes PBP feature caches.
+7. Automatically commits and pushes to GitHub to trigger an instant Vercel redeploy.
+8. Writes last run timestamp to last_run.txt.
 """
 
 import os
 import sys
+import argparse
 import subprocess
 import time
 from datetime import datetime
@@ -28,6 +32,40 @@ from backend.pbp_features import load_pbp_features
 
 SEASONS = [2023, 2024, 2025, 2026]
 AUTO_PUSH = True
+LAST_RUN_FILE = os.path.join(PROJECT_DIR, 'last_run.txt')
+
+
+def has_run_today():
+    """Checks if the daily update has already executed today."""
+    if not os.path.exists(LAST_RUN_FILE):
+        return False
+    try:
+        with open(LAST_RUN_FILE, 'r', encoding='utf-8') as f:
+            last_date = f.read().strip().split()[0]
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        return last_date == today_str
+    except Exception:
+        return False
+
+
+def record_run_success():
+    """Records successful execution timestamp to last_run.txt."""
+    try:
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        with open(LAST_RUN_FILE, 'w', encoding='utf-8') as f:
+            f.write(now_str + '\n')
+        print(f"[Tracker] Recorded successful sync at {now_str} in {os.path.basename(LAST_RUN_FILE)}")
+    except Exception as e:
+        print(f"[Tracker Warning] Could not record last run timestamp: {e}")
+
+
+def sync_remote_repo():
+    """Pulls latest changes from origin main to avoid push rejection."""
+    try:
+        print("Pulling latest changes from remote...")
+        subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'], cwd=PROJECT_DIR, check=False)
+    except Exception as e:
+        print(f"[Notice] Remote sync check: {e}")
 
 
 def fetch_and_update_data():
@@ -148,16 +186,28 @@ def push_to_github():
 
 
 def main():
+    parser = argparse.ArgumentParser(description="NFL Website Daily Data Ingestion")
+    parser.add_argument("--force", action="store_true", help="Force run even if already executed today")
+    args = parser.parse_args()
+
     t_start = time.time()
+    today_str = datetime.now().strftime('%Y-%m-%d')
     print("=" * 65)
     print("NFL ANALYTICS HUB - DAILY DATA SYNC")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 65)
 
+    if not args.force and has_run_today():
+        print(f"[SKIP] NFL data sync has already completed today ({today_str}).")
+        print("Use '--force' if you wish to override and run again.")
+        return
+
+    sync_remote_repo()
     success = fetch_and_update_data()
     if success:
         if AUTO_PUSH:
             push_to_github()
+        record_run_success()
         elapsed = time.time() - t_start
         print(f"\nProcess completed successfully in {elapsed:.1f} seconds.")
     else:

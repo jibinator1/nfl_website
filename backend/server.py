@@ -7,7 +7,7 @@ Runs 100% on public open-source NFL data with zero API key dependencies.
 
 import os
 import threading
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import FastAPI, APIRouter, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
@@ -28,20 +28,10 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# CORS setup for local development
-_origins = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-custom_origin = os.getenv("ALLOWED_ORIGIN")
-if custom_origin:
-    _origins.append(custom_origin)
-
+# CORS setup for local and production Vercel environments
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -86,7 +76,13 @@ async def serve_index():
     return HTMLResponse("<h1>Dashboard loading... please refresh in a moment.</h1>")
 
 
-@app.get("/api/status")
+# ---------------------------------------------------------------------------
+# API Router (Registered under both /api and root / for seamless Vercel rewrites)
+# ---------------------------------------------------------------------------
+api_router = APIRouter()
+
+
+@api_router.get("/status")
 async def get_status():
     """Returns data ingestion and system status."""
     ensure_data_loaded()
@@ -100,7 +96,7 @@ async def get_status():
     }
 
 
-@app.get("/api/team-stats")
+@api_router.get("/team-stats")
 async def get_team_stats(
     season: int = Query(None, description="NFL Season (e.g. 2026, 2025)"),
     start_date: str = Query(None, description="Start date YYYY-MM-DD"),
@@ -117,7 +113,7 @@ async def get_team_stats(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/team-highlights")
+@api_router.get("/team-highlights")
 async def get_team_highlights(
     season: int = Query(None, description="NFL Season"),
     start_date: str = Query(None, description="Start date YYYY-MM-DD"),
@@ -144,7 +140,7 @@ async def get_team_highlights(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/schedule-weeks")
+@api_router.get("/schedule-weeks")
 async def get_schedule_weeks(season: int = Query(2026, description="NFL Season")):
     """Returns all weeks and calendar dates in the schedule for dropdown filtering."""
     ensure_data_loaded()
@@ -164,7 +160,7 @@ async def get_schedule_weeks(season: int = Query(2026, description="NFL Season")
     return {'season': season, 'weeks': weeks}
 
 
-@app.get("/api/matchup-deepdive")
+@api_router.get("/matchup-deepdive")
 async def get_matchup_deepdive_endpoint(
     home_team: str = Query(..., description="Home Team Abbreviation"),
     away_team: str = Query(..., description="Away Team Abbreviation"),
@@ -187,8 +183,8 @@ async def get_matchup_deepdive_endpoint(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/schedule")
-@app.get("/api/full-schedule")
+@api_router.get("/schedule")
+@api_router.get("/full-schedule")
 async def get_full_schedule_endpoint(
     season: int = Query(2026, description="NFL Season (e.g. 2026, 2025)"),
     start_date: str = Query(None, description="Start date in YYYY-MM-DD format"),
@@ -203,6 +199,11 @@ async def get_full_schedule_endpoint(
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# Mount the router under both /api and root /
+app.include_router(api_router, prefix="/api")
+app.include_router(api_router, prefix="")
 
 
 if __name__ == "__main__":
