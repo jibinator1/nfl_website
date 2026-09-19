@@ -55,6 +55,7 @@ def ensure_data_loaded():
 @app.on_event("startup")
 def startup_event():
     print("NFL Analytics Hub API initialized.")
+    ensure_data_loaded()
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -169,6 +170,7 @@ async def get_matchup_deepdive_endpoint(
     end_date: str = Query(None, description="End date in YYYY-MM-DD format")
 ):
     """Returns unit battles, ground vs aerial matchups, WR1 tests, and scramble containment."""
+    ensure_data_loaded()
     try:
         data = compute_matchup_deepdive(
             engine.weekly, engine.schedules,
@@ -191,6 +193,7 @@ async def get_full_schedule_endpoint(
     end_date: str = Query(None, description="End date in YYYY-MM-DD format")
 ):
     """Returns the full 18-week schedule with per-game team stats, records, and opportunity funnels."""
+    ensure_data_loaded()
     try:
         data = compute_full_season_schedule(
             engine.weekly, engine.schedules,
