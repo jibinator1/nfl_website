@@ -1,38 +1,27 @@
-"""
-NFL Data Loader & Analytics Ingestion Engine
-============================================
-Manages open-source NFL data ingestion via nflreadpy with zero API key dependencies:
-- Weekly player box scores (passing, rushing, receiving, EPA, target shares)
-- Full 18-week regular season schedules, game scores, and spread/total lines
-- Official NFL team rosters and dynamic trade/injury overrides
-- Pre-cached play-by-play advanced metrics (PROE, explosive play rates, pressure rates)
-"""
-
 import os
 import json
 import pandas as pd
 import numpy as np
-import nflreadpy as nfl
 
 from backend.pbp_features import load_pbp_features
 
-# Determine data directory (check api/data first for Vercel, then root data/)
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CANDIDATE_DATA_DIRS = [
     os.path.join(ROOT_DIR, 'api', 'data'),
     os.path.join(ROOT_DIR, 'data'),
     os.path.join(os.getcwd(), 'api', 'data'),
     os.path.join(os.getcwd(), 'data'),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'api', 'data'),
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data'),
 ]
-DATA_DIR = os.path.join(ROOT_DIR, 'data')
-for c in CANDIDATE_DATA_DIRS:
-    if os.path.exists(os.path.join(c, 'weekly_cache.parquet')):
-        DATA_DIR = c
-        break
 
-MANUAL_OVERRIDES_FILE = os.path.join(DATA_DIR, 'manual_overrides.json')
-WEEKLY_CACHE_PATH = os.path.join(DATA_DIR, 'weekly_cache.parquet')
-SCHEDULES_CACHE_PATH = os.path.join(DATA_DIR, 'schedules_cache.parquet')
+
+def _find_data_file(filename):
+    for d in CANDIDATE_DATA_DIRS:
+        p = os.path.join(d, filename)
+        if os.path.exists(p):
+            return p
+    return os.path.join(ROOT_DIR, 'data', filename)
 
 
 class NFLDataLoader:
@@ -47,11 +36,12 @@ class NFLDataLoader:
         self.is_loaded = False
 
     def _load_manual_overrides(self):
-        """Loads trade and injury overrides from data/manual_overrides.json."""
-        if not os.path.exists(MANUAL_OVERRIDES_FILE):
+        """Loads trade and injury overrides from manual_overrides.json."""
+        overrides_file = _find_data_file('manual_overrides.json')
+        if not os.path.exists(overrides_file):
             return {'trade_overrides': {}, 'injury_overrides': {}, 'player_blacklist': []}
         try:
-            with open(MANUAL_OVERRIDES_FILE, 'r', encoding='utf-8') as f:
+            with open(overrides_file, 'r', encoding='utf-8') as f:
                 raw = json.load(f)
             t_map = {}
             for item in raw.get('trade_overrides', []):
@@ -68,12 +58,16 @@ class NFLDataLoader:
 
     def load_data(self):
         """Loads player stats, schedules, and advanced metrics (cache-first for instant Vercel startup)."""
-        # 1. Instant Cache Path (0.05s cold start on Vercel)
-        if os.path.exists(WEEKLY_CACHE_PATH) and os.path.exists(SCHEDULES_CACHE_PATH):
+        weekly_path = _find_data_file('weekly_cache.parquet')
+        schedules_path = _find_data_file('schedules_cache.parquet')
+        is_serverless = os.getenv('VERCEL') is not None or os.getenv('AWS_LAMBDA_FUNCTION_NAME') is not None
+
+        # 1. Instant Cache Path (0.05s cold start on Vercel, < 50MB RAM)
+        if os.path.exists(weekly_path) and os.path.exists(schedules_path):
             try:
-                print(f"Loading NFL data from cache at {DATA_DIR}...")
-                self.weekly = pd.read_parquet(WEEKLY_CACHE_PATH)
-                self.schedules = pd.read_parquet(SCHEDULES_CACHE_PATH)
+                print(f"Loading NFL data from cache ({weekly_path})...")
+                self.weekly = pd.read_parquet(weekly_path)
+                self.schedules = pd.read_parquet(schedules_path)
                 try:
                     self.pbp_feats = load_pbp_features(self.seasons)
                 except Exception as pe:
@@ -82,9 +76,18 @@ class NFLDataLoader:
                 print(f"NFL Data Engine ready (cached)! Loaded {len(self.weekly)} player games and {len(self.schedules)} matchups.")
                 return
             except Exception as e:
-                print(f"Note loading parquet cache, falling back to network: {e}")
+                print(f"Note loading parquet cache: {e}")
 
-        # 2. Network Fallback Path via nflreadpy
+        if is_serverless:
+            print("[Data Engine] Serverless mode: cache unreadable, initializing minimal safe state.")
+            self.weekly = pd.DataFrame()
+            self.schedules = pd.DataFrame()
+            self.pbp_feats = load_pbp_features(self.seasons)
+            self.is_loaded = True
+            return
+
+        # 2. Local Ingestion Fallback (Only run offline/locally)
+        import nflreadpy as nfl
         print(f"Loading NFL data for seasons {self.seasons} via nflreadpy...")
         weekly_dfs = []
         sched_dfs = []
@@ -151,9 +154,11 @@ class NFLDataLoader:
 
         # Cache freshly fetched datasets
         try:
-            self.weekly.to_parquet(WEEKLY_CACHE_PATH, index=False)
-            self.schedules.to_parquet(SCHEDULES_CACHE_PATH, index=False)
-            print("Saved updated data to local parquet cache.")
+            for save_dir in [os.path.join(ROOT_DIR, 'data'), os.path.join(ROOT_DIR, 'api', 'data')]:
+                os.makedirs(save_dir, exist_ok=True)
+                self.weekly.to_parquet(os.path.join(save_dir, 'weekly_cache.parquet'), index=False)
+                self.schedules.to_parquet(os.path.join(save_dir, 'schedules_cache.parquet'), index=False)
+            print("Saved updated data to local parquet caches.")
         except Exception as se:
             print(f"Note caching datasets: {se}")
 

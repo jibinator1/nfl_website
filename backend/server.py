@@ -37,10 +37,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend')
-os.makedirs(FRONTEND_DIR, exist_ok=True)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FRONTEND_DIR = os.path.join(ROOT_DIR, 'frontend')
 
-# Initialize Data Loader singleton (seasons 2023–2026)
+# Initialize Data Loader singleton (seasons 2023-2026)
 engine = NFLDataLoader(seasons=[2023, 2024, 2025, 2026])
 _data_lock = threading.Lock()
 
@@ -64,10 +64,13 @@ async def favicon():
 
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/index.html", response_class=HTMLResponse)
 async def serve_index():
     candidates = [
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html"),
+        os.path.join(ROOT_DIR, "index.html"),
         os.path.join(FRONTEND_DIR, "index.html"),
+        os.path.join(os.getcwd(), "index.html"),
+        os.path.join(os.getcwd(), "frontend", "index.html"),
         "index.html",
     ]
     for p in candidates:
@@ -104,7 +107,6 @@ async def get_team_stats(
     end_date: str = Query(None, description="End date YYYY-MM-DD")
 ):
     ensure_data_loaded()
-    """Returns 32-team rankings and volume x efficiency statistics overview."""
     try:
         overview = compute_team_stat_overview(
             engine.weekly, engine.schedules, season=season, start_date=start_date, end_date=end_date
@@ -122,7 +124,6 @@ async def get_team_highlights(
     team: str = Query(None, description="Filter by team code (e.g. KC, BAL)")
 ):
     ensure_data_loaded()
-    """Returns matchup trends, tactical vulnerabilities, and explosive unit alerts."""
     try:
         res = compute_matchup_highlights(
             engine.weekly, engine.schedules, season=season, start_date=start_date, end_date=end_date
@@ -169,7 +170,6 @@ async def get_matchup_deepdive_endpoint(
     start_date: str = Query(None, description="Start date in YYYY-MM-DD format"),
     end_date: str = Query(None, description="End date in YYYY-MM-DD format")
 ):
-    """Returns unit battles, ground vs aerial matchups, WR1 tests, and scramble containment."""
     ensure_data_loaded()
     try:
         data = compute_matchup_deepdive(
@@ -192,7 +192,6 @@ async def get_full_schedule_endpoint(
     start_date: str = Query(None, description="Start date in YYYY-MM-DD format"),
     end_date: str = Query(None, description="End date in YYYY-MM-DD format")
 ):
-    """Returns the full 18-week schedule with per-game team stats, records, and opportunity funnels."""
     ensure_data_loaded()
     try:
         data = compute_full_season_schedule(

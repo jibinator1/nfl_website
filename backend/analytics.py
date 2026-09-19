@@ -1839,6 +1839,10 @@ def compute_full_season_schedule(weekly_df, schedules_df, season=2026, start_dat
     with team records, game metadata, and comprehensive per-game offensive/defensive
     team stats and 1-32 league rankings based on user-controlled date timeline or season.
     """
+    try:
+        season = int(season) if season is not None else 2026
+    except (ValueError, TypeError):
+        season = 2026
     s = schedules_df[(schedules_df['season'] == season) & (schedules_df['game_type'] == 'REG')].copy()
     if len(s) == 0:
         return {
