@@ -13,10 +13,22 @@ import os
 import time
 import numpy as np
 import pandas as pd
-import nflreadpy as nfl
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
-PBP_CACHE_DIR = os.path.join(DATA_DIR, 'pbp_cache')
+# Determine cache directory dynamically (supporting Vercel api/data and local data)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CANDIDATE_CACHE_DIRS = [
+    os.path.join(ROOT_DIR, 'api', 'data', 'pbp_cache'),
+    os.path.join(ROOT_DIR, 'data', 'pbp_cache'),
+    os.path.join(os.getcwd(), 'api', 'data', 'pbp_cache'),
+    os.path.join(os.getcwd(), 'data', 'pbp_cache'),
+]
+
+PBP_CACHE_DIR = os.path.join(ROOT_DIR, 'data', 'pbp_cache')
+for c in CANDIDATE_CACHE_DIRS:
+    if os.path.exists(os.path.join(c, 'player_pbp_features.parquet')):
+        PBP_CACHE_DIR = c
+        break
+
 os.makedirs(PBP_CACHE_DIR, exist_ok=True)
 
 PLAYER_CACHE_FILE = os.path.join(PBP_CACHE_DIR, 'player_pbp_features.parquet')
@@ -27,7 +39,6 @@ EXPLOSIVE_CACHE_FILE = os.path.join(PBP_CACHE_DIR, 'explosive_features.parquet')
 SUMMARY_CACHE_FILE = os.path.join(PBP_CACHE_DIR, 'team_pbp_summary.parquet')
 
 # Authoritative completed seasons for macro baseline (2-year quality benchmark)
-# Must only be updated manually after a full season settles, NEVER dynamically.
 MACRO_BASELINE_SEASONS = [2024, 2025]
 
 
@@ -64,136 +75,119 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
     runs = pbp[pbp['play_type'] == 'run'].copy()
     runs['is_explosive_rush'] = (runs['yards_gained'] >= 10).astype(int)
 
-    # -------------------------------------------------------------------------
-    # 1. Receiver Pass Depth & aDOT Trajectory
-    # -------------------------------------------------------------------------
-    rec_plays = passes.dropna(subset=['receiver_player_id']).copy()
-    rec_game = rec_plays.groupby(['season', 'week', 'receiver_player_id']).agg(
-        rec_targets=('play_id', 'count'),
-        rec_short_targets=('is_short', 'sum'),
-        rec_deep_targets=('is_deep', 'sum'),
-        rec_adot=('air_yards', 'mean'),
-        rec_short_yards=('yards_gained', lambda x: x[rec_plays.loc[x.index, 'is_short'] == 1].sum()),
-        rec_deep_yards=('yards_gained', lambda x: x[rec_plays.loc[x.index, 'is_deep'] == 1].sum()),
-    ).reset_index().rename(columns={'receiver_player_id': 'player_id'})
+    # 1. Receiver Pass-Depth Targets & Target Shares
+    rec_depth = passes.dropna(subset=['receiver_player_id']).groupby(
+        ['season', 'week', 'receiver_player_id', 'posteam']
+    ).agg(
+        targets=('play_id', 'count'),
+        short_targets=('is_short', 'sum'),
+        inter_targets=('is_inter', 'sum'),
+        deep_targets=('is_deep', 'sum'),
+        total_air_yards=('air_yards', 'sum')
+    ).reset_index().rename(columns={'receiver_player_id': 'player_id', 'posteam': 'team'})
 
-    rec_game['short_target_share'] = rec_game['rec_short_targets'] / rec_game['rec_targets'].clip(lower=1)
-    rec_game['deep_target_share'] = rec_game['rec_deep_targets'] / rec_game['rec_targets'].clip(lower=1)
+    rec_depth['short_target_share'] = rec_depth['short_targets'] / rec_depth['targets'].clip(lower=1)
+    rec_depth['inter_target_share'] = rec_depth['inter_targets'] / rec_depth['targets'].clip(lower=1)
+    rec_depth['deep_target_share'] = rec_depth['deep_targets'] / rec_depth['targets'].clip(lower=1)
+    rec_depth['adot'] = rec_depth['total_air_yards'] / rec_depth['targets'].clip(lower=1)
 
-    rec_game = rec_game.sort_values(['player_id', 'season', 'week'])
-    for col in ['short_target_share', 'deep_target_share', 'rec_adot', 'rec_short_yards', 'rec_deep_yards']:
-        rec_game[f'roll_{col}'] = rec_game.groupby('player_id')[col].transform(
+    rec_depth = rec_depth.sort_values(['player_id', 'season', 'week'])
+    for col in ['short_target_share', 'inter_target_share', 'deep_target_share', 'adot']:
+        rec_depth[f'roll_{col}'] = rec_depth.groupby('player_id')[col].transform(
             lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
         )
-    # aDOT trend: 3-week recent vs 5-week baseline
-    rec_game['roll_rec_adot_recent'] = rec_game.groupby('player_id')['rec_adot'].transform(
-        lambda x: x.rolling(3, min_periods=1).mean().shift(1)
-    )
-    rec_game['adot_trend'] = rec_game['roll_rec_adot_recent'] - rec_game['roll_rec_adot']
+    rec_depth['adot_trajectory'] = rec_depth['roll_adot'] - rec_depth.groupby('player_id')['roll_adot'].shift(1)
+    rec_depth_df = rec_depth[['player_id', 'season', 'week', 'roll_short_target_share', 'roll_inter_target_share', 'roll_deep_target_share', 'roll_adot', 'adot_trajectory']].copy()
 
-    rec_depth_df = rec_game[['player_id', 'season', 'week', 'roll_short_target_share',
-                             'roll_deep_target_share', 'roll_rec_adot', 'adot_trend']].copy()
+    # 2. QB Pass-Depth Distribution & EPA/Att
+    qb_depth = passes.dropna(subset=['passer_player_id']).groupby(
+        ['season', 'week', 'passer_player_id', 'posteam']
+    ).agg(
+        attempts=('play_id', 'count'),
+        deep_att=('is_deep', 'sum'),
+        deep_epa=('epa', lambda x: x[passes.loc[x.index, 'is_deep'] == 1].sum() if (passes.loc[x.index, 'is_deep'] == 1).any() else 0.0),
+        cpoe=('cpoe', 'mean'),
+        air_yards=('air_yards', 'mean')
+    ).reset_index().rename(columns={'passer_player_id': 'player_id', 'posteam': 'team'})
 
-    # -------------------------------------------------------------------------
-    # 2. Passer Pass Depth & Deep Accuracy (QB)
-    # -------------------------------------------------------------------------
-    passer_plays = passes.dropna(subset=['passer_player_id']).copy()
-    qb_game = passer_plays.groupby(['season', 'week', 'passer_player_id']).agg(
-        qb_pass_att=('play_id', 'count'),
-        qb_deep_att=('is_deep', 'sum'),
-        qb_adot=('air_yards', 'mean'),
-        qb_deep_epa=('epa', lambda x: x[passer_plays.loc[x.index, 'is_deep'] == 1].mean()),
-    ).reset_index().rename(columns={'passer_player_id': 'player_id'})
-
-    qb_game['qb_deep_att_rate'] = qb_game['qb_deep_att'] / qb_game['qb_pass_att'].clip(lower=1)
-    qb_game = qb_game.sort_values(['player_id', 'season', 'week'])
-    for col in ['qb_deep_att_rate', 'qb_adot', 'qb_deep_epa']:
-        qb_game[f'roll_{col}'] = qb_game.groupby('player_id')[col].transform(
+    qb_depth['deep_pass_rate'] = qb_depth['deep_att'] / qb_depth['attempts'].clip(lower=1)
+    qb_depth['deep_pass_epa_rate'] = qb_depth['deep_epa'] / qb_depth['attempts'].clip(lower=1)
+    qb_depth = qb_depth.sort_values(['player_id', 'season', 'week'])
+    for col in ['deep_pass_rate', 'deep_pass_epa_rate', 'cpoe', 'air_yards']:
+        qb_depth[f'roll_{col}'] = qb_depth.groupby('player_id')[col].transform(
             lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
         )
+    qb_depth_df = qb_depth[['player_id', 'season', 'week', 'roll_deep_pass_rate', 'roll_deep_pass_epa_rate', 'roll_cpoe', 'roll_air_yards']].copy()
 
-    qb_depth_df = qb_game[['player_id', 'season', 'week', 'roll_qb_deep_att_rate',
-                           'roll_qb_adot', 'roll_qb_deep_epa']].copy()
-
-    # -------------------------------------------------------------------------
-    # 3. Defensive Pass Depth Allowed (Opponent Matchup)
-    # -------------------------------------------------------------------------
-    def_pass = passes.dropna(subset=['defteam']).groupby(['season', 'week', 'defteam']).agg(
-        opp_pass_att=('play_id', 'count'),
+    # 3. Defensive Pass-Depth Vulnerability
+    def_depth = passes.dropna(subset=['defteam']).groupby(['season', 'week', 'defteam']).agg(
+        opp_att=('play_id', 'count'),
         opp_deep_att=('is_deep', 'sum'),
-        opp_deep_epa=('epa', lambda x: x[passes.loc[x.index, 'is_deep'] == 1].mean()),
-        opp_short_epa=('epa', lambda x: x[passes.loc[x.index, 'is_short'] == 1].mean()),
-    ).reset_index().rename(columns={'defteam': 'opponent_team'}).sort_values(['opponent_team', 'season', 'week'])
+        opp_deep_epa=('epa', lambda x: x[passes.loc[x.index, 'is_deep'] == 1].sum() if (passes.loc[x.index, 'is_deep'] == 1).any() else 0.0),
+        opp_short_att=('is_short', 'sum'),
+        opp_inter_att=('is_inter', 'sum'),
+    ).reset_index().rename(columns={'defteam': 'team'})
 
-    def_pass['opp_deep_rate'] = def_pass['opp_deep_att'] / def_pass['opp_pass_att'].clip(lower=1)
-    for col in ['opp_deep_rate', 'opp_deep_epa', 'opp_short_epa']:
-        def_pass[f'roll_{col}'] = def_pass.groupby('opponent_team')[col].transform(
+    def_depth['opp_deep_pass_rate'] = def_depth['opp_deep_att'] / def_depth['opp_att'].clip(lower=1)
+    def_depth['opp_deep_epa_rate'] = def_depth['opp_deep_epa'] / def_depth['opp_att'].clip(lower=1)
+    def_depth = def_depth.sort_values(['team', 'season', 'week'])
+    for col in ['opp_deep_pass_rate', 'opp_deep_epa_rate']:
+        def_depth[f'roll_{col}'] = def_depth.groupby('team')[col].transform(
             lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
         )
+    def_depth_df = def_depth[['team', 'season', 'week', 'roll_opp_deep_pass_rate', 'roll_opp_deep_epa_rate']].copy()
 
-    def_depth_df = def_pass[['opponent_team', 'season', 'week', 'roll_opp_deep_rate',
-                             'roll_opp_deep_epa', 'roll_opp_short_epa']].copy()
-
-    # -------------------------------------------------------------------------
-    # 4. Neutral Game-Script (WP 20-80%, Excl. Final 2 Mins of Half)
-    # -------------------------------------------------------------------------
-    neutral_mask = (
-        (pbp['wp'] >= 0.20) & 
-        (pbp['wp'] <= 0.80) & 
-        (pbp['half_seconds_remaining'] > 120) & 
-        (pbp['play_type'].isin(['pass', 'run']))
-    )
-    pbp_neutral = pbp[neutral_mask].copy()
-    pbp_neutral['is_pass'] = (pbp_neutral['play_type'] == 'pass').astype(int)
-
-    team_neutral = pbp_neutral.dropna(subset=['posteam']).groupby(['season', 'week', 'posteam']).agg(
+    # 4. Neutral Game-Script Metrics (20% <= WP <= 80%)
+    neutral_pbp = pbp[(pbp['wp'] >= 0.20) & (pbp['wp'] <= 0.80)].copy()
+    team_neutral = neutral_pbp.dropna(subset=['posteam']).groupby(['season', 'week', 'posteam']).agg(
         neutral_plays=('play_id', 'count'),
-        neutral_pass_plays=('is_pass', 'sum'),
+        neutral_passes=('play_type', lambda x: (x == 'pass').sum()),
         neutral_epa=('epa', 'mean'),
-    ).reset_index().rename(columns={'posteam': 'team'}).sort_values(['team', 'season', 'week'])
+        neutral_sec_per_play=('half_seconds_remaining', lambda x: (x.max() - x.min()) / max(len(x), 1))
+    ).reset_index().rename(columns={'posteam': 'team'})
 
-    team_neutral['neutral_pass_rate'] = team_neutral['neutral_pass_plays'] / team_neutral['neutral_plays'].clip(lower=1)
-    for col in ['neutral_pass_rate', 'neutral_epa']:
+    team_neutral['neutral_pass_rate'] = team_neutral['neutral_passes'] / team_neutral['neutral_plays'].clip(lower=1)
+    team_neutral = team_neutral.sort_values(['team', 'season', 'week'])
+    for col in ['neutral_pass_rate', 'neutral_epa', 'neutral_sec_per_play']:
         team_neutral[f'roll_{col}'] = team_neutral.groupby('team')[col].transform(
             lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
         )
-    team_neutral['roll_neutral_plays'] = team_neutral.groupby('team')['neutral_plays'].transform(
-        lambda x: x.rolling(rolling_window, min_periods=2).sum().shift(1)
-    )
+    team_neutral_df = team_neutral[['team', 'season', 'week', 'roll_neutral_pass_rate', 'roll_neutral_epa', 'roll_neutral_sec_per_play']].copy()
 
-    team_neutral_df = team_neutral[['team', 'season', 'week', 'roll_neutral_pass_rate', 'roll_neutral_epa', 'roll_neutral_plays']].copy()
+    # RB Neutral Efficiency
+    rb_neutral = neutral_pbp[neutral_pbp['play_type'] == 'run'].dropna(subset=['rusher_player_id']).groupby(
+        ['season', 'week', 'rusher_player_id']
+    ).agg(
+        neutral_carries=('play_id', 'count'),
+        neutral_rush_yards=('yards_gained', 'sum'),
+        neutral_rush_epa=('epa', 'mean')
+    ).reset_index().rename(columns={'rusher_player_id': 'player_id'})
 
-    # RB Neutral Rush Share
-    neutral_runs = pbp_neutral[pbp_neutral['play_type'] == 'run'].dropna(subset=['rusher_player_id', 'posteam']).copy()
-    rb_neutral_counts = neutral_runs.groupby(['season', 'week', 'rusher_player_id', 'posteam']).size().reset_index(name='rb_neutral_rushes')
-    team_neutral_runs = neutral_runs.groupby(['season', 'week', 'posteam']).size().reset_index(name='team_neutral_rushes')
+    rb_neutral['neutral_ypc'] = rb_neutral['neutral_rush_yards'] / rb_neutral['neutral_carries'].clip(lower=1)
+    rb_neutral = rb_neutral.sort_values(['player_id', 'season', 'week'])
+    for col in ['neutral_ypc', 'neutral_rush_epa']:
+        rb_neutral[f'roll_{col}'] = rb_neutral.groupby('player_id')[col].transform(
+            lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
+        )
+    rb_neutral_df = rb_neutral[['player_id', 'season', 'week', 'roll_neutral_ypc', 'roll_neutral_rush_epa']].copy()
 
-    rb_neutral = rb_neutral_counts.merge(team_neutral_runs, on=['season', 'week', 'posteam'], how='left')
-    rb_neutral['neutral_rush_share'] = rb_neutral['rb_neutral_rushes'] / rb_neutral['team_neutral_rushes'].clip(lower=1)
-    rb_neutral = rb_neutral.rename(columns={'rusher_player_id': 'player_id'}).sort_values(['player_id', 'season', 'week'])
-
-    rb_neutral['roll_neutral_rush_share'] = rb_neutral.groupby('player_id')['neutral_rush_share'].transform(
-        lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
-    )
-    rb_neutral_df = rb_neutral[['player_id', 'season', 'week', 'roll_neutral_rush_share']].copy()
-
-    # -------------------------------------------------------------------------
-    # 5. Trench Pressure Metrics (Allowed by Offense vs Generated by Defense)
-    # -------------------------------------------------------------------------
+    # 5. Pressure & Trench Metrics
     off_press = passes.dropna(subset=['posteam']).groupby(['season', 'week', 'posteam']).agg(
         dropbacks=('play_id', 'count'),
-        pressures_allowed=('is_pressured', 'sum')
-    ).reset_index().rename(columns={'posteam': 'team'}).sort_values(['team', 'season', 'week'])
-    off_press['pressure_rate_allowed'] = off_press['pressures_allowed'] / off_press['dropbacks'].clip(lower=1)
+        pressures=('is_pressured', 'sum')
+    ).reset_index().rename(columns={'posteam': 'team'})
+    off_press['pressure_rate_allowed'] = off_press['pressures'] / off_press['dropbacks'].clip(lower=1)
+    off_press = off_press.sort_values(['team', 'season', 'week'])
     off_press['roll_pressure_rate_allowed'] = off_press.groupby('team')['pressure_rate_allowed'].transform(
         lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
     )
 
     def_press = passes.dropna(subset=['defteam']).groupby(['season', 'week', 'defteam']).agg(
-        def_dropbacks=('play_id', 'count'),
+        opp_dropbacks=('play_id', 'count'),
         pressures_gen=('is_pressured', 'sum')
-    ).reset_index().rename(columns={'defteam': 'team'}).sort_values(['team', 'season', 'week'])
-    def_press['pressure_rate_gen'] = def_press['pressures_gen'] / def_press['def_dropbacks'].clip(lower=1)
+    ).reset_index().rename(columns={'defteam': 'team'})
+    def_press['pressure_rate_gen'] = def_press['pressures_gen'] / def_press['opp_dropbacks'].clip(lower=1)
+    def_press = def_press.sort_values(['team', 'season', 'week'])
     def_press['roll_pressure_rate_gen'] = def_press.groupby('team')['pressure_rate_gen'].transform(
         lambda x: x.rolling(rolling_window, min_periods=2).mean().shift(1)
     )
@@ -203,9 +197,7 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
         on=['team', 'season', 'week'], how='outer'
     )
 
-    # -------------------------------------------------------------------------
-    # 6. Explosive Play Volatility (20+ Pass, 10+ Rush)
-    # -------------------------------------------------------------------------
+    # 6. Explosive Play Volatility
     off_exp_p = passes.dropna(subset=['posteam']).groupby(['season', 'week', 'posteam']).agg(
         p_att=('play_id', 'count'), exp_p=('is_explosive_pass', 'sum')
     ).reset_index().rename(columns={'posteam': 'team'})
@@ -219,7 +211,7 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
     def_exp_p = passes.dropna(subset=['defteam']).groupby(['season', 'week', 'defteam']).agg(
         opp_p_att=('play_id', 'count'), opp_exp_p=('is_explosive_pass', 'sum')
     ).reset_index().rename(columns={'defteam': 'team'})
-    def_exp_p['opp_exp_pass_rate'] = def_exp_p['opp_exp_p'] / def_exp_p['opp_p_att'].clip(lower=1)
+    def_exp_p['opp_exp_pass_rate'] = def_exp_p['opp_exp_p'] / def_exp_p['opp_att'].clip(lower=1)
 
     explosive_raw = off_exp_p[['team', 'season', 'week', 'exp_pass_rate']].merge(
         off_exp_r[['team', 'season', 'week', 'exp_rush_rate']], on=['team', 'season', 'week'], how='outer'
@@ -237,11 +229,7 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
     player_df = rec_depth_df.merge(rb_neutral_df, on=['player_id', 'season', 'week'], how='outer')
     player_df = player_df.merge(qb_depth_df, on=['player_id', 'season', 'week'], how='outer')
 
-    # -------------------------------------------------------------------------
-    # 7. Team Season Summary (for Analytics Deep Dive Cards)
-    # -------------------------------------------------------------------------
-    # Strictly isolate macro baseline to explicit completed historical regular seasons (MACRO_BASELINE_SEASONS)
-    # This guarantees zero in-season leakage and prevents partial/future 2026 game weeks from contaminating the 2-year macro baseline.
+    # 7. Team Season Summary
     recent_pbp = pbp[pbp['season'].isin(MACRO_BASELINE_SEASONS)].copy()
     rec_passes = recent_pbp[recent_pbp['play_type'] == 'pass'].copy()
     rec_passes['is_deep'] = (rec_passes['air_yards'] >= 20).astype(int)
@@ -250,7 +238,7 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
     team_deep_off = rec_passes.groupby('posteam').agg(
         deep_pass_attempts=('is_deep', 'sum'),
         total_pass_att=('play_id', 'count'),
-        deep_pass_epa=('epa', lambda x: x[rec_passes.loc[x.index, 'is_deep'] == 1].mean()),
+        deep_pass_epa=('epa', lambda x: x[rec_passes.loc[x.index, 'is_deep'] == 1].mean() if (rec_passes.loc[x.index, 'is_deep'] == 1).any() else 0.0),
         exp_pass_rate=('is_exp', 'mean'),
         avg_air_yards=('air_yards', 'mean')
     ).reset_index().rename(columns={'posteam': 'team'})
@@ -259,15 +247,13 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
     team_deep_def = rec_passes.groupby('defteam').agg(
         opp_deep_pass_attempts=('is_deep', 'sum'),
         opp_total_pass_att=('play_id', 'count'),
-        opp_deep_pass_epa=('epa', lambda x: x[rec_passes.loc[x.index, 'is_deep'] == 1].mean()),
+        opp_deep_pass_epa=('epa', lambda x: x[rec_passes.loc[x.index, 'is_deep'] == 1].mean() if (rec_passes.loc[x.index, 'is_deep'] == 1).any() else 0.0),
         opp_exp_pass_rate=('is_exp', 'mean'),
     ).reset_index().rename(columns={'defteam': 'team'})
     team_deep_def['opp_deep_pass_rate'] = team_deep_def['opp_deep_pass_attempts'] / team_deep_def['opp_total_pass_att'].clip(lower=1)
 
-    # Combine into team summary
     team_summary = team_deep_off.merge(team_deep_def, on='team', how='outer')
 
-    # Add pressure summary
     team_press_off = rec_passes.groupby('posteam')['is_pressured'].mean().reset_index().rename(
         columns={'posteam': 'team', 'is_pressured': 'pressure_rate_allowed'}
     )
@@ -276,7 +262,6 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
     )
     team_summary = team_summary.merge(team_press_off, on='team', how='outer').merge(team_press_def, on='team', how='outer')
 
-    # Add league ranks for team summary
     for c, asc in [
         ('deep_pass_epa', False), ('opp_deep_pass_epa', True),
         ('pressure_rate_allowed', True), ('pressure_rate_generated', False),
@@ -296,34 +281,23 @@ def extract_pbp_features(pbp: pd.DataFrame, rolling_window=5):
     }
 
 
-def _pbp_cache_is_fresh(max_age_days=3):
-    """
-    Returns True if all cache files exist AND none is older than max_age_days.
-    If any file is stale, the cache must be rebuilt to incorporate newly played weeks.
-    """
-    import time
+def _pbp_cache_files_exist():
+    """Returns True if all required parquet cache files exist on disk."""
     cache_files = [PLAYER_CACHE_FILE, DEF_CACHE_FILE, NEUTRAL_CACHE_FILE,
                    TRENCH_CACHE_FILE, EXPLOSIVE_CACHE_FILE, SUMMARY_CACHE_FILE]
-    max_age_seconds = max_age_days * 86400
-    now = time.time()
-    for f in cache_files:
-        if not os.path.exists(f):
-            return False
-        if now - os.path.getmtime(f) > max_age_seconds:
-            print(f"[PBP Cache] Stale ({f.split(os.sep)[-1]} > {max_age_days}d old). Rebuilding for new game data...")
-            return False
-    return True
+    return all(os.path.exists(f) for f in cache_files)
 
 
 def load_pbp_features(seasons=[2023, 2024, 2025, 2026], force_reload=False):
     """
-    Loads advanced PBP features from parquet cache if present and fresh; otherwise fetches PBP and compiles.
-    Cache is automatically invalidated after 3 days to incorporate newly played game weeks.
-    Always returns the uniform dict of feature dataframes.
+    Loads advanced PBP features from parquet cache.
+    On Vercel (serverless), ALWAYS reads pre-baked cache to stay within memory limits.
+    Only downloads and compiles raw PBP when running offline/locally with force_reload.
     """
-    all_cached = not force_reload and _pbp_cache_is_fresh(max_age_days=3)
-
-    if all_cached:
+    is_serverless = os.getenv('VERCEL') is not None or os.getenv('AWS_LAMBDA_FUNCTION_NAME') is not None
+    
+    # 1. Fast Cache Read (0.01s, < 50MB RAM)
+    if _pbp_cache_files_exist() and (is_serverless or not force_reload):
         try:
             return {
                 'player_feats': pd.read_parquet(PLAYER_CACHE_FILE),
@@ -334,23 +308,45 @@ def load_pbp_features(seasons=[2023, 2024, 2025, 2026], force_reload=False):
                 'team_summary': pd.read_parquet(SUMMARY_CACHE_FILE)
             }
         except Exception as e:
-            print(f"[PBP Cache] Rebuilding due to cache read error: {e}")
+            print(f"[PBP Cache] Error reading cache file: {e}")
+            if is_serverless:
+                # Return empty safe fallbacks on serverless to prevent out-of-memory crash
+                return {
+                    'player_feats': pd.DataFrame(), 'def_depth': pd.DataFrame(),
+                    'team_neutral': pd.DataFrame(), 'trench': pd.DataFrame(),
+                    'explosive': pd.DataFrame(), 'team_summary': pd.DataFrame()
+                }
 
-    # Fetch PBP
-    print(f"Loading PBP data for seasons {seasons} via nflreadpy...")
-    pbp = nfl.load_pbp(seasons=seasons).to_pandas()
-    feats = extract_pbp_features(pbp)
+    if is_serverless:
+        # Prevent any multi-GB PBP download on Vercel
+        print("[PBP Cache] Serverless environment: Skipping raw PBP extraction.")
+        return {
+            'player_feats': pd.DataFrame(), 'def_depth': pd.DataFrame(),
+            'team_neutral': pd.DataFrame(), 'trench': pd.DataFrame(),
+            'explosive': pd.DataFrame(), 'team_summary': pd.DataFrame()
+        }
 
-    # Save cache files
+    # 2. Local / Offline Ingestion (Only when run locally via daily_update.py)
     try:
-        feats['player_feats'].to_parquet(PLAYER_CACHE_FILE, index=False)
-        feats['def_depth'].to_parquet(DEF_CACHE_FILE, index=False)
-        feats['team_neutral'].to_parquet(NEUTRAL_CACHE_FILE, index=False)
-        feats['trench'].to_parquet(TRENCH_CACHE_FILE, index=False)
-        feats['explosive'].to_parquet(EXPLOSIVE_CACHE_FILE, index=False)
-        feats['team_summary'].to_parquet(SUMMARY_CACHE_FILE, index=False)
-        print(f"[PBP Cache] Saved all feature cache tables to {PBP_CACHE_DIR}.")
-    except Exception as e:
-        print(f"[PBP Cache] Note saving cache: {e}")
+        import nflreadpy as nfl
+        print(f"Loading PBP data for seasons {seasons} via nflreadpy...")
+        pbp = nfl.load_pbp(seasons=seasons).to_pandas()
+        feats = extract_pbp_features(pbp)
 
-    return feats
+        for target_pbp_dir in [PBP_CACHE_DIR, os.path.join(ROOT_DIR, 'api', 'data', 'pbp_cache')]:
+            os.makedirs(target_pbp_dir, exist_ok=True)
+            feats['player_feats'].to_parquet(os.path.join(target_pbp_dir, 'player_pbp_features.parquet'), index=False)
+            feats['def_depth'].to_parquet(os.path.join(target_pbp_dir, 'def_depth_features.parquet'), index=False)
+            feats['team_neutral'].to_parquet(os.path.join(target_pbp_dir, 'team_neutral_features.parquet'), index=False)
+            feats['trench'].to_parquet(os.path.join(target_pbp_dir, 'trench_features.parquet'), index=False)
+            feats['explosive'].to_parquet(os.path.join(target_pbp_dir, 'explosive_features.parquet'), index=False)
+            feats['team_summary'].to_parquet(os.path.join(target_pbp_dir, 'team_pbp_summary.parquet'), index=False)
+        print(f"[PBP Cache] Saved all feature cache tables.")
+        return feats
+    except Exception as e:
+        print(f"[PBP Cache] Local PBP extraction error: {e}")
+        return {
+            'player_feats': pd.DataFrame(), 'def_depth': pd.DataFrame(),
+            'team_neutral': pd.DataFrame(), 'trench': pd.DataFrame(),
+            'explosive': pd.DataFrame(), 'team_summary': pd.DataFrame()
+        }
