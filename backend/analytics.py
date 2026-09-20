@@ -2015,3 +2015,265 @@ def compute_full_season_schedule(weekly_df, schedules_df, season=2026, start_dat
         'weeks': weeks_data
     }
 
+
+
+def compute_match_history(schedules_df, season=None, team=None, opponent=None, outcome=None, limit=250):
+    """
+    Computes historical game results, head-to-head match records, ATS (against the spread),
+    and Over/Under trends across regular season games (2023-2026).
+    """
+    if schedules_df is None or schedules_df.empty:
+        return {'summary': {}, 'games': [], 'available_seasons': [], 'teams': []}
+
+    s = schedules_df[schedules_df['home_score'].notna() & schedules_df['away_score'].notna()].copy()
+    if s.empty:
+        return {'summary': {}, 'games': [], 'available_seasons': [], 'teams': []}
+
+    # Available filter metadata
+    available_seasons = [int(x) for x in sorted(s['season'].unique().tolist(), reverse=True)]
+    available_teams = sorted(list(set(s['home_team'].dropna().tolist() + s['away_team'].dropna().tolist())))
+
+    # Apply Season Filter
+    if season and str(season).upper() != 'ALL':
+        try:
+            s_int = int(season)
+            s = s[s['season'] == s_int]
+        except (ValueError, TypeError):
+            pass
+
+    # Apply Team & Opponent Filter
+    team_focus = str(team).upper().strip() if (team and str(team).upper() != 'ALL') else None
+    opp_focus = str(opponent).upper().strip() if (opponent and str(opponent).upper() != 'ALL') else None
+
+    if team_focus and opp_focus:
+        s = s[((s['home_team'] == team_focus) & (s['away_team'] == opp_focus)) | ((s['home_team'] == opp_focus) & (s['away_team'] == team_focus))]
+    elif team_focus:
+        s = s[(s['home_team'] == team_focus) | (s['away_team'] == team_focus)]
+    elif opp_focus:
+        s = s[(s['home_team'] == opp_focus) | (s['away_team'] == opp_focus)]
+
+    # Sort descending by date (newest first)
+    s = s.sort_values(by=['gameday', 'season', 'week'], ascending=[False, False, False]).reset_index(drop=True)
+
+    games_list = []
+
+    # Aggregators for summary
+    total_pts_scored = 0.0
+    total_pts_allowed = 0.0
+    wins = 0
+    losses = 0
+    ties = 0
+    ats_wins = 0
+    ats_losses = 0
+    ats_pushes = 0
+    ou_overs = 0
+    ou_unders = 0
+    ou_pushes = 0
+    home_w = 0
+    home_l = 0
+    away_w = 0
+    away_l = 0
+
+    for _, row in s.iterrows():
+        ht = str(row['home_team'])
+        at = str(row['away_team'])
+        h_score = float(row['home_score'])
+        a_score = float(row['away_score'])
+        tot_score = h_score + a_score
+
+        spread = float(row['spread_line']) if pd.notna(row.get('spread_line')) else None
+        tot_line = float(row['total_line']) if pd.notna(row.get('total_line')) else None
+
+        margin = abs(h_score - a_score)
+        if h_score > a_score:
+            winner = ht
+            loser = at
+        elif a_score > h_score:
+            winner = at
+            loser = ht
+        else:
+            winner = 'TIE'
+            loser = 'TIE'
+
+        # ATS Result
+        ats_result = 'N/A'
+        if spread is not None:
+            res_diff = h_score - a_score
+            if res_diff > spread:
+                ats_result = 'HOME_COVER'
+            elif res_diff < spread:
+                ats_result = 'AWAY_COVER'
+            else:
+                ats_result = 'PUSH'
+
+        # O/U Result
+        ou_result = 'N/A'
+        if tot_line is not None:
+            if tot_score > tot_line:
+                ou_result = 'OVER'
+            elif tot_score < tot_line:
+                ou_result = 'UNDER'
+            else:
+                ou_result = 'PUSH'
+
+        focus_outcome = None
+        focus_is_home = None
+        focus_cover = None
+        if team_focus:
+            focus_is_home = (ht == team_focus)
+            pts_for = h_score if focus_is_home else a_score
+            pts_against = a_score if focus_is_home else h_score
+            total_pts_scored += pts_for
+            total_pts_allowed += pts_against
+
+            if pts_for > pts_against:
+                focus_outcome = 'W'
+                wins += 1
+                if focus_is_home:
+                    home_w += 1
+                else:
+                    away_w += 1
+            elif pts_against > pts_for:
+                focus_outcome = 'L'
+                losses += 1
+                if focus_is_home:
+                    home_l += 1
+                else:
+                    away_l += 1
+            else:
+                focus_outcome = 'T'
+                ties += 1
+
+            if ats_result == 'HOME_COVER':
+                focus_cover = 'COVER' if focus_is_home else 'NO_COVER'
+                if focus_is_home:
+                    ats_wins += 1
+                else:
+                    ats_losses += 1
+            elif ats_result == 'AWAY_COVER':
+                focus_cover = 'COVER' if not focus_is_home else 'NO_COVER'
+                if not focus_is_home:
+                    ats_wins += 1
+                else:
+                    ats_losses += 1
+            elif ats_result == 'PUSH':
+                focus_cover = 'PUSH'
+                ats_pushes += 1
+
+            if ou_result == 'OVER':
+                ou_overs += 1
+            elif ou_result == 'UNDER':
+                ou_unders += 1
+            elif ou_result == 'PUSH':
+                ou_pushes += 1
+        else:
+            total_pts_scored += h_score + a_score
+            if winner != 'TIE':
+                wins += 1
+            if ats_result == 'HOME_COVER' or ats_result == 'AWAY_COVER':
+                ats_wins += 1
+            elif ats_result == 'PUSH':
+                ats_pushes += 1
+            if ou_result == 'OVER':
+                ou_overs += 1
+            elif ou_result == 'UNDER':
+                ou_unders += 1
+            elif ou_result == 'PUSH':
+                ou_pushes += 1
+
+        # Apply outcome filter if requested
+        if outcome and team_focus and str(outcome).upper() != 'ALL':
+            if focus_outcome != str(outcome).upper().strip():
+                continue
+
+        game_item = {
+            'game_id': str(row.get('game_id', '')),
+            'season': int(row['season']),
+            'week': int(row['week']),
+            'gameday': str(row['gameday']),
+            'weekday': str(row.get('weekday', '')),
+            'gametime': str(row.get('gametime', '')) if pd.notna(row.get('gametime')) else '',
+            'home_team': ht,
+            'home_team_name': TEAM_FULL_NAMES.get(ht, ht),
+            'away_team': at,
+            'away_team_name': TEAM_FULL_NAMES.get(at, at),
+            'home_score': int(h_score),
+            'away_score': int(a_score),
+            'total_score': int(tot_score),
+            'winner': winner,
+            'loser': loser,
+            'margin': int(margin),
+            'is_overtime': bool(row.get('overtime', 0) == 1),
+            'spread_line': spread,
+            'ats_result': ats_result,
+            'total_line': tot_line,
+            'ou_result': ou_result,
+            'home_qb_name': str(row.get('home_qb_name', '')) if pd.notna(row.get('home_qb_name')) else '',
+            'away_qb_name': str(row.get('away_qb_name', '')) if pd.notna(row.get('away_qb_name')) else '',
+            'stadium': str(row.get('stadium', '')) if pd.notna(row.get('stadium')) else '',
+            'roof': str(row.get('roof', '')) if pd.notna(row.get('roof')) else '',
+            'temp': float(row['temp']) if pd.notna(row.get('temp')) else None,
+            'wind': float(row['wind']) if pd.notna(row.get('wind')) else None,
+            'focus_outcome': focus_outcome,
+            'focus_is_home': focus_is_home,
+            'focus_cover': focus_cover
+        }
+        games_list.append(game_item)
+
+    n_games = len(games_list)
+    if team_focus:
+        decided_games = max(1, (wins + losses + ties))
+        avg_scored = round(total_pts_scored / decided_games, 1)
+        avg_allowed = round(total_pts_allowed / decided_games, 1)
+        diff = round(avg_scored - avg_allowed, 1)
+        win_pct = round((wins + (0.5 * ties)) / decided_games * 100, 1)
+        ats_games = ats_wins + ats_losses
+        ats_pct = round(ats_wins / max(1, ats_games) * 100, 1) if ats_games > 0 else 0.0
+        ou_games = ou_overs + ou_unders
+        over_pct = round(ou_overs / max(1, ou_games) * 100, 1) if ou_games > 0 else 0.0
+
+        summary = {
+            'team': team_focus,
+            'team_name': TEAM_FULL_NAMES.get(team_focus, team_focus),
+            'opponent': opp_focus,
+            'opponent_name': TEAM_FULL_NAMES.get(opp_focus, opp_focus) if opp_focus else None,
+            'total_games': wins + losses + ties,
+            'record_str': f"{wins}-{losses}" + (f"-{ties}" if ties > 0 else ""),
+            'win_pct': win_pct,
+            'home_record_str': f"{home_w}-{home_l}",
+            'away_record_str': f"{away_w}-{away_l}",
+            'avg_pts_scored': avg_scored,
+            'avg_pts_allowed': avg_allowed,
+            'point_differential': diff,
+            'ats_record_str': f"{ats_wins}-{ats_losses}" + (f"-{ats_pushes}" if ats_pushes > 0 else ""),
+            'ats_pct': ats_pct,
+            'ou_record_str': f"{ou_overs}O-{ou_unders}U" + (f"-{ou_pushes}P" if ou_pushes > 0 else ""),
+            'over_pct': over_pct
+        }
+    else:
+        ou_games = ou_overs + ou_unders
+        over_pct = round(ou_overs / max(1, ou_games) * 100, 1) if ou_games > 0 else 0.0
+        summary = {
+            'team': 'ALL',
+            'team_name': 'All NFL Teams',
+            'opponent': opp_focus,
+            'opponent_name': TEAM_FULL_NAMES.get(opp_focus, opp_focus) if opp_focus else None,
+            'total_games': n_games,
+            'record_str': f"{n_games} Games",
+            'avg_pts_per_game': round((total_pts_scored / max(1, n_games)), 1) if n_games > 0 else 0.0,
+            'ou_record_str': f"{ou_overs}O-{ou_unders}U" + (f"-{ou_pushes}P" if ou_pushes > 0 else ""),
+            'over_pct': over_pct
+        }
+
+    display_games = games_list[:limit] if (limit and limit > 0) else games_list
+
+    return {
+        'season': season if season else 'ALL',
+        'team': team_focus if team_focus else 'ALL',
+        'opponent': opp_focus if opp_focus else 'ALL',
+        'available_seasons': available_seasons,
+        'available_teams': available_teams,
+        'summary': summary,
+        'total_count': len(games_list),
+        'games': display_games
+    }

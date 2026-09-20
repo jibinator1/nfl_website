@@ -1,14 +1,30 @@
-# NFL Analytics & Matchup Hub 🏈
+# NFL Analytics & Matchup Hub
 
-An interactive, full-stack NFL statistics, team analytics, matchup lab (H2H), and 18-week schedule explorer.
+[![Live Website](https://img.shields.io/badge/Live_Website-nflwebsite--ten.vercel.app-0070f3?style=for-the-badge&logo=vercel&logoColor=white)](https://nflwebsite-ten.vercel.app)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![NFLverse](https://img.shields.io/badge/Data-NFLverse_nflreadpy-013369?style=for-the-badge)](https://github.com/nflverse/nflreadpy)
 
-> **Zero API Keys Required**: 100% powered by open-source NFL play-by-play and box score data via [`nflreadpy`](https://github.com/nflverse/nflreadpy) from the NFLverse project. No paid services, rate limits, or API keys required to run.
+An interactive, production-grade NFL analytics dashboard, historical match logs explorer, matchup lab (H2H), and 18-week schedule hub.
+
+Live Production URL: **[https://nflwebsite-ten.vercel.app](https://nflwebsite-ten.vercel.app)**
+
+> **Zero API Keys Required**: 100% powered by open-source NFL play-by-play, box scores, and spread lines via [`nflreadpy`](https://github.com/nflverse/nflreadpy) from the NFLverse project. No paid subscriptions, rate limits, or API keys needed.
 
 ---
 
-## 🌟 Core Features
+## Core Features & Dashboard Tabs
 
-### 1. 📅 18-Week Schedule & Matchup Explorer (2026 / 2025)
+### 1. Match History & H2H Logs (New)
+* **Comprehensive Historical Coverage**: Explore 800+ completed NFL regular season games across the 2023, 2024, 2025, and 2026 seasons.
+* **Team & Head-to-Head (H2H) Focus**: Instantly isolate any franchise's game logs or compare two specific teams head-to-head.
+* **Betting & Spread Analytics**:
+  * **Against The Spread (ATS)**: Track closing spreads, home/away cover results, cover percentages, and pushes.
+  * **Over/Under (O/U)**: View Vegas totals, game combined points, Over/Under hit rates, and push records.
+* **Performance KPI Banner**: Live calculated record (W-L-T), win %, home/away splits, average points scored vs allowed, and point differentials (+/-).
+* **Game Context**: Starting quarterbacks, game dates/times, stadium venue, roof type, temperature, and wind speed.
+* **Direct Matchup Lab Simulation**: Jump directly from any historical card into the Head-to-Head Simulation Lab with both teams pre-selected.
+
+### 2. 18-Week Schedule & Matchup Explorer (2026 / 2025)
 * **Full Schedule Coverage**: Interactive navigation across all 18 regular season weeks, game dates, and prime-time slots.
 * **Per-Game Volume x Efficiency Table**: Head-to-head offensive vs. defensive statistical matchup cards featuring:
   * **Scoring**: Vegas Implied Team Totals.
@@ -18,23 +34,38 @@ An interactive, full-stack NFL statistics, team analytics, matchup lab (H2H), an
   * **Trenches**: Pass protection pressure allowed and defensive pressure generation rates.
 * **Pass / Run Opportunity Funnel**: Dynamically models team play calling intent scaled by game pace and Vegas totals.
 
-### 2. 📊 32-Team League Stats & Rankings
+### 3. Yahoo Sports Team Stats & Rankings (32 Teams)
 * **Comprehensive Metrics**: 25+ offensive and defensive volume & efficiency stats with league-wide `#1` to `#32` rankings.
 * **Multi-Category Filtering**: Quick view toggles across All Stats, Passing, Rushing, Defense, Scoring, and Advanced Trenches.
 * **Interactive Sorting**: Real-time ascending/descending sorting across any statistical column.
 
-### 3. 🎯 Matchup Lab (Head-to-Head Comparison)
+### 4. Matchup Lab (Head-to-Head Comparison)
 * **Custom Matchup Selector**: Select any two NFL franchises to simulate unit matchups.
 * **Unit Battle Radar**: Compares overall team ratings, passing offense vs. secondary, and rushing attack vs. front seven.
 * **WR1 & Star RB Showdown**: Tests how defenses hold up against the opponent's primary weapons.
 * **Scramble Containment**: Rates defensive vulnerability to mobile QBs.
 
-### 4. ⚡ Matchup Vulnerabilities & Trends
+### 5. Matchup Vulnerabilities & Trends
 * Automated spotlight detection highlighting defensive pass funnels, soft run fronts, offensive red-zone efficiency, and rest advantages.
 
 ---
 
-## 🚀 Quick Start
+## Live Access & Deployment
+
+The application is deployed on Vercel Serverless Functions (`@vercel/python`):
+
+* **Live Dashboard**: [https://nflwebsite-ten.vercel.app](https://nflwebsite-ten.vercel.app)
+* **REST API Endpoints**:
+  * `GET /api/status`: Health check and cache status.
+  * `GET /api/match-history`: Historical match logs, ATS records, and O/U splits.
+  * `GET /api/full-schedule`: 18-week schedule with volume and efficiency cards.
+  * `GET /api/team-stats`: 32-team Yahoo Sports rankings and statistical breakdowns.
+  * `GET /api/team-highlights`: Defensive vulnerabilities and weekly trend spotlights.
+  * `GET /api/matchup-deepdive`: Unit-by-unit head-to-head tactical matchup simulator.
+
+---
+
+## Local Development & Quick Start
 
 ### 1. Clone & Install Dependencies
 ```bash
@@ -49,129 +80,55 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Launch the Application
+### 2. Launch Local Server
 ```bash
 python run_app.py
 ```
-The FastAPI server will boot and automatically open your default browser at:
-**`http://localhost:8000`**
+The FastAPI server will boot and open your browser at **`http://localhost:8000`**.
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## Project Structure
 
 ```
 nfl_website/
+├── api/
+│   ├── index.py              # Vercel serverless entrypoint
+│   └── data/                 # Pre-computed parquet cache files
 ├── backend/
-│   ├── server.py             # FastAPI REST endpoints & HTML static server
-│   ├── data_loader.py        # nflreadpy data pipeline (zero API keys)
-│   ├── analytics.py          # Volume x efficiency metrics, H2H deep dive, schedule engine
-│   └── pbp_features.py       # Advanced play-by-play metric aggregations
+│   ├── server.py             # FastAPI REST endpoints & router mounts
+│   ├── data_loader.py        # nflreadpy data pipeline
+│   ├── analytics.py          # Match history, stats rankings, schedule engine, H2H lab
+│   └── pbp_features.py       # Advanced play-by-play aggregations
 ├── data/
-│   ├── manual_overrides.json # Trade and injury adjustments
-│   └── pbp_cache/            # Pre-computed parquet feature tables (<700KB)
+│   └── manual_overrides.json # Trade and roster adjustments
 ├── frontend/
-│   └── index.html            # Tailwind CSS + Lucide icons dark-themed dashboard
-├── requirements.txt          # Python dependencies
+│   └── index.html            # Dark-themed Tailwind CSS dashboard
+├── index.html                # Root static template for Vercel & local server
+├── daily_update.py           # Automated daily stat pull & cache refresher
+├── requirements.txt          # Production dependencies
+├── vercel.json               # Vercel serverless configuration
 ├── run_app.py                # Standalone launcher
 └── README.md
 ```
 
-* **Frontend**: Vanilla HTML5, Tailwind CSS, Lucide Icons (pinned CDN), client-side dynamic DOM rendering.
-* **Backend**: Python 3.10+, FastAPI, Uvicorn, Pandas, NumPy, PyArrow.
-* **Data Sources**: Official NFL data via `nflreadpy` (NFLverse).
+---
+
+## Daily Data Updates (Auto-Sync to Vercel)
+
+Because Vercel serverless functions have a read-only filesystem and execution time limits, fresh NFL stats are pulled locally using [`daily_update.py`](daily_update.py) or [`daily_update.sh`](daily_update.sh). The script fetches new games, recomputes the parquet cache, commits to GitHub, and triggers Vercel to automatically redeploy your live website!
+
+### Run Manually
+```bash
+python daily_update.py
+```
+
+### Automated Daily Cron (Mac / Linux)
+```bash
+(crontab -l 2>/dev/null | grep -v "daily_update.sh"; echo "0 6 * * * cd "$PWD" && ./daily_update.sh >> update.log 2>&1") | crontab -
+```
 
 ---
 
-## 📄 License
+## License
 MIT License. Open-source and free for non-commercial sports analytics.
-
----
-
-## Deploy to Vercel
-
-This repository is pre-configured for instant deployment on Vercel Serverless Functions (`@vercel/python`).
-
-### Option 1: Automatic Deploy via GitHub (Recommended)
-1. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
-2. Select your GitHub repository: **`jibinator1/nfl_website`**.
-3. Keep default settings (Framework Preset: Other, Root Directory: `./`).
-4. Click **Deploy**. Vercel will install `requirements.txt` and launch your live serverless app with a free HTTPS domain!
-
-### Option 2: Deploy from Command Line
-Run either:
-* Double-click `deploy.bat` (Windows)
-* Run `npx vercel --prod` in the project directory
----
-
-## 🍏 Daily Data Updates on Mac (Auto-Deploy to Vercel)
-
-Because Vercel serverless functions have a read-only filesystem and execution time limits, fresh NFL stats are pulled locally from your computer using [`daily_update.py`](daily_update.py) or [`daily_update.sh`](daily_update.sh). The script automatically fetches new games, recomputes the parquet cache, commits to GitHub, and triggers Vercel to automatically redeploy your live website!
-
-### 1. Initial Setup on Your Mac (One-Time)
-Open Terminal on your Mac and run:
-```bash
-# Clone the repository
-git clone https://github.com/jibinator1/nfl_website.git
-cd nfl_website
-
-# Create and activate virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Make runner script executable
-chmod +x daily_update.sh
-```
-
-### 2. Run Manually Whenever You Want Fresh Stats
-In your Mac Terminal, simply run:
-```bash
-./daily_update.sh
-```
-*(Or run `python3 daily_update.py`)*
-
-The script will automatically:
-1. Pull fresh weekly player stats, game scores, and spread/total lines via `nflreadpy`.
-2. Recompute team totals, weather, and rest adjustments.
-3. Update `api/data/weekly_cache.parquet` and `api/data/schedules_cache.parquet`.
-4. Run `git commit` and `git push origin main`.
-5. **Vercel automatically detects the push and redeploys your live website with the updated stats!**
-
-### 3. (Optional) Run Automatically Every Day via Mac Cron
-To have your Mac sync data and deploy to Vercel automatically every morning at 6:00 AM:
-
-#### Option A: Quick 1-Line Setup (Recommended - No Text Editor Needed)
-1. **Navigate into your project folder first** (make sure your terminal prompt says `nfl_website %`, not `~ %`):
-   ```bash
-   cd nfl_website
-   ```
-2. Paste this single command and press **Enter**:
-   ```bash
-   (crontab -l 2>/dev/null | grep -v "daily_update.sh"; echo "0 6 * * * cd \"$PWD\" && ./daily_update.sh >> update.log 2>&1") | crontab -
-   ```
-   *(The `grep -v` ensures no duplicate entries are created if re-run).*
-
-#### Option B: Using `crontab -e` (Interactive `vi` Editor)
-If you prefer editing crontab manually:
-1. Navigate into `nfl_website` and run `crontab -e` in your terminal.
-2. Press the **`i`** key to enter **INSERT** mode (you will see `-- INSERT --` at the bottom left).
-3. Paste the cron command:
-   ```cron
-   0 6 * * * cd "$PWD" && ./daily_update.sh >> update.log 2>&1
-   ```
-4. Press **`Esc`**, then type **`:wq`** and press **Enter** to save and quit.
-
-#### Verify Your Active Cron Schedule
-To confirm your automated schedule is active:
-```bash
-crontab -l
-```
-You should see the path ending in your project folder:
-```
-0 6 * * * cd "/Users/yourusername/.../nfl_website" && ./daily_update.sh >> update.log 2>&1
-```
-
-Your Mac will now pull fresh stats and update Vercel automatically every morning at 6:00 AM!

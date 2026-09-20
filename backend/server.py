@@ -17,7 +17,8 @@ from backend.analytics import (
     compute_team_stat_overview,
     compute_matchup_highlights,
     compute_matchup_deepdive,
-    compute_full_season_schedule
+    compute_full_season_schedule,
+    compute_match_history
 )
 
 load_dotenv()
@@ -202,6 +203,31 @@ async def get_full_schedule_endpoint(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
+
+@api_router.get("/match-history")
+async def get_match_history_endpoint(
+    season: str = Query(None, description="NFL Season filter (e.g. 2026, 2025, 2024, 2023, or ALL)"),
+    team: str = Query(None, description="Team code filter (e.g. KC, BAL, or ALL)"),
+    opponent: str = Query(None, description="Opponent team code filter for H2H history"),
+    outcome: str = Query(None, description="Outcome filter: W, L, T, or ALL"),
+    limit: int = Query(250, description="Max number of games to return")
+):
+    """Returns historical match records, H2H matchups, spreads, and ATS results."""
+    ensure_data_loaded()
+    try:
+        data = compute_match_history(
+            engine.schedules,
+            season=season,
+            team=team,
+            opponent=opponent,
+            outcome=outcome,
+            limit=limit
+        )
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Mount the router under both /api and root /
 app.include_router(api_router, prefix="/api")

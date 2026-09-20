@@ -5,6 +5,363 @@
     <script>
         window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+
+        // ==========================================
+        // MATCH HISTORY & HEAD-TO-HEAD LOGS
+        // ==========================================
+        let matchHistorySeason = 'ALL';
+        let matchHistoryTeam = 'ALL';
+        let matchHistoryOpponent = 'ALL';
+        let matchHistoryOutcome = 'ALL';
+        let matchHistorySearch = '';
+        let globalMatchHistoryData = null;
+        let isMatchHistoryLoading = false;
+
+        function populateHistoryDropdowns() {
+            const teamSelect = document.getElementById('history-team-select');
+            const oppSelect = document.getElementById('history-opp-select');
+            if (!teamSelect || !oppSelect) return;
+
+            const currentTeamVal = teamSelect.value || 'ALL';
+            const currentOppVal = oppSelect.value || 'ALL';
+
+            const teams = Object.keys(TEAM_FULL_NAMES).sort();
+            
+            let teamOpts = '<option value="ALL" class="bg-[#161b22] text-slate-200">All 32 Teams</option>';
+            let oppOpts = '<option value="ALL" class="bg-[#161b22] text-slate-200">Any Opponent</option>';
+
+            teams.forEach(code => {
+                const name = TEAM_FULL_NAMES[code] || code;
+                teamOpts += `<option value="${code}" class="bg-[#161b22] text-slate-200">${name} (${code})</option>`;
+                oppOpts += `<option value="${code}" class="bg-[#161b22] text-slate-200">${name} (${code})</option>`;
+            });
+
+            teamSelect.innerHTML = teamOpts;
+            oppSelect.innerHTML = oppOpts;
+
+            teamSelect.value = currentTeamVal;
+            oppSelect.value = currentOppVal;
+        }
+
+        async function loadMatchHistory() {
+            if (isMatchHistoryLoading) return;
+            isMatchHistoryLoading = true;
+
+            const gamesContainer = document.getElementById('history-games-container');
+            const summaryContainer = document.getElementById('history-summary-container');
+            if (gamesContainer) {
+                gamesContainer.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 space-y-3">
+                        <div class="w-8 h-8 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+                        <p class="text-xs text-slate-400 font-mono">Loading match history & spread logs...</p>
+                    </div>
+                `;
+            }
+
+            try {
+                const params = new URLSearchParams();
+                if (matchHistorySeason && matchHistorySeason !== 'ALL') params.append('season', matchHistorySeason);
+                if (matchHistoryTeam && matchHistoryTeam !== 'ALL') params.append('team', matchHistoryTeam);
+                if (matchHistoryOpponent && matchHistoryOpponent !== 'ALL') params.append('opponent', matchHistoryOpponent);
+                if (matchHistoryOutcome && matchHistoryOutcome !== 'ALL') params.append('outcome', matchHistoryOutcome);
+                params.append('limit', '300');
+
+                const res = await fetch(`/api/match-history?${params.toString()}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                globalMatchHistoryData = data;
+
+                renderHistorySummary(data.summary);
+                renderHistoryGames(data.games || []);
+            } catch (err) {
+                console.error('Failed to load match history:', err);
+                if (gamesContainer) {
+                    gamesContainer.innerHTML = `
+                        <div class="col-span-full p-8 text-center glass-panel rounded-xl border border-rose-500/30">
+                            <i data-lucide="alert-circle" class="w-8 h-8 text-rose-400 mx-auto mb-2"></i>
+                            <p class="text-sm font-semibold text-rose-300">Unable to load match history</p>
+                            <p class="text-xs text-slate-400 mt-1">${err.message || 'Please check connection'}</p>
+                            <button onclick="loadMatchHistory()" class="mt-3 px-3 py-1.5 bg-[#21262d] hover:bg-[#30363d] text-slate-200 rounded text-xs border border-[#30363d] transition">Retry</button>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }
+            } finally {
+                isMatchHistoryLoading = false;
+            }
+        }
+
+        function onHistorySeasonChange(val) {
+            matchHistorySeason = val;
+            loadMatchHistory();
+        }
+
+        function onHistoryTeamChange(val) {
+            matchHistoryTeam = val;
+            loadMatchHistory();
+        }
+
+        function onHistoryOpponentChange(val) {
+            matchHistoryOpponent = val;
+            loadMatchHistory();
+        }
+
+        function onHistoryOutcomeChange(val) {
+            matchHistoryOutcome = val;
+            loadMatchHistory();
+        }
+
+        function onHistorySearch(query) {
+            matchHistorySearch = (query || '').toLowerCase().trim();
+            if (!globalMatchHistoryData || !globalMatchHistoryData.games) return;
+
+            let filtered = globalMatchHistoryData.games;
+            if (matchHistorySearch) {
+                filtered = filtered.filter(g => {
+                    const searchable = `${g.home_team} ${g.home_team_name} ${g.away_team} ${g.away_team_name} ${g.home_qb_name} ${g.away_qb_name} ${g.stadium} week ${g.week} ${g.season} ${g.gameday}`.toLowerCase();
+                    return searchable.includes(matchHistorySearch);
+                });
+            }
+            renderHistoryGames(filtered);
+        }
+
+        function resetHistoryFilters() {
+            matchHistorySeason = 'ALL';
+            matchHistoryTeam = 'ALL';
+            matchHistoryOpponent = 'ALL';
+            matchHistoryOutcome = 'ALL';
+            matchHistorySearch = '';
+
+            const seasonSelect = document.getElementById('history-season-select');
+            const teamSelect = document.getElementById('history-team-select');
+            const oppSelect = document.getElementById('history-opp-select');
+            const outcomeSelect = document.getElementById('history-outcome-select');
+            const searchInput = document.getElementById('history-search-input');
+
+            if (seasonSelect) seasonSelect.value = 'ALL';
+            if (teamSelect) teamSelect.value = 'ALL';
+            if (oppSelect) oppSelect.value = 'ALL';
+            if (outcomeSelect) outcomeSelect.value = 'ALL';
+            if (searchInput) searchInput.value = '';
+
+            loadMatchHistory();
+        }
+
+        function renderHistorySummary(sum) {
+            const container = document.getElementById('history-summary-container');
+            if (!container || !sum) return;
+
+            const isTeamFocus = sum.team && sum.team !== 'ALL';
+            
+            if (isTeamFocus) {
+                const diffColor = (sum.point_differential || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                const diffSign = (sum.point_differential || 0) >= 0 ? '+' : '';
+                
+                container.innerHTML = `
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Total Games</div>
+                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.total_games}</div>
+                        <div class="text-[10px] text-slate-500">${sum.team} Record</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Overall Record</div>
+                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.record_str}</div>
+                        <div class="text-[10px] text-emerald-400 font-semibold">${sum.win_pct}% Win Rate</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Home / Away</div>
+                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.home_record_str} <span class="text-slate-500 text-xs">/</span> ${sum.away_record_str}</div>
+                        <div class="text-[10px] text-slate-400">Home vs Away Split</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Avg Points (+/-)</div>
+                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.avg_pts_scored} <span class="text-slate-500 text-xs">-</span> ${sum.avg_pts_allowed}</div>
+                        <div class="text-[10px] font-mono font-semibold ${diffColor}">${diffSign}${sum.point_differential} Diff</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">ATS Cover Record</div>
+                        <div class="text-lg font-mono font-bold text-amber-400 mt-0.5">${sum.ats_record_str}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">${sum.ats_pct}% Cover Rate</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Over / Under</div>
+                        <div class="text-lg font-mono font-bold text-cyan-400 mt-0.5">${sum.ou_record_str}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">${sum.over_pct}% Overs</div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Total Matchups</div>
+                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.total_games}</div>
+                        <div class="text-[10px] text-slate-500">Historical Games</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Avg Game Total</div>
+                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.avg_pts_per_game}</div>
+                        <div class="text-[10px] text-slate-400">Points Per Game</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Over / Under Record</div>
+                        <div class="text-lg font-mono font-bold text-cyan-400 mt-0.5">${sum.ou_record_str}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">${sum.over_pct}% Over Rate</div>
+                    </div>
+                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center col-span-2 sm:col-span-3">
+                        <div class="text-[10px] uppercase font-bold text-slate-400">Filter Tip</div>
+                        <div class="text-xs text-slate-300 mt-1">Select a <b>Team Focus</b> and <b>vs Opponent</b> above to see historical head-to-head records and ATS betting covers.</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderHistoryGames(games) {
+            const container = document.getElementById('history-games-container');
+            if (!container) return;
+
+            if (!games || games.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full p-12 text-center glass-panel rounded-xl border border-[#30363d]">
+                        <i data-lucide="inbox" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
+                        <p class="text-sm font-semibold text-slate-300">No Historical Games Found</p>
+                        <p class="text-xs text-slate-500 mt-1">Try adjusting the season, team filter, or search query.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            let html = '';
+            games.forEach(g => {
+                const homeWon = g.home_score > g.away_score;
+                const awayWon = g.away_score > g.home_score;
+                const isTie = g.home_score === g.away_score;
+
+                const homeScoreClass = homeWon ? 'text-emerald-400 font-black' : (awayWon ? 'text-slate-400 font-semibold' : 'text-slate-200');
+                const awayScoreClass = awayWon ? 'text-emerald-400 font-black' : (homeWon ? 'text-slate-400 font-semibold' : 'text-slate-200');
+
+                let spreadDisplay = 'PK';
+                if (g.spread_line != null && g.spread_line !== 0) {
+                    if (g.spread_line > 0) {
+                        spreadDisplay = `${g.away_team} -${g.spread_line}`;
+                    } else {
+                        spreadDisplay = `${g.home_team} -${Math.abs(g.spread_line)}`;
+                    }
+                }
+
+                let atsBadge = '';
+                if (g.ats_result === 'HOME_COVER') {
+                    atsBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${g.home_team} Covered</span>`;
+                } else if (g.ats_result === 'AWAY_COVER') {
+                    atsBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${g.away_team} Covered</span>`;
+                } else if (g.ats_result === 'PUSH') {
+                    atsBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">ATS Push</span>`;
+                }
+
+                let ouBadge = '';
+                if (g.ou_result === 'OVER') {
+                    ouBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">OVER (${g.total_score} > ${g.total_line})</span>`;
+                } else if (g.ou_result === 'UNDER') {
+                    ouBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30">UNDER (${g.total_score} < ${g.total_line})</span>`;
+                } else if (g.ou_result === 'PUSH') {
+                    ouBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">O/U Push (${g.total_score})</span>`;
+                }
+
+                let focusBadge = '';
+                if (g.focus_outcome) {
+                    if (g.focus_outcome === 'W') {
+                        focusBadge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">WIN</span>`;
+                    } else if (g.focus_outcome === 'L') {
+                        focusBadge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">LOSS</span>`;
+                    } else if (g.focus_outcome === 'T') {
+                        focusBadge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">TIE</span>`;
+                    }
+                }
+
+                const awayLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${(g.away_team || '').toLowerCase()}.png`;
+                const homeLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${(g.home_team || '').toLowerCase()}.png`;
+
+                html += `
+                    <div class="glass-panel rounded-xl border border-[#30363d] p-4 space-y-3 hover:border-slate-500/50 transition">
+                        <!-- Card Header -->
+                        <div class="flex items-center justify-between border-b border-[#21262d] pb-2 text-xs">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-mono text-slate-400 font-semibold">${g.season} W${g.week}</span>
+                                <span class="text-slate-600">•</span>
+                                <span class="text-slate-400">${g.gameday}${g.weekday ? ' (' + g.weekday + ')' : ''}</span>
+                                ${g.is_overtime ? '<span class="text-[9px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 font-mono rounded font-bold">OT</span>' : ''}
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                ${focusBadge}
+                            </div>
+                        </div>
+
+                        <!-- Scoreboard Matchup Line -->
+                        <div class="space-y-2 py-1">
+                            <!-- Away Team -->
+                            <div class="flex items-center justify-between ${awayWon ? 'bg-[#161b22] px-2 py-1.5 rounded-lg border border-[#21262d]' : 'px-2 py-1'}">
+                                <div class="flex items-center space-x-2.5 truncate">
+                                    <img src="${awayLogo}" alt="${g.away_team}" class="w-6 h-6 object-contain flex-shrink-0" onerror="this.src='https://static.nfl.com/static/content/public/static/img/share/shield.png'">
+                                    <div class="truncate">
+                                        <div class="text-xs font-bold text-slate-100 flex items-center space-x-1.5">
+                                            <span>${g.away_team_name}</span>
+                                            ${awayWon ? '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>' : ''}
+                                        </div>
+                                        <div class="text-[10px] text-slate-500 font-mono">Away ${g.away_qb_name ? '• QB: ' + g.away_qb_name : ''}</div>
+                                    </div>
+                                </div>
+                                <div class="text-lg font-mono ${awayScoreClass}">${g.away_score}</div>
+                            </div>
+
+                            <!-- Home Team -->
+                            <div class="flex items-center justify-between ${homeWon ? 'bg-[#161b22] px-2 py-1.5 rounded-lg border border-[#21262d]' : 'px-2 py-1'}">
+                                <div class="flex items-center space-x-2.5 truncate">
+                                    <img src="${homeLogo}" alt="${g.home_team}" class="w-6 h-6 object-contain flex-shrink-0" onerror="this.src='https://static.nfl.com/static/content/public/static/img/share/shield.png'">
+                                    <div class="truncate">
+                                        <div class="text-xs font-bold text-slate-100 flex items-center space-x-1.5">
+                                            <span>${g.home_team_name}</span>
+                                            ${homeWon ? '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>' : ''}
+                                        </div>
+                                        <div class="text-[10px] text-slate-500 font-mono">Home ${g.home_qb_name ? '• QB: ' + g.home_qb_name : ''}</div>
+                                    </div>
+                                </div>
+                                <div class="text-lg font-mono ${homeScoreClass}">${g.home_score}</div>
+                            </div>
+                        </div>
+
+                        <!-- Spreads & Totals Breakdown -->
+                        <div class="bg-[#12161c] rounded-lg p-2.5 border border-[#21262d] space-y-1.5 text-xs font-mono">
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="text-slate-400">Closing Spread: <b class="text-slate-200">${spreadDisplay}</b></span>
+                                ${atsBadge}
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] pt-1 border-t border-[#1a1f26]">
+                                <span class="text-slate-400">Closing Total: <b class="text-slate-200">${g.total_line ? 'O/U ' + g.total_line : 'N/A'}</b></span>
+                                ${ouBadge}
+                            </div>
+                        </div>
+
+                        <!-- Venue & Weather Line -->
+                        <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-0.5 px-1">
+                            <div class="flex items-center space-x-1.5 truncate max-w-[200px]">
+                                <i data-lucide="map-pin" class="w-3 h-3 text-slate-500"></i>
+                                <span class="truncate">${g.stadium || 'NFL Stadium'}${g.roof ? ' • ' + g.roof : ''}</span>
+                            </div>
+                            ${g.temp != null ? `<div class="font-mono text-slate-400">${g.temp}°F${g.wind ? ' • ' + g.wind + 'mph' : ''}</div>` : ''}
+                        </div>
+
+                        <!-- Action Link to H2H Lab -->
+                        <button onclick="jumpToH2H('${g.home_team}', '${g.away_team}')" class="w-full py-1.5 px-3 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-slate-300 hover:text-slate-100 text-xs font-medium flex items-center justify-center space-x-1.5 border border-[#30363d] transition">
+                            <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Simulate Matchup in H2H Lab</span>
+                        </button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
     </script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
     <script defer src="/_vercel/insights/script.js"></script>
@@ -120,6 +477,10 @@
             <button onclick="switchTab('h2h')" id="tab-btn-h2h" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
                 <i data-lucide="shield" class="w-4 h-4 text-slate-400"></i>
                 <span>Matchup Lab (H2H)</span>
+            </button>
+            <button onclick="switchTab('match-history')" id="tab-btn-match-history" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
+                <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
+                <span>Match History & H2H Logs</span>
             </button>
         </div>
     </header>
@@ -373,6 +734,92 @@
                     <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-slate-400"></i>
                     <p class="text-sm">Loading 2026 season schedule and team stats...</p>
                 </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- TAB 6: MATCH HISTORY & HEAD-TO-HEAD LOGS -->
+        <!-- ============================================================== -->
+        <section id="tab-match-history" class="hidden space-y-4">
+            <!-- Header & Filter Bar -->
+            <div class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#30363d] pb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
+                            <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
+                            <span id="history-title">NFL Historical Game Logs & Head-to-Head Records</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Filter historical regular season matchups (2023–2026), point spreads, ATS covers, Over/Under totals, and starting QBs.
+                        </p>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <!-- Season Selector -->
+                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span class="text-[11px] text-slate-400 font-medium">Season:</span>
+                            <select id="history-season-select" onchange="onHistorySeasonChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer">
+                                <option value="ALL" class="bg-[#161b22] text-slate-200">All Seasons (2023–2026)</option>
+                                <option value="2026" class="bg-[#161b22] text-slate-200">2026 Season</option>
+                                <option value="2025" class="bg-[#161b22] text-slate-200">2025 Season</option>
+                                <option value="2024" class="bg-[#161b22] text-slate-200">2024 Season</option>
+                                <option value="2023" class="bg-[#161b22] text-slate-200">2023 Season</option>
+                            </select>
+                        </div>
+
+                        <!-- Team Focus Dropdown -->
+                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
+                            <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span class="text-[11px] text-slate-400 font-medium">Team Focus:</span>
+                            <select id="history-team-select" onchange="onHistoryTeamChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer max-w-[140px] truncate">
+                                <option value="ALL" class="bg-[#161b22] text-slate-200">All 32 Teams</option>
+                            </select>
+                        </div>
+
+                        <!-- Opponent H2H Dropdown -->
+                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
+                            <i data-lucide="swords" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span class="text-[11px] text-slate-400 font-medium">vs Opponent:</span>
+                            <select id="history-opp-select" onchange="onHistoryOpponentChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer max-w-[140px] truncate">
+                                <option value="ALL" class="bg-[#161b22] text-slate-200">Any Opponent</option>
+                            </select>
+                        </div>
+
+                        <!-- Outcome Filter -->
+                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
+                            <span class="text-[11px] text-slate-400 font-medium">Result:</span>
+                            <select id="history-outcome-select" onchange="onHistoryOutcomeChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer">
+                                <option value="ALL" class="bg-[#161b22] text-slate-200">All Results</option>
+                                <option value="W" class="bg-[#161b22] text-emerald-400 font-bold">Wins (W)</option>
+                                <option value="L" class="bg-[#161b22] text-rose-400 font-bold">Losses (L)</option>
+                            </select>
+                        </div>
+
+                        <!-- Search Input -->
+                        <div class="relative">
+                            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="history-search-input" oninput="onHistorySearch(this.value)" placeholder="Search QB, team, week..." class="bg-[#21262d] border border-[#30363d] text-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs outline-none focus:border-slate-500 w-36 sm:w-48 placeholder-slate-500">
+                        </div>
+
+                        <!-- Reset Button -->
+                        <button onclick="resetHistoryFilters()" class="p-2 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 rounded-lg transition" title="Reset Filters">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Summary Dashboard Banner -->
+                <div id="history-summary-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <!-- Populated dynamically via renderHistorySummary() -->
+                </div>
+            </div>
+
+            <!-- Games Grid Container -->
+            <div id="history-games-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <!-- Populated dynamically via renderHistoryGames() -->
             </div>
         </section>
 
@@ -805,7 +1252,7 @@
         }
 
         function switchTab(tabId) {
-            ['schedule', 'team-stats', 'highlights', 'h2h'].forEach(t => {
+            ['schedule', 'team-stats', 'highlights', 'h2h', 'match-history'].forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
                 if (el) el.classList.add('hidden');
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -819,6 +1266,11 @@
             if (tabId === 'schedule') {
                 if (!globalScheduleData && !isScheduleLoading) {
                     loadFullSchedule(currentScheduleSeason, startDate, endDate);
+                }
+            } else if (tabId === 'match-history') {
+                if (!globalMatchHistoryData && !isMatchHistoryLoading) {
+                    populateHistoryDropdowns();
+                    loadMatchHistory();
                 }
             }
             lucide.createIcons();
