@@ -462,13 +462,13 @@
 
         <!-- Navigation Tabs -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 border-t border-[#30363d] overflow-x-auto">
-            <button onclick="switchTab('schedule')" id="tab-btn-schedule"
+            <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="py-2.5 px-1 border-b-2 border-slate-300 text-slate-100 font-semibold text-xs flex items-center space-x-2 transition whitespace-nowrap">
+                <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                <span id="nav-schedule-label">Schedule & Matchups (2026 / 2025)</span>
+            </button>
             <button onclick="switchTab('floor-streak')" id="tab-btn-floor-streak" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
                 <i data-lucide="trending-up" class="w-4 h-4 text-slate-400"></i>
                 <span>Player Floor Streaks</span>
-            </button> class="py-2.5 px-1 border-b-2 border-slate-300 text-slate-100 font-semibold text-xs flex items-center space-x-2 transition whitespace-nowrap">
-                <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
-                <span id="nav-schedule-label">Schedule & Matchups (2026 / 2025)</span>
             </button>
             <button onclick="switchTab('team-stats')" id="tab-btn-team-stats" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
                 <i data-lucide="table" class="w-4 h-4 text-slate-400"></i>
