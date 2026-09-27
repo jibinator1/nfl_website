@@ -462,7 +462,11 @@
 
         <!-- Navigation Tabs -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 border-t border-[#30363d] overflow-x-auto">
-            <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="py-2.5 px-1 border-b-2 border-slate-300 text-slate-100 font-semibold text-xs flex items-center space-x-2 transition whitespace-nowrap">
+            <button onclick="switchTab('schedule')" id="tab-btn-schedule"
+            <button onclick="switchTab('floor-streak')" id="tab-btn-floor-streak" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
+                <i data-lucide="trending-up" class="w-4 h-4 text-slate-400"></i>
+                <span>Player Floor Streaks</span>
+            </button> class="py-2.5 px-1 border-b-2 border-slate-300 text-slate-100 font-semibold text-xs flex items-center space-x-2 transition whitespace-nowrap">
                 <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
                 <span id="nav-schedule-label">Schedule & Matchups (2026 / 2025)</span>
             </button>
@@ -491,6 +495,129 @@
         <!-- ============================================================== -->
         <!-- TAB 2: YAHOO SPORTS TEAM STATS & RANKINGS (32 TEAMS) -->
         <!-- ============================================================== -->
+        
+        <!-- ============================================================== -->
+        <!-- TAB: PLAYER FLOOR BREACH STREAKS -->
+        <!-- ============================================================== -->
+        <section id="tab-floor-streak" class="hidden space-y-5">
+            <!-- Header & Concept Overview -->
+            <div class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
+                                <i data-lucide="trending-up" class="w-4 h-4 text-slate-400"></i>
+                                <span>Player Floor Streaks</span>
+                            </h2>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-200 border border-[#30363d]">Hard Line Threshold (-30% Margin)</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Tracks consecutive games where player production meets or exceeds their established hard floor threshold (-30% margin off baseline, min 10 yds).
+                            Evaluated as a hard line across all games.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="loadFloorStreakTab()" class="px-3 py-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-200 text-xs rounded-lg transition flex items-center gap-1.5" title="Recalculate Floor Streaks">
+                            <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Refresh Streaks</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Summary Ribbon -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#30363d]">
+                    <div class="bg-[#21262d]/80 border border-[#30363d] rounded-lg p-3">
+                        <span class="text-[11px] text-slate-400 block font-medium">Longest Active Streak</span>
+                        <div id="floor-kpi-longest" class="text-xs font-semibold font-mono text-slate-200 mt-1">--</div>
+                    </div>
+                    <div class="bg-[#21262d]/80 border border-[#30363d] rounded-lg p-3">
+                        <span class="text-[11px] text-slate-400 block font-medium">High Consistency (8+ Games)</span>
+                        <div id="floor-kpi-elite" class="text-xs font-semibold font-mono text-slate-200 mt-1">--</div>
+                    </div>
+                    <div class="bg-[#21262d]/80 border border-[#30363d] rounded-lg p-3">
+                        <span class="text-[11px] text-slate-400 block font-medium">Solid Floor (5-7 Games)</span>
+                        <div id="floor-kpi-solid" class="text-xs font-semibold font-mono text-slate-200 mt-1">--</div>
+                    </div>
+                    <div class="bg-[#21262d]/80 border border-[#30363d] rounded-lg p-3">
+                        <span class="text-[11px] text-slate-400 block font-medium">Developing (1-4 Games)</span>
+                        <div id="floor-kpi-breached" class="text-xs font-semibold font-mono text-slate-200 mt-1">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls & Filter Toolbar -->
+            <div class="glass-panel rounded-xl p-4 border border-[#30363d] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Search Input -->
+                    <div class="relative w-56">
+                        <input type="text" id="floor-search-input" oninput="onFloorSearch(this.value)" placeholder="Search player or team..." class="w-full bg-[#21262d] border border-[#30363d] text-slate-200 text-xs rounded-lg pl-8 pr-3 py-1.5 outline-none focus:border-slate-500 font-medium">
+                        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+                    </div>
+
+                    <!-- Position Filter Chips -->
+                    <div class="flex items-center gap-1 bg-[#21262d] border border-[#30363d] rounded-lg p-1 text-xs">
+                        <button onclick="setFloorPosFilter('ALL')" id="floor-filter-pos-ALL" class="px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold">ALL</button>
+                        <button onclick="setFloorPosFilter('QB')" id="floor-filter-pos-QB" class="px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">QB</button>
+                        <button onclick="setFloorPosFilter('RB')" id="floor-filter-pos-RB" class="px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">RB</button>
+                        <button onclick="setFloorPosFilter('WR')" id="floor-filter-pos-WR" class="px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">WR</button>
+                        <button onclick="setFloorPosFilter('TE')" id="floor-filter-pos-TE" class="px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">TE</button>
+                    </div>
+
+                    <!-- Minimum Streak Filter -->
+                    <div class="flex items-center gap-1.5 text-xs text-slate-400 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1">
+                        <span class="text-[11px] font-medium">Streak:</span>
+                        <select id="floor-streak-filter-select" onchange="setFloorStreakFilter(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-medium cursor-pointer">
+                            <option value="1">All Active (1+)</option>
+                            <option value="2">Active (2+)</option>
+                            <option value="5" selected>Solid (5+)</option>
+                            <option value="8">Elite (8+)</option>
+                        </select>
+                    </div>
+
+                    <!-- Min Games Filter -->
+                    <div class="flex items-center gap-1.5 text-xs text-slate-400 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1">
+                        <span class="text-[11px] font-medium">Min Games:</span>
+                        <select id="floor-games-filter-select" onchange="setFloorMinGamesFilter(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-medium cursor-pointer">
+                            <option value="4" selected>4+ Games</option>
+                            <option value="8">8+ Games</option>
+                            <option value="12">12+ Games</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-400 font-mono">
+                    Showing <span id="floor-visible-count" class="text-slate-100 font-bold">0</span> tracked players
+                </div>
+            </div>
+
+            <!-- Floor Streaks Data Table -->
+            <div class="glass-panel rounded-xl overflow-hidden border border-[#30363d]">
+                <div class="overflow-x-auto max-h-[700px] overflow-y-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-[#21262d] sticky top-0 z-10 text-slate-400 font-medium border-b border-[#30363d]">
+                            <tr>
+                                <th class="th-sortable text-center w-12 py-2.5 px-3" onclick="sortFloorStreaks('rank')">#</th>
+                                <th class="th-sortable py-2.5 px-3" onclick="sortFloorStreaks('player_name')">Player</th>
+                                <th class="th-sortable text-center py-2.5 px-3" onclick="sortFloorStreaks('position')">Pos</th>
+                                <th class="th-sortable text-center py-2.5 px-3" onclick="sortFloorStreaks('team')">Team</th>
+                                <th class="text-left py-2.5 px-3">Tracked Production Metric</th>
+                                <th class="th-sortable text-right py-2.5 px-3" onclick="sortFloorStreaks('Baseline_Median')">Baseline (Median)</th>
+                                <th class="text-center py-2.5 px-3">Floor Margin</th>
+                                <th class="th-sortable text-right py-2.5 px-3" onclick="sortFloorStreaks('Floor_Threshold')">Floor Threshold</th>
+                                <th class="th-sortable text-center py-2.5 px-3" onclick="sortFloorStreaks('Floor_Streak')">Floor Streak</th>
+                                <th class="text-center py-2.5 px-3">Reliability Tier</th>
+                                <th class="th-sortable text-center py-2.5 px-3" onclick="sortFloorStreaks('Games_Played')">Games</th>
+                            </tr>
+                        </thead>
+                        <tbody id="floor-streak-table-body" class="divide-y divide-[#30363d]/60 text-slate-300">
+                            <!-- Injected via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <section id="tab-team-stats" class="hidden space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
@@ -684,6 +811,10 @@
                         </div>
 
                         <!-- Refresh -->
+                        <a id="btn-download-matchups-excel" href="/api/export-matchups-excel?season=2026&week=all" class="flex items-center space-x-1.5 px-2.5 py-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-200 text-xs rounded-lg transition" title="Export Matchup Workbook (.xlsx)">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
+                            <span class="hidden sm:inline font-medium">Export Excel</span>
+                        </a>
                         <button onclick="loadFullSchedule(currentScheduleSeason, startDate, endDate)" class="p-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 rounded-lg transition" title="Refresh Schedule">
                             <i data-lucide="rotate-cw" class="w-4 h-4"></i>
                         </button>
@@ -1252,7 +1383,7 @@
         }
 
         function switchTab(tabId) {
-            ['schedule', 'team-stats', 'highlights', 'h2h', 'match-history'].forEach(t => {
+            ['schedule', 'floor-streak', 'team-stats', 'highlights', 'h2h', 'match-history'].forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
                 if (el) el.classList.add('hidden');
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -1266,6 +1397,10 @@
             if (tabId === 'schedule') {
                 if (!globalScheduleData && !isScheduleLoading) {
                     loadFullSchedule(currentScheduleSeason, startDate, endDate);
+                }
+            } else if (tabId === 'floor-streak') {
+                if ((!globalFloorStreaks || globalFloorStreaks.length === 0) && !isFloorStreakLoading) {
+                    loadFloorStreakTab();
                 }
             } else if (tabId === 'match-history') {
                 if (!globalMatchHistoryData && !isMatchHistoryLoading) {

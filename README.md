@@ -45,7 +45,13 @@ Live Production URL: **[https://nflwebsite-ten.vercel.app](https://nflwebsite-te
 * **WR1 & Star RB Showdown**: Tests how defenses hold up against the opponent's primary weapons.
 * **Scramble Containment**: Rates defensive vulnerability to mobile QBs.
 
-### 5. Matchup Vulnerabilities & Trends
+### 5. Player Floor Streaks (Hard Line Thresholds)
+* **Streak Tracking**: Tracks consecutive games where player production meets or exceeds their established hard floor threshold (-30% margin off trailing baseline median, minimum 10 yards).
+* **Hard Line Invariant**: Evaluated as a fixed hard line threshold across all games in the streak rather than shifting dynamically per game.
+* **Position & Metric Filters**: Supports QB (rushing yds), RB (rushing yds), WR (receiving yds), and TE (receiving yds) with customizable minimum streak and games filters.
+* **Reliability Tiers**: Segregates players into Elite (8+ games), Consistent (5-7 games), Active (2-4 games), and Breached.
+
+### 6. Matchup Vulnerabilities & Trends
 * Automated spotlight detection highlighting defensive pass funnels, soft run fronts, offensive red-zone efficiency, and rest advantages.
 
 ---
@@ -57,6 +63,8 @@ The application is deployed on Vercel Serverless Functions (`@vercel/python`):
 * **Live Dashboard**: [https://nflwebsite-ten.vercel.app](https://nflwebsite-ten.vercel.app)
 * **REST API Endpoints**:
   * `GET /api/status`: Health check and cache status.
+  * `GET /api/floor-streak`: Player floor streaks with hard line thresholds.
+  * `GET /api/export-matchups-excel`: Generates and downloads multi-tab matchup workbooks (.xlsx).
   * `GET /api/match-history`: Historical match logs, ATS records, and O/U splits.
   * `GET /api/full-schedule`: 18-week schedule with volume and efficiency cards.
   * `GET /api/team-stats`: 32-team Yahoo Sports rankings and statistical breakdowns.

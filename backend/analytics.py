@@ -2277,3 +2277,142 @@ def compute_match_history(schedules_df, season=None, team=None, opponent=None, o
         'total_count': len(games_list),
         'games': display_games
     }
+
+
+# ===========================================================================
+# PLAYER FLOOR BREACH STREAKS (HARD LINE THRESHOLD)
+# ===========================================================================
+FLOOR_MARGINS = {
+    'QB': 0.30,
+    'RB': 0.30,
+    'WR': 0.30,
+    'TE': 0.30,
+}
+
+FLOOR_STAT_MAP = {
+    'QB': 'rushing_yards',
+    'RB': 'rushing_yards',
+    'WR': 'receiving_yards',
+    'TE': 'receiving_yards',
+}
+
+FLOOR_WINDOW = 8
+
+
+def compute_floor_streak_df(weekly_df: pd.DataFrame, rosters_df: pd.DataFrame = None) -> pd.DataFrame:
+    """
+    Computes the Player Floor Breach Streak for all players against a hard floor threshold line.
+
+    Algorithm per player-position:
+    1. Sort games chronologically.
+    2. Compute trailing baseline median of the primary production stat
+       (lagged by 1 so the current game is not included — strict leakage prevention).
+    3. Establish a fixed hard threshold line: set_threshold = (1 - margin) * baseline_median.
+    4. A "floor breach" occurs when actual production < set_threshold (or actual < 10 yards).
+       All X games in the streak must pass this fixed hard threshold line, not dynamic thresholds relative to each historical game.
+    5. Count consecutive games (most-recent streak) WITHOUT a breach as Floor_Streak.
+    """
+    if weekly_df is None or weekly_df.empty:
+        return pd.DataFrame()
+
+    df = weekly_df.copy()
+    df = df.sort_values(['player_id', 'season', 'week']).reset_index(drop=True)
+
+    # Lookup currently active players from official rosters if available
+    active_id_to_team = {}
+    if rosters_df is not None and not rosters_df.empty and 'status' in rosters_df.columns:
+        act_rost = rosters_df[rosters_df['status'] == 'ACT'].sort_values('season').groupby('gsis_id').last().reset_index()
+        active_id_to_team = dict(zip(act_rost['gsis_id'], act_rost['team']))
+
+    # Determine each team's most recently completed game (season, week)
+    team_last_game = {}
+    for t, t_df in df.groupby('team'):
+        lr = t_df.sort_values(['season', 'week']).iloc[-1]
+        team_last_game[t] = (int(lr['season']), int(lr['week']))
+
+    records = []
+
+    for pid, player_df in df.groupby('player_id'):
+        if active_id_to_team and pid not in active_id_to_team:
+            continue
+
+        player_df = player_df.reset_index(drop=True)
+        pos = str(player_df['position'].iloc[-1]).upper() if len(player_df) > 0 else 'WR'
+        if pos not in ['QB', 'RB', 'WR', 'TE']:
+            continue
+
+        # Filter out players who did not play in their team's last game
+        last_p_row = player_df.sort_values(['season', 'week']).iloc[-1]
+        player_last_game = (int(last_p_row['season']), int(last_p_row['week']))
+        current_team = active_id_to_team.get(pid, str(player_df['team'].iloc[-1]))
+        expected_last = team_last_game.get(current_team, team_last_game.get(str(player_df['team'].iloc[-1])))
+
+        if expected_last and player_last_game != expected_last:
+            continue
+
+        stat_col = FLOOR_STAT_MAP.get(pos, 'receiving_yards')
+        margin = FLOOR_MARGINS.get(pos, 0.30)
+
+        if stat_col not in player_df.columns:
+            continue
+
+        production = pd.to_numeric(player_df[stat_col], errors='coerce').fillna(0.0)
+
+        # Trailing baseline median (strictly prior games)
+        lag1 = production.shift(1)
+        baseline_med = float(lag1.rolling(FLOOR_WINDOW, min_periods=2).median().iloc[-1]) if lag1.notna().any() else 0.0
+        if baseline_med < 10.0:
+            continue
+
+        # Fixed set hard line threshold across all games for this player
+        set_threshold = round((1.0 - margin) * baseline_med, 1)
+
+        # Hard line threshold breach check: every game in streak must pass set_threshold
+        breach = (production < set_threshold) | (production < 10.0)
+
+        # Count consecutive no-breach games from end of history
+        streak = 0
+        for b in reversed(breach.values):
+            if not b:  # reached floor
+                streak += 1
+            else:
+                break
+
+        # Must have reached the floor threshold in their most recent game
+        if streak < 1:
+            continue
+
+        if streak < len(breach):
+            b_idx = len(breach) - 1 - streak
+            b_row = player_df.iloc[b_idx]
+            b_season = b_row.get('season', '')
+            b_week = b_row.get('week', '')
+            b_val = round(float(production.iloc[b_idx]), 1)
+            last_breach_desc = f"{b_season} W{b_week} ({b_val} yds < {set_threshold} yds floor)"
+            last_breach_short = f"{b_season} W{b_week}"
+        else:
+            last_breach_desc = "None in record"
+            last_breach_short = "None"
+
+        p_name = str(player_df.get('player_display_name', player_df['player_name']).iloc[-1])
+
+        records.append({
+            'player_id': pid,
+            'player_name': p_name,
+            'position': pos,
+            'team': active_id_to_team.get(pid, str(player_df['team'].iloc[-1])),
+            'Floor_Streak': streak,
+            'Baseline_Median': round(baseline_med, 1),
+            'Floor_Threshold': set_threshold,
+            'Margin_Used': margin,
+            'Floor_Stat': stat_col,
+            'Games_Played': len(player_df),
+            'Last_Breach': last_breach_desc,
+            'Last_Breach_Game': last_breach_short,
+        })
+
+    result_df = pd.DataFrame(records)
+    if not result_df.empty:
+        result_df = result_df.sort_values('Floor_Streak', ascending=False).reset_index(drop=True)
+    return result_df
+

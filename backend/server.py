@@ -18,7 +18,8 @@ from backend.analytics import (
     compute_matchup_highlights,
     compute_matchup_deepdive,
     compute_full_season_schedule,
-    compute_match_history
+    compute_match_history,
+    compute_floor_streak_df
 )
 
 load_dotenv()
@@ -228,6 +229,77 @@ async def get_match_history_endpoint(
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/floor-streak")
+async def get_floor_streak_endpoint(
+    season: int = Query(None, description="Filter by season (optional)"),
+    pos: str = Query(None, description="Filter by position (QB, RB, WR, TE)"),
+    min_streak: int = Query(0, description="Minimum floor streak to include"),
+    min_games: int = Query(4, description="Minimum games played to include player"),
+):
+    """
+    Returns the Player Floor Breach Streak for all tracked players against a hard floor threshold line.
+    Streak = consecutive most-recent games meeting or exceeding the hard floor threshold line ((1 - margin) × baseline median).
+    Position-specific margins: QB=30%, RB=30%, WR=30%, TE=30%.
+    """
+    ensure_data_loaded()
+    try:
+        import pandas as pd
+        df = compute_floor_streak_df(engine.weekly)
+        if df.empty:
+            return {'status': 'success', 'count': 0, 'players': []}
+
+        if pos and pos.upper() != 'ALL':
+            df = df[df['position'].str.upper() == pos.upper()]
+        else:
+            df = df[df['position'].str.upper().isin(['QB', 'RB', 'WR', 'TE'])]
+
+        df = df[df['Games_Played'] >= min_games]
+        df = df[df['Floor_Streak'] >= min_streak]
+        df['Floor_Threshold'] = ((1.0 - df['Margin_Used']) * df['Baseline_Median']).round(1)
+        df = df.sort_values('Floor_Streak', ascending=False)
+        df = df.where(pd.notnull(df), None)
+
+        return {
+            'status': 'success',
+            'count': len(df),
+            'players': df.to_dict(orient='records')
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/export-matchups-excel")
+async def export_matchups_excel_endpoint(
+    season: int = Query(2026, description="NFL Season (e.g. 2026, 2025, 2024)"),
+    week: str = Query("1", description="NFL Week (1 to 18, or 'all')"),
+    start_date: str = Query(None, description="Start date in YYYY-MM-DD format"),
+    end_date: str = Query(None, description="End date in YYYY-MM-DD format")
+):
+    """Generates and downloads a multi-tab NFL Matchup Data workbook (.xlsx)."""
+    ensure_data_loaded()
+    try:
+        from backend.excel_exporter import export_weekly_matchups_xlsx
+        schedule_data = compute_full_season_schedule(
+            engine.weekly, engine.schedules,
+            season=season, start_date=start_date, end_date=end_date
+        )
+        target_week_label = f"Week_{week}" if week and str(week).lower() != 'all' else "All_Weeks"
+        filename = f"NFL_Matchup_Data_{target_week_label}_{season}.xlsx"
+        excel_bytes = export_weekly_matchups_xlsx(
+            schedule_data=schedule_data,
+            week=week,
+            season=season
+        )
+        return Response(
+            content=excel_bytes,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Mount the router under both /api and root /
 app.include_router(api_router, prefix="/api")
