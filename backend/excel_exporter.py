@@ -579,8 +579,10 @@ def export_weekly_matchups_xlsx(schedule_data: dict, week=None, season: int = 20
         "Away Sacks S/G", "Away Sacks S Rank", "Home Sacks S/G", "Home Sacks S Rank",
         "Away Turnover Margin", "Away TO Rank", "Home Turnover Margin", "Home TO Rank",
         # Matchup Verdicts
-        "Away Defense vs Star RB", "Home Defense vs Star RB",
+        "Away Defense vs RB1", "Home Defense vs RB1",
+        "Away Defense vs RB2", "Home Defense vs RB2",
         "Away Defense vs WR1", "Home Defense vs WR1",
+        "Away Defense vs WR2", "Home Defense vs WR2",
         "Away QB Scramble Contain", "Home QB Scramble Contain",
         "Away RB Rec Contain", "Home RB Rec Contain"
     ]
@@ -639,7 +641,9 @@ def export_weekly_matchups_xlsx(schedule_data: dict, week=None, season: int = 20
                 h.get('turnover_diff'), h.get('rank_turnover_diff'),
                 # Verdicts
                 a.get('def_star_rb_verdict', '--'), h.get('def_star_rb_verdict', '--'),
+                a.get('def_rb2_verdict', '--'), h.get('def_rb2_verdict', '--'),
                 a.get('def_star_wr_verdict', '--'), h.get('def_star_wr_verdict', '--'),
+                a.get('def_wr2_verdict', '--'), h.get('def_wr2_verdict', '--'),
                 a.get('def_qb_rush_verdict', '--'), h.get('def_qb_rush_verdict', '--'),
                 a.get('def_rb_rec_verdict', '--'), h.get('def_rb_rec_verdict', '--')
             ]
@@ -710,7 +714,7 @@ def export_weekly_matchups_xlsx(schedule_data: dict, week=None, season: int = 20
         "Total YPG", "Total Rank", "Total Allowed/G", "Total Def Rank",
         "Carries/G", "Pass Att/G", "Yds/Carry", "Yds/Pass Att", "Cmp %",
         "Turnover Diff", "TO Rank", "Sacks F/G", "Sacks S/G",
-        "Defense vs Star RB", "Defense vs WR1"
+        "Defense vs RB1", "Defense vs RB2", "Defense vs WR1", "Defense vs WR2"
     ]
 
     ws3.row_dimensions[3].height = 24
@@ -770,7 +774,9 @@ def export_weekly_matchups_xlsx(schedule_data: dict, week=None, season: int = 20
             t_stat.get('sacks_forced_per_game', 0.0),
             t_stat.get('sacks_suffered_per_game', 0.0),
             t_stat.get('def_star_rb_verdict', '--'),
-            t_stat.get('def_star_wr_verdict', '--')
+            t_stat.get('def_rb2_verdict', '--'),
+            t_stat.get('def_star_wr_verdict', '--'),
+            t_stat.get('def_wr2_verdict', '--')
         ]
 
         # Rank columns in sheet 3: 1, 8, 10, 12, 14, 16, 18, 25

@@ -2481,12 +2481,14 @@
                                 <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
                                     <span class="text-[10px] text-slate-400 block font-semibold">VS RUN</span>
                                     <span class="font-mono font-bold text-slate-200">#${h.rank_rush_allowed || '--'} (${h.rush_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs Star RBs: <span class="${(h.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_rb_diff != null ? (h.def_star_rb_diff > 0 ? '+' : '') + h.def_star_rb_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB1: <span class="${(h.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_rb_diff != null ? (h.def_star_rb_diff > 0 ? '+' : '') + h.def_star_rb_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB2: <span class="${(h.def_rb2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((h.def_rb2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_rb2_diff != null ? (h.def_rb2_diff > 0 ? '+' : '') + h.def_rb2_diff : '--'} yds</span></p>
                                 </div>
                                 <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
                                     <span class="text-[10px] text-slate-400 block font-semibold">VS PASS</span>
                                     <span class="font-mono font-bold text-slate-200">#${h.rank_pass_allowed || '--'} (${h.pass_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1s: <span class="${(h.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_wr_diff != null ? (h.def_star_wr_diff > 0 ? '+' : '') + h.def_star_wr_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1: <span class="${(h.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_wr_diff != null ? (h.def_star_wr_diff > 0 ? '+' : '') + h.def_star_wr_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR2: <span class="${(h.def_wr2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((h.def_wr2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_wr2_diff != null ? (h.def_wr2_diff > 0 ? '+' : '') + h.def_wr2_diff : '--'} yds</span></p>
                                 </div>
                                 <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
                                     <span class="text-[10px] text-amber-400 block font-semibold">VS QB RUSH</span>
@@ -2516,12 +2518,14 @@
                                 <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
                                     <span class="text-[10px] text-slate-400 block font-semibold">VS RUN</span>
                                     <span class="font-mono font-bold text-slate-200">#${a.rank_rush_allowed || '--'} (${a.rush_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs Star RBs: <span class="${(a.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_rb_diff != null ? (a.def_star_rb_diff > 0 ? '+' : '') + a.def_star_rb_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB1: <span class="${(a.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_rb_diff != null ? (a.def_star_rb_diff > 0 ? '+' : '') + a.def_star_rb_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB2: <span class="${(a.def_rb2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((a.def_rb2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_rb2_diff != null ? (a.def_rb2_diff > 0 ? '+' : '') + a.def_rb2_diff : '--'} yds</span></p>
                                 </div>
                                 <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
                                     <span class="text-[10px] text-slate-400 block font-semibold">VS PASS</span>
                                     <span class="font-mono font-bold text-slate-200">#${a.rank_pass_allowed || '--'} (${a.pass_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1s: <span class="${(a.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_wr_diff != null ? (a.def_star_wr_diff > 0 ? '+' : '') + a.def_star_wr_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1: <span class="${(a.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_wr_diff != null ? (a.def_star_wr_diff > 0 ? '+' : '') + a.def_star_wr_diff : '--'} yds</span></p>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR2: <span class="${(a.def_wr2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((a.def_wr2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_wr2_diff != null ? (a.def_wr2_diff > 0 ? '+' : '') + a.def_wr2_diff : '--'} yds</span></p>
                                 </div>
                                 <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
                                     <span class="text-[10px] text-amber-400 block font-semibold">VS QB RUSH</span>
@@ -2995,9 +2999,11 @@
                         ${formatRow('YPC (Offense)', fmt1Dec(a.yds_per_carry), a.rank_ypc, fmt1Dec(h.yds_per_carry), h.rank_ypc, true)}
                         ${formatRow('YPC Allowed', fmt1Dec(a.opp_yds_per_carry), a.rank_opp_ypc, fmt1Dec(h.opp_yds_per_carry), h.rank_opp_ypc, false)}
 
-                        <!-- 6. Defense vs Star Players -->
-                        ${a.def_star_rb_diff != null || h.def_star_rb_diff != null ? formatRow('vs Star RBs', fmtDiffYds(a.def_star_rb_diff), a.rank_def_star_rb, fmtDiffYds(h.def_star_rb_diff), h.rank_def_star_rb, false) : ''}
+                        <!-- 6. Defense vs Star Players (RB1, RB2, WR1, WR2) -->
+                        ${a.def_star_rb_diff != null || h.def_star_rb_diff != null ? formatRow('vs RB1s', fmtDiffYds(a.def_star_rb_diff), a.rank_def_star_rb, fmtDiffYds(h.def_star_rb_diff), h.rank_def_star_rb, false) : ''}
+                        ${a.def_rb2_diff != null || h.def_rb2_diff != null ? formatRow('vs RB2s', fmtDiffYds(a.def_rb2_diff), a.rank_def_rb2, fmtDiffYds(h.def_rb2_diff), h.rank_def_rb2, false) : ''}
                         ${a.def_star_wr_diff != null || h.def_star_wr_diff != null ? formatRow('vs WR1s', fmtDiffYds(a.def_star_wr_diff), a.rank_def_star_wr, fmtDiffYds(h.def_star_wr_diff), h.rank_def_star_wr, false) : ''}
+                        ${a.def_wr2_diff != null || h.def_wr2_diff != null ? formatRow('vs WR2s', fmtDiffYds(a.def_wr2_diff), a.rank_def_wr2, fmtDiffYds(h.def_wr2_diff), h.rank_def_wr2, false) : ''}
 
                         <!-- 7. Trenches: Pressure Generation & Pass Protection Leak -->
                         ${a.pressure_rate_generated != null || h.pressure_rate_generated != null ? formatRow('Def Pressure Rate Gen', fmtPct(a.pressure_rate_generated), a.rank_pressure_rate_generated, fmtPct(h.pressure_rate_generated), h.rank_pressure_rate_generated, true, a.opp_pass_att_sample, h.opp_pass_att_sample) : ''}

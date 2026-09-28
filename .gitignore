@@ -43,3 +43,9 @@ venv.bak/
 *.swo
 .DS_Store
 Thumbs.db
+
+# Logs and Local Sync Run Tracker
+out.txt
+last_run.txt
+*.log
+

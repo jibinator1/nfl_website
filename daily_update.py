@@ -62,8 +62,12 @@ def record_run_success():
 def sync_remote_repo():
     """Pulls latest changes from origin main to avoid push rejection."""
     try:
-        print("Pulling latest changes from remote...")
-        subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'], cwd=PROJECT_DIR, check=False)
+        print("Pulling latest changes from remote with --autostash...")
+        res = subprocess.run(['git', 'pull', '--rebase', '--autostash', 'origin', 'main'], cwd=PROJECT_DIR, capture_output=True, text=True)
+        if res.returncode == 0:
+            print("Remote repository sync successful.")
+        else:
+            print(f"[Notice] Remote pull info: {res.stdout.strip()} {res.stderr.strip()}")
     except Exception as e:
         print(f"[Notice] Remote sync check: {e}")
 
@@ -168,8 +172,8 @@ def push_to_github():
             print("No data changes detected. Everything is up to date!")
             return True
 
-        print("Staging data updates...")
-        subprocess.run(["git", "add", "data/", "api/data/"], check=True)
+        print("Staging updates (data, api, backend, frontend, index.html)...")
+        subprocess.run(["git", "add", "data/", "api/data/", "backend/", "frontend/", "index.html", ".gitignore", "daily_update.py"], check=True)
         
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
         commit_msg = f"Auto-update NFL stats & schedules: {timestamp}"
@@ -205,11 +209,15 @@ def main():
     sync_remote_repo()
     success = fetch_and_update_data()
     if success:
+        pushed = True
         if AUTO_PUSH:
-            push_to_github()
-        record_run_success()
-        elapsed = time.time() - t_start
-        print(f"\nProcess completed successfully in {elapsed:.1f} seconds.")
+            pushed = push_to_github()
+        if pushed:
+            record_run_success()
+            elapsed = time.time() - t_start
+            print(f"\nProcess completed successfully in {elapsed:.1f} seconds.")
+        else:
+            print("\n[Warning] GitHub sync failed. last_run.txt not updated so retry can occur.")
     else:
         print("\nData sync encountered an issue. Exiting.")
 
