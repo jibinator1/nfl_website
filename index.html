@@ -1525,6 +1525,20 @@
             lucide.createIcons();
         }
 
+        function getRankBadge(rank, highIsGood = true) {
+            if (rank == null) return '';
+            const r = parseInt(rank, 10);
+            if (isNaN(r)) return '';
+            if (!highIsGood) {
+                if (r <= 8) return 'rank-bot';
+                if (r >= 25) return 'rank-top';
+                return 'rank-mid';
+            }
+            if (r <= 8) return 'rank-top';
+            if (r >= 25) return 'rank-bot';
+            return 'rank-mid';
+        }
+
         function renderGameCardHtml(g) {
             const isFinal = g.is_final;
             const a = g.away_stats || {};
