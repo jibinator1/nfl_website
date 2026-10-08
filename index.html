@@ -14,362 +14,6 @@
         window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 
-        // ==========================================
-        // MATCH HISTORY & HEAD-TO-HEAD LOGS
-        // ==========================================
-        let matchHistorySeason = 'ALL';
-        let matchHistoryTeam = 'ALL';
-        let matchHistoryOpponent = 'ALL';
-        let matchHistoryOutcome = 'ALL';
-        let matchHistorySearch = '';
-        let globalMatchHistoryData = null;
-        let isMatchHistoryLoading = false;
-
-        function populateHistoryDropdowns() {
-            const teamSelect = document.getElementById('history-team-select');
-            const oppSelect = document.getElementById('history-opp-select');
-            if (!teamSelect || !oppSelect) return;
-
-            const currentTeamVal = teamSelect.value || 'ALL';
-            const currentOppVal = oppSelect.value || 'ALL';
-
-            const teams = Object.keys(TEAM_FULL_NAMES).sort();
-            
-            let teamOpts = '<option value="ALL" class="bg-[#161b22] text-slate-200">All 32 Teams</option>';
-            let oppOpts = '<option value="ALL" class="bg-[#161b22] text-slate-200">Any Opponent</option>';
-
-            teams.forEach(code => {
-                const name = TEAM_FULL_NAMES[code] || code;
-                teamOpts += `<option value="${code}" class="bg-[#161b22] text-slate-200">${name} (${code})</option>`;
-                oppOpts += `<option value="${code}" class="bg-[#161b22] text-slate-200">${name} (${code})</option>`;
-            });
-
-            teamSelect.innerHTML = teamOpts;
-            oppSelect.innerHTML = oppOpts;
-
-            teamSelect.value = currentTeamVal;
-            oppSelect.value = currentOppVal;
-        }
-
-        async function loadMatchHistory() {
-            if (isMatchHistoryLoading) return;
-            isMatchHistoryLoading = true;
-
-            const gamesContainer = document.getElementById('history-games-container');
-            const summaryContainer = document.getElementById('history-summary-container');
-            if (gamesContainer) {
-                gamesContainer.innerHTML = `
-                    <div class="col-span-full flex flex-col items-center justify-center py-16 space-y-3">
-                        <div class="w-8 h-8 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
-                        <p class="text-xs text-slate-400 font-mono">Loading match history & spread logs...</p>
-                    </div>
-                `;
-            }
-
-            try {
-                const params = new URLSearchParams();
-                if (matchHistorySeason && matchHistorySeason !== 'ALL') params.append('season', matchHistorySeason);
-                if (matchHistoryTeam && matchHistoryTeam !== 'ALL') params.append('team', matchHistoryTeam);
-                if (matchHistoryOpponent && matchHistoryOpponent !== 'ALL') params.append('opponent', matchHistoryOpponent);
-                if (matchHistoryOutcome && matchHistoryOutcome !== 'ALL') params.append('outcome', matchHistoryOutcome);
-                params.append('limit', '300');
-
-                const res = await fetch(`/api/match-history?${params.toString()}`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                globalMatchHistoryData = data;
-
-                renderHistorySummary(data.summary);
-                renderHistoryGames(data.games || []);
-            } catch (err) {
-                console.error('Failed to load match history:', err);
-                if (gamesContainer) {
-                    gamesContainer.innerHTML = `
-                        <div class="col-span-full p-8 text-center glass-panel rounded-xl border border-rose-500/30">
-                            <i data-lucide="alert-circle" class="w-8 h-8 text-rose-400 mx-auto mb-2"></i>
-                            <p class="text-sm font-semibold text-rose-300">Unable to load match history</p>
-                            <p class="text-xs text-slate-400 mt-1">${err.message || 'Please check connection'}</p>
-                            <button onclick="loadMatchHistory()" class="mt-3 px-3 py-1.5 bg-[#21262d] hover:bg-[#30363d] text-slate-200 rounded text-xs border border-[#30363d] transition">Retry</button>
-                        </div>
-                    `;
-                    lucide.createIcons();
-                }
-            } finally {
-                isMatchHistoryLoading = false;
-            }
-        }
-
-        function onHistorySeasonChange(val) {
-            matchHistorySeason = val;
-            loadMatchHistory();
-        }
-
-        function onHistoryTeamChange(val) {
-            matchHistoryTeam = val;
-            loadMatchHistory();
-        }
-
-        function onHistoryOpponentChange(val) {
-            matchHistoryOpponent = val;
-            loadMatchHistory();
-        }
-
-        function onHistoryOutcomeChange(val) {
-            matchHistoryOutcome = val;
-            loadMatchHistory();
-        }
-
-        function onHistorySearch(query) {
-            matchHistorySearch = (query || '').toLowerCase().trim();
-            if (!globalMatchHistoryData || !globalMatchHistoryData.games) return;
-
-            let filtered = globalMatchHistoryData.games;
-            if (matchHistorySearch) {
-                filtered = filtered.filter(g => {
-                    const searchable = `${g.home_team} ${g.home_team_name} ${g.away_team} ${g.away_team_name} ${g.home_qb_name} ${g.away_qb_name} ${g.stadium} week ${g.week} ${g.season} ${g.gameday}`.toLowerCase();
-                    return searchable.includes(matchHistorySearch);
-                });
-            }
-            renderHistoryGames(filtered);
-        }
-
-        function resetHistoryFilters() {
-            matchHistorySeason = 'ALL';
-            matchHistoryTeam = 'ALL';
-            matchHistoryOpponent = 'ALL';
-            matchHistoryOutcome = 'ALL';
-            matchHistorySearch = '';
-
-            const seasonSelect = document.getElementById('history-season-select');
-            const teamSelect = document.getElementById('history-team-select');
-            const oppSelect = document.getElementById('history-opp-select');
-            const outcomeSelect = document.getElementById('history-outcome-select');
-            const searchInput = document.getElementById('history-search-input');
-
-            if (seasonSelect) seasonSelect.value = 'ALL';
-            if (teamSelect) teamSelect.value = 'ALL';
-            if (oppSelect) oppSelect.value = 'ALL';
-            if (outcomeSelect) outcomeSelect.value = 'ALL';
-            if (searchInput) searchInput.value = '';
-
-            loadMatchHistory();
-        }
-
-        function renderHistorySummary(sum) {
-            const container = document.getElementById('history-summary-container');
-            if (!container || !sum) return;
-
-            const isTeamFocus = sum.team && sum.team !== 'ALL';
-            
-            if (isTeamFocus) {
-                const diffColor = (sum.point_differential || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400';
-                const diffSign = (sum.point_differential || 0) >= 0 ? '+' : '';
-                
-                container.innerHTML = `
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Total Games</div>
-                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.total_games}</div>
-                        <div class="text-[10px] text-slate-500">${sum.team} Record</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Overall Record</div>
-                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.record_str}</div>
-                        <div class="text-[10px] text-emerald-400 font-semibold">${sum.win_pct}% Win Rate</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Home / Away</div>
-                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.home_record_str} <span class="text-slate-500 text-xs">/</span> ${sum.away_record_str}</div>
-                        <div class="text-[10px] text-slate-400">Home vs Away Split</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Avg Points (+/-)</div>
-                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.avg_pts_scored} <span class="text-slate-500 text-xs">-</span> ${sum.avg_pts_allowed}</div>
-                        <div class="text-[10px] font-mono font-semibold ${diffColor}">${diffSign}${sum.point_differential} Diff</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">ATS Cover Record</div>
-                        <div class="text-lg font-mono font-bold text-amber-400 mt-0.5">${sum.ats_record_str}</div>
-                        <div class="text-[10px] text-slate-400 font-mono">${sum.ats_pct}% Cover Rate</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Over / Under</div>
-                        <div class="text-lg font-mono font-bold text-cyan-400 mt-0.5">${sum.ou_record_str}</div>
-                        <div class="text-[10px] text-slate-400 font-mono">${sum.over_pct}% Overs</div>
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Total Matchups</div>
-                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.total_games}</div>
-                        <div class="text-[10px] text-slate-500">Historical Games</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Avg Game Total</div>
-                        <div class="text-lg font-mono font-bold text-slate-100 mt-0.5">${sum.avg_pts_per_game}</div>
-                        <div class="text-[10px] text-slate-400">Points Per Game</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Over / Under Record</div>
-                        <div class="text-lg font-mono font-bold text-cyan-400 mt-0.5">${sum.ou_record_str}</div>
-                        <div class="text-[10px] text-slate-400 font-mono">${sum.over_pct}% Over Rate</div>
-                    </div>
-                    <div class="bg-[#161b22] border border-[#30363d] rounded-lg p-3 text-center col-span-2 sm:col-span-3">
-                        <div class="text-[10px] uppercase font-bold text-slate-400">Filter Tip</div>
-                        <div class="text-xs text-slate-300 mt-1">Select a <b>Team Focus</b> and <b>vs Opponent</b> above to see historical head-to-head records and ATS betting covers.</div>
-                    </div>
-                `;
-            }
-        }
-
-        function renderHistoryGames(games) {
-            const container = document.getElementById('history-games-container');
-            if (!container) return;
-
-            if (!games || games.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full p-12 text-center glass-panel rounded-xl border border-[#30363d]">
-                        <i data-lucide="inbox" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
-                        <p class="text-sm font-semibold text-slate-300">No Historical Games Found</p>
-                        <p class="text-xs text-slate-500 mt-1">Try adjusting the season, team filter, or search query.</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            let html = '';
-            games.forEach(g => {
-                const homeWon = g.home_score > g.away_score;
-                const awayWon = g.away_score > g.home_score;
-                const isTie = g.home_score === g.away_score;
-
-                const homeScoreClass = homeWon ? 'text-emerald-400 font-black' : (awayWon ? 'text-slate-400 font-semibold' : 'text-slate-200');
-                const awayScoreClass = awayWon ? 'text-emerald-400 font-black' : (homeWon ? 'text-slate-400 font-semibold' : 'text-slate-200');
-
-                let spreadDisplay = 'PK';
-                if (g.spread_line != null && g.spread_line !== 0) {
-                    if (g.spread_line > 0) {
-                        spreadDisplay = `${g.away_team} -${g.spread_line}`;
-                    } else {
-                        spreadDisplay = `${g.home_team} -${Math.abs(g.spread_line)}`;
-                    }
-                }
-
-                let atsBadge = '';
-                if (g.ats_result === 'HOME_COVER') {
-                    atsBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${g.home_team} Covered</span>`;
-                } else if (g.ats_result === 'AWAY_COVER') {
-                    atsBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${g.away_team} Covered</span>`;
-                } else if (g.ats_result === 'PUSH') {
-                    atsBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">ATS Push</span>`;
-                }
-
-                let ouBadge = '';
-                if (g.ou_result === 'OVER') {
-                    ouBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">OVER (${g.total_score} > ${g.total_line})</span>`;
-                } else if (g.ou_result === 'UNDER') {
-                    ouBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30">UNDER (${g.total_score} < ${g.total_line})</span>`;
-                } else if (g.ou_result === 'PUSH') {
-                    ouBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30">O/U Push (${g.total_score})</span>`;
-                }
-
-                let focusBadge = '';
-                if (g.focus_outcome) {
-                    if (g.focus_outcome === 'W') {
-                        focusBadge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">WIN</span>`;
-                    } else if (g.focus_outcome === 'L') {
-                        focusBadge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/40">LOSS</span>`;
-                    } else if (g.focus_outcome === 'T') {
-                        focusBadge = `<span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/40">TIE</span>`;
-                    }
-                }
-
-                const awayLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${(g.away_team || '').toLowerCase()}.png`;
-                const homeLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${(g.home_team || '').toLowerCase()}.png`;
-
-                html += `
-                    <div class="glass-panel rounded-xl border border-[#30363d] p-4 space-y-3 hover:border-slate-500/50 transition">
-                        <!-- Card Header -->
-                        <div class="flex items-center justify-between border-b border-[#21262d] pb-2 text-xs">
-                            <div class="flex items-center space-x-2">
-                                <span class="font-mono text-slate-400 font-semibold">${g.season} W${g.week}</span>
-                                <span class="text-slate-600">•</span>
-                                <span class="text-slate-400">${g.gameday}${g.weekday ? ' (' + g.weekday + ')' : ''}</span>
-                                ${g.is_overtime ? '<span class="text-[9px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 font-mono rounded font-bold">OT</span>' : ''}
-                            </div>
-                            <div class="flex items-center space-x-1.5">
-                                ${focusBadge}
-                            </div>
-                        </div>
-
-                        <!-- Scoreboard Matchup Line -->
-                        <div class="space-y-2 py-1">
-                            <!-- Away Team -->
-                            <div class="flex items-center justify-between ${awayWon ? 'bg-[#161b22] px-2 py-1.5 rounded-lg border border-[#21262d]' : 'px-2 py-1'}">
-                                <div class="flex items-center space-x-2.5 truncate">
-                                    <img src="${awayLogo}" alt="${g.away_team}" class="w-6 h-6 object-contain flex-shrink-0" onerror="this.src='https://static.nfl.com/static/content/public/static/img/share/shield.png'">
-                                    <div class="truncate">
-                                        <div class="text-xs font-bold text-slate-100 flex items-center space-x-1.5">
-                                            <span>${g.away_team_name}</span>
-                                            ${awayWon ? '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>' : ''}
-                                        </div>
-                                        <div class="text-[10px] text-slate-500 font-mono">Away ${g.away_qb_name ? '• QB: ' + g.away_qb_name : ''}</div>
-                                    </div>
-                                </div>
-                                <div class="text-lg font-mono ${awayScoreClass}">${g.away_score}</div>
-                            </div>
-
-                            <!-- Home Team -->
-                            <div class="flex items-center justify-between ${homeWon ? 'bg-[#161b22] px-2 py-1.5 rounded-lg border border-[#21262d]' : 'px-2 py-1'}">
-                                <div class="flex items-center space-x-2.5 truncate">
-                                    <img src="${homeLogo}" alt="${g.home_team}" class="w-6 h-6 object-contain flex-shrink-0" onerror="this.src='https://static.nfl.com/static/content/public/static/img/share/shield.png'">
-                                    <div class="truncate">
-                                        <div class="text-xs font-bold text-slate-100 flex items-center space-x-1.5">
-                                            <span>${g.home_team_name}</span>
-                                            ${homeWon ? '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>' : ''}
-                                        </div>
-                                        <div class="text-[10px] text-slate-500 font-mono">Home ${g.home_qb_name ? '• QB: ' + g.home_qb_name : ''}</div>
-                                    </div>
-                                </div>
-                                <div class="text-lg font-mono ${homeScoreClass}">${g.home_score}</div>
-                            </div>
-                        </div>
-
-                        <!-- Spreads & Totals Breakdown -->
-                        <div class="bg-[#12161c] rounded-lg p-2.5 border border-[#21262d] space-y-1.5 text-xs font-mono">
-                            <div class="flex items-center justify-between text-[11px]">
-                                <span class="text-slate-400">Closing Spread: <b class="text-slate-200">${spreadDisplay}</b></span>
-                                ${atsBadge}
-                            </div>
-                            <div class="flex items-center justify-between text-[11px] pt-1 border-t border-[#1a1f26]">
-                                <span class="text-slate-400">Closing Total: <b class="text-slate-200">${g.total_line ? 'O/U ' + g.total_line : 'N/A'}</b></span>
-                                ${ouBadge}
-                            </div>
-                        </div>
-
-                        <!-- Venue & Weather Line -->
-                        <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-0.5 px-1">
-                            <div class="flex items-center space-x-1.5 truncate max-w-[200px]">
-                                <i data-lucide="map-pin" class="w-3 h-3 text-slate-500"></i>
-                                <span class="truncate">${g.stadium || 'NFL Stadium'}${g.roof ? ' • ' + g.roof : ''}</span>
-                            </div>
-                            ${g.temp != null ? `<div class="font-mono text-slate-400">${g.temp}°F${g.wind ? ' • ' + g.wind + 'mph' : ''}</div>` : ''}
-                        </div>
-
-                        <!-- Action Link to H2H Lab -->
-                        <button onclick="jumpToH2H('${g.home_team}', '${g.away_team}')" class="w-full py-1.5 px-3 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-slate-300 hover:text-slate-100 text-xs font-medium flex items-center justify-center space-x-1.5 border border-[#30363d] transition">
-                            <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
-                            <span>Simulate Matchup in H2H Lab</span>
-                        </button>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            lucide.createIcons();
-        }
-
     </script>
     <script defer src="/_vercel/speed-insights/script.js"></script>
     <script defer src="/_vercel/insights/script.js"></script>
@@ -563,32 +207,13 @@
                 <i data-lucide="trending-up" class="w-4 h-4 text-slate-400"></i>
                 <span>Player Floor Streaks</span>
             </button>
-            <button onclick="switchTab('team-stats')" id="tab-btn-team-stats" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
-                <i data-lucide="table" class="w-4 h-4 text-slate-400"></i>
-                <span>Yahoo Sports Team Stats & Rankings</span>
-            </button>
-            <button onclick="switchTab('highlights')" id="tab-btn-highlights" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-slate-400"></i>
-                <span>Matchup Vulnerabilities & Trends</span>
-            </button>
-            <button onclick="switchTab('h2h')" id="tab-btn-h2h" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
-                <i data-lucide="shield" class="w-4 h-4 text-slate-400"></i>
-                <span>Matchup Lab (H2H)</span>
-            </button>
-            <button onclick="switchTab('match-history')" id="tab-btn-match-history" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
-                <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
-                <span>Match History & H2H Logs</span>
-            </button>
         </div>
     </header>
 
     <!-- Main Content Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
 
-        <!-- ============================================================== -->
-        <!-- TAB 2: YAHOO SPORTS TEAM STATS & RANKINGS (32 TEAMS) -->
-        <!-- ============================================================== -->
-        
+
         <!-- ============================================================== -->
         <!-- TAB: PLAYER FLOOR BREACH STREAKS -->
         <!-- ============================================================== -->
@@ -610,7 +235,11 @@
                         </p>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-3">
+                        <div class="text-[11px] text-slate-400 font-mono flex items-center gap-1.5">
+                            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span id="floor-active-timeline-text">Window (Top-Right): Active</span>
+                        </div>
                         <button onclick="loadFloorStreakTab()" class="px-3 py-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-200 text-xs rounded-lg transition flex items-center gap-1.5" title="Recalculate Floor Streaks">
                             <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-slate-400"></i>
                             <span>Refresh Streaks</span>
@@ -635,43 +264,6 @@
                     <div class="bg-[#21262d]/80 border border-[#30363d] rounded-lg p-3">
                         <span class="text-[11px] text-slate-400 block font-medium">Developing (1-4 Games)</span>
                         <div id="floor-kpi-breached" class="text-xs font-semibold font-mono text-slate-200 mt-1">--</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats History Date Range Selector -->
-            <div class="glass-panel p-4 rounded-xl border border-[#30363d] space-y-3">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-xs text-slate-300 font-semibold flex items-center gap-1.5 shrink-0">
-                            <i data-lucide="history" class="w-4 h-4 text-emerald-400"></i>
-                            <span>Streak History Window:</span>
-                        </span>
-
-                        <!-- Presets -->
-                        <div class="flex items-center gap-1 bg-[#161b22] border border-[#30363d] rounded-lg p-0.5">
-                            <button id="floor-preset-season26" onclick="setFloorHistoryPreset('season26')" class="px-2.5 py-1 text-[11px] rounded bg-[#30363d] text-slate-100 font-medium transition" title="Sept 1, 2026 to Current Date">2026 (Sept 1 – Today)</button>
-                            <button id="floor-preset-all" onclick="setFloorHistoryPreset('all')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="All 3 years of historical game stats">All History</button>
-                            <button id="floor-preset-1y" onclick="setFloorHistoryPreset('1y')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Last 365 days of player stats">Last 1 Year</button>
-                            <button id="floor-preset-2025" onclick="setFloorHistoryPreset('2025')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="2025 Season games only">2025 Season</button>
-                            <button id="floor-preset-8w" onclick="setFloorHistoryPreset('8w')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Last 8 weeks of player stats">Last 8 Wks</button>
-                            <button id="floor-preset-4w" onclick="setFloorHistoryPreset('4w')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Last 4 weeks of player stats">Last 4 Wks</button>
-                            <button id="floor-preset-custom" onclick="setFloorHistoryPreset('custom')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Custom Start and End dates">Custom</button>
-                        </div>
-
-                        <!-- Custom Date Range Inputs -->
-                        <div class="flex items-center gap-1.5 bg-[#161b22] px-2.5 py-1 rounded-lg border border-[#30363d]">
-                            <span class="text-[11px] text-slate-400">From:</span>
-                            <input type="date" id="floor-start-date" value="2026-09-01" onchange="onFloorDateRangeInputChange()" class="bg-[#21262d] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-mono cursor-pointer" title="History Start Date">
-                            <span class="text-[11px] text-slate-400">To:</span>
-                            <input type="date" id="floor-end-date" onchange="onFloorDateRangeInputChange()" class="bg-[#21262d] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-mono cursor-pointer" title="History End Date">
-                            <button onclick="clearFloorHistoryRange()" class="text-slate-400 hover:text-slate-200 p-1" title="Reset to default (Sept 1, 2026 - Today)"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
-                        </div>
-                    </div>
-
-                    <div class="text-[11px] text-slate-400 font-mono flex items-center gap-1.5">
-                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-                        <span id="floor-active-timeline-text">Stats window: Sept 1, 2026 to Current Date</span>
                     </div>
                 </div>
             </div>
@@ -762,150 +354,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </section>
-
-        <section id="tab-team-stats" class="hidden space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                    <h2 class="text-base font-bold text-slate-100 flex items-center space-x-2">
-                        <i data-lucide="table" class="w-4 h-4 text-slate-400"></i>
-                        <span>32-Team League Stat Overview & Rankings</span>
-                    </h2>
-                    <p class="text-xs text-slate-400">Click any column header to sort ascending or descending</p>
-                </div>
-
-                <!-- Sub View Toggle -->
-                <div class="flex bg-[#21262d] border border-[#30363d] rounded-lg p-1 text-xs">
-                    <button onclick="setStatsView('all')" id="stat-view-all" class="px-3 py-1 rounded bg-[#30363d] text-slate-100 font-semibold">Overview</button>
-                    <button onclick="setStatsView('offense')" id="stat-view-offense" class="px-3 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">Offense</button>
-                    <button onclick="setStatsView('defense')" id="stat-view-defense" class="px-3 py-1 rounded text-slate-400 hover:text-slate-200 font-medium">Defense</button>
-                </div>
-            </div>
-
-            <!-- Mobile Horizontal Swipe Tip -->
-            <p class="text-[10px] text-slate-400 sm:hidden flex items-center space-x-1">
-                <i data-lucide="chevrons-right" class="w-3.5 h-3.5 text-slate-400"></i>
-                <span>Swipe table horizontally to view all volume & efficiency metrics</span>
-            </p>
-            <!-- Team Stats Table -->
-            <div class="glass-panel rounded-xl overflow-hidden border border-[#30363d]">
-                <div class="overflow-x-auto max-h-[650px] overflow-y-auto touch-scroll">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead class="bg-[#21262d] sticky top-0 z-10 text-slate-400 font-medium border-b border-[#30363d]">
-                            <tr id="stats-table-header">
-                                <!-- Dynamic Headers with Sorters -->
-                            </tr>
-                        </thead>
-                        <tbody id="stats-table-body" class="divide-y divide-[#30363d]/60 text-slate-300">
-                            <tr>
-                                <td colspan="12" class="py-8 text-center text-slate-500">Loading team rankings...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ============================================================== -->
-        <!-- TAB 3: MATCHUP VULNERABILITIES & TREND HIGHLIGHTS -->
-        <!-- ============================================================== -->
-        <section id="tab-highlights" class="hidden space-y-4">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div>
-                    <h2 class="text-base font-bold text-slate-100 flex items-center space-x-2">
-                        <i data-lucide="alert-circle" class="w-4 h-4 text-slate-400"></i>
-                        <span>Matchup Vulnerabilities & Trend Highlights</span>
-                    </h2>
-                    <p class="text-xs text-slate-400">Filter by specific team, scheme liability, or situation</p>
-                </div>
-
-                <!-- Filters & Controls -->
-                <div class="flex flex-wrap items-center gap-2">
-                    <!-- Team Filter Dropdown -->
-                    <div class="flex items-center bg-[#21262d] border border-[#30363d] rounded-lg px-2 py-1 text-xs">
-                        <span class="text-slate-400 mr-1.5 font-medium text-[11px]">Team:</span>
-                        <select id="highlight-team-filter" onchange="filterHighlightsTeam(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 text-xs rounded px-2 py-0.5 outline-none font-medium cursor-pointer">
-                            <option value="ALL">All 32 Teams</option>
-                        </select>
-                    </div>
-
-                    <!-- Search Input -->
-                    <input type="text" id="highlight-search" oninput="renderHighlights()" placeholder="Search team, scheme..." class="bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1 text-xs text-slate-200 outline-none focus:border-slate-500 w-40">
-                </div>
-            </div>
-
-            <!-- Trend Category Filter Buttons -->
-            <div class="flex flex-wrap gap-1.5 text-xs border-b border-[#30363d] pb-2">
-                <button onclick="filterHighlights('ALL')" id="hl-btn-ALL" class="px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold">All Categories</button>
-                <button onclick="filterHighlights('pass_rush')" id="hl-btn-pass_rush" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Elite Sack Engine</button>
-                <button onclick="filterHighlights('zero_pressure')" id="hl-btn-zero_pressure" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Zero Pressure D</button>
-                <button onclick="filterHighlights('ironclad_protection')" id="hl-btn-ironclad_protection" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Clean Pocket O-Line</button>
-                <button onclick="filterHighlights('sack_magnet')" id="hl-btn-sack_magnet" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Sack Magnet O-Line</button>
-                <button onclick="filterHighlights('rb_boom')" id="hl-btn-rb_boom" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">RB Boom Defense</button>
-                <button onclick="filterHighlights('rb_shutdown')" id="hl-btn-rb_shutdown" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">RB Shutdown Wall</button>
-                <button onclick="filterHighlights('bulldozer_rush')" id="hl-btn-bulldozer_rush" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Bulldozer Ground</button>
-                <button onclick="filterHighlights('anemic_rush')" id="hl-btn-anemic_rush" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Anemic Run Game</button>
-                <button onclick="filterHighlights('air_raid')" id="hl-btn-air_raid" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Air Raid Offense</button>
-                <button onclick="filterHighlights('no_fly_zone')" id="hl-btn-no_fly_zone" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">No-Fly Zone</button>
-                <button onclick="filterHighlights('pass_funnel')" id="hl-btn-pass_funnel" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Pass Funnels</button>
-                <button onclick="filterHighlights('run_funnel')" id="hl-btn-run_funnel" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Run Funnels</button>
-                <button onclick="filterHighlights('turnover_elite')" id="hl-btn-turnover_elite" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Ball Hawks</button>
-                <button onclick="filterHighlights('turnover_bleed')" id="hl-btn-turnover_bleed" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Turnover Bleeder</button>
-                <button onclick="filterHighlights('home_dominance')" id="hl-btn-home_dominance" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Home Fortress</button>
-                <button onclick="filterHighlights('road_struggles')" id="hl-btn-road_struggles" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Road Vulnerable</button>
-                <button onclick="filterHighlights('deep_pass_funnel')" id="hl-btn-deep_pass_funnel" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Deep Pass Funnel</button>
-                <button onclick="filterHighlights('deep_pass_lockdown')" id="hl-btn-deep_pass_lockdown" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Deep Lockdown</button>
-                <button onclick="filterHighlights('neutral_pass_heavy')" id="hl-btn-neutral_pass_heavy" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Neutral Pass Heavy</button>
-                <button onclick="filterHighlights('neutral_run_heavy')" id="hl-btn-neutral_run_heavy" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Neutral Ground</button>
-                <button onclick="filterHighlights('trench_protection_leak')" id="hl-btn-trench_protection_leak" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Pass Pro Leak</button>
-                <button onclick="filterHighlights('trench_pressure_elite')" id="hl-btn-trench_pressure_elite" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Pocket Disruptor</button>
-                <button onclick="filterHighlights('explosive_bleed')" id="hl-btn-explosive_bleed" class="px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white">Explosive Bleed</button>
-            </div>
-
-            <!-- Highlight Cards Container -->
-            <div id="highlights-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="glass-panel rounded-xl p-8 text-center text-slate-500 col-span-full">
-                    Scanning trends & vulnerabilities across 32 teams...
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ============================================================== -->
-        <!-- TAB 4: HEAD-TO-HEAD MATCHUP LAB -->
-        <!-- ============================================================== -->
-        <section id="tab-h2h" class="hidden space-y-4">
-            <div>
-                <h2 class="text-base font-bold text-slate-100 flex items-center space-x-2">
-                    <i data-lucide="shield" class="w-4 h-4 text-slate-400"></i>
-                    <span>Matchup Simulator & Head-to-Head Comparison</span>
-                </h2>
-                <p class="text-xs text-slate-400">Select two franchises to compare scheme rankings side-by-side</p>
-            </div>
-
-            <!-- Team Pickers -->
-            <div class="glass-panel rounded-xl p-5 border border-[#30363d] flex flex-col md:flex-row items-center justify-between gap-5">
-                <div class="flex-1 w-full text-center">
-                    <label class="block text-xs uppercase font-medium text-slate-400 mb-1.5">HOME TEAM</label>
-                    <select id="h2h-home-team" onchange="renderH2HComparison()" class="w-full bg-[#21262d] border border-[#30363d] rounded-lg p-2.5 text-base font-bold text-slate-100 text-center focus:border-slate-500 outline-none">
-                    </select>
-                </div>
-
-                <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center font-bold text-slate-400 text-xs border border-[#30363d]">
-                    VS
-                </div>
-
-                <div class="flex-1 w-full text-center">
-                    <label class="block text-xs uppercase font-medium text-slate-400 mb-1.5">AWAY TEAM</label>
-                    <select id="h2h-away-team" onchange="renderH2HComparison()" class="w-full bg-[#21262d] border border-[#30363d] rounded-lg p-2.5 text-base font-bold text-slate-100 text-center focus:border-slate-500 outline-none">
-                    </select>
-                </div>
-            </div>
-
-            <!-- H2H Comparison Output -->
-            <div id="h2h-results" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             </div>
         </section>
 
@@ -1027,92 +475,6 @@
             </div>
         </section>
 
-
-        <!-- ============================================================== -->
-        <!-- TAB 6: MATCH HISTORY & HEAD-TO-HEAD LOGS -->
-        <!-- ============================================================== -->
-        <section id="tab-match-history" class="hidden space-y-4">
-            <!-- Header & Filter Bar -->
-            <div class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#30363d] pb-4">
-                    <div>
-                        <h2 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
-                            <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
-                            <span id="history-title">NFL Historical Game Logs & Head-to-Head Records</span>
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Filter historical regular season matchups (2023–2026), point spreads, ATS covers, Over/Under totals, and starting QBs.
-                        </p>
-                    </div>
-
-                    <!-- Filter Controls -->
-                    <div class="flex flex-wrap items-center gap-2.5">
-                        <!-- Season Selector -->
-                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
-                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
-                            <span class="text-[11px] text-slate-400 font-medium">Season:</span>
-                            <select id="history-season-select" onchange="onHistorySeasonChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer">
-                                <option value="ALL" class="bg-[#161b22] text-slate-200">All Seasons (2023–2026)</option>
-                                <option value="2026" class="bg-[#161b22] text-slate-200">2026 Season</option>
-                                <option value="2025" class="bg-[#161b22] text-slate-200">2025 Season</option>
-                                <option value="2024" class="bg-[#161b22] text-slate-200">2024 Season</option>
-                                <option value="2023" class="bg-[#161b22] text-slate-200">2023 Season</option>
-                            </select>
-                        </div>
-
-                        <!-- Team Focus Dropdown -->
-                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
-                            <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400"></i>
-                            <span class="text-[11px] text-slate-400 font-medium">Team Focus:</span>
-                            <select id="history-team-select" onchange="onHistoryTeamChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer max-w-[140px] truncate">
-                                <option value="ALL" class="bg-[#161b22] text-slate-200">All 32 Teams</option>
-                            </select>
-                        </div>
-
-                        <!-- Opponent H2H Dropdown -->
-                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
-                            <i data-lucide="swords" class="w-3.5 h-3.5 text-slate-400"></i>
-                            <span class="text-[11px] text-slate-400 font-medium">vs Opponent:</span>
-                            <select id="history-opp-select" onchange="onHistoryOpponentChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer max-w-[140px] truncate">
-                                <option value="ALL" class="bg-[#161b22] text-slate-200">Any Opponent</option>
-                            </select>
-                        </div>
-
-                        <!-- Outcome Filter -->
-                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs">
-                            <span class="text-[11px] text-slate-400 font-medium">Result:</span>
-                            <select id="history-outcome-select" onchange="onHistoryOutcomeChange(this.value)" class="bg-transparent text-slate-200 text-xs font-semibold focus:outline-none cursor-pointer">
-                                <option value="ALL" class="bg-[#161b22] text-slate-200">All Results</option>
-                                <option value="W" class="bg-[#161b22] text-emerald-400 font-bold">Wins (W)</option>
-                                <option value="L" class="bg-[#161b22] text-rose-400 font-bold">Losses (L)</option>
-                            </select>
-                        </div>
-
-                        <!-- Search Input -->
-                        <div class="relative">
-                            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="history-search-input" oninput="onHistorySearch(this.value)" placeholder="Search QB, team, week..." class="bg-[#21262d] border border-[#30363d] text-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs outline-none focus:border-slate-500 w-36 sm:w-48 placeholder-slate-500">
-                        </div>
-
-                        <!-- Reset Button -->
-                        <button onclick="resetHistoryFilters()" class="p-2 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-300 rounded-lg transition" title="Reset Filters">
-                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- KPI Summary Dashboard Banner -->
-                <div id="history-summary-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                    <!-- Populated dynamically via renderHistorySummary() -->
-                </div>
-            </div>
-
-            <!-- Games Grid Container -->
-            <div id="history-games-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                <!-- Populated dynamically via renderHistoryGames() -->
-            </div>
-        </section>
-
     </main>
 
     <!-- Footer -->
@@ -1129,20 +491,13 @@
         let isPropsEnabled = true;
 
         let currentPropsFilter = 'ALL';
-        let currentStatsView = 'all';
-        let currentHighlightsFilter = 'ALL';
 
-        // Sorting state for Team Stats
-        let statsSortCol = 'pts_per_game';
-        let statsSortAsc = false;
 
         // Sorting state for Props
         let propsSortCol = 'edge';
         let propsSortAsc = false;
 
         let globalPredictions = { games: [], props: [] };
-        let globalTeamStats = [];
-        let globalHighlights = [];
 
         // Schedule tab state variables
         let currentScheduleSeason = 2026;
@@ -1165,7 +520,6 @@
             lucide.createIcons();
             populateScheduleTeams();
             await reloadAllData();
-            populateH2HTeams();
         });
 
         async function onPropsDateChange(fetchData = true) {
@@ -1490,6 +844,11 @@
             }
             updateGameHeaders();
             reloadAllData();
+
+            const activeFloor = document.getElementById('tab-floor-streak');
+            if (activeFloor && !activeFloor.classList.contains('hidden')) {
+                loadFloorStreakTab();
+            }
         }
 
         function onScheduleDateRangeChange() {
@@ -1529,20 +888,18 @@
 
         async function reloadAllData() {
             const promises = [
-                loadTeamStats(),
-                loadHighlights(),
                 loadFullSchedule(currentScheduleSeason, startDate, endDate)
             ];
-            await Promise.all(promises);
-            const activeH2H = document.getElementById('tab-h2h');
-            if (activeH2H && !activeH2H.classList.contains('hidden')) {
-                renderH2HComparison();
+            const activeFloor = document.getElementById('tab-floor-streak');
+            if (activeFloor && !activeFloor.classList.contains('hidden')) {
+                promises.push(loadFloorStreakTab());
             }
+            await Promise.all(promises);
             lucide.createIcons();
         }
 
         function switchTab(tabId) {
-            ['schedule', 'floor-streak', 'team-stats', 'highlights', 'h2h', 'match-history'].forEach(t => {
+            ['schedule', 'floor-streak'].forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
                 if (el) el.classList.add('hidden');
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -1558,14 +915,7 @@
                     loadFullSchedule(currentScheduleSeason, startDate, endDate);
                 }
             } else if (tabId === 'floor-streak') {
-                if ((!globalFloorStreaks || globalFloorStreaks.length === 0) && !isFloorStreakLoading) {
-                    loadFloorStreakTab();
-                }
-            } else if (tabId === 'match-history') {
-                if (!globalMatchHistoryData && !isMatchHistoryLoading) {
-                    populateHistoryDropdowns();
-                    loadMatchHistory();
-                }
+                loadFloorStreakTab();
             }
             lucide.createIcons();
         }
@@ -1925,792 +1275,6 @@
             }).join('');
         }
 
-        // ==========================================
-        // YAHOO SPORTS TEAM STATS & SORTERS
-        // ==========================================
-        async function loadTeamStats() {
-            try {
-                const res = await fetch(`/api/team-stats?start_date=${startDate}&end_date=${endDate}`);
-                globalTeamStats = await res.json();
-                renderTeamStatsTable();
-            } catch (err) {
-                console.error("Error loading team stats:", err);
-            }
-        }
-
-        function setStatsView(view) {
-            currentStatsView = view;
-            ['all', 'offense', 'defense'].forEach(v => {
-                const btn = document.getElementById(`stat-view-${v}`);
-                if (btn) {
-                    btn.className = v === view
-                        ? 'px-3 py-1 rounded bg-[#30363d] text-slate-100 font-semibold'
-                        : 'px-3 py-1 rounded text-slate-400 hover:text-slate-200 font-medium';
-                }
-            });
-            renderTeamStatsTable();
-        }
-
-        function sortStats(col) {
-            if (statsSortCol === col) {
-                statsSortAsc = !statsSortAsc;
-            } else {
-                statsSortCol = col;
-                statsSortAsc = (col === 'team' || col.includes('allowed') || col.includes('rank_'));
-            }
-            renderTeamStatsTable();
-        }
-
-        function getSortIcon(col) {
-            if (statsSortCol !== col) return '';
-            return statsSortAsc ? '<span class="text-slate-300 font-bold ml-1">▲</span>' : '<span class="text-slate-300 font-bold ml-1">▼</span>';
-        }
-
-        function renderTeamStatsTable() {
-            const thead = document.getElementById('stats-table-header');
-            const tbody = document.getElementById('stats-table-body');
-
-            let sortedData = [...globalTeamStats];
-            sortedData.sort((a, b) => {
-                let vA = a[statsSortCol];
-                let vB = b[statsSortCol];
-                if (vA === null || vA === undefined) vA = statsSortAsc ? 999999 : -999999;
-                if (vB === null || vB === undefined) vB = statsSortAsc ? 999999 : -999999;
-
-                if (typeof vA === 'string') {
-                    return statsSortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
-                }
-                return statsSortAsc ? vA - vB : vB - vA;
-            });
-
-            if (currentStatsView === 'offense') {
-                thead.innerHTML = `
-                    <th onclick="sortStats('team')" class="th-sortable py-2.5 px-3">TEAM ${getSortIcon('team')}</th>
-                    <th onclick="sortStats('pts_per_game')" class="th-sortable py-2.5 px-3 text-right">PTS / G (RANK) ${getSortIcon('pts_per_game')}</th>
-                    <th onclick="sortStats('rush_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">RUSH YDS / G (RANK) ${getSortIcon('rush_yds_per_game')}</th>
-                    <th onclick="sortStats('pass_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">PASS YDS / G (RANK) ${getSortIcon('pass_yds_per_game')}</th>
-                    <th onclick="sortStats('total_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">TOTAL YDS / G (RANK) ${getSortIcon('total_yds_per_game')}</th>
-                    <th onclick="sortStats('yds_per_carry')" class="th-sortable py-2.5 px-3 text-right">YDS / CARRY ${getSortIcon('yds_per_carry')}</th>
-                    <th onclick="sortStats('cmp_pct')" class="th-sortable py-2.5 px-3 text-right">CMP % ${getSortIcon('cmp_pct')}</th>
-                    <th onclick="sortStats('total_pass_tds')" class="th-sortable py-2.5 px-3 text-right">PASS TDS ${getSortIcon('total_pass_tds')}</th>
-                    <th onclick="sortStats('total_rush_tds')" class="th-sortable py-2.5 px-3 text-right">RUSH TDS ${getSortIcon('total_rush_tds')}</th>
-                `;
-                tbody.innerHTML = sortedData.map(t => `
-                    <tr class="hover:bg-[#21262d]/50 transition">
-                        <td class="py-2 px-3 font-semibold text-slate-100 flex items-center space-x-2">
-                            <span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 font-mono text-[11px] font-bold">${t.team}</span>
-                            <span class="text-xs text-slate-300">${t.team_name || t.team}</span>
-                        </td>
-                        <td class="py-2 px-3 text-right font-mono font-medium text-slate-200">${t.pts_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_scored, true)}">#${t.rank_pts_scored}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_yds, true)}">#${t.rank_rush_yds}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_yds, true)}">#${t.rank_pass_yds}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_total_yds, true)}">#${t.rank_total_yds}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.yds_per_carry}</td>
-                        <td class="py-2 px-3 text-right font-mono">${t.cmp_pct}%</td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_pass_tds}</td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_rush_tds}</td>
-                    </tr>`).join('');
-            } else if (currentStatsView === 'defense') {
-                thead.innerHTML = `
-                    <th onclick="sortStats('team')" class="th-sortable py-2.5 px-3" title="NFL Team">TEAM ${getSortIcon('team')}</th>
-                    <th onclick="sortStats('pts_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right" title="Points surrendered per game by defense">PTS ALLOWED (RANK) ${getSortIcon('pts_allowed_per_game')}</th>
-                    <th onclick="sortStats('rush_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right" title="Rushing yards surrendered per game">RUSH ALLOWED (RANK) ${getSortIcon('rush_yds_allowed_per_game')}</th>
-                    <th onclick="sortStats('pass_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right" title="Passing yards surrendered per game">PASS ALLOWED (RANK) ${getSortIcon('pass_yds_allowed_per_game')}</th>
-                    <th onclick="sortStats('total_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right" title="Total yards conceded per game">TOTAL ALLOWED (RANK) ${getSortIcon('total_yds_allowed_per_game')}</th>
-                    <th onclick="sortStats('opp_yds_per_carry')" class="th-sortable py-2.5 px-3 text-right" title="Opponent Yards Per Carry allowed">OPP YPC ${getSortIcon('opp_yds_per_carry')}</th>
-                    <th onclick="sortStats('total_ints_forced')" class="th-sortable py-2.5 px-3 text-right" title="Interceptions forced on defense">INTS ${getSortIcon('total_ints_forced')}</th>
-                    <th onclick="sortStats('total_sacks_forced')" class="th-sortable py-2.5 px-3 text-right" title="Sacks recorded by defensive pass rush">SACKS ${getSortIcon('total_sacks_forced')}</th>
-                    <th onclick="sortStats('turnover_diff')" class="th-sortable py-2.5 px-3 text-right" title="Turnover differential (takeaways minus giveaways)">TO DIFF ${getSortIcon('turnover_diff')}</th>
-                `;
-                tbody.innerHTML = sortedData.map(t => `
-                    <tr class="hover:bg-[#21262d]/50 transition">
-                        <td class="py-2 px-3 font-semibold text-slate-100 flex items-center space-x-2">
-                            <span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 font-mono text-[11px] font-bold">${t.team}</span>
-                            <span class="text-xs text-slate-300">${t.team_name || t.team}</span>
-                        </td>
-                        <td class="py-2 px-3 text-right font-mono font-medium text-slate-200">${t.pts_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_allowed, false)}">#${t.rank_pts_allowed}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_allowed, false)}">#${t.rank_rush_allowed}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_allowed, false)}">#${t.rank_pass_allowed}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_total_allowed, false)}">#${t.rank_total_allowed}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.opp_yds_per_carry}</td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_ints_forced}</td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_sacks_forced}</td>
-                        <td class="py-2 px-3 text-right font-mono font-semibold ${t.turnover_diff >= 0 ? 'text-slate-200' : 'text-slate-400'}">${t.turnover_diff > 0 ? '+' : ''}${t.turnover_diff} (#${t.rank_turnover_diff})</td>
-                    </tr>`).join('');
-            } else {
-                thead.innerHTML = `
-                    <th onclick="sortStats('team')" class="th-sortable py-2.5 px-3">TEAM ${getSortIcon('team')}</th>
-                    <th onclick="sortStats('pts_per_game')" class="th-sortable py-2.5 px-3 text-right">OFF PTS ${getSortIcon('pts_per_game')}</th>
-                    <th onclick="sortStats('pts_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">DEF PTS ${getSortIcon('pts_allowed_per_game')}</th>
-                    <th onclick="sortStats('rush_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">RUSH OFF ${getSortIcon('rush_yds_per_game')}</th>
-                    <th onclick="sortStats('rush_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">RUSH DEF ${getSortIcon('rush_yds_allowed_per_game')}</th>
-                    <th onclick="sortStats('pass_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">PASS OFF ${getSortIcon('pass_yds_per_game')}</th>
-                    <th onclick="sortStats('pass_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">PASS DEF ${getSortIcon('pass_yds_allowed_per_game')}</th>
-                    <th onclick="sortStats('total_yds_per_game')" class="th-sortable py-2.5 px-3 text-right">TOTAL OFF ${getSortIcon('total_yds_per_game')}</th>
-                    <th onclick="sortStats('total_yds_allowed_per_game')" class="th-sortable py-2.5 px-3 text-right">TOTAL DEF ${getSortIcon('total_yds_allowed_per_game')}</th>
-                    <th onclick="sortStats('turnover_diff')" class="th-sortable py-2.5 px-3 text-right">TO DIFF ${getSortIcon('turnover_diff')}</th>
-                `;
-                tbody.innerHTML = sortedData.map(t => `
-                    <tr class="hover:bg-[#21262d]/50 transition">
-                        <td class="py-2 px-3 font-semibold text-slate-100 flex items-center space-x-2">
-                            <span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 font-mono text-[11px] font-bold">${t.team}</span>
-                            <span class="text-xs text-slate-300">${t.team_name || t.team}</span>
-                        </td>
-                        <td class="py-2 px-3 text-right font-mono text-slate-200">${t.pts_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_scored, true)}">#${t.rank_pts_scored}</span></td>
-                        <td class="py-2 px-3 text-right font-mono text-slate-200">${t.pts_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pts_allowed, false)}">#${t.rank_pts_allowed}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_yds, true)}">#${t.rank_rush_yds}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.rush_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_rush_allowed, false)}">#${t.rank_rush_allowed}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_yds, true)}">#${t.rank_pass_yds}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.pass_yds_allowed_per_game} <span class="text-[10px] px-1 rounded ${getRankBadge(t.rank_pass_allowed, false)}">#${t.rank_pass_allowed}</span></td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_per_game}</td>
-                        <td class="py-2 px-3 text-right font-mono">${t.total_yds_allowed_per_game}</td>
-                        <td class="py-2 px-3 text-right font-mono font-medium ${t.turnover_diff >= 0 ? 'text-slate-200' : 'text-slate-400'}">${t.turnover_diff > 0 ? '+' : ''}${t.turnover_diff}</td>
-                    </tr>`).join('');
-            }
-        }
-
-        function getRankBadge(rank, highIsGood = true) {
-            if (rank <= 8) return 'rank-top';
-            if (rank >= 25) return 'rank-bot';
-            return 'rank-mid';
-        }
-
-        // ==========================================
-        // HIGHLIGHTS & MATCHUP VULNERABILITY SCANNER
-        // ==========================================
-        let selectedHighlightTeam = 'ALL';
-
-        async function loadHighlights() {
-            try {
-                const res = await fetch(`/api/team-highlights?start_date=${startDate}&end_date=${endDate}`);
-                const data = await res.json();
-                
-                // Safely extract array
-                if (Array.isArray(data)) {
-                    globalHighlights = data;
-                } else if (data && Array.isArray(data.highlights)) {
-                    globalHighlights = data.highlights;
-                } else if (data && data.highlights && Array.isArray(data.highlights.highlights)) {
-                    globalHighlights = data.highlights.highlights;
-                } else {
-                    globalHighlights = [];
-                }
-
-                populateHighlightTeamDropdown();
-                renderHighlights();
-            } catch (err) {
-                console.error("Error loading highlights:", err);
-                const container = document.getElementById('highlights-container');
-                if (container) container.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-slate-500 col-span-full">Failed to load highlights. Please refresh.</div>`;
-            }
-        }
-
-        function populateHighlightTeamDropdown() {
-            const select = document.getElementById('highlight-team-filter');
-            if (!select) return;
-
-            const teamsInHighlights = Array.from(new Set(globalHighlights.map(h => h.team))).sort();
-            const allTeams = ["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LAC","LA","LV","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SEA","SF","TB","TEN","WAS"];
-            const teamList = teamsInHighlights.length > 0 ? teamsInHighlights : allTeams;
-
-            select.innerHTML = `<option value="ALL" ${selectedHighlightTeam === 'ALL' ? 'selected' : ''}>All 32 Teams</option>` +
-                teamList.map(t => `<option value="${t}" ${selectedHighlightTeam === t ? 'selected' : ''}>${t}</option>`).join('');
-        }
-
-        function filterHighlightsTeam(team) {
-            selectedHighlightTeam = team;
-            renderHighlights();
-        }
-
-        function filterHighlights(type) {
-            currentHighlightsFilter = type;
-            [
-                'ALL', 'pass_rush', 'zero_pressure', 'ironclad_protection', 'sack_magnet',
-                'rb_boom', 'rb_shutdown', 'bulldozer_rush', 'anemic_rush',
-                'air_raid', 'no_fly_zone', 'pass_funnel', 'run_funnel',
-                'turnover_elite', 'turnover_bleed', 'home_dominance', 'road_struggles',
-                'deep_pass_funnel', 'deep_pass_lockdown', 'neutral_pass_heavy',
-                'neutral_run_heavy', 'trench_protection_leak', 'trench_pressure_elite',
-                'explosive_bleed'
-            ].forEach(t => {
-                const btn = document.getElementById(`hl-btn-${t}`);
-                if (btn) {
-                    btn.className = t === type
-                        ? 'px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold'
-                        : 'px-2.5 py-1 rounded bg-[#21262d] border border-[#30363d] text-slate-300 hover:text-white';
-                }
-            });
-            renderHighlights();
-        }
-
-        function renderHighlights() {
-            const container = document.getElementById('highlights-container');
-            if (!container) return;
-
-            const searchVal = (document.getElementById('highlight-search')?.value || '').toLowerCase();
-
-            let items = [...globalHighlights];
-
-            // 1. Filter by category
-            if (currentHighlightsFilter !== 'ALL') {
-                items = items.filter(h => h.type === currentHighlightsFilter);
-            }
-
-            // 2. Filter by selected team
-            if (selectedHighlightTeam !== 'ALL') {
-                items = items.filter(h => h.team === selectedHighlightTeam);
-            }
-
-            // 3. Search query filter
-            if (searchVal) {
-                items = items.filter(h =>
-                    h.team.toLowerCase().includes(searchVal) ||
-                    h.title.toLowerCase().includes(searchVal) ||
-                    h.badge.toLowerCase().includes(searchVal) ||
-                    h.description.toLowerCase().includes(searchVal)
-                );
-            }
-
-            if (items.length === 0) {
-                container.innerHTML = `<div class="glass-panel rounded-xl p-8 text-center text-slate-500 col-span-full">No matching trends found for team "${selectedHighlightTeam}" and category "${currentHighlightsFilter}".</div>`;
-                return;
-            }
-
-            container.innerHTML = items.map(h => {
-                return `
-                <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-2.5 hover:border-slate-600 transition">
-                    <div class="flex items-center justify-between">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">
-                            ${h.badge}
-                        </span>
-                        <span class="text-xs font-bold text-slate-200 bg-[#21262d] px-2 py-0.5 rounded">${h.team}</span>
-                    </div>
-
-                    <h3 class="text-sm font-semibold text-slate-100">${h.title}</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">${h.description}</p>
-
-                    <div class="bg-[#21262d] rounded p-2 text-xs text-slate-300 flex items-center justify-between font-mono">
-                        <span>${h.stat_evidence}</span>
-                    </div>
-
-                    ${h.sample_players ? `<p class="text-[11px] text-slate-400">Featured backs: <span class="text-slate-300">${h.sample_players}</span></p>` : ''}
-                </div>`;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        // ==========================================
-        // IN-DEPTH HEAD-TO-HEAD MATCHUP LAB
-        // ==========================================
-        function populateH2HTeams() {
-            const homeSelect = document.getElementById('h2h-home-team');
-            const awaySelect = document.getElementById('h2h-away-team');
-            if (!homeSelect || !awaySelect) return;
-
-            const teams = ["ARI","ATL","BAL","BUF","CAR","CHI","CIN","CLE","DAL","DEN","DET","GB","HOU","IND","JAX","KC","LAC","LA","LV","MIA","MIN","NE","NO","NYG","NYJ","PHI","PIT","SEA","SF","TB","TEN","WAS"];
-            homeSelect.innerHTML = teams.map(t => `<option value="${t}" ${t === 'KC' ? 'selected' : ''}>${t}</option>`).join('');
-            awaySelect.innerHTML = teams.map(t => `<option value="${t}" ${t === 'BAL' ? 'selected' : ''}>${t}</option>`).join('');
-            renderH2HComparison();
-        }
-
-        function onH2HQuickGameSelect(val) {
-            if (!val) return;
-            const parts = val.split(',');
-            if (parts.length === 2) {
-                const homeSelect = document.getElementById('h2h-home-team');
-                const awaySelect = document.getElementById('h2h-away-team');
-                if (homeSelect) homeSelect.value = parts[0].trim();
-                if (awaySelect) awaySelect.value = parts[1].trim();
-                renderH2HComparison();
-            }
-        }
-
-        async function renderH2HComparison() {
-            const homeTeam = document.getElementById('h2h-home-team').value;
-            const awayTeam = document.getElementById('h2h-away-team').value;
-            const season = document.getElementById('h2h-season-select')?.value || '2026';
-            const container = document.getElementById('h2h-results');
-
-            container.innerHTML = `<div class="glass-panel rounded-xl p-8 text-center text-slate-400 col-span-full">Analyzing ${season} scheme battles & matchup metrics for ${homeTeam} vs ${awayTeam}...</div>`;
-
-            try {
-                const res = await fetch(`/api/matchup-deepdive?home_team=${homeTeam}&away_team=${awayTeam}&season=${season}&start_date=${startDate}&end_date=${endDate}`);
-                const data = await res.json();
-
-                if (data.error) {
-                    container.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-slate-500 col-span-full">Teams not found.</div>`;
-                    return;
-                }
-
-                const h = data.home_stats;
-                const a = data.away_stats;
-                const battles = data.battles || [];
-                const xFactors = data.x_factors || [];
-                const hLeaders = data.home_leaders || {};
-                const aLeaders = data.away_leaders || {};
-                const defVsStars = data.defense_vs_stars || {};
-                const spotlights = defVsStars.spotlights || [];
-                const hDef = defVsStars.home_def || {};
-                const aDef = defVsStars.away_def || {};
-
-                container.innerHTML = `
-                <!-- 1. TALE OF THE TAPE OVERVIEW -->
-                <div class="glass-panel rounded-xl p-5 border border-[#30363d] col-span-full space-y-4">
-                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="scale" class="w-4 h-4 text-slate-400"></i>
-                            <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Tale of the Tape • Overall Metric Comparison</h3>
-                        </div>
-                        <span class="text-xs text-slate-400 font-mono">${h.team_name} (Home) vs ${a.team_name} (Away)</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                        <!-- Scoring -->
-                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
-                            <p class="text-slate-400 text-[11px] font-medium uppercase">Scoring (Pts / Game)</p>
-                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
-                                <span>${h.team}: ${typeof h.pts_per_game === 'number' ? h.pts_per_game.toFixed(1) : h.pts_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${h.rank_pts_scored})</span></span>
-                                <span>${a.team}: ${typeof a.pts_per_game === 'number' ? a.pts_per_game.toFixed(1) : a.pts_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${a.rank_pts_scored})</span></span>
-                            </div>
-                            <div class="w-full bg-[#161b22] h-1.5 rounded-full overflow-hidden flex">
-                                <div class="bg-slate-300 h-full" style="width: ${(h.pts_per_game / (h.pts_per_game + a.pts_per_game) * 100) || 50}%"></div>
-                                <div class="bg-slate-600 h-full" style="width: ${(a.pts_per_game / (h.pts_per_game + a.pts_per_game) * 100) || 50}%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Points Allowed -->
-                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
-                            <p class="text-slate-400 text-[11px] font-medium uppercase">Points Allowed / G</p>
-                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
-                                <span>${h.team}: ${typeof h.pts_allowed_per_game === 'number' ? h.pts_allowed_per_game.toFixed(1) : h.pts_allowed_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${h.rank_pts_allowed})</span></span>
-                                <span>${a.team}: ${typeof a.pts_allowed_per_game === 'number' ? a.pts_allowed_per_game.toFixed(1) : a.pts_allowed_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${a.rank_pts_allowed})</span></span>
-                            </div>
-                            <div class="w-full bg-[#161b22] h-1.5 rounded-full overflow-hidden flex">
-                                <div class="bg-slate-300 h-full" style="width: ${(a.pts_allowed_per_game / (h.pts_allowed_per_game + a.pts_allowed_per_game) * 100) || 50}%"></div>
-                                <div class="bg-slate-600 h-full" style="width: ${(h.pts_allowed_per_game / (h.pts_allowed_per_game + a.pts_allowed_per_game) * 100) || 50}%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Total Offense Yards -->
-                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
-                            <p class="text-slate-400 text-[11px] font-medium uppercase">Total Offense (Yds / G)</p>
-                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
-                                <span>${h.team}: ${typeof h.total_yds_per_game === 'number' ? h.total_yds_per_game.toFixed(1) : h.total_yds_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${h.rank_total_yds})</span></span>
-                                <span>${a.team}: ${typeof a.total_yds_per_game === 'number' ? a.total_yds_per_game.toFixed(1) : a.total_yds_per_game} <span class="text-[10px] text-slate-400 font-normal">(#${a.rank_total_yds})</span></span>
-                            </div>
-                            <div class="w-full bg-[#161b22] h-1.5 rounded-full overflow-hidden flex">
-                                <div class="bg-slate-300 h-full" style="width: ${(h.total_yds_per_game / (h.total_yds_per_game + a.total_yds_per_game) * 100) || 50}%"></div>
-                                <div class="bg-slate-600 h-full" style="width: ${(a.total_yds_per_game / (h.total_yds_per_game + a.total_yds_per_game) * 100) || 50}%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Turnover Differential -->
-                        <div class="bg-[#21262d] p-3 rounded-lg border border-[#30363d] space-y-2">
-                            <p class="text-slate-400 text-[11px] font-medium uppercase">Turnover Differential</p>
-                            <div class="flex justify-between items-center text-sm font-bold text-slate-100">
-                                <span class="${h.turnover_diff >= 0 ? 'text-slate-100' : 'text-slate-400'}">${h.team}: ${h.turnover_diff > 0 ? '+' : ''}${h.turnover_diff} (#${h.rank_turnover_diff})</span>
-                                <span class="${a.turnover_diff >= 0 ? 'text-slate-100' : 'text-slate-400'}">${a.team}: ${a.turnover_diff > 0 ? '+' : ''}${a.turnover_diff} (#${a.rank_turnover_diff})</span>
-                            </div>
-                            <div class="text-[10px] text-slate-400">INTs: ${h.total_ints_forced} vs ${a.total_ints_forced} | Sacks: ${h.total_sacks_forced} vs ${a.total_sacks_forced}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PASS / RUN OPPORTUNITY FUNNEL -->
-                ${data.funnel ? `
-                <div class="glass-panel rounded-xl p-5 border border-[#30363d] col-span-full space-y-3">
-                    <div class="flex items-center justify-between border-b border-[#30363d] pb-2.5">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="split" class="w-4 h-4 text-slate-400"></i>
-                            <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Pass / Run Opportunity Funnel</h3>
-                        </div>
-                        <span class="text-xs text-slate-400 font-mono">Opponent-Adjusted Play Volume (League Avg ~63 plays)</span>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Away Offense Funnel -->
-                        <div class="bg-[#21262d] p-3.5 rounded-xl border border-[#30363d] space-y-2.5">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-100 font-mono text-sm">${a.team} Offense (${a.team_name})</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold ${data.funnel.away.off_tendency === 'PASS_HEAVY' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : (data.funnel.away.off_tendency === 'RUN_HEAVY' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-[#161b22] text-slate-300 border border-[#30363d]')}">${data.funnel.away.off_tendency}</span>
-                            </div>
-                            <div class="flex justify-between text-xs font-mono text-slate-300">
-                                <span>Projected Pass: <b class="text-cyan-400">${data.funnel.away.proj_pass_att} att</b> (${data.funnel.away.pass_rate}%)</span>
-                                <span>Projected Rush: <b class="text-amber-400">${data.funnel.away.proj_carries} car</b> (${data.funnel.away.run_rate}%)</span>
-                            </div>
-                            <div class="w-full bg-[#161b22] h-2 rounded-full overflow-hidden flex">
-                                <div class="bg-cyan-500 h-full" style="width: ${data.funnel.away.pass_rate}%"></div>
-                                <div class="bg-amber-500 h-full" style="width: ${data.funnel.away.run_rate}%"></div>
-                            </div>
-                            <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-[#30363d]/60">
-                                <span>${h.team} Defense Funnel Effect:</span>
-                                <span class="font-mono font-semibold text-slate-200">${data.funnel.away.def_funnel}</span>
-                            </div>
-                        </div>
-                        <!-- Home Offense Funnel -->
-                        <div class="bg-[#21262d] p-3.5 rounded-xl border border-[#30363d] space-y-2.5">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-100 font-mono text-sm">${h.team} Offense (${h.team_name})</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold ${data.funnel.home.off_tendency === 'PASS_HEAVY' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : (data.funnel.home.off_tendency === 'RUN_HEAVY' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-[#161b22] text-slate-300 border border-[#30363d]')}">${data.funnel.home.off_tendency}</span>
-                            </div>
-                            <div class="flex justify-between text-xs font-mono text-slate-300">
-                                <span>Projected Pass: <b class="text-cyan-400">${data.funnel.home.proj_pass_att} att</b> (${data.funnel.home.pass_rate}%)</span>
-                                <span>Projected Rush: <b class="text-amber-400">${data.funnel.home.proj_carries} car</b> (${data.funnel.home.run_rate}%)</span>
-                            </div>
-                            <div class="w-full bg-[#161b22] h-2 rounded-full overflow-hidden flex">
-                                <div class="bg-cyan-500 h-full" style="width: ${data.funnel.home.pass_rate}%"></div>
-                                <div class="bg-amber-500 h-full" style="width: ${data.funnel.home.run_rate}%"></div>
-                            </div>
-                            <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-[#30363d]/60">
-                                <span>${a.team} Defense Funnel Effect:</span>
-                                <span class="font-mono font-semibold text-slate-200">${data.funnel.home.def_funnel}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                ` : ''}
-
-                <!-- 2. UNIT SCHEME BATTLES (4 CARDS) -->
-                <div class="col-span-full space-y-3">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="swords" class="w-4 h-4 text-slate-400"></i>
-                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Unit vs Unit Scheme Matchups</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        ${battles.map(b => {
-                            let badgeStyle = 'bg-[#21262d] text-slate-300 border border-[#30363d]';
-                            if (b.level.includes('heavy')) badgeStyle = 'bg-[#30363d] text-slate-100 border border-slate-500 font-bold';
-                            return `
-                            <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-bold text-slate-200">${b.stat} Battle</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] ${badgeStyle}">${b.verdict}</span>
-                                </div>
-                                <div class="flex items-center justify-between text-xs bg-[#21262d] p-2.5 rounded-lg border border-[#30363d]">
-                                    <div>
-                                        <p class="text-slate-400 text-[10px] uppercase font-medium">${b.offense}</p>
-                                        <p class="text-sm font-bold text-slate-100 mt-0.5">Rank #${b.off_rank} in League</p>
-                                    </div>
-                                    <div class="text-slate-500 font-bold text-xs">VS</div>
-                                    <div class="text-right">
-                                        <p class="text-slate-400 text-[10px] uppercase font-medium">${b.defense}</p>
-                                        <p class="text-sm font-bold text-slate-100 mt-0.5">Rank #${b.def_rank} in League</p>
-                                    </div>
-                                </div>
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>
-
-                <!-- 3. TACTICAL X-FACTORS & KEYS TO THE GAME -->
-                <div class="col-span-full space-y-3">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="zap" class="w-4 h-4 text-slate-400"></i>
-                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Tactical X-Factors & Key Matchup Insights</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        ${xFactors.map(x => `
-                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">${x.tag}</span>
-                            </div>
-                            <h4 class="text-xs font-bold text-slate-100">${x.title}</h4>
-                            <p class="text-xs text-slate-400 leading-relaxed">${x.detail}</p>
-                        </div>`).join('')}
-                    </div>
-                </div>
-
-                <!-- 4. KEY ROSTER LEADERS HEAD-TO-HEAD -->
-                <div class="col-span-full space-y-3">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="users" class="w-4 h-4 text-slate-400"></i>
-                        <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Key Skill Player Head-to-Head Comparison</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                        <!-- QBs -->
-                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
-                            <p class="text-[11px] font-bold text-slate-300 uppercase tracking-wider border-b border-[#30363d] pb-1.5 flex items-center justify-between">
-                                <span>Quarterbacks</span>
-                                <span class="text-slate-500 font-mono">QB1 • DUAL-THREAT</span>
-                            </p>
-                            <div class="space-y-2.5">
-                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
-                                    <div class="flex justify-between font-bold text-slate-200">
-                                        <span>${hLeaders.qb?.player_display_name || 'N/A'}</span>
-                                        <span class="font-mono text-slate-400">${h.team}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-300">${hLeaders.qb ? `${hLeaders.qb.yds_per_game} pass yds/g • ${hLeaders.qb.cmp_pct}% CMP • ${hLeaders.qb.pass_tds} TD / ${hLeaders.qb.pass_ints} INT` : '-'}</p>
-                                    ${hLeaders.qb?.rush_yds_per_game != null ? `
-                                        <div class="text-[10px] text-emerald-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
-                                            <span>+ ${hLeaders.qb.rush_yds_per_game} rush yds/g</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${hLeaders.qb.rush_ypc} YPC</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${hLeaders.qb.rush_tds} rush TDs</span>
-                                        </div>
-                                    ` : ''}
-                                    <div class="text-[10px] text-amber-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
-                                        <span class="text-slate-400 font-sans">Opponent vs QBs:</span>
-                                        <span class="font-bold">${a.team} allows ${a.qb_rush_yds_allowed_per_game != null ? a.qb_rush_yds_allowed_per_game : (aDef.qb_rush?.allowed != null ? aDef.qb_rush.allowed : '--')} yds/g (#${a.rank_qb_rush_allowed || aDef.qb_rush?.rank || '--'}) • ${a.def_qb_rush_verdict || aDef.qb_rush?.verdict || 'Average'}</span>
-                                    </div>
-                                </div>
-                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
-                                    <div class="flex justify-between font-bold text-slate-200">
-                                        <span>${aLeaders.qb?.player_display_name || 'N/A'}</span>
-                                        <span class="font-mono text-slate-400">${a.team}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-300">${aLeaders.qb ? `${aLeaders.qb.yds_per_game} pass yds/g • ${aLeaders.qb.cmp_pct}% CMP • ${aLeaders.qb.pass_tds} TD / ${aLeaders.qb.pass_ints} INT` : '-'}</p>
-                                    ${aLeaders.qb?.rush_yds_per_game != null ? `
-                                        <div class="text-[10px] text-emerald-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
-                                            <span>+ ${aLeaders.qb.rush_yds_per_game} rush yds/g</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${aLeaders.qb.rush_ypc} YPC</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${aLeaders.qb.rush_tds} rush TDs</span>
-                                        </div>
-                                    ` : ''}
-                                    <div class="text-[10px] text-amber-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
-                                        <span class="text-slate-400 font-sans">Opponent vs QBs:</span>
-                                        <span class="font-bold">${h.team} allows ${h.qb_rush_yds_allowed_per_game != null ? h.qb_rush_yds_allowed_per_game : (hDef.qb_rush?.allowed != null ? hDef.qb_rush.allowed : '--')} yds/g (#${h.rank_qb_rush_allowed || hDef.qb_rush?.rank || '--'}) • ${h.def_qb_rush_verdict || hDef.qb_rush?.verdict || 'Average'}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RBs -->
-                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
-                            <p class="text-[11px] font-bold text-slate-300 uppercase tracking-wider border-b border-[#30363d] pb-1.5 flex items-center justify-between">
-                                <span>Lead Rushers</span>
-                                <span class="text-slate-500 font-mono">RB1 • RUSH + REC</span>
-                            </p>
-                            <div class="space-y-2.5">
-                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
-                                    <div class="flex justify-between font-bold text-slate-200">
-                                        <span>${hLeaders.rb?.player_display_name || 'N/A'}</span>
-                                        <span class="font-mono text-slate-400">${h.team}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-300">${hLeaders.rb ? `${hLeaders.rb.yds_per_game} rush yds/g • ${hLeaders.rb.ypc} YPC • ${hLeaders.rb.rush_tds} Rush TDs` : '-'}</p>
-                                    ${hLeaders.rb?.rec_yds_per_game != null ? `
-                                        <div class="text-[10px] text-cyan-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
-                                            <span>+ ${hLeaders.rb.rec_yds_per_game} rec yds/g</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${hLeaders.rb.receptions} rec (${hLeaders.rb.catch_pct || '--'}%)</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${hLeaders.rb.rec_tds} rec TDs</span>
-                                        </div>
-                                    ` : ''}
-                                    <div class="text-[10px] text-cyan-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
-                                        <span class="text-slate-400 font-sans">Opponent vs RB Rec:</span>
-                                        <span class="font-bold">${a.team} allows ${a.rb_rec_yds_allowed_per_game != null ? a.rb_rec_yds_allowed_per_game : (aDef.rb_rec?.allowed != null ? aDef.rb_rec.allowed : '--')} yds/g (#${a.rank_rb_rec_allowed || aDef.rb_rec?.rank || '--'}) • ${a.def_rb_rec_verdict || aDef.rb_rec?.verdict || 'Average'}</span>
-                                    </div>
-                                </div>
-                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
-                                    <div class="flex justify-between font-bold text-slate-200">
-                                        <span>${aLeaders.rb?.player_display_name || 'N/A'}</span>
-                                        <span class="font-mono text-slate-400">${a.team}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-300">${aLeaders.rb ? `${aLeaders.rb.yds_per_game} rush yds/g • ${aLeaders.rb.ypc} YPC • ${aLeaders.rb.rush_tds} Rush TDs` : '-'}</p>
-                                    ${aLeaders.rb?.rec_yds_per_game != null ? `
-                                        <div class="text-[10px] text-cyan-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
-                                            <span>+ ${aLeaders.rb.rec_yds_per_game} rec yds/g</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${aLeaders.rb.receptions} rec (${aLeaders.rb.catch_pct || '--'}%)</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${aLeaders.rb.rec_tds} rec TDs</span>
-                                        </div>
-                                    ` : ''}
-                                    <div class="text-[10px] text-cyan-300/90 font-mono flex items-center justify-between pt-1 border-t border-[#30363d]/60">
-                                        <span class="text-slate-400 font-sans">Opponent vs RB Rec:</span>
-                                        <span class="font-bold">${h.team} allows ${h.rb_rec_yds_allowed_per_game != null ? h.rb_rec_yds_allowed_per_game : (hDef.rb_rec?.allowed != null ? hDef.rb_rec.allowed : '--')} yds/g (#${h.rank_rb_rec_allowed || hDef.rb_rec?.rank || '--'}) • ${h.def_rb_rec_verdict || hDef.rb_rec?.verdict || 'Average'}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- WRs -->
-                        <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3">
-                            <p class="text-[11px] font-bold text-slate-300 uppercase tracking-wider border-b border-[#30363d] pb-1.5 flex items-center justify-between">
-                                <span>Top Pass Catchers</span>
-                                <span class="text-slate-500 font-mono">WR/TE • EFFICIENCY</span>
-                            </p>
-                            <div class="space-y-2.5">
-                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
-                                    <div class="flex justify-between font-bold text-slate-200">
-                                        <span>${hLeaders.wr?.player_display_name || 'N/A'}</span>
-                                        <span class="font-mono text-slate-400">${h.team}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-300">${hLeaders.wr ? `${hLeaders.wr.yds_per_game} rec yds/g • ${hLeaders.wr.ypr} YPR • ${hLeaders.wr.rec_tds} TDs` : '-'}</p>
-                                    ${hLeaders.wr?.tgt_per_game != null ? `
-                                        <div class="text-[10px] text-purple-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
-                                            <span>${hLeaders.wr.tgt_per_game} tgt/g</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${hLeaders.wr.catch_rate || '--'}% catch rate</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${hLeaders.wr.receptions} rec</span>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                                <div class="bg-[#21262d] p-2.5 rounded-lg space-y-1">
-                                    <div class="flex justify-between font-bold text-slate-200">
-                                        <span>${aLeaders.wr?.player_display_name || 'N/A'}</span>
-                                        <span class="font-mono text-slate-400">${a.team}</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-300">${aLeaders.wr ? `${aLeaders.wr.yds_per_game} rec yds/g • ${aLeaders.wr.ypr} YPR • ${aLeaders.wr.rec_tds} TDs` : '-'}</p>
-                                    ${aLeaders.wr?.tgt_per_game != null ? `
-                                        <div class="text-[10px] text-purple-400/90 font-mono flex items-center space-x-1 pt-0.5 border-t border-[#30363d]/60">
-                                            <span>${aLeaders.wr.tgt_per_game} tgt/g</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${aLeaders.wr.catch_rate || '--'}% catch rate</span>
-                                            <span class="text-slate-500">•</span>
-                                            <span>${aLeaders.wr.receptions} rec</span>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 5. DEFENSE VS STAR PLAYERS & POSITIONAL CONTEXT -->
-                <div class="col-span-full space-y-3">
-                    <div class="flex items-center justify-between flex-wrap gap-2">
-                        <div class="flex items-center space-x-2">
-                            <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
-                            <h3 class="text-sm font-bold text-slate-100 uppercase tracking-wide">Defense vs Star Players & Positional Context</h3>
-                        </div>
-                        <span class="text-[11px] text-slate-400">Empirical track record vs Top-12 Star RBs/WRs • General character when no stars</span>
-                    </div>
-
-                    <!-- Matchup Spotlight Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        ${spotlights.map(s => {
-                            let badgeStyle = 'bg-[#21262d] text-slate-300 border-[#30363d]';
-                            let cardBorder = 'border-[#30363d]';
-                            if (s.level === 'lockdown') {
-                                badgeStyle = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
-                                cardBorder = 'border-emerald-500/30';
-                            } else if (s.level === 'vulnerable') {
-                                badgeStyle = 'bg-rose-500/15 text-rose-400 border-rose-500/30';
-                                cardBorder = 'border-rose-500/30';
-                            } else if (s.level === 'slight_good') {
-                                badgeStyle = 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30';
-                            }
-
-                            const isStarBadge = s.is_star
-                                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center space-x-1"><i data-lucide="star" class="w-3 h-3"></i><span>${s.tag}</span></span>`
-                                : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#21262d] text-slate-400 border border-[#30363d]">${s.tag}</span>`;
-
-                            return `
-                                <div class="glass-panel rounded-xl p-4 border ${cardBorder} space-y-2.5">
-                                    <div class="flex items-center justify-between flex-wrap gap-1.5">
-                                        <div class="flex items-center space-x-2">
-                                            ${isStarBadge}
-                                            <span class="text-[11px] font-mono font-bold text-slate-300">${s.def_team} DEF vs ${s.off_team}</span>
-                                        </div>
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeStyle}">
-                                            ${s.verdict}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xs font-bold text-slate-100">${s.title}</h4>
-                                        <p class="text-[11px] font-mono text-slate-300 mt-0.5">${s.stat_line}</p>
-                                    </div>
-                                    <p class="text-xs text-slate-400 leading-relaxed">${s.detail}</p>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-
-                    <!-- General Defensive Unit Character Comparison -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                        <!-- Home Defense Profile -->
-                        <div class="glass-panel rounded-xl p-3.5 border border-[#30363d] space-y-2 bg-[#12161c]">
-                            <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-mono font-bold text-slate-200 text-xs">${h.team} Defensive Profile</span>
-                                    <span class="text-[10px] text-slate-500">Home</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${hDef.general?.level === 'lockdown' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : (hDef.general?.level === 'vulnerable' ? 'bg-rose-500/15 text-rose-400 border-rose-500/30' : 'bg-[#21262d] text-slate-300 border border-[#30363d]')}">
-                                    ${hDef.general?.verdict || 'Defensive Unit'}
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-slate-400 block font-semibold">VS RUN</span>
-                                    <span class="font-mono font-bold text-slate-200">#${h.rank_rush_allowed || '--'} (${h.rush_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB1: <span class="${(h.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_rb_diff != null ? (h.def_star_rb_diff > 0 ? '+' : '') + h.def_star_rb_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB2: <span class="${(h.def_rb2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((h.def_rb2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_rb2_diff != null ? (h.def_rb2_diff > 0 ? '+' : '') + h.def_rb2_diff : '--'} yds</span></p>
-                                </div>
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-slate-400 block font-semibold">VS PASS</span>
-                                    <span class="font-mono font-bold text-slate-200">#${h.rank_pass_allowed || '--'} (${h.pass_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1: <span class="${(h.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((h.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_star_wr_diff != null ? (h.def_star_wr_diff > 0 ? '+' : '') + h.def_star_wr_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR2: <span class="${(h.def_wr2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((h.def_wr2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_wr2_diff != null ? (h.def_wr2_diff > 0 ? '+' : '') + h.def_wr2_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs TE1: <span class="${(h.def_te1_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((h.def_te1_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_te1_diff != null ? (h.def_te1_diff > 0 ? '+' : '') + h.def_te1_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs TE2: <span class="${(h.def_te2_diff || 0) <= -6 ? 'text-emerald-400 font-bold' : ((h.def_te2_diff || 0) >= 6 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${h.def_te2_diff != null ? (h.def_te2_diff > 0 ? '+' : '') + h.def_te2_diff : '--'} yds</span></p>
-                                </div>
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-amber-400 block font-semibold">VS QB RUSH</span>
-                                    <span class="font-mono font-bold text-slate-200">#${h.rank_qb_rush_allowed || hDef.qb_rush?.rank || '--'} (${h.qb_rush_yds_allowed_per_game != null ? h.qb_rush_yds_allowed_per_game : (hDef.qb_rush?.allowed || '--')} yds/g)</span>
-                                    <p class="text-[10px] mt-0.5 truncate ${(h.rank_qb_rush_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((h.rank_qb_rush_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${h.def_qb_rush_verdict || hDef.qb_rush?.verdict || 'Average'}</p>
-                                </div>
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-cyan-400 block font-semibold">VS RB REC</span>
-                                    <span class="font-mono font-bold text-slate-200">#${h.rank_rb_rec_allowed || hDef.rb_rec?.rank || '--'} (${h.rb_rec_yds_allowed_per_game != null ? h.rb_rec_yds_allowed_per_game : (hDef.rb_rec?.allowed || '--')} yds/g)</span>
-                                    <p class="text-[10px] mt-0.5 truncate ${(h.rank_rb_rec_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((h.rank_rb_rec_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${h.def_rb_rec_verdict || hDef.rb_rec?.verdict || 'Average'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Away Defense Profile -->
-                        <div class="glass-panel rounded-xl p-3.5 border border-[#30363d] space-y-2 bg-[#12161c]">
-                            <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-mono font-bold text-slate-200 text-xs">${a.team} Defensive Profile</span>
-                                    <span class="text-[10px] text-slate-500">Away</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${aDef.general?.level === 'lockdown' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : (aDef.general?.level === 'vulnerable' ? 'bg-rose-500/15 text-rose-400 border-rose-500/30' : 'bg-[#21262d] text-slate-300 border border-[#30363d]')}">
-                                    ${aDef.general?.verdict || 'Defensive Unit'}
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-slate-400 block font-semibold">VS RUN</span>
-                                    <span class="font-mono font-bold text-slate-200">#${a.rank_rush_allowed || '--'} (${a.rush_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB1: <span class="${(a.def_star_rb_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_rb_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_rb_diff != null ? (a.def_star_rb_diff > 0 ? '+' : '') + a.def_star_rb_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs RB2: <span class="${(a.def_rb2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((a.def_rb2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_rb2_diff != null ? (a.def_rb2_diff > 0 ? '+' : '') + a.def_rb2_diff : '--'} yds</span></p>
-                                </div>
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-slate-400 block font-semibold">VS PASS</span>
-                                    <span class="font-mono font-bold text-slate-200">#${a.rank_pass_allowed || '--'} (${a.pass_yds_allowed_per_game || '--'} yds/g)</span>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR1: <span class="${(a.def_star_wr_diff || 0) <= -10 ? 'text-emerald-400 font-bold' : ((a.def_star_wr_diff || 0) >= 10 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_star_wr_diff != null ? (a.def_star_wr_diff > 0 ? '+' : '') + a.def_star_wr_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs WR2: <span class="${(a.def_wr2_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((a.def_wr2_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_wr2_diff != null ? (a.def_wr2_diff > 0 ? '+' : '') + a.def_wr2_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs TE1: <span class="${(a.def_te1_diff || 0) <= -8 ? 'text-emerald-400 font-bold' : ((a.def_te1_diff || 0) >= 8 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_te1_diff != null ? (a.def_te1_diff > 0 ? '+' : '') + a.def_te1_diff : '--'} yds</span></p>
-                                    <p class="text-[10px] text-slate-400 mt-0.5">vs TE2: <span class="${(a.def_te2_diff || 0) <= -6 ? 'text-emerald-400 font-bold' : ((a.def_te2_diff || 0) >= 6 ? 'text-rose-400 font-bold' : 'text-slate-300')}">${a.def_te2_diff != null ? (a.def_te2_diff > 0 ? '+' : '') + a.def_te2_diff : '--'} yds</span></p>
-                                </div>
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-amber-400 block font-semibold">VS QB RUSH</span>
-                                    <span class="font-mono font-bold text-slate-200">#${a.rank_qb_rush_allowed || aDef.qb_rush?.rank || '--'} (${a.qb_rush_yds_allowed_per_game != null ? a.qb_rush_yds_allowed_per_game : (aDef.qb_rush?.allowed || '--')} yds/g)</span>
-                                    <p class="text-[10px] mt-0.5 truncate ${(a.rank_qb_rush_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((a.rank_qb_rush_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${a.def_qb_rush_verdict || aDef.qb_rush?.verdict || 'Average'}</p>
-                                </div>
-                                <div class="bg-[#1c2128] p-2 rounded border border-[#30363d]/50">
-                                    <span class="text-[10px] text-cyan-400 block font-semibold">VS RB REC</span>
-                                    <span class="font-mono font-bold text-slate-200">#${a.rank_rb_rec_allowed || aDef.rb_rec?.rank || '--'} (${a.rb_rec_yds_allowed_per_game != null ? a.rb_rec_yds_allowed_per_game : (aDef.rb_rec?.allowed || '--')} yds/g)</span>
-                                    <p class="text-[10px] mt-0.5 truncate ${(a.rank_rb_rec_allowed || 16) <= 8 ? 'text-emerald-400 font-bold' : ((a.rank_rb_rec_allowed || 16) >= 24 ? 'text-rose-400 font-bold' : 'text-slate-400')}">${a.def_rb_rec_verdict || aDef.rb_rec?.verdict || 'Average'}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-
-                lucide.createIcons();
-            } catch (err) {
-                console.error("Error loading deepdive matchup:", err);
-                container.innerHTML = `<div class="glass-panel rounded-xl p-6 text-center text-slate-500 col-span-full">Error loading matchup analysis.</div>`;
-            }
-        }
 
         // ==============================================================
         // TAB 5: 2026 SCHEDULE & PER-GAME TEAM STATS LOGIC
@@ -3294,26 +1858,8 @@
                         </div>
                         ${g.temp != null ? `<div class="font-mono text-slate-400">${g.temp}°F${g.wind ? ' • ' + g.wind + 'mph wind' : ''}</div>` : ''}
                     </div>
-
-                    <!-- Action Button: Deep Dive in Matchup Lab -->
-                    <button onclick="jumpToH2H('${g.home_team}', '${g.away_team}')" class="w-full py-2 px-3 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-slate-300 hover:text-slate-100 text-xs font-semibold flex items-center justify-center space-x-2 border border-[#30363d] transition">
-                        <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
-                        <span>Deep Dive in Matchup Lab (H2H)</span>
-                    </button>
                 </div>
             `;
-        }
-
-        function jumpToH2H(homeTeam, awayTeam) {
-            switchTab('h2h');
-            const homeSelect = document.getElementById('h2h-home-team');
-            const awaySelect = document.getElementById('h2h-away-team');
-            if (homeSelect && awaySelect) {
-                homeSelect.value = homeTeam;
-                awaySelect.value = awayTeam;
-                renderH2HComparison();
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ==========================================
@@ -3326,9 +1872,6 @@
         let floorFilterStreak = '1';
         let floorFilterMinGames = '4';
         let floorSearchQuery = '';
-        let floorStartDate = '2026-09-01';
-        let floorEndDate = new Date().toISOString().substring(0, 10);
-        let floorDatePreset = 'season26';
         let floorSortCol = 'Floor_Streak';
         let floorSortAsc = false;
 
@@ -3362,14 +1905,17 @@
                 console.warn('Could not load schedule games for Floor Streak view:', e);
             }
 
+            const headerStart = document.getElementById('input-start-date')?.value || startDate || '';
+            const headerEnd = document.getElementById('input-end-date')?.value || endDate || '';
+
             try {
                 let url = `/api/floor-streak?min_games=${floorFilterMinGames}`;
-                if (floorStartDate) url += `&start_date=${floorStartDate}`;
-                if (floorEndDate) url += `&end_date=${floorEndDate}`;
+                if (headerStart) url += `&start_date=${headerStart}`;
+                if (headerEnd) url += `&end_date=${headerEnd}`;
 
                 let res = await fetch(url);
                 if (!res.ok) {
-                    res = await fetch(`/floor-streak?min_games=${floorFilterMinGames}&start_date=${floorStartDate}&end_date=${floorEndDate}`);
+                    res = await fetch(`/floor-streak?min_games=${floorFilterMinGames}&start_date=${headerStart}&end_date=${headerEnd}`);
                 }
                 const data = await res.json();
                 let list = data.players || [];
@@ -3399,14 +1945,14 @@
                 // Update active timeline display badge
                 const timelineEl = document.getElementById('floor-active-timeline-text');
                 if (timelineEl) {
-                    if (floorStartDate && floorEndDate) {
-                        timelineEl.textContent = `Stats Range: ${floorStartDate} to ${floorEndDate} • (${list.length} players found)`;
-                    } else if (floorStartDate) {
-                        timelineEl.textContent = `Stats Range: From ${floorStartDate} to Present • (${list.length} players)`;
-                    } else if (floorEndDate) {
-                        timelineEl.textContent = `Stats Range: Through ${floorEndDate} • (${list.length} players)`;
+                    if (headerStart && headerEnd) {
+                        timelineEl.textContent = `Window: ${headerStart} to ${headerEnd} (${list.length} players)`;
+                    } else if (headerStart) {
+                        timelineEl.textContent = `Window: From ${headerStart} (${list.length} players)`;
+                    } else if (headerEnd) {
+                        timelineEl.textContent = `Window: Through ${headerEnd} (${list.length} players)`;
                     } else {
-                        timelineEl.textContent = `Baseline window: All Available History (3 Years) • (${list.length} players)`;
+                        timelineEl.textContent = `Window: All Available History (${list.length} players)`;
                     }
                 }
 
@@ -3652,68 +2198,6 @@
         function onFloorSearch(query) {
             floorSearchQuery = query || '';
             renderFloorStreaks();
-        }
-
-        function setFloorHistoryPreset(preset) {
-            floorDatePreset = preset;
-            document.querySelectorAll('[id^="floor-preset-"]').forEach(btn => btn.classList.remove('active', 'bg-[#30363d]', 'text-slate-100'));
-            const btn = document.getElementById(`floor-preset-${preset}`);
-            if (btn) btn.classList.add('active', 'bg-[#30363d]', 'text-slate-100');
-
-            const startInput = document.getElementById('floor-start-date');
-            const endInput = document.getElementById('floor-end-date');
-            const todayStr = new Date().toISOString().substring(0, 10);
-            const today = new Date(todayStr + 'T00:00:00Z');
-
-            if (preset === 'season26') {
-                floorStartDate = '2026-09-01';
-                floorEndDate = todayStr;
-            } else if (preset === 'all') {
-                floorStartDate = '';
-                floorEndDate = '';
-            } else if (preset === '1y') {
-                const d = new Date(today);
-                d.setFullYear(d.getFullYear() - 1);
-                floorStartDate = d.toISOString().substring(0, 10);
-                floorEndDate = todayStr;
-            } else if (preset === '2025') {
-                floorStartDate = '2025-09-01';
-                floorEndDate = '2026-01-15';
-            } else if (preset === '8w') {
-                const d = new Date(today);
-                d.setDate(d.getDate() - 56);
-                floorStartDate = d.toISOString().substring(0, 10);
-                floorEndDate = todayStr;
-            } else if (preset === '4w') {
-                const d = new Date(today);
-                d.setDate(d.getDate() - 28);
-                floorStartDate = d.toISOString().substring(0, 10);
-                floorEndDate = todayStr;
-            } else if (preset === 'custom') {
-                if (startInput) startInput.focus();
-                return;
-            }
-
-            if (startInput) startInput.value = floorStartDate;
-            if (endInput) endInput.value = floorEndDate;
-
-            loadFloorStreakTab();
-        }
-
-        function onFloorDateRangeInputChange() {
-            const startInput = document.getElementById('floor-start-date');
-            const endInput = document.getElementById('floor-end-date');
-            floorStartDate = startInput?.value || '';
-            floorEndDate = endInput?.value || '';
-            floorDatePreset = 'custom';
-            document.querySelectorAll('[id^="floor-preset-"]').forEach(btn => btn.classList.remove('active', 'bg-[#30363d]', 'text-slate-100'));
-            const customBtn = document.getElementById('floor-preset-custom');
-            if (customBtn) customBtn.classList.add('active', 'bg-[#30363d]', 'text-slate-100');
-            loadFloorStreakTab();
-        }
-
-        function clearFloorHistoryRange() {
-            setFloorHistoryPreset('season26');
         }
     </script>
 </body>
