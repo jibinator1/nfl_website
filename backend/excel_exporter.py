@@ -644,6 +644,8 @@ def export_weekly_matchups_xlsx(schedule_data: dict, week=None, season: int = 20
                 a.get('def_rb2_verdict', '--'), h.get('def_rb2_verdict', '--'),
                 a.get('def_star_wr_verdict', '--'), h.get('def_star_wr_verdict', '--'),
                 a.get('def_wr2_verdict', '--'), h.get('def_wr2_verdict', '--'),
+                a.get('def_te1_verdict', '--'), h.get('def_te1_verdict', '--'),
+                a.get('def_te2_verdict', '--'), h.get('def_te2_verdict', '--'),
                 a.get('def_qb_rush_verdict', '--'), h.get('def_qb_rush_verdict', '--'),
                 a.get('def_rb_rec_verdict', '--'), h.get('def_rb_rec_verdict', '--')
             ]
