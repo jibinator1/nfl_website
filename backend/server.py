@@ -7,9 +7,15 @@ Runs 100% on public open-source NFL data with zero API key dependencies.
 
 import os
 import threading
+import json
+import math
+from typing import Any
+import numpy as np
+import pandas as pd
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 
 from backend.data_loader import NFLDataLoader
@@ -24,10 +30,59 @@ from backend.analytics import (
 
 load_dotenv()
 
+def sanitize_nan(obj: Any) -> Any:
+    """
+    Recursively replaces NaN, Infinity, -Infinity with None so that
+    JSON serialization produces valid RFC-compliant JSON ('null' instead of invalid 'NaN').
+    """
+    if obj is None:
+        return None
+    if isinstance(obj, (str, int, bool)):
+        return obj
+    if isinstance(obj, float):
+        return None if (math.isnan(obj) or math.isinf(obj)) else obj
+    if hasattr(obj, '__class__') and obj.__class__.__name__ in ('Query', 'Path', 'Header', 'Cookie', 'Body', 'Form', 'File', 'Param'):
+        default_val = getattr(obj, 'default', None)
+        return None if default_val is ... or default_val is Ellipsis else sanitize_nan(default_val)
+    if isinstance(obj, dict):
+        return {k: sanitize_nan(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [sanitize_nan(v) for v in obj]
+    if isinstance(obj, tuple):
+        return [sanitize_nan(v) for v in obj]
+    if isinstance(obj, (np.floating,)):
+        val = float(obj)
+        return None if (math.isnan(val) or math.isinf(val)) else val
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    if isinstance(obj, np.ndarray):
+        return sanitize_nan(obj.tolist())
+    if isinstance(obj, pd.Timestamp):
+        return str(obj)
+    return obj
+
+
+class SafeJSONResponse(JSONResponse):
+    """
+    Custom JSONResponse that automatically replaces out-of-range floats (NaN, +/-Inf)
+    with None (JSON null) before serializing, preventing 'ValueError: Out of range float
+    values are not JSON compliant: nan'.
+    """
+    def render(self, content: Any) -> bytes:
+        return json.dumps(
+            sanitize_nan(content),
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+        ).encode("utf-8")
+
+
 app = FastAPI(
     title="NFL Analytics & Matchup Hub",
     description="Interactive NFL statistics, volume x efficiency team rankings, matchup lab (H2H), and 18-week schedule explorer.",
-    version="2.0.0"
+    version="2.0.0",
+    default_response_class=SafeJSONResponse
 )
 
 # CORS setup for local and production Vercel environments
@@ -235,6 +290,9 @@ async def get_match_history_endpoint(
 async def get_floor_streak_endpoint(
     season: int = Query(None, description="Filter by season (optional)"),
     pos: str = Query(None, description="Filter by position (QB, RB, WR, TE)"),
+    date: str = Query(None, description="Filter by upcoming game date (YYYY-MM-DD)"),
+    start_date: str = Query(None, description="Start date for stats history window (YYYY-MM-DD)"),
+    end_date: str = Query(None, description="End date for stats history window (YYYY-MM-DD)"),
     min_streak: int = Query(0, description="Minimum floor streak to include"),
     min_games: int = Query(4, description="Minimum games played to include player"),
 ):
@@ -245,15 +303,29 @@ async def get_floor_streak_endpoint(
     """
     ensure_data_loaded()
     try:
-        import pandas as pd
-        df = compute_floor_streak_df(engine.weekly)
+        df = compute_floor_streak_df(
+            engine.weekly,
+            start_date=start_date,
+            end_date=end_date,
+            season=season
+        )
         if df.empty:
-            return {'status': 'success', 'count': 0, 'players': []}
+            return {
+                'status': 'success',
+                'count': 0,
+                'start_date': start_date,
+                'end_date': end_date,
+                'season': season,
+                'players': []
+            }
 
         if pos and pos.upper() != 'ALL':
             df = df[df['position'].str.upper() == pos.upper()]
         else:
             df = df[df['position'].str.upper().isin(['QB', 'RB', 'WR', 'TE'])]
+
+        if date and 'date' in df.columns:
+            df = df[df['date'] == date]
 
         df = df[df['Games_Played'] >= min_games]
         df = df[df['Floor_Streak'] >= min_streak]
@@ -264,6 +336,9 @@ async def get_floor_streak_endpoint(
         return {
             'status': 'success',
             'count': len(df),
+            'start_date': start_date,
+            'end_date': end_date,
+            'season': season,
             'players': df.to_dict(orient='records')
         }
     except Exception as e:

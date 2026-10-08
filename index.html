@@ -639,6 +639,43 @@
                 </div>
             </div>
 
+            <!-- Stats History Date Range Selector -->
+            <div class="glass-panel p-4 rounded-xl border border-[#30363d] space-y-3">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs text-slate-300 font-semibold flex items-center gap-1.5 shrink-0">
+                            <i data-lucide="history" class="w-4 h-4 text-emerald-400"></i>
+                            <span>Streak History Window:</span>
+                        </span>
+
+                        <!-- Presets -->
+                        <div class="flex items-center gap-1 bg-[#161b22] border border-[#30363d] rounded-lg p-0.5">
+                            <button id="floor-preset-season26" onclick="setFloorHistoryPreset('season26')" class="px-2.5 py-1 text-[11px] rounded bg-[#30363d] text-slate-100 font-medium transition" title="Sept 1, 2026 to Current Date">2026 (Sept 1 – Today)</button>
+                            <button id="floor-preset-all" onclick="setFloorHistoryPreset('all')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="All 3 years of historical game stats">All History</button>
+                            <button id="floor-preset-1y" onclick="setFloorHistoryPreset('1y')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Last 365 days of player stats">Last 1 Year</button>
+                            <button id="floor-preset-2025" onclick="setFloorHistoryPreset('2025')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="2025 Season games only">2025 Season</button>
+                            <button id="floor-preset-8w" onclick="setFloorHistoryPreset('8w')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Last 8 weeks of player stats">Last 8 Wks</button>
+                            <button id="floor-preset-4w" onclick="setFloorHistoryPreset('4w')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Last 4 weeks of player stats">Last 4 Wks</button>
+                            <button id="floor-preset-custom" onclick="setFloorHistoryPreset('custom')" class="px-2.5 py-1 text-[11px] rounded text-slate-400 hover:text-slate-200 transition" title="Custom Start and End dates">Custom</button>
+                        </div>
+
+                        <!-- Custom Date Range Inputs -->
+                        <div class="flex items-center gap-1.5 bg-[#161b22] px-2.5 py-1 rounded-lg border border-[#30363d]">
+                            <span class="text-[11px] text-slate-400">From:</span>
+                            <input type="date" id="floor-start-date" value="2026-09-01" onchange="onFloorDateRangeInputChange()" class="bg-[#21262d] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-mono cursor-pointer" title="History Start Date">
+                            <span class="text-[11px] text-slate-400">To:</span>
+                            <input type="date" id="floor-end-date" onchange="onFloorDateRangeInputChange()" class="bg-[#21262d] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-mono cursor-pointer" title="History End Date">
+                            <button onclick="clearFloorHistoryRange()" class="text-slate-400 hover:text-slate-200 p-1" title="Reset to default (Sept 1, 2026 - Today)"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 font-mono flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span id="floor-active-timeline-text">Stats window: Sept 1, 2026 to Current Date</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Controls & Filter Toolbar -->
             <div class="glass-panel rounded-xl p-4 border border-[#30363d] flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex flex-wrap items-center gap-3">
@@ -646,6 +683,18 @@
                     <div class="relative w-56">
                         <input type="text" id="floor-search-input" oninput="onFloorSearch(this.value)" placeholder="Search player or team..." class="w-full bg-[#21262d] border border-[#30363d] text-slate-200 text-xs rounded-lg pl-8 pr-3 py-1.5 outline-none focus:border-slate-500 font-medium">
                         <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+                    </div>
+
+                    <!-- Date Filter: Select Game Date -->
+                    <div class="flex items-center gap-1.5 bg-[#161b22] px-2.5 py-1 rounded-lg border border-[#30363d] min-w-0 max-w-full overflow-hidden">
+                        <span class="text-xs text-slate-400 font-semibold flex items-center gap-1 shrink-0">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Game Slate:</span>
+                        </span>
+                        <div id="floor-date-chips" class="flex items-center gap-1 overflow-x-auto max-w-[240px] sm:max-w-[320px] md:max-w-[420px] py-0.5 whitespace-nowrap scrollbar-thin shrink">
+                            <button id="btn-floor-all-dates" onclick="clearFloorDateFilter()" class="chip active text-[11px] py-0.5 px-2.5 rounded shrink-0 bg-[#30363d] text-slate-100 font-bold" title="Show all dates">All</button>
+                        </div>
+                        <input type="date" id="floor-date-picker" onchange="onFloorDateChange(this.value)" class="bg-[#21262d] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-mono cursor-pointer shrink-0" title="Select custom slate date">
                     </div>
 
                     <!-- Position Filter Chips -->
@@ -3265,6 +3314,406 @@
                 renderH2HComparison();
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // PLAYER FLOOR BREACH STREAKS MODULE
+        // ==========================================
+        let globalFloorStreaks = [];
+        let isFloorStreakLoading = false;
+        let floorSelectedDate = '';
+        let floorFilterPos = 'ALL';
+        let floorFilterStreak = '1';
+        let floorFilterMinGames = '4';
+        let floorSearchQuery = '';
+        let floorStartDate = '2026-09-01';
+        let floorEndDate = new Date().toISOString().substring(0, 10);
+        let floorDatePreset = 'season26';
+        let floorSortCol = 'Floor_Streak';
+        let floorSortAsc = false;
+
+        async function loadFloorStreakTab() {
+            const tbody = document.getElementById('floor-streak-table-body');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-slate-400"><div class="flex items-center justify-center gap-2"><i data-lucide="rotate-cw" class="w-4 h-4 animate-spin text-slate-400"></i><span>Calculating player floor breach streaks...</span></div></td></tr>`;
+                if (window.lucide) lucide.createIcons({ root: tbody });
+            }
+            isFloorStreakLoading = true;
+
+            // Ensure schedule games are available so date chips and matchups can be resolved
+            let allGames = [];
+            try {
+                if (window.globalSchedule && window.globalSchedule.weeks) {
+                    window.globalSchedule.weeks.forEach(w => {
+                        if (Array.isArray(w.games)) allGames.push(...w.games);
+                    });
+                } else {
+                    const schedRes = await fetch('/api/schedule?season=2026');
+                    if (schedRes.ok) {
+                        const sched = await schedRes.json();
+                        if (sched && sched.weeks) {
+                            sched.weeks.forEach(w => {
+                                if (Array.isArray(w.games)) allGames.push(...w.games);
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not load schedule games for Floor Streak view:', e);
+            }
+
+            try {
+                let url = `/api/floor-streak?min_games=${floorFilterMinGames}`;
+                if (floorStartDate) url += `&start_date=${floorStartDate}`;
+                if (floorEndDate) url += `&end_date=${floorEndDate}`;
+
+                let res = await fetch(url);
+                if (!res.ok) {
+                    res = await fetch(`/floor-streak?min_games=${floorFilterMinGames}&start_date=${floorStartDate}&end_date=${floorEndDate}`);
+                }
+                const data = await res.json();
+                let list = data.players || [];
+
+                // Map game dates to players from the active schedule
+                if (allGames.length > 0) {
+                    const teamGameMap = {};
+                    allGames.forEach(g => {
+                        const h = (g.home_team || '').toUpperCase();
+                        const a = (g.away_team || '').toUpperCase();
+                        const gd = (g.gameday || g.date || '').substring(0, 10);
+                        if (h) teamGameMap[h] = { date: gd, opponent: a, matchup: `${h} vs ${a}` };
+                        if (a) teamGameMap[a] = { date: gd, opponent: h, matchup: `${a} @ ${h}` };
+                    });
+                    list.forEach(p => {
+                        const t = (p.team || '').toUpperCase();
+                        if (teamGameMap[t]) {
+                            p.date = teamGameMap[t].date;
+                            p.opponent = teamGameMap[t].opponent;
+                            p.matchup = teamGameMap[t].matchup;
+                        }
+                    });
+                }
+
+                globalFloorStreaks = list;
+
+                // Update active timeline display badge
+                const timelineEl = document.getElementById('floor-active-timeline-text');
+                if (timelineEl) {
+                    if (floorStartDate && floorEndDate) {
+                        timelineEl.textContent = `Stats Range: ${floorStartDate} to ${floorEndDate} • (${list.length} players found)`;
+                    } else if (floorStartDate) {
+                        timelineEl.textContent = `Stats Range: From ${floorStartDate} to Present • (${list.length} players)`;
+                    } else if (floorEndDate) {
+                        timelineEl.textContent = `Stats Range: Through ${floorEndDate} • (${list.length} players)`;
+                    } else {
+                        timelineEl.textContent = `Baseline window: All Available History (3 Years) • (${list.length} players)`;
+                    }
+                }
+
+                updateFloorKPIs(list);
+                renderFloorDateChips(allGames);
+                renderFloorStreaks(allGames);
+            } catch (err) {
+                console.error('Failed to load floor streaks:', err);
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-red-400">Error loading floor streaks: ${err.message}</td></tr>`;
+                }
+            } finally {
+                isFloorStreakLoading = false;
+            }
+        }
+
+        function updateFloorKPIs(players) {
+            const longestEl = document.getElementById('floor-kpi-longest');
+            const eliteEl = document.getElementById('floor-kpi-elite');
+            const solidEl = document.getElementById('floor-kpi-solid');
+            const devEl = document.getElementById('floor-kpi-breached');
+
+            if (!players || players.length === 0) {
+                if (longestEl) longestEl.innerHTML = '--';
+                if (eliteEl) eliteEl.textContent = '0 players';
+                if (solidEl) solidEl.textContent = '0 players';
+                if (devEl) devEl.textContent = '0 players';
+                return;
+            }
+
+            let longestPlayer = players[0];
+            for (const p of players) {
+                if ((p.Floor_Streak || 0) > (longestPlayer.Floor_Streak || 0)) {
+                    longestPlayer = p;
+                }
+            }
+            if (longestEl && longestPlayer) {
+                longestEl.innerHTML = `${longestPlayer.player_name} (${longestPlayer.team}) &bull; <span class="text-slate-100 font-bold">${longestPlayer.Floor_Streak} games</span>`;
+            }
+
+            const eliteCount = players.filter(p => (p.Floor_Streak || 0) >= 8).length;
+            if (eliteEl) eliteEl.textContent = `${eliteCount} players`;
+
+            const solidCount = players.filter(p => (p.Floor_Streak || 0) >= 5 && (p.Floor_Streak || 0) < 8).length;
+            if (solidEl) solidEl.textContent = `${solidCount} players`;
+
+            const devCount = players.filter(p => (p.Floor_Streak || 0) >= 1 && (p.Floor_Streak || 0) < 5).length;
+            if (devEl) devEl.textContent = `${devCount} players`;
+        }
+
+        function renderFloorDateChips(games = []) {
+            const container = document.getElementById('floor-date-chips');
+            if (!container) return;
+
+            const dateCounts = {};
+            const teamDates = {};
+            games.forEach(g => {
+                const d = (g.gameday || g.date || '').substring(0, 10);
+                if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+                    if (g.home_team) teamDates[g.home_team.toUpperCase()] = d;
+                    if (g.away_team) teamDates[g.away_team.toUpperCase()] = d;
+                    if (!dateCounts[d]) dateCounts[d] = 0;
+                }
+            });
+
+            (globalFloorStreaks || []).forEach(p => {
+                const t = (p.team || '').toUpperCase();
+                const d = teamDates[t] || (p.date || '').substring(0, 10);
+                if (d && dateCounts.hasOwnProperty(d)) {
+                    dateCounts[d] = (dateCounts[d] || 0) + 1;
+                }
+            });
+
+            const uniqueDates = Object.keys(dateCounts).sort();
+            const totalCount = globalFloorStreaks.length;
+            let html = `<button id="btn-floor-all-dates" onclick="clearFloorDateFilter()" class="chip ${!floorSelectedDate ? 'bg-[#30363d] text-slate-100 font-bold' : 'text-slate-400 hover:text-slate-200'} text-[11px] py-0.5 px-2.5 rounded shrink-0 transition" title="Show all dates">All (${totalCount})</button>`;
+
+            uniqueDates.forEach(d => {
+                const count = dateCounts[d] || 0;
+                const dateObj = new Date(d + 'T00:00:00Z');
+                const label = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+                const isActive = floorSelectedDate === d;
+                html += `<button onclick="onFloorDateChange('${d}')" class="chip ${isActive ? 'bg-[#30363d] text-emerald-400 font-bold border border-emerald-500/50' : 'text-slate-400 hover:text-slate-200'} text-[11px] py-0.5 px-2.5 rounded shrink-0 transition" title="${label}: ${count} player${count === 1 ? '' : 's'}">${label} (${count})</button>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function onFloorDateChange(date) {
+            floorSelectedDate = date || '';
+            const datePicker = document.getElementById('floor-date-picker');
+            if (datePicker) {
+                datePicker.value = floorSelectedDate;
+            }
+            renderFloorDateChips();
+            renderFloorStreaks();
+        }
+
+        function clearFloorDateFilter() {
+            floorSelectedDate = '';
+            const datePicker = document.getElementById('floor-date-picker');
+            if (datePicker) {
+                datePicker.value = '';
+            }
+            renderFloorDateChips();
+            renderFloorStreaks();
+        }
+
+        function renderFloorStreaks(games = []) {
+            const tbody = document.getElementById('floor-streak-table-body');
+            const countEl = document.getElementById('floor-visible-count');
+            if (!tbody) return;
+
+            let filtered = [...globalFloorStreaks];
+
+            // Filter by Selected Game Date
+            if (floorSelectedDate) {
+                filtered = filtered.filter(p => {
+                    const pDate = (p.date || '').substring(0, 10);
+                    return pDate === floorSelectedDate;
+                });
+            }
+
+            // Filter by Position
+            if (floorFilterPos && floorFilterPos !== 'ALL') {
+                filtered = filtered.filter(p => (p.position || '').toUpperCase() === floorFilterPos);
+            }
+
+            // Filter by Min Streak
+            const minStreak = parseInt(floorFilterStreak || 0, 10);
+            if (minStreak > 0) {
+                filtered = filtered.filter(p => (p.Floor_Streak || 0) >= minStreak);
+            }
+
+            // Filter by Search Query
+            if (floorSearchQuery) {
+                const q = floorSearchQuery.toLowerCase().trim();
+                filtered = filtered.filter(p =>
+                    (p.player_name || '').toLowerCase().includes(q) ||
+                    (p.team || '').toLowerCase().includes(q)
+                );
+            }
+
+            // Sort
+            filtered.sort((a, b) => {
+                let vA = a[floorSortCol];
+                let vB = b[floorSortCol];
+                if (typeof vA === 'string') vA = vA.toLowerCase();
+                if (typeof vB === 'string') vB = vB.toLowerCase();
+                if (vA < vB) return floorSortAsc ? -1 : 1;
+                if (vA > vB) return floorSortAsc ? 1 : -1;
+                return 0;
+            });
+
+            if (countEl) countEl.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="py-12 text-center text-slate-500">
+                            <i data-lucide="inbox" class="w-6 h-6 mx-auto mb-2 text-slate-600"></i>
+                            <p class="font-medium">No players match the current filters.</p>
+                            <p class="text-[11px] text-slate-600 mt-1">Try clearing the date filter or lowering the streak threshold.</p>
+                        </td>
+                    </tr>
+                `;
+                if (window.lucide) lucide.createIcons({ root: tbody });
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((p, idx) => {
+                const streak = p.Floor_Streak || 0;
+                let tierBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">Developing</span>';
+                if (streak >= 8) {
+                    tierBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950/80 text-emerald-400 border border-emerald-800 font-bold">Elite (8+)</span>';
+                } else if (streak >= 5) {
+                    tierBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-950/80 text-blue-400 border border-blue-800 font-semibold">Solid (5-7)</span>';
+                }
+
+                const marginPct = Math.round((p.Margin_Used || 0.30) * 100);
+                const statLabel = p.position === 'QB' ? 'Passing Yards' : (p.position === 'RB' ? 'Rushing Yards' : 'Receiving Yards');
+
+                return `
+                    <tr class="hover:bg-[#21262d]/50 transition">
+                        <td class="text-center font-mono text-slate-500 py-2.5 px-3">${idx + 1}</td>
+                        <td class="py-2.5 px-3">
+                            <div class="font-semibold text-slate-100">${p.player_name || 'Unknown'}</div>
+                            ${p.matchup ? `<div class="text-[10px] text-slate-500 font-mono">${p.matchup}${p.date ? ' • ' + p.date : ''}</div>` : ''}
+                        </td>
+                        <td class="text-center font-mono font-bold text-slate-300 py-2.5 px-3">${p.position || '--'}</td>
+                        <td class="text-center font-mono font-bold text-slate-300 py-2.5 px-3">${p.team || '--'}</td>
+                        <td class="py-2.5 px-3 text-slate-400">${statLabel}</td>
+                        <td class="text-right font-mono font-semibold text-slate-200 py-2.5 px-3">${p.Baseline_Median != null ? p.Baseline_Median : '--'}</td>
+                        <td class="text-center font-mono text-slate-400 py-2.5 px-3">-${marginPct}%</td>
+                        <td class="text-right font-mono font-bold text-emerald-400 py-2.5 px-3">${p.Floor_Threshold != null ? p.Floor_Threshold : '--'}</td>
+                        <td class="text-center font-mono font-bold text-slate-100 py-2.5 px-3">
+                            <span class="inline-block px-2 py-0.5 rounded bg-[#161b22] border border-[#30363d]">${streak}</span>
+                        </td>
+                        <td class="text-center py-2.5 px-3">${tierBadge}</td>
+                        <td class="text-center font-mono text-slate-400 py-2.5 px-3">${p.Games_Played || '--'}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons({ root: tbody });
+        }
+
+        function sortFloorStreaks(col) {
+            if (floorSortCol === col) {
+                floorSortAsc = !floorSortAsc;
+            } else {
+                floorSortCol = col;
+                floorSortAsc = (col === 'player_name' || col === 'team' || col === 'position');
+            }
+            renderFloorStreaks();
+        }
+
+        function setFloorPosFilter(pos) {
+            floorFilterPos = pos;
+            ['ALL', 'QB', 'RB', 'WR', 'TE'].forEach(p => {
+                const btn = document.getElementById(`floor-filter-pos-${p}`);
+                if (btn) {
+                    if (p === pos) {
+                        btn.className = 'px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold';
+                    } else {
+                        btn.className = 'px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium';
+                    }
+                }
+            });
+            renderFloorStreaks();
+        }
+
+        function setFloorStreakFilter(val) {
+            floorFilterStreak = val;
+            renderFloorStreaks();
+        }
+
+        function setFloorMinGamesFilter(val) {
+            floorFilterMinGames = val;
+            loadFloorStreakTab();
+        }
+
+        function onFloorSearch(query) {
+            floorSearchQuery = query || '';
+            renderFloorStreaks();
+        }
+
+        function setFloorHistoryPreset(preset) {
+            floorDatePreset = preset;
+            document.querySelectorAll('[id^="floor-preset-"]').forEach(btn => btn.classList.remove('active', 'bg-[#30363d]', 'text-slate-100'));
+            const btn = document.getElementById(`floor-preset-${preset}`);
+            if (btn) btn.classList.add('active', 'bg-[#30363d]', 'text-slate-100');
+
+            const startInput = document.getElementById('floor-start-date');
+            const endInput = document.getElementById('floor-end-date');
+            const todayStr = new Date().toISOString().substring(0, 10);
+            const today = new Date(todayStr + 'T00:00:00Z');
+
+            if (preset === 'season26') {
+                floorStartDate = '2026-09-01';
+                floorEndDate = todayStr;
+            } else if (preset === 'all') {
+                floorStartDate = '';
+                floorEndDate = '';
+            } else if (preset === '1y') {
+                const d = new Date(today);
+                d.setFullYear(d.getFullYear() - 1);
+                floorStartDate = d.toISOString().substring(0, 10);
+                floorEndDate = todayStr;
+            } else if (preset === '2025') {
+                floorStartDate = '2025-09-01';
+                floorEndDate = '2026-01-15';
+            } else if (preset === '8w') {
+                const d = new Date(today);
+                d.setDate(d.getDate() - 56);
+                floorStartDate = d.toISOString().substring(0, 10);
+                floorEndDate = todayStr;
+            } else if (preset === '4w') {
+                const d = new Date(today);
+                d.setDate(d.getDate() - 28);
+                floorStartDate = d.toISOString().substring(0, 10);
+                floorEndDate = todayStr;
+            } else if (preset === 'custom') {
+                if (startInput) startInput.focus();
+                return;
+            }
+
+            if (startInput) startInput.value = floorStartDate;
+            if (endInput) endInput.value = floorEndDate;
+
+            loadFloorStreakTab();
+        }
+
+        function onFloorDateRangeInputChange() {
+            const startInput = document.getElementById('floor-start-date');
+            const endInput = document.getElementById('floor-end-date');
+            floorStartDate = startInput?.value || '';
+            floorEndDate = endInput?.value || '';
+            floorDatePreset = 'custom';
+            document.querySelectorAll('[id^="floor-preset-"]').forEach(btn => btn.classList.remove('active', 'bg-[#30363d]', 'text-slate-100'));
+            const customBtn = document.getElementById('floor-preset-custom');
+            if (customBtn) customBtn.classList.add('active', 'bg-[#30363d]', 'text-slate-100');
+            loadFloorStreakTab();
+        }
+
+        function clearFloorHistoryRange() {
+            setFloorHistoryPreset('season26');
         }
     </script>
 </body>

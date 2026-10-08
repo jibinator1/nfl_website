@@ -2455,9 +2455,16 @@ FLOOR_STAT_MAP = {
 FLOOR_WINDOW = 8
 
 
-def compute_floor_streak_df(weekly_df: pd.DataFrame, rosters_df: pd.DataFrame = None) -> pd.DataFrame:
+def compute_floor_streak_df(
+    weekly_df: pd.DataFrame,
+    rosters_df: pd.DataFrame = None,
+    start_date: str = None,
+    end_date: str = None,
+    season: int = None
+) -> pd.DataFrame:
     """
     Computes the Player Floor Breach Streak for all players against a hard floor threshold line.
+    Supports filtering by stats history window (start_date, end_date) and season.
 
     Algorithm per player-position:
     1. Sort games chronologically.
@@ -2472,6 +2479,16 @@ def compute_floor_streak_df(weekly_df: pd.DataFrame, rosters_df: pd.DataFrame = 
         return pd.DataFrame()
 
     df = weekly_df.copy()
+    if start_date and 'gameday' in df.columns:
+        df = df[df['gameday'] >= str(start_date)]
+    if end_date and 'gameday' in df.columns:
+        df = df[df['gameday'] <= str(end_date)]
+    if season and 'season' in df.columns:
+        df = df[df['season'] == int(season)]
+
+    if df.empty:
+        return pd.DataFrame()
+
     df = df.sort_values(['player_id', 'season', 'week']).reset_index(drop=True)
 
     # Lookup currently active players from official rosters if available
