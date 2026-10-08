@@ -376,20 +376,6 @@
 
                     <!-- Filter Controls (Mobile Responsive) -->
                     <div class="flex flex-wrap items-center gap-2">
-                        <!-- Stats Date Range -->
-                        <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2 py-1.5 text-xs w-full sm:w-auto justify-between sm:justify-start">
-                            <div class="flex items-center space-x-1">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                                <span class="text-[11px] text-slate-400 font-medium">Stats:</span>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                <span class="text-slate-400 font-medium text-[10px] sm:text-[11px]">From:</span>
-                                <input type="date" id="sched-start-date" onchange="onScheduleDateRangeChange()" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-1.5 py-0.5 outline-none focus:border-slate-500 font-mono text-[11px] sm:text-xs cursor-pointer">
-                                <span class="text-slate-400 font-medium text-[10px] sm:text-[11px]">To:</span>
-                                <input type="date" id="sched-end-date" onchange="onScheduleDateRangeChange()" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-1.5 py-0.5 outline-none focus:border-slate-500 font-mono text-[11px] sm:text-xs cursor-pointer">
-                            </div>
-                        </div>
-
                         <!-- Season & Team Selectors -->
                         <div class="flex items-center gap-2 flex-1 sm:flex-initial">
                             <div class="flex items-center space-x-1.5 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1.5 flex-1 sm:flex-initial">
@@ -510,12 +496,8 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const startInput = document.getElementById('input-start-date');
             const endInput = document.getElementById('input-end-date');
-            const schedStart = document.getElementById('sched-start-date');
-            const schedEnd = document.getElementById('sched-end-date');
             if (startInput) startInput.value = startDate;
             if (endInput) endInput.value = endDate;
-            if (schedStart) schedStart.value = startDate;
-            if (schedEnd) schedEnd.value = endDate;
 
             lucide.createIcons();
             populateScheduleTeams();
@@ -832,10 +814,6 @@
         function onDateRangeChange() {
             startDate = document.getElementById('input-start-date').value;
             endDate = document.getElementById('input-end-date').value;
-            const schedStart = document.getElementById('sched-start-date');
-            const schedEnd = document.getElementById('sched-end-date');
-            if (schedStart) schedStart.value = startDate;
-            if (schedEnd) schedEnd.value = endDate;
 
             if (startDate === endDate) {
                 propsDate = startDate;
@@ -849,26 +827,6 @@
             if (activeFloor && !activeFloor.classList.contains('hidden')) {
                 loadFloorStreakTab();
             }
-        }
-
-        function onScheduleDateRangeChange() {
-            const schedStart = document.getElementById('sched-start-date');
-            const schedEnd = document.getElementById('sched-end-date');
-            if (schedStart && schedStart.value) startDate = schedStart.value;
-            if (schedEnd && schedEnd.value) endDate = schedEnd.value;
-
-            const startInput = document.getElementById('input-start-date');
-            const endInput = document.getElementById('input-end-date');
-            if (startInput) startInput.value = startDate;
-            if (endInput) endInput.value = endDate;
-
-            if (startDate === endDate) {
-                propsDate = startDate;
-                const pInput = document.getElementById('input-props-date');
-                if (pInput) pInput.value = propsDate;
-            }
-            updateGameHeaders();
-            reloadAllData();
         }
 
         function updateGameHeaders() {
