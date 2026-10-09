@@ -2529,7 +2529,38 @@ def compute_floor_streak_df(
         if stat_col not in player_df.columns:
             continue
 
-        # Determine target season for current season median baseline
+        production = pd.to_numeric(player_df[stat_col], errors='coerce').fillna(0.0)
+
+        # Calculate trailing baseline and breaches game by game
+        breaches = []
+        thresholds = []
+        for i in range(len(player_df)):
+            sub_prod = production.iloc[:i]
+            if len(sub_prod) >= 2:
+                rolling_base = float(sub_prod.tail(FLOOR_WINDOW).median())
+            elif len(sub_prod) == 1:
+                rolling_base = float(sub_prod.iloc[0])
+            else:
+                rolling_base = float(production.iloc[i])
+            g_thresh = round((1.0 - margin) * rolling_base, 1)
+            thresholds.append(g_thresh)
+            actual = float(production.iloc[i])
+            passed = (actual >= g_thresh) and (actual >= 10.0)
+            breaches.append(not passed)
+
+        # Active unbroken streak from most recent game
+        streak = 0
+        for b in reversed(breaches):
+            if not b:
+                streak += 1
+            else:
+                break
+
+        # Must have reached the floor threshold in their most recent game
+        if streak < 1:
+            continue
+
+        # Determine target season for current season median baseline display
         target_season = int(season) if season else (int(weekly_df['season'].max()) if ('season' in weekly_df.columns and not weekly_df.empty) else 2026)
 
         # Baseline median is strictly the player's current season median
@@ -2544,34 +2575,17 @@ def compute_floor_streak_df(
         if baseline_med < 10.0:
             continue
 
-        # Fixed set hard line threshold across all games for this player
+        # Set upcoming hard line threshold for the current baseline
         set_threshold = round((1.0 - margin) * baseline_med, 1)
 
-        # Evaluate streak across all games played in player_df (including prior season)
-        production = pd.to_numeric(player_df[stat_col], errors='coerce').fillna(0.0)
-
-        # Hard line threshold breach check: every game in streak must pass set_threshold
-        breach = (production < set_threshold) | (production < 10.0)
-
-        # Count consecutive no-breach games from end of history
-        streak = 0
-        for b in reversed(breach.values):
-            if not b:  # reached floor
-                streak += 1
-            else:
-                break
-
-        # Must have reached the floor threshold in their most recent game
-        if streak < 1:
-            continue
-
-        if streak < len(breach):
-            b_idx = len(breach) - 1 - streak
+        if streak < len(breaches):
+            b_idx = len(breaches) - 1 - streak
             b_row = player_df.iloc[b_idx]
             b_season = b_row.get('season', '')
             b_week = b_row.get('week', '')
             b_val = round(float(production.iloc[b_idx]), 1)
-            last_breach_desc = f"{b_season} W{b_week} ({b_val} yds < {set_threshold} yds floor)"
+            b_thresh = thresholds[b_idx]
+            last_breach_desc = f"{b_season} W{b_week} ({b_val} yds < {b_thresh} yds floor)"
             last_breach_short = f"{b_season} W{b_week}"
         else:
             last_breach_desc = "None in record"
