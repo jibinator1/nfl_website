@@ -2215,7 +2215,7 @@
                 }
 
                 const marginPct = Math.round((p.Margin_Used || 0.30) * 100);
-                const statLabel = p.position === 'QB' ? 'Passing Yards' : (p.position === 'RB' ? 'Rushing Yards' : 'Receiving Yards');
+                const statLabel = p.Floor_Stat === 'passing_yards' ? 'Passing Yards' : (p.Floor_Stat === 'rushing_yards' ? 'Rushing Yards' : (p.position === 'QB' ? 'Passing Yards' : (p.position === 'RB' ? 'Rushing Yards' : 'Receiving Yards')));
 
                 return `
                     <tr class="hover:bg-[#21262d]/50 transition">

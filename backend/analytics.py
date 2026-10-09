@@ -2446,7 +2446,7 @@ FLOOR_MARGINS = {
 }
 
 FLOOR_STAT_MAP = {
-    'QB': 'rushing_yards',
+    'QB': 'passing_yards',
     'RB': 'rushing_yards',
     'WR': 'receiving_yards',
     'TE': 'receiving_yards',
