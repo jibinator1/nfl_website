@@ -1498,18 +1498,13 @@
             lucide.createIcons();
         }
 
-        function getRankBadge(rank, highIsGood = true) {
+        function getRankBadge(rank) {
             if (rank == null) return '';
             const r = parseInt(rank, 10);
             if (isNaN(r)) return '';
-            if (!highIsGood) {
-                if (r <= 8) return 'rank-bot';
-                if (r >= 25) return 'rank-top';
-                return 'rank-mid';
-            }
-            if (r <= 8) return 'rank-top';
-            if (r >= 25) return 'rank-bot';
-            return 'rank-mid';
+            if (r <= 8) return 'rank-top';   // Top 8 (#1 to #8) = Best (Green)
+            if (r >= 25) return 'rank-bot';  // Bottom 8 (#25 to #32) = Worst (Red)
+            return 'rank-mid';               // Mid 16 (#9 to #24) = Average (Blue)
         }
 
         function renderGameCardHtml(g) {
@@ -1607,11 +1602,11 @@
             };
 
             // Helpers for formatting stat rows with responsive hover explanations
-            const formatRow = (label, awayVal, awayRank, homeVal, homeRank, highIsGood = true, awayN = null, homeN = null) => {
+            const formatRow = (label, awayVal, awayRank, homeVal, homeRank, awayN = null, homeN = null) => {
                 const awayNTag = awayN != null ? `<span class="text-[9px] text-slate-500 font-mono ml-0.5">(n=${awayN})</span>` : '';
                 const homeNTag = homeN != null ? `<span class="text-[9px] text-slate-500 font-mono mr-0.5">(n=${homeN})</span>` : '';
-                const awayBadge = awayRank ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${getRankBadge(awayRank, highIsGood)}">#${awayRank}</span>` : '';
-                const homeBadge = homeRank ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${getRankBadge(homeRank, highIsGood)}">#${homeRank}</span>` : '';
+                const awayBadge = awayRank ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${getRankBadge(awayRank)}">#${awayRank}</span>` : '';
+                const homeBadge = homeRank ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-semibold ${getRankBadge(homeRank)}">#${homeRank}</span>` : '';
                 
                 const explanation = STAT_EXPLANATIONS[label] || '';
 
@@ -1743,39 +1738,39 @@
                         </div>
 
                         <!-- 1. Scoring (Vegas Implied Total) -->
-                        ${g.implied_away_total != null || g.implied_home_total != null ? formatRow('Vegas Implied Total', fmt1Dec(g.implied_away_total), null, fmt1Dec(g.implied_home_total), null, true) : ''}
+                        ${g.implied_away_total != null || g.implied_home_total != null ? formatRow('Vegas Implied Total', fmt1Dec(g.implied_away_total), null, fmt1Dec(g.implied_home_total), null) : ''}
 
                         <!-- 2. Passing: Volume & Game-Script-Neutral Intent -->
-                        ${formatRow('Pass Att/G', fmt1Dec(a.pass_att_per_game), a.rank_pass_att, fmt1Dec(h.pass_att_per_game), h.rank_pass_att, true, a.games_played, h.games_played)}
-                        ${formatRow('Pass Yds Allowed/G', fmt1Dec(a.pass_yds_allowed_per_game), a.rank_pass_allowed, fmt1Dec(h.pass_yds_allowed_per_game), h.rank_pass_allowed, false)}
-                        ${a.proe != null || h.proe != null ? formatRow('PROE (Neutral Pass Intent)', fmtSignedPct(a.proe), a.rank_proe, fmtSignedPct(h.proe), h.rank_proe, true, a.neutral_plays_sample, h.neutral_plays_sample) : ''}
+                        ${formatRow('Pass Att/G', fmt1Dec(a.pass_att_per_game), a.rank_pass_att, fmt1Dec(h.pass_att_per_game), h.rank_pass_att, a.games_played, h.games_played)}
+                        ${formatRow('Pass Yds Allowed/G', fmt1Dec(a.pass_yds_allowed_per_game), a.rank_pass_allowed, fmt1Dec(h.pass_yds_allowed_per_game), h.rank_pass_allowed)}
+                        ${a.proe != null || h.proe != null ? formatRow('PROE (Neutral Pass Intent)', fmtSignedPct(a.proe), a.rank_proe, fmtSignedPct(h.proe), h.rank_proe, a.neutral_plays_sample, h.neutral_plays_sample) : ''}
 
                         <!-- 3. Passing: Efficiency & Explosiveness (20+ Yd Chunk Plays) -->
-                        ${formatRow('YPA (Offense)', fmt1Dec(a.yds_per_att), a.rank_ypa, fmt1Dec(h.yds_per_att), h.rank_ypa, true)}
-                        ${formatRow('YPA Allowed', fmt1Dec(a.opp_yds_per_att), a.rank_opp_ypa, fmt1Dec(h.opp_yds_per_att), h.rank_opp_ypa, false)}
-                        ${a.exp_pass_rate != null || h.exp_pass_rate != null ? formatRow('Explosive Pass Rate (20+ yds)', fmtPct(a.exp_pass_rate), a.rank_exp_pass_rate, fmtPct(h.exp_pass_rate), h.rank_exp_pass_rate, true, a.total_pass_att_sample, h.total_pass_att_sample) : ''}
-                        ${a.opp_exp_pass_rate != null || h.opp_exp_pass_rate != null ? formatRow('Opp Explosive Pass Allowed', fmtPct(a.opp_exp_pass_rate), a.rank_opp_exp_pass_rate, fmtPct(h.opp_exp_pass_rate), h.rank_opp_exp_pass_rate, false, a.opp_pass_att_sample, h.opp_pass_att_sample) : ''}
+                        ${formatRow('YPA (Offense)', fmt1Dec(a.yds_per_att), a.rank_ypa, fmt1Dec(h.yds_per_att), h.rank_ypa)}
+                        ${formatRow('YPA Allowed', fmt1Dec(a.opp_yds_per_att), a.rank_opp_ypa, fmt1Dec(h.opp_yds_per_att), h.rank_opp_ypa)}
+                        ${a.exp_pass_rate != null || h.exp_pass_rate != null ? formatRow('Explosive Pass Rate (20+ yds)', fmtPct(a.exp_pass_rate), a.rank_exp_pass_rate, fmtPct(h.exp_pass_rate), h.rank_exp_pass_rate, a.total_pass_att_sample, h.total_pass_att_sample) : ''}
+                        ${a.opp_exp_pass_rate != null || h.opp_exp_pass_rate != null ? formatRow('Opp Explosive Pass Allowed', fmtPct(a.opp_exp_pass_rate), a.rank_opp_exp_pass_rate, fmtPct(h.opp_exp_pass_rate), h.rank_opp_exp_pass_rate, a.opp_pass_att_sample, h.opp_pass_att_sample) : ''}
 
                         <!-- 4. Rushing: Volume -->
-                        ${formatRow('Carries/G', fmt1Dec(a.carries_per_game), a.rank_carries, fmt1Dec(h.carries_per_game), h.rank_carries, true, a.games_played, h.games_played)}
-                        ${formatRow('Rush Yds Allowed/G', fmt1Dec(a.rush_yds_allowed_per_game), a.rank_rush_allowed, fmt1Dec(h.rush_yds_allowed_per_game), h.rank_rush_allowed, false)}
+                        ${formatRow('Carries/G', fmt1Dec(a.carries_per_game), a.rank_carries, fmt1Dec(h.carries_per_game), h.rank_carries, a.games_played, h.games_played)}
+                        ${formatRow('Rush Yds Allowed/G', fmt1Dec(a.rush_yds_allowed_per_game), a.rank_rush_allowed, fmt1Dec(h.rush_yds_allowed_per_game), h.rank_rush_allowed)}
 
                         <!-- 5. Rushing: Efficiency -->
-                        ${formatRow('YPC (Offense)', fmt1Dec(a.yds_per_carry), a.rank_ypc, fmt1Dec(h.yds_per_carry), h.rank_ypc, true)}
-                        ${formatRow('YPC Allowed', fmt1Dec(a.opp_yds_per_carry), a.rank_opp_ypc, fmt1Dec(h.opp_yds_per_carry), h.rank_opp_ypc, false)}
+                        ${formatRow('YPC (Offense)', fmt1Dec(a.yds_per_carry), a.rank_ypc, fmt1Dec(h.yds_per_carry), h.rank_ypc)}
+                        ${formatRow('YPC Allowed', fmt1Dec(a.opp_yds_per_carry), a.rank_opp_ypc, fmt1Dec(h.opp_yds_per_carry), h.rank_opp_ypc)}
 
                         <!-- 6. Defense vs Positional Roles (RB1, RB2, WR1, WR2, TE1, TE2) -->
-                        ${a.def_star_rb_diff != null || h.def_star_rb_diff != null ? formatRow('vs RB1s', fmtDiffYds(a.def_star_rb_diff), a.rank_def_star_rb, fmtDiffYds(h.def_star_rb_diff), h.rank_def_star_rb, false) : ''}
-                        ${a.def_rb2_diff != null || h.def_rb2_diff != null ? formatRow('vs RB2s', fmtDiffYds(a.def_rb2_diff), a.rank_def_rb2, fmtDiffYds(h.def_rb2_diff), h.rank_def_rb2, false) : ''}
-                        ${a.def_star_wr_diff != null || h.def_star_wr_diff != null ? formatRow('vs WR1s', fmtDiffYds(a.def_star_wr_diff), a.rank_def_star_wr, fmtDiffYds(h.def_star_wr_diff), h.rank_def_star_wr, false) : ''}
-                        ${a.def_wr2_diff != null || h.def_wr2_diff != null ? formatRow('vs WR2s', fmtDiffYds(a.def_wr2_diff), a.rank_def_wr2, fmtDiffYds(h.def_wr2_diff), h.rank_def_wr2, false) : ''}
-                        ${a.def_te1_diff != null || h.def_te1_diff != null ? formatRow('vs TE1s', fmtDiffYds(a.def_te1_diff), a.rank_def_te1, fmtDiffYds(h.def_te1_diff), h.rank_def_te1, false) : ''}
-                        ${a.def_te2_diff != null || h.def_te2_diff != null ? formatRow('vs TE2s', fmtDiffYds(a.def_te2_diff), a.rank_def_te2, fmtDiffYds(h.def_te2_diff), h.rank_def_te2, false) : ''}
+                        ${a.def_star_rb_diff != null || h.def_star_rb_diff != null ? formatRow('vs RB1s', fmtDiffYds(a.def_star_rb_diff), a.rank_def_star_rb, fmtDiffYds(h.def_star_rb_diff), h.rank_def_star_rb) : ''}
+                        ${a.def_rb2_diff != null || h.def_rb2_diff != null ? formatRow('vs RB2s', fmtDiffYds(a.def_rb2_diff), a.rank_def_rb2, fmtDiffYds(h.def_rb2_diff), h.rank_def_rb2) : ''}
+                        ${a.def_star_wr_diff != null || h.def_star_wr_diff != null ? formatRow('vs WR1s', fmtDiffYds(a.def_star_wr_diff), a.rank_def_star_wr, fmtDiffYds(h.def_star_wr_diff), h.rank_def_star_wr) : ''}
+                        ${a.def_wr2_diff != null || h.def_wr2_diff != null ? formatRow('vs WR2s', fmtDiffYds(a.def_wr2_diff), a.rank_def_wr2, fmtDiffYds(h.def_wr2_diff), h.rank_def_wr2) : ''}
+                        ${a.def_te1_diff != null || h.def_te1_diff != null ? formatRow('vs TE1s', fmtDiffYds(a.def_te1_diff), a.rank_def_te1, fmtDiffYds(h.def_te1_diff), h.rank_def_te1) : ''}
+                        ${a.def_te2_diff != null || h.def_te2_diff != null ? formatRow('vs TE2s', fmtDiffYds(a.def_te2_diff), a.rank_def_te2, fmtDiffYds(h.def_te2_diff), h.rank_def_te2) : ''}
 
                         <!-- 7. Trenches: Pressure Generation & Pass Protection Leak -->
-                        ${a.pressure_rate_generated != null || h.pressure_rate_generated != null ? formatRow('Def Pressure Rate Gen', fmtPct(a.pressure_rate_generated), a.rank_pressure_rate_generated, fmtPct(h.pressure_rate_generated), h.rank_pressure_rate_generated, true, a.opp_pass_att_sample, h.opp_pass_att_sample) : ''}
-                        ${a.pressure_rate_allowed != null || h.pressure_rate_allowed != null ? formatRow('Pass Pro Pressure Allowed', fmtPct(a.pressure_rate_allowed), a.rank_pressure_rate_allowed, fmtPct(h.pressure_rate_allowed), h.rank_pressure_rate_allowed, false, a.total_pass_att_sample, h.total_pass_att_sample) : ''}
-                        ${formatRow('Sacks Generated/G', fmt1Dec(a.sacks_forced_per_game), a.rank_sacks_forced, fmt1Dec(h.sacks_forced_per_game), h.rank_sacks_forced, true)}
+                        ${a.pressure_rate_generated != null || h.pressure_rate_generated != null ? formatRow('Def Pressure Rate Gen', fmtPct(a.pressure_rate_generated), a.rank_pressure_rate_generated, fmtPct(h.pressure_rate_generated), h.rank_pressure_rate_generated, a.opp_pass_att_sample, h.opp_pass_att_sample) : ''}
+                        ${a.pressure_rate_allowed != null || h.pressure_rate_allowed != null ? formatRow('Pass Pro Pressure Allowed', fmtPct(a.pressure_rate_allowed), a.rank_pressure_rate_allowed, fmtPct(h.pressure_rate_allowed), h.rank_pressure_rate_allowed, a.total_pass_att_sample, h.total_pass_att_sample) : ''}
+                        ${formatRow('Sacks Generated/G', fmt1Dec(a.sacks_forced_per_game), a.rank_sacks_forced, fmt1Dec(h.sacks_forced_per_game), h.rank_sacks_forced)}
                     </div>
 
                     <!-- Pass / Run Opportunity Funnel Card (Scaled by Pace & Vegas Total) -->
