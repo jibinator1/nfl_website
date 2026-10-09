@@ -2460,20 +2460,12 @@ def compute_floor_streak_df(
     rosters_df: pd.DataFrame = None,
     start_date: str = None,
     end_date: str = None,
-    season: int = None
+    season: int = None,
+    margin: float = None
 ) -> pd.DataFrame:
     """
     Computes the Player Floor Breach Streak for all players against a hard floor threshold line.
-    Supports filtering by stats history window (start_date, end_date) and season.
-
-    Algorithm per player-position:
-    1. Sort games chronologically.
-    2. Compute trailing baseline median of the primary production stat
-       (lagged by 1 so the current game is not included — strict leakage prevention).
-    3. Establish a fixed hard threshold line: set_threshold = (1 - margin) * baseline_median.
-    4. A "floor breach" occurs when actual production < set_threshold (or actual < 10 yards).
-       All X games in the streak must pass this fixed hard threshold line, not dynamic thresholds relative to each historical game.
-    5. Count consecutive games (most-recent streak) WITHOUT a breach as Floor_Streak.
+    Supports filtering by stats history window (start_date, end_date), season, and custom floor margin.
     """
     if weekly_df is None or weekly_df.empty:
         return pd.DataFrame()
@@ -2524,7 +2516,7 @@ def compute_floor_streak_df(
             continue
 
         stat_col = FLOOR_STAT_MAP.get(pos, 'receiving_yards')
-        margin = FLOOR_MARGINS.get(pos, 0.30)
+        margin_val = float(margin) if margin is not None else FLOOR_MARGINS.get(pos, 0.30)
 
         if stat_col not in player_df.columns:
             continue
@@ -2545,7 +2537,7 @@ def compute_floor_streak_df(
             continue
 
         # Hard floor threshold line across all games for this player
-        set_threshold = round((1.0 - margin) * baseline_med, 1)
+        set_threshold = round((1.0 - margin_val) * baseline_med, 1)
 
         # Evaluate streak across all games played in player_df against set_threshold
         production = pd.to_numeric(player_df[stat_col], errors='coerce').fillna(0.0)
@@ -2585,7 +2577,7 @@ def compute_floor_streak_df(
             'Floor_Streak': streak,
             'Baseline_Median': round(baseline_med, 1),
             'Floor_Threshold': set_threshold,
-            'Margin_Used': margin,
+            'Margin_Used': margin_val,
             'Floor_Stat': stat_col,
             'Games_Played': len(player_df),
             'Last_Breach': last_breach_desc,

@@ -293,13 +293,14 @@ async def get_floor_streak_endpoint(
     date: str = Query(None, description="Filter by upcoming game date (YYYY-MM-DD)"),
     start_date: str = Query(None, description="Start date for stats history window (YYYY-MM-DD)"),
     end_date: str = Query(None, description="End date for stats history window (YYYY-MM-DD)"),
+    margin: float = Query(None, description="Custom floor margin percentage (e.g. 0.30 for -30%)"),
     min_streak: int = Query(0, description="Minimum floor streak to include"),
     min_games: int = Query(4, description="Minimum games played to include player"),
 ):
     """
     Returns the Player Floor Breach Streak for all tracked players against a hard floor threshold line.
     Streak = consecutive most-recent games meeting or exceeding the hard floor threshold line ((1 - margin) × baseline median).
-    Position-specific margins: QB=30%, RB=30%, WR=30%, TE=30%.
+    Position-specific margins: QB=30%, RB=30%, WR=30%, TE=30% (or custom margin).
     """
     ensure_data_loaded()
     try:
@@ -307,7 +308,8 @@ async def get_floor_streak_endpoint(
             engine.weekly,
             start_date=start_date,
             end_date=end_date,
-            season=season
+            season=season,
+            margin=margin
         )
         if df.empty:
             return {

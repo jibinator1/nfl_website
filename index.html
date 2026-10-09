@@ -318,6 +318,21 @@
                             <option value="12">12+ Games</option>
                         </select>
                     </div>
+
+                    <!-- Floor Margin Filter -->
+                    <div class="flex items-center gap-1.5 text-xs text-slate-400 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1">
+                        <span class="text-[11px] font-medium">Floor Margin:</span>
+                        <select id="floor-margin-filter-select" onchange="setFloorMarginFilter(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-medium cursor-pointer">
+                            <option value="0.10">-10% (Tight)</option>
+                            <option value="0.15">-15%</option>
+                            <option value="0.20">-20%</option>
+                            <option value="0.25">-25%</option>
+                            <option value="0.30" selected>-30% (Standard)</option>
+                            <option value="0.35">-35%</option>
+                            <option value="0.40">-40%</option>
+                            <option value="0.50">-50% (Wide)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="text-xs text-slate-400 font-mono">
@@ -1840,9 +1855,11 @@
         let globalFloorStreaks = [];
         let isFloorStreakLoading = false;
         let floorSelectedDate = '';
+        let floorDateInitialized = false;
         let floorFilterPos = 'ALL';
         let floorFilterStreak = '1';
         let floorFilterMinGames = '4';
+        let floorFilterMargin = '0.30';
         let floorSearchQuery = '';
         let floorSortCol = 'Floor_Streak';
         let floorSortAsc = false;
@@ -1857,6 +1874,10 @@
 
             const streakSelect = document.getElementById('floor-streak-filter-select');
             if (streakSelect) floorFilterStreak = streakSelect.value;
+            const gamesSelect = document.getElementById('floor-games-filter-select');
+            if (gamesSelect) floorFilterMinGames = gamesSelect.value;
+            const marginSelect = document.getElementById('floor-margin-filter-select');
+            if (marginSelect) floorFilterMargin = marginSelect.value;
 
             // Ensure schedule games are available so date chips and matchups can be resolved
             let allGames = [];
@@ -1892,14 +1913,14 @@
             const headerEnd = document.getElementById('input-end-date')?.value || endDate || '';
 
             try {
-                let url = `/api/floor-streak?min_games=${floorFilterMinGames}`;
+                let url = `/api/floor-streak?min_games=${floorFilterMinGames}&margin=${floorFilterMargin}`;
                 if (headerStart) url += `&start_date=${headerStart}`;
                 if (headerEnd) url += `&end_date=${headerEnd}`;
                 if (currentScheduleSeason) url += `&season=${currentScheduleSeason}`;
 
                 let res = await fetch(url);
                 if (!res.ok) {
-                    let fallbackUrl = `/floor-streak?min_games=${floorFilterMinGames}`;
+                    let fallbackUrl = `/floor-streak?min_games=${floorFilterMinGames}&margin=${floorFilterMargin}`;
                     if (headerStart) fallbackUrl += `&start_date=${headerStart}`;
                     if (headerEnd) fallbackUrl += `&end_date=${headerEnd}`;
                     if (currentScheduleSeason) fallbackUrl += `&season=${currentScheduleSeason}`;
@@ -2038,6 +2059,17 @@
             }
             displayDates = displayDates.slice(0, 12);
 
+            // Auto-default to the first upcoming slate date on initial load
+            if (!floorDateInitialized && !floorSelectedDate && displayDates.length > 0) {
+                floorSelectedDate = displayDates[0];
+                floorDateInitialized = true;
+            }
+
+            const datePicker = document.getElementById('floor-date-picker');
+            if (datePicker) {
+                datePicker.value = floorSelectedDate || '';
+            }
+
             // Include selected date if picked via custom date picker and not in chips
             if (floorSelectedDate && !displayDates.includes(floorSelectedDate) && dateCounts[floorSelectedDate] !== undefined) {
                 displayDates.push(floorSelectedDate);
@@ -2045,7 +2077,7 @@
             }
 
             const totalCount = globalFloorStreaks.length;
-            let html = `<button id="btn-floor-all-dates" onclick="clearFloorDateFilter()" class="chip ${!floorSelectedDate ? 'bg-[#30363d] text-slate-100 font-bold' : 'text-slate-400 hover:text-slate-200'} text-[11px] py-0.5 px-2.5 rounded shrink-0 transition" title="Show all dates">All (${totalCount})</button>`;
+            let html = `<button id="btn-floor-all-dates" onclick="clearFloorDateFilter()" class="chip ${!floorSelectedDate ? 'bg-[#30363d] text-slate-100 font-bold border border-slate-600' : 'text-slate-400 hover:text-slate-200'} text-[11px] py-0.5 px-2.5 rounded shrink-0 transition" title="Show all dates">All (${totalCount})</button>`;
 
             displayDates.forEach(d => {
                 const count = dateCounts[d] || 0;
@@ -2060,22 +2092,24 @@
 
         function onFloorDateChange(date) {
             floorSelectedDate = date || '';
+            floorDateInitialized = true;
             const datePicker = document.getElementById('floor-date-picker');
             if (datePicker) {
                 datePicker.value = floorSelectedDate;
             }
-            renderFloorDateChips();
-            renderFloorStreaks();
+            renderFloorDateChips(window.floorAllGames || []);
+            renderFloorStreaks(window.floorAllGames || []);
         }
 
         function clearFloorDateFilter() {
             floorSelectedDate = '';
+            floorDateInitialized = true;
             const datePicker = document.getElementById('floor-date-picker');
             if (datePicker) {
                 datePicker.value = '';
             }
-            renderFloorDateChips();
-            renderFloorStreaks();
+            renderFloorDateChips(window.floorAllGames || []);
+            renderFloorStreaks(window.floorAllGames || []);
         }
 
         function renderFloorStreaks(games = window.floorAllGames || []) {
@@ -2240,6 +2274,11 @@
 
         function setFloorMinGamesFilter(val) {
             floorFilterMinGames = val;
+            loadFloorStreakTab();
+        }
+
+        function setFloorMarginFilter(val) {
+            floorFilterMargin = val || '0.30';
             loadFloorStreakTab();
         }
 
