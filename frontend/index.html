@@ -302,9 +302,9 @@
                     <div class="flex items-center gap-1.5 text-xs text-slate-400 bg-[#21262d] border border-[#30363d] rounded-lg px-2.5 py-1">
                         <span class="text-[11px] font-medium">Streak:</span>
                         <select id="floor-streak-filter-select" onchange="setFloorStreakFilter(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2 py-0.5 text-xs outline-none focus:border-slate-500 font-medium cursor-pointer">
-                            <option value="1">All Active (1+)</option>
+                            <option value="1" selected>All Active (1+)</option>
                             <option value="2">Active (2+)</option>
-                            <option value="5" selected>Solid (5+)</option>
+                            <option value="5">Solid (5+)</option>
                             <option value="8">Elite (8+)</option>
                         </select>
                     </div>
@@ -1855,11 +1855,14 @@
             }
             isFloorStreakLoading = true;
 
+            const streakSelect = document.getElementById('floor-streak-filter-select');
+            if (streakSelect) floorFilterStreak = streakSelect.value;
+
             // Ensure schedule games are available so date chips and matchups can be resolved
             let allGames = [];
             try {
-                if (window.globalSchedule && window.globalSchedule.weeks) {
-                    window.globalSchedule.weeks.forEach(w => {
+                if (window.globalScheduleData && window.globalScheduleData.weeks) {
+                    window.globalScheduleData.weeks.forEach(w => {
                         if (Array.isArray(w.games)) allGames.push(...w.games);
                     });
                 } else {
@@ -1877,6 +1880,14 @@
                 console.warn('Could not load schedule games for Floor Streak view:', e);
             }
 
+            // Sort all games chronologically
+            allGames.sort((a, b) => {
+                const da = (a.gameday || a.date || '').substring(0, 10);
+                const db = (b.gameday || b.date || '').substring(0, 10);
+                return da.localeCompare(db);
+            });
+            window.floorAllGames = allGames;
+
             const headerStart = document.getElementById('input-start-date')?.value || startDate || '';
             const headerEnd = document.getElementById('input-end-date')?.value || endDate || '';
 
@@ -1892,25 +1903,35 @@
                 const data = await res.json();
                 let list = data.players || [];
 
-                // Map game dates to players from the active schedule
-                if (allGames.length > 0) {
-                    const teamGameMap = {};
-                    allGames.forEach(g => {
-                        const h = (g.home_team || '').toUpperCase();
-                        const a = (g.away_team || '').toUpperCase();
-                        const gd = (g.gameday || g.date || '').substring(0, 10);
-                        if (h) teamGameMap[h] = { date: gd, opponent: a, matchup: `${h} vs ${a}` };
-                        if (a) teamGameMap[a] = { date: gd, opponent: h, matchup: `${a} @ ${h}` };
-                    });
-                    list.forEach(p => {
-                        const t = (p.team || '').toUpperCase();
-                        if (teamGameMap[t]) {
-                            p.date = teamGameMap[t].date;
-                            p.opponent = teamGameMap[t].opponent;
-                            p.matchup = teamGameMap[t].matchup;
-                        }
-                    });
-                }
+                // Map each team to their first upcoming (uncompleted) game, with fallback to any game
+                const teamUpcomingGame = {};
+                allGames.forEach(g => {
+                    if (g.is_final) return; // skip completed games
+                    const h = (g.home_team || '').toUpperCase();
+                    const a = (g.away_team || '').toUpperCase();
+                    const gd = (g.gameday || g.date || '').substring(0, 10);
+                    if (h && !teamUpcomingGame[h]) teamUpcomingGame[h] = { date: gd, opponent: a, matchup: `${h} vs ${a}` };
+                    if (a && !teamUpcomingGame[a]) teamUpcomingGame[a] = { date: gd, opponent: h, matchup: `${a} @ ${h}` };
+                });
+                allGames.forEach(g => {
+                    const h = (g.home_team || '').toUpperCase();
+                    const a = (g.away_team || '').toUpperCase();
+                    const gd = (g.gameday || g.date || '').substring(0, 10);
+                    if (h && !teamUpcomingGame[h]) teamUpcomingGame[h] = { date: gd, opponent: a, matchup: `${h} vs ${a}` };
+                    if (a && !teamUpcomingGame[a]) teamUpcomingGame[a] = { date: gd, opponent: h, matchup: `${a} @ ${h}` };
+                });
+
+                list.forEach(p => {
+                    const t = (p.team || '').toUpperCase();
+                    if (teamUpcomingGame[t]) {
+                        p.next_date = teamUpcomingGame[t].date;
+                        p.next_opponent = teamUpcomingGame[t].opponent;
+                        p.next_matchup = teamUpcomingGame[t].matchup;
+                        p.date = p.next_date;
+                        p.opponent = p.next_opponent;
+                        p.matchup = p.next_matchup;
+                    }
+                });
 
                 globalFloorStreaks = list;
 
@@ -1975,34 +1996,53 @@
             if (devEl) devEl.textContent = `${devCount} players`;
         }
 
-        function renderFloorDateChips(games = []) {
+        function renderFloorDateChips(games = window.floorAllGames || []) {
             const container = document.getElementById('floor-date-chips');
             if (!container) return;
 
-            const dateCounts = {};
-            const teamDates = {};
-            games.forEach(g => {
+            // Map each gameday to all team codes playing on that date
+            const dateTeamsMap = {};
+            const dateHasUnfinal = {};
+            (games || []).forEach(g => {
                 const d = (g.gameday || g.date || '').substring(0, 10);
-                if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
-                    if (g.home_team) teamDates[g.home_team.toUpperCase()] = d;
-                    if (g.away_team) teamDates[g.away_team.toUpperCase()] = d;
-                    if (!dateCounts[d]) dateCounts[d] = 0;
-                }
+                if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+                if (!dateTeamsMap[d]) dateTeamsMap[d] = new Set();
+                if (g.home_team) dateTeamsMap[d].add(g.home_team.toUpperCase());
+                if (g.away_team) dateTeamsMap[d].add(g.away_team.toUpperCase());
+                if (!g.is_final) dateHasUnfinal[d] = true;
             });
 
-            (globalFloorStreaks || []).forEach(p => {
-                const t = (p.team || '').toUpperCase();
-                const d = teamDates[t] || (p.date || '').substring(0, 10);
-                if (d && dateCounts.hasOwnProperty(d)) {
-                    dateCounts[d] = (dateCounts[d] || 0) + 1;
-                }
+            // Count how many players with active streaks play on each date
+            const dateCounts = {};
+            Object.keys(dateTeamsMap).forEach(d => {
+                const teams = dateTeamsMap[d];
+                let count = 0;
+                (globalFloorStreaks || []).forEach(p => {
+                    const t = (p.team || '').toUpperCase();
+                    if (teams.has(t)) count++;
+                });
+                dateCounts[d] = count;
             });
 
-            const uniqueDates = Object.keys(dateCounts).sort();
+            const allDates = Object.keys(dateCounts).sort();
+
+            // Display upcoming uncompleted slate dates first
+            let displayDates = allDates.filter(d => dateCounts[d] > 0 && dateHasUnfinal[d]);
+            if (displayDates.length === 0) {
+                displayDates = allDates.filter(d => dateCounts[d] > 0);
+            }
+            displayDates = displayDates.slice(0, 12);
+
+            // Include selected date if picked via custom date picker and not in chips
+            if (floorSelectedDate && !displayDates.includes(floorSelectedDate) && dateCounts[floorSelectedDate] !== undefined) {
+                displayDates.push(floorSelectedDate);
+                displayDates.sort();
+            }
+
             const totalCount = globalFloorStreaks.length;
             let html = `<button id="btn-floor-all-dates" onclick="clearFloorDateFilter()" class="chip ${!floorSelectedDate ? 'bg-[#30363d] text-slate-100 font-bold' : 'text-slate-400 hover:text-slate-200'} text-[11px] py-0.5 px-2.5 rounded shrink-0 transition" title="Show all dates">All (${totalCount})</button>`;
 
-            uniqueDates.forEach(d => {
+            displayDates.forEach(d => {
                 const count = dateCounts[d] || 0;
                 const dateObj = new Date(d + 'T00:00:00Z');
                 const label = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
@@ -2033,7 +2073,7 @@
             renderFloorStreaks();
         }
 
-        function renderFloorStreaks(games = []) {
+        function renderFloorStreaks(games = window.floorAllGames || []) {
             const tbody = document.getElementById('floor-streak-table-body');
             const countEl = document.getElementById('floor-visible-count');
             if (!tbody) return;
@@ -2042,10 +2082,41 @@
 
             // Filter by Selected Game Date
             if (floorSelectedDate) {
-                filtered = filtered.filter(p => {
-                    const pDate = (p.date || '').substring(0, 10);
-                    return pDate === floorSelectedDate;
+                const gamesOnDate = (games || []).filter(g => {
+                    const gd = (g.gameday || g.date || '').substring(0, 10);
+                    return gd === floorSelectedDate;
                 });
+                const teamsOnDate = {};
+                gamesOnDate.forEach(g => {
+                    const h = (g.home_team || '').toUpperCase();
+                    const a = (g.away_team || '').toUpperCase();
+                    const gd = (g.gameday || g.date || '').substring(0, 10);
+                    if (h) teamsOnDate[h] = { date: gd, opponent: a, matchup: `${h} vs ${a}` };
+                    if (a) teamsOnDate[a] = { date: gd, opponent: h, matchup: `${a} @ ${h}` };
+                });
+
+                filtered = filtered.filter(p => {
+                    const t = (p.team || '').toUpperCase();
+                    return Boolean(teamsOnDate[t]);
+                });
+
+                filtered = filtered.map(p => {
+                    const t = (p.team || '').toUpperCase();
+                    const mInfo = teamsOnDate[t];
+                    return {
+                        ...p,
+                        date: mInfo ? mInfo.date : p.date,
+                        opponent: mInfo ? mInfo.opponent : p.opponent,
+                        matchup: mInfo ? mInfo.matchup : p.matchup
+                    };
+                });
+            } else {
+                filtered = filtered.map(p => ({
+                    ...p,
+                    date: p.next_date || p.date,
+                    opponent: p.next_opponent || p.opponent,
+                    matchup: p.next_matchup || p.matchup
+                }));
             }
 
             // Filter by Position
