@@ -470,10 +470,10 @@
 
     <!-- Frontend Application Logic -->
     <script>
-        // State variables (Defaulted to previous season start 2025-09-04 through now 2026-09-16)
+        // State variables (Defaulted to previous season start 2025-09-04 through current active week 2026-10-15)
         let startDate = '2025-09-04';
-        let endDate = '2026-09-16';
-        let propsDate = '2026-09-13';
+        let endDate = '2026-10-15';
+        let propsDate = '2026-10-11';
         let isPropsEnabled = true;
 
         let currentPropsFilter = 'ALL';
@@ -1895,10 +1895,15 @@
                 let url = `/api/floor-streak?min_games=${floorFilterMinGames}`;
                 if (headerStart) url += `&start_date=${headerStart}`;
                 if (headerEnd) url += `&end_date=${headerEnd}`;
+                if (currentScheduleSeason) url += `&season=${currentScheduleSeason}`;
 
                 let res = await fetch(url);
                 if (!res.ok) {
-                    res = await fetch(`/floor-streak?min_games=${floorFilterMinGames}&start_date=${headerStart}&end_date=${headerEnd}`);
+                    let fallbackUrl = `/floor-streak?min_games=${floorFilterMinGames}`;
+                    if (headerStart) fallbackUrl += `&start_date=${headerStart}`;
+                    if (headerEnd) fallbackUrl += `&end_date=${headerEnd}`;
+                    if (currentScheduleSeason) fallbackUrl += `&season=${currentScheduleSeason}`;
+                    res = await fetch(fallbackUrl);
                 }
                 const data = await res.json();
                 let list = data.players || [];
