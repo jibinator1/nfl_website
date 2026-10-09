@@ -2483,7 +2483,7 @@ def compute_floor_streak_df(
         df = df[df['gameday'] >= str(start_date)]
     if end_date and 'gameday' in df.columns:
         df = df[df['gameday'] <= str(end_date)]
-    if season and 'season' in df.columns:
+    elif season and 'season' in df.columns and not start_date and not end_date:
         df = df[df['season'] == int(season)]
 
     if df.empty:
@@ -2529,19 +2529,15 @@ def compute_floor_streak_df(
         if stat_col not in player_df.columns:
             continue
 
-        production = pd.to_numeric(player_df[stat_col], errors='coerce').fillna(0.0)
-
         # Determine target season for current season median baseline
         target_season = int(season) if season else (int(weekly_df['season'].max()) if ('season' in weekly_df.columns and not weekly_df.empty) else 2026)
 
         # Baseline median is strictly the player's current season median
         cur_season_games = player_df[player_df['season'] == target_season]
         if not cur_season_games.empty:
-            eval_games = cur_season_games
             cur_production = pd.to_numeric(cur_season_games[stat_col], errors='coerce').fillna(0.0)
             baseline_med = float(cur_production.median())
         else:
-            eval_games = player_df
             all_production = pd.to_numeric(player_df[stat_col], errors='coerce').fillna(0.0)
             baseline_med = float(all_production.median()) if not all_production.empty else 0.0
 
@@ -2551,7 +2547,8 @@ def compute_floor_streak_df(
         # Fixed set hard line threshold across all games for this player
         set_threshold = round((1.0 - margin) * baseline_med, 1)
 
-        production = pd.to_numeric(eval_games[stat_col], errors='coerce').fillna(0.0)
+        # Evaluate streak across all games played in player_df (including prior season)
+        production = pd.to_numeric(player_df[stat_col], errors='coerce').fillna(0.0)
 
         # Hard line threshold breach check: every game in streak must pass set_threshold
         breach = (production < set_threshold) | (production < 10.0)
@@ -2570,7 +2567,7 @@ def compute_floor_streak_df(
 
         if streak < len(breach):
             b_idx = len(breach) - 1 - streak
-            b_row = eval_games.iloc[b_idx]
+            b_row = player_df.iloc[b_idx]
             b_season = b_row.get('season', '')
             b_week = b_row.get('week', '')
             b_val = round(float(production.iloc[b_idx]), 1)
@@ -2592,7 +2589,7 @@ def compute_floor_streak_df(
             'Floor_Threshold': set_threshold,
             'Margin_Used': margin,
             'Floor_Stat': stat_col,
-            'Games_Played': len(eval_games),
+            'Games_Played': len(player_df),
             'Last_Breach': last_breach_desc,
             'Last_Breach_Game': last_breach_short,
         })
