@@ -398,7 +398,9 @@ async def get_scheme_insights_endpoint(
     home_team: str = Query(..., description="Home Team Abbreviation"),
     away_team: str = Query(..., description="Away Team Abbreviation"),
     season: int = Query(2026, description="NFL Season (e.g. 2026, 2025)"),
-    week: int = Query(1, description="NFL Week Number")
+    week: int = Query(1, description="NFL Week Number"),
+    start_date: str = Query(None, description="Start date YYYY-MM-DD"),
+    end_date: str = Query(None, description="End date YYYY-MM-DD")
 ):
     """
     Returns 5-pillar scheme analytics:
@@ -413,7 +415,9 @@ async def get_scheme_insights_endpoint(
             home_team=home_team.upper(),
             away_team=away_team.upper(),
             season=season,
-            week=week
+            week=week,
+            start_date=start_date,
+            end_date=end_date
         )
         return sanitize_nan(data)
     except Exception as e:

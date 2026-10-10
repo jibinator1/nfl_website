@@ -13,6 +13,7 @@ import os
 import json
 from typing import Dict, Any, List, Optional
 import math
+import copy
 
 TEAM_NAMES = {
     'ARI': 'Arizona Cardinals', 'ATL': 'Atlanta Falcons', 'BAL': 'Baltimore Ravens',
@@ -396,8 +397,176 @@ def _build_generic_team_profile(team: str) -> Dict[str, Any]:
     }
 
 
+COACH_SCHEME_PROFILES: Dict[str, Dict[str, Any]] = {
+    'Mike Macdonald': {
+        'archetype': 'Mike Macdonald Disguised Match-Quarters & Simulated Pressure',
+        'zone_pct': 72.0, 'man_pct': 28.0,
+        'mfo_pct': 64.0, 'mfc_pct': 36.0,
+        'cover_1': 14.0, 'cover_2': 18.0, 'cover_3': 18.0, 'cover_4': 32.0, 'cover_6': 16.0, 'cover_0': 2.0,
+        'blitz_pct': 31.0,
+        'vulnerability_note': 'Eliminates 20+ yard boundary passes with disguised two-high shells; intermediate flats open on delayed releases.',
+        'coaching_note': 'Coaching Shift (Mike Macdonald): Modernized into an elite simulated-pressure match quarters defense, suffocating pass efficiency.'
+    },
+    'Pete Carroll': {
+        'archetype': 'Pete Carroll Classic Cover 3 / Single-High Box Clamp',
+        'zone_pct': 74.0, 'man_pct': 26.0,
+        'mfo_pct': 36.0, 'mfc_pct': 64.0,
+        'cover_1': 20.0, 'cover_2': 12.0, 'cover_3': 44.0, 'cover_4': 14.0, 'cover_6': 8.0, 'cover_0': 2.0,
+        'blitz_pct': 24.0,
+        'vulnerability_note': 'Single-high safety stacks the box against runs, leaving soft intermediate cushions on boundary sidelines.',
+        'coaching_note': 'Coaching Context (Pete Carroll Era): Classic Cover 3 Seattle system, stacking 8 defenders in the box on early downs.'
+    },
+    'Bill Belichick': {
+        'archetype': 'Bill Belichick Matchup-Man Bracket & Stout Interior Run Wall',
+        'zone_pct': 48.0, 'man_pct': 52.0,
+        'mfo_pct': 35.0, 'mfc_pct': 65.0,
+        'cover_1': 38.0, 'cover_2': 10.0, 'cover_3': 24.0, 'cover_4': 14.0, 'cover_6': 8.0, 'cover_0': 6.0,
+        'blitz_pct': 32.0,
+        'vulnerability_note': 'Stout #1 ranked interior run wall; man coverage vulnerable to crossing routes with natural traffic picks.',
+        'coaching_note': 'Coaching Context (Bill Belichick Era): Heavy Cover 1 man bracket clamping down on opposing WR1s and elite interior gap fits.'
+    },
+    'Jerod Mayo': {
+        'archetype': 'Jerod Mayo Transitional Single-High Hybrid',
+        'zone_pct': 56.4, 'man_pct': 43.6,
+        'mfo_pct': 40.5, 'mfc_pct': 59.5,
+        'cover_1': 30.5, 'cover_2': 12.0, 'cover_3': 29.0, 'cover_4': 14.5, 'cover_6': 9.0, 'cover_0': 5.0,
+        'blitz_pct': 26.5,
+        'vulnerability_note': 'Transitional scheme adjusting fronts, conceding cushion on intermediate crossers.',
+        'coaching_note': 'Coaching Context (Jerod Mayo Era): Transitional hybrid front adjusting scheme principles.'
+    },
+    'Mike Vrabel': {
+        'archetype': 'Mike Vrabel Balanced Two-High Physical Multiple Shell',
+        'zone_pct': 64.0, 'man_pct': 36.0,
+        'mfo_pct': 54.0, 'mfc_pct': 46.0,
+        'cover_1': 22.0, 'cover_2': 18.0, 'cover_3': 26.0, 'cover_4': 22.0, 'cover_6': 10.0, 'cover_0': 2.0,
+        'blitz_pct': 22.0,
+        'vulnerability_note': 'Two-high shell limits deep vertical shots; disciplined physical run fits maintain gap integrity.',
+        'coaching_note': 'Coaching Shift (Mike Vrabel): Rebuilt into a balanced, physical two-high coverage scheme that caps explosive plays.'
+    },
+    'Dan Quinn': {
+        'archetype': 'Dan Quinn Aggressive Single-High Cover 3 / Cover 1 Pressure',
+        'zone_pct': 58.0, 'man_pct': 42.0,
+        'mfo_pct': 38.0, 'mfc_pct': 62.0,
+        'cover_1': 32.0, 'cover_2': 10.0, 'cover_3': 34.0, 'cover_4': 12.0, 'cover_6': 8.0, 'cover_0': 4.0,
+        'blitz_pct': 33.5,
+        'vulnerability_note': 'Aggressive attacking front blitzes frequently, leaving cornerbacks in isolated 1-on-1s on the boundary.',
+        'coaching_note': 'Coaching Shift (Dan Quinn): Aggressive attacking defensive front with high blitz rates and tight man coverage on early downs.'
+    },
+    'Ron Rivera': {
+        'archetype': 'Ron Rivera Four-Man Rush Soft Zone',
+        'zone_pct': 70.0, 'man_pct': 30.0,
+        'mfo_pct': 48.0, 'mfc_pct': 52.0,
+        'cover_1': 18.0, 'cover_2': 18.0, 'cover_3': 34.0, 'cover_4': 20.0, 'cover_6': 8.0, 'cover_0': 2.0,
+        'blitz_pct': 18.5,
+        'vulnerability_note': 'Passive four-man rush yields elevated completion percentage to intermediate crossing routes.',
+        'coaching_note': 'Coaching Context (Ron Rivera Era): Conservative four-man rushes that surrendered elevated passing efficiency.'
+    },
+    'Jim Harbaugh': {
+        'archetype': 'Jim Harbaugh & Jesse Minter Physical Ravens-Style Split Front',
+        'zone_pct': 68.0, 'man_pct': 32.0,
+        'mfo_pct': 58.0, 'mfc_pct': 42.0,
+        'cover_1': 18.0, 'cover_2': 16.0, 'cover_3': 24.0, 'cover_4': 28.0, 'cover_6': 12.0, 'cover_0': 2.0,
+        'blitz_pct': 24.0,
+        'vulnerability_note': 'Disciplined, heavy-box split-safety front limits big runs; soft intermediate voids against play-action.',
+        'coaching_note': 'Coaching Shift (Jim Harbaugh Era): Rebuilt interior trench discipline, reducing opponent rush success to top-tier levels.'
+    },
+    'Brandon Staley': {
+        'archetype': 'Brandon Staley Two-High Light Box Umbrella',
+        'zone_pct': 74.0, 'man_pct': 26.0,
+        'mfo_pct': 68.0, 'mfc_pct': 32.0,
+        'cover_1': 14.0, 'cover_2': 20.0, 'cover_3': 18.0, 'cover_4': 34.0, 'cover_6': 12.0, 'cover_0': 2.0,
+        'blitz_pct': 19.0,
+        'vulnerability_note': 'Persistent light boxes concede 4.6+ YPC on interior runs to power rushing attacks.',
+        'coaching_note': 'Coaching Context (Brandon Staley Era): Conceded elevated ground yardage due to persistent light box personnel.'
+    },
+    'Vic Fangio': {
+        'archetype': 'Vic Fangio Classic Two-High / Match-Quarter Umbrella',
+        'zone_pct': 78.2, 'man_pct': 21.8,
+        'mfo_pct': 64.5, 'mfc_pct': 35.5,
+        'cover_1': 13.5, 'cover_2': 18.0, 'cover_3': 22.0, 'cover_4': 31.0, 'cover_6': 13.5, 'cover_0': 2.0,
+        'blitz_pct': 17.5,
+        'vulnerability_note': 'Soft underneath cushion yields high completion % to check-downs, but rallies and tackles prevent YAC.',
+        'coaching_note': 'Fangio two-high umbrella structure that eliminates 20+ yard boundary explosives.'
+    },
+    'Todd Bowles': {
+        'archetype': 'Todd Bowles Heavy Blitz & Single-High Pressure Front',
+        'zone_pct': 52.0, 'man_pct': 48.0,
+        'mfo_pct': 35.0, 'mfc_pct': 65.0,
+        'cover_1': 36.0, 'cover_2': 10.0, 'cover_3': 30.0, 'cover_4': 10.0, 'cover_6': 6.0, 'cover_0': 8.0,
+        'blitz_pct': 38.5,
+        'vulnerability_note': 'Heavy blitz frequency leaves defensive backs in aggressive 1-on-1s susceptible to double moves.',
+        'coaching_note': 'Coaching Context (Todd Bowles): High-rate blitz package and aggressive single-high run clamping.'
+    },
+    'Robert Saleh': {
+        'archetype': 'Robert Saleh Fast-Flow Wide-9 Cover 3 / Quarters Match',
+        'zone_pct': 78.0, 'man_pct': 22.0,
+        'mfo_pct': 46.0, 'mfc_pct': 54.0,
+        'cover_1': 16.0, 'cover_2': 14.0, 'cover_3': 38.0, 'cover_4': 22.0, 'cover_6': 8.0, 'cover_0': 2.0,
+        'blitz_pct': 16.0,
+        'vulnerability_note': 'Relies on four-man rush without blitzing; disciplined zone limits explosive plays downfield.',
+        'coaching_note': 'Coaching Context (Robert Saleh): Four-man pressure with fast sideline pursuit and Cover 3 match principles.'
+    },
+    'Sean McDermott': {
+        'archetype': 'Sean McDermott Two-High Match-Quarters & Split Safety Umbrella',
+        'zone_pct': 80.0, 'man_pct': 20.0,
+        'mfo_pct': 68.0, 'mfc_pct': 32.0,
+        'cover_1': 14.0, 'cover_2': 20.0, 'cover_3': 18.0, 'cover_4': 34.0, 'cover_6': 12.0, 'cover_0': 2.0,
+        'blitz_pct': 18.0,
+        'vulnerability_note': 'Disciplined two-high umbrella concedes underneath checkdowns while completely eliminating vertical boundaries.',
+        'coaching_note': 'Coaching Context (Sean McDermott): Split-safety match-quarters scheme designed to eliminate chunk passing plays.'
+    },
+    'Matt Eberflus': {
+        'archetype': 'Matt Eberflus Classic Tampa-2 / Cover 3 Discipline',
+        'zone_pct': 76.0, 'man_pct': 24.0,
+        'mfo_pct': 52.0, 'mfc_pct': 48.0,
+        'cover_1': 18.0, 'cover_2': 28.0, 'cover_3': 32.0, 'cover_4': 14.0, 'cover_6': 6.0, 'cover_0': 2.0,
+        'blitz_pct': 21.0,
+        'vulnerability_note': 'Soft underneath zone cushions yield quick hitches and crossing routes to slot targets.',
+        'coaching_note': 'Coaching Context (Matt Eberflus): Zone-heavy discipline emphasizing ball-hawking and open-field tackling.'
+    },
+    'DeMeco Ryans': {
+        'archetype': 'DeMeco Ryans Downhill Wide-9 Single-High & Quarters',
+        'zone_pct': 74.0, 'man_pct': 26.0,
+        'mfo_pct': 46.0, 'mfc_pct': 54.0,
+        'cover_1': 20.0, 'cover_2': 12.0, 'cover_3': 38.0, 'cover_4': 20.0, 'cover_6': 8.0, 'cover_0': 2.0,
+        'blitz_pct': 22.0,
+        'vulnerability_note': 'Aggressive downhill front leaves boundary 1-on-1s on deep crossers and play-action shots.',
+        'coaching_note': 'Coaching Shift (DeMeco Ryans): Rebuilt front seven into an aggressive, penetrating front with fast secondary pursuit.'
+    },
+    'Raheem Morris': {
+        'archetype': 'Raheem Morris Two-High Match-Quarters Shell',
+        'zone_pct': 75.0, 'man_pct': 25.0,
+        'mfo_pct': 62.0, 'mfc_pct': 38.0,
+        'cover_1': 18.0, 'cover_2': 16.0, 'cover_3': 22.0, 'cover_4': 32.0, 'cover_6': 10.0, 'cover_0': 2.0,
+        'blitz_pct': 21.0,
+        'vulnerability_note': 'Two-high alignment concedes underneath intermediate cushions to tight ends and slot receivers.',
+        'coaching_note': 'Coaching Shift (Raheem Morris): Modern split-safety quarters umbrella capping perimeter explosives.'
+    },
+    'Dennis Allen': {
+        'archetype': 'Dennis Allen Heavy Press-Man Cover 1 Bracket',
+        'zone_pct': 52.0, 'man_pct': 48.0,
+        'mfo_pct': 38.0, 'mfc_pct': 62.0,
+        'cover_1': 38.0, 'cover_2': 12.0, 'cover_3': 28.0, 'cover_4': 12.0, 'cover_6': 6.0, 'cover_0': 4.0,
+        'blitz_pct': 29.0,
+        'vulnerability_note': 'Tight man press vulnerable to mesh pick plays and rub concepts in traffic.',
+        'coaching_note': 'Coaching Context (Dennis Allen): Aggressive press-man boundary brackets and stacked box run defense.'
+    },
+    'Jonathan Gannon': {
+        'archetype': 'Jonathan Gannon Split-Safety Match Zone',
+        'zone_pct': 74.0, 'man_pct': 26.0,
+        'mfo_pct': 60.0, 'mfc_pct': 40.0,
+        'cover_1': 16.0, 'cover_2': 18.0, 'cover_3': 26.0, 'cover_4': 28.0, 'cover_6': 10.0, 'cover_0': 2.0,
+        'blitz_pct': 18.0,
+        'vulnerability_note': 'Conservative two-high umbrella yields high completion rate to short intermediate throws.',
+        'coaching_note': 'Coaching Context (Jonathan Gannon): Two-high split safety shell prioritizing top-down containment.'
+    }
+}
+
 _DATA_PROFILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'scheme_profiles_32.json')
 _PROFILES_LOADED = False
+_PARQUET_LOADED = False
+_SCHEDULES_DF = None
+_WEEKLY_DF = None
 
 def _ensure_profiles_loaded():
     global _PROFILES_LOADED
@@ -412,12 +581,116 @@ def _ensure_profiles_loaded():
                 pass
         _PROFILES_LOADED = True
 
+def _ensure_parquet_loaded():
+    global _PARQUET_LOADED, _SCHEDULES_DF, _WEEKLY_DF
+    if not _PARQUET_LOADED:
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+        sched_p = os.path.join(data_dir, 'schedules_cache.parquet')
+        week_p = os.path.join(data_dir, 'weekly_cache.parquet')
+        if os.path.exists(sched_p) and os.path.exists(week_p):
+            try:
+                import pandas as pd
+                _SCHEDULES_DF = pd.read_parquet(sched_p)
+                _WEEKLY_DF = pd.read_parquet(week_p)
+            except Exception:
+                pass
+        _PARQUET_LOADED = True
+
+def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = None, end_date: Optional[str] = None, schedules_df=None, weekly_df=None):
+    _ensure_parquet_loaded()
+    s = schedules_df if schedules_df is not None else _SCHEDULES_DF
+    w = weekly_df if weekly_df is not None else _WEEKLY_DF
+    if s is None or w is None:
+        return None
+
+    is_custom_date = bool(start_date and end_date)
+    sub_s = s.copy()
+
+    if is_custom_date:
+        sub_s = sub_s[(sub_s['gameday'] >= start_date) & (sub_s['gameday'] <= end_date)]
+        seasons = sub_s['season'].dropna().unique().tolist()
+        eff_season = int(seasons[0]) if len(seasons) == 1 else (int(season) if season else 2026)
+    else:
+        eff_season = int(season if season else 2026)
+        sub_s = sub_s[sub_s['season'] == eff_season]
+
+    completed = sub_s[sub_s['home_score'].notna()]
+    if completed.empty:
+        eff_season = int(season if season else 2026)
+        completed = s[(s['season'] == eff_season) & (s['home_score'].notna())]
+
+    game_ids = set(completed['game_id'].unique())
+    sub_w = w[w['game_id'].isin(game_ids)]
+
+    team_def_ypc = {}
+    team_def_ypa = {}
+    team_rush_ypc = {}
+    team_coaches = {}
+    team_games_count = {}
+
+    unique_teams = s['home_team'].unique()
+
+    for tm in unique_teams:
+        tm_games = completed[(completed['home_team'] == tm) | (completed['away_team'] == tm)]
+        team_games_count[tm] = len(tm_games)
+
+        h_c = tm_games[tm_games['home_team'] == tm]['home_coach'].dropna().tolist()
+        a_c = tm_games[tm_games['away_team'] == tm]['away_coach'].dropna().tolist()
+        coaches = list(dict.fromkeys(h_c + a_c))
+        team_coaches[tm] = coaches[-1] if coaches else None
+
+        opp_w = sub_w[sub_w['opponent_team'] == tm]
+        c = opp_w['carries'].sum()
+        ry = opp_w['rushing_yards'].sum()
+        team_def_ypc[tm] = float(ry / c) if c > 0 else 4.20
+
+        att = opp_w['attempts'].sum()
+        py = opp_w['passing_yards'].sum()
+        team_def_ypa[tm] = float(py / att) if att > 0 else 6.80
+
+        tm_w = sub_w[sub_w['team'] == tm]
+        tc = tm_w['carries'].sum()
+        tryds = tm_w['rushing_yards'].sum()
+        team_rush_ypc[tm] = float(tryds / tc) if tc > 0 else 4.30
+
+    ypc_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(team_def_ypc.items(), key=lambda x: x[1]))}
+    ypa_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(team_def_ypa.items(), key=lambda x: x[1]))}
+
+    if is_custom_date:
+        if start_date >= '2026-08-01':
+            sample_label = f"2026 Season ({start_date} to {end_date})"
+        elif start_date >= '2025-08-01' and end_date <= '2026-03-01':
+            sample_label = f"2025 Season ({start_date} to {end_date})"
+        else:
+            sample_label = f"Date Range: {start_date} to {end_date}"
+    else:
+        if eff_season == 2026:
+            sample_label = "2026 Season Only (Weeks 1–5 Current Games)"
+        else:
+            sample_label = f"{eff_season} Full Season Sample (18 Weeks)"
+
+    return {
+        'season': eff_season,
+        'start_date': start_date,
+        'end_date': end_date,
+        'is_custom_date': is_custom_date,
+        'sample_label': sample_label,
+        'team_def_ypc': team_def_ypc,
+        'ypc_ranks': ypc_ranks,
+        'team_def_ypa': team_def_ypa,
+        'ypa_ranks': ypa_ranks,
+        'team_rush_ypc': team_rush_ypc,
+        'team_coaches': team_coaches,
+        'team_games_count': team_games_count,
+        'sub_w': sub_w,
+        'completed': completed
+    }
 
 def get_team_scheme_profile(team: str) -> Dict[str, Any]:
     _ensure_profiles_loaded()
     t = team.upper()
     if t in TEAM_SCHEME_PROFILES:
-        return TEAM_SCHEME_PROFILES[t]
+        return copy.deepcopy(TEAM_SCHEME_PROFILES[t])
     return _build_generic_team_profile(t)
 
 
@@ -427,7 +700,9 @@ def compute_scheme_insights(
     season: int = 2026,
     week: Optional[int] = 1,
     weekly_df=None,
-    schedules_df=None
+    schedules_df=None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Computes a comprehensive 5-pillar scheme analytics report for the selected matchup.
@@ -441,10 +716,102 @@ def compute_scheme_insights(
     h_name = TEAM_NAMES.get(h_team, h_team)
     a_name = TEAM_NAMES.get(a_team, a_team)
 
+    # Dynamic Sample & Coaching Context Overlay
+    ctx = _get_dynamic_sample_context(season=season, start_date=start_date, end_date=end_date, schedules_df=schedules_df, weekly_df=weekly_df)
+
+    h_coach = "Head Coach"
+    a_coach = "Head Coach"
+    h_games = 0
+    a_games = 0
+    sample_window = {
+        'season': season,
+        'start_date': start_date,
+        'end_date': end_date,
+        'sample_label': f"{season} Season Analysis",
+        'is_custom_date': bool(start_date and end_date),
+        'home_coach': h_coach,
+        'away_coach': a_coach,
+        'home_games_in_sample': h_games,
+        'away_games_in_sample': a_games,
+        'home_coaching_note': '',
+        'away_coaching_note': ''
+    }
+
+    if ctx is not None:
+        h_coach = ctx['team_coaches'].get(h_team) or h_coach
+        a_coach = ctx['team_coaches'].get(a_team) or a_coach
+        h_games = ctx['team_games_count'].get(h_team, 0)
+        a_games = ctx['team_games_count'].get(a_team, 0)
+
+        # Apply coaching scheme profiles if known coach
+        if h_coach in COACH_SCHEME_PROFILES:
+            cp = COACH_SCHEME_PROFILES[h_coach]
+            for k in ['archetype', 'zone_pct', 'man_pct', 'mfo_pct', 'mfc_pct',
+                      'cover_1', 'cover_2', 'cover_3', 'cover_4', 'cover_6', 'cover_0', 'blitz_pct']:
+                if k in cp:
+                    h_profile['coverage'][k] = cp[k]
+            h_profile['coverage']['coaching_note'] = cp.get('coaching_note', '')
+            h_profile['coverage']['active_coach'] = h_coach
+        else:
+            h_profile['coverage']['active_coach'] = h_coach
+            h_profile['coverage']['coaching_note'] = f"Active Head Coach: {h_coach}"
+
+        if a_coach in COACH_SCHEME_PROFILES:
+            cp = COACH_SCHEME_PROFILES[a_coach]
+            for k in ['archetype', 'zone_pct', 'man_pct', 'mfo_pct', 'mfc_pct',
+                      'cover_1', 'cover_2', 'cover_3', 'cover_4', 'cover_6', 'cover_0', 'blitz_pct']:
+                if k in cp:
+                    a_profile['coverage'][k] = cp[k]
+            a_profile['coverage']['coaching_note'] = cp.get('coaching_note', '')
+            a_profile['coverage']['active_coach'] = a_coach
+        else:
+            a_profile['coverage']['active_coach'] = a_coach
+            a_profile['coverage']['coaching_note'] = f"Active Head Coach: {a_coach}"
+
+        # Dynamic Def YPC Allowed & Ranks
+        h_def_ypc = ctx['team_def_ypc'].get(h_team)
+        h_rank = ctx['ypc_ranks'].get(h_team)
+        if h_def_ypc is not None:
+            h_profile['run_scheme']['def_gap_ypc_allowed'] = round(h_def_ypc * 0.98, 2)
+            h_profile['run_scheme']['def_zone_ypc_allowed'] = round(h_def_ypc * 1.02, 2)
+            h_profile['run_scheme']['def_gap_rank'] = h_rank
+            h_profile['run_scheme']['def_zone_rank'] = h_rank
+
+        a_def_ypc = ctx['team_def_ypc'].get(a_team)
+        a_rank = ctx['ypc_ranks'].get(a_team)
+        if a_def_ypc is not None:
+            a_profile['run_scheme']['def_gap_ypc_allowed'] = round(a_def_ypc * 0.98, 2)
+            a_profile['run_scheme']['def_zone_ypc_allowed'] = round(a_def_ypc * 1.02, 2)
+            a_profile['run_scheme']['def_gap_rank'] = a_rank
+            a_profile['run_scheme']['def_zone_rank'] = a_rank
+
+        # Dynamic Offense Rush YPC
+        h_rush_ypc = ctx['team_rush_ypc'].get(h_team)
+        if h_rush_ypc is not None:
+            h_profile['run_scheme']['zone_ypc'] = round(h_rush_ypc * 1.01, 2)
+            h_profile['run_scheme']['gap_ypc'] = round(h_rush_ypc * 0.99, 2)
+        a_rush_ypc = ctx['team_rush_ypc'].get(a_team)
+        if a_rush_ypc is not None:
+            a_profile['run_scheme']['zone_ypc'] = round(a_rush_ypc * 1.01, 2)
+            a_profile['run_scheme']['gap_ypc'] = round(a_rush_ypc * 0.99, 2)
+
+        sample_window = {
+            'season': ctx['season'],
+            'start_date': ctx['start_date'],
+            'end_date': ctx['end_date'],
+            'sample_label': ctx['sample_label'],
+            'is_custom_date': ctx['is_custom_date'],
+            'home_coach': h_coach,
+            'away_coach': a_coach,
+            'home_games_in_sample': h_games,
+            'away_games_in_sample': a_games,
+            'home_coaching_note': h_profile['coverage'].get('coaching_note', ''),
+            'away_coaching_note': a_profile['coverage'].get('coaching_note', '')
+        }
+
     # -------------------------------------------------------------
     # Pillar 1: Defensive Coverage Tendencies & Shell Archetype (0:49, 17:53)
     # -------------------------------------------------------------
-    # Matchup Battle 1: Away Offense vs Home Defense
     # Matchup Battle 1: Away Offense vs Home Defense
     h_cov = h_profile['coverage']
     if h_cov['zone_pct'] >= 60.0:
@@ -461,6 +828,8 @@ def compute_scheme_insights(
     a_vs_h_cov = {
         'offense_team': a_team,
         'defense_team': h_team,
+        'active_coach': h_profile['coverage'].get('active_coach', h_coach),
+        'coaching_note': h_profile['coverage'].get('coaching_note', ''),
         'def_zone_pct': h_cov['zone_pct'],
         'def_man_pct': h_cov['man_pct'],
         'def_mfo_pct': h_cov['mfo_pct'],
@@ -477,11 +846,11 @@ def compute_scheme_insights(
             'Cover 0 Blitz': h_cov['cover_0']
         },
         'shell_takeaway': (
-            f"{h_team} operates primarily in {h_cov['mfo_pct']:.1f}% Middle-Field Open (MFO) "
+            f"{h_team} ({h_coach}) operates primarily in {h_cov['mfo_pct']:.1f}% Middle-Field Open (MFO) "
             f"sets, designed to eliminate 20+ yard boundary explosives against {a_team}'s passing attack. "
             f"This shell surrenders soft underneath cushions to slot receivers and inline tight ends."
             if h_cov['mfo_pct'] > 50 else
-            f"{h_team} plays {h_cov['mfc_pct']:.1f}% Middle-Field Closed (MFC) single-high shells, "
+            f"{h_team} ({h_coach}) plays {h_cov['mfc_pct']:.1f}% Middle-Field Closed (MFC) single-high shells, "
             f"stacking 8 defenders in the box to choke interior runs and forcing 1-on-1 boundary matchups for {a_team} receivers."
         )
     }
@@ -502,6 +871,8 @@ def compute_scheme_insights(
     h_vs_a_cov = {
         'offense_team': h_team,
         'defense_team': a_team,
+        'active_coach': a_profile['coverage'].get('active_coach', a_coach),
+        'coaching_note': a_profile['coverage'].get('coaching_note', ''),
         'def_zone_pct': a_cov['zone_pct'],
         'def_man_pct': a_cov['man_pct'],
         'def_mfo_pct': a_cov['mfo_pct'],
@@ -518,10 +889,10 @@ def compute_scheme_insights(
             'Cover 0 Blitz': a_cov['cover_0']
         },
         'shell_takeaway': (
-            f"{a_team} deploys {a_cov['mfo_pct']:.1f}% MFO shells. Expect {h_team} to leverage "
+            f"{a_team} ({a_coach}) deploys {a_cov['mfo_pct']:.1f}% MFO shells. Expect {h_team} to leverage "
             f"underneath intermediate crossing routes and check-downs to sustain long drives."
             if a_cov['mfo_pct'] > 50 else
-            f"{a_team} utilizes {a_cov['mfc_pct']:.1f}% MFC single-high coverage. "
+            f"{a_team} ({a_coach}) utilizes {a_cov['mfc_pct']:.1f}% MFC single-high coverage. "
             f"Look for {h_team} to dial up vertical boundary shots against isolated cornerbacks."
         )
     }
@@ -876,6 +1247,7 @@ def compute_scheme_insights(
         'away_team_name': a_name,
         'season': season,
         'week': week,
+        'sample_window': sample_window,
         'thesis_quote': thesis_quote,
         'coverage_tendencies': {
             'away_vs_home': a_vs_h_cov,
