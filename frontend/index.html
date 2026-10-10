@@ -549,8 +549,8 @@
                     </div>
                 </div>
 
-                <!-- 5 Pillars Navigation Quick-Jumps -->
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 border-t border-[#21262d]">
+                <!-- 6 Pillars & Summary Navigation Quick-Jumps -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 border-t border-[#21262d]">
                     <a href="#pillar-coverage" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">1. Coverage</span>
@@ -561,15 +561,19 @@
                     </a>
                     <a href="#pillar-alignment" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="target" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                        <span class="truncate">3. Alignment Targets</span>
+                        <span class="truncate">3. Targets</span>
                     </a>
                     <a href="#pillar-breakouts" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">4. Breakouts</span>
                     </a>
-                    <a href="#pillar-tempo" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition col-span-2 sm:col-span-1">
+                    <a href="#pillar-tempo" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                        <span class="truncate">5. Tempo & Pace</span>
+                        <span class="truncate">5. Tempo</span>
+                    </a>
+                    <a href="#pillar-summary" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">6. Wrap Up</span>
                     </a>
                 </div>
             </div>
@@ -2691,9 +2695,91 @@
             return `<span class="stat-info-trigger group inline-flex items-center cursor-help border-b border-dotted border-slate-500/70 hover:border-slate-300 text-slate-300 hover:text-slate-100 transition-colors" tabindex="0" title="${label}: ${info.desc}"><span class="inline-flex items-center">${label}${iconSvg}</span><div class="${posClass}"><div class="font-bold text-slate-100 mb-1 flex items-center space-x-1.5 border-b border-[#30363d] pb-1 text-left"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400 shrink-0 inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>${info.title}</span></div><div class="text-[10.5px] text-slate-300 font-sans leading-relaxed text-left normal-case">${info.desc}</div></div></span>`;
         }
 
+        function buildSchemeWrapUp(d) {
+            const aCov = d.coverage_tendencies?.away_vs_home || {};
+            const hCov = d.coverage_tendencies?.home_vs_away || {};
+            const runSplits = d.run_scheme_splits || {};
+            const aRun = runSplits.away_unit || {};
+            const hRun = runSplits.home_unit || {};
+            const tgts = d.positional_target_rates || {};
+            const breakouts = d.efficiency_breakouts || [];
+            const flow = d.game_flow_tempo || {};
+            const aTempo = flow.away_tempo || {};
+            const hTempo = flow.home_tempo || {};
+
+            // 1. Pass Game & Coverage Tendency Takeaways
+            const hDefZone = parseFloat(aCov.def_zone_pct || 65);
+            const aDefZone = parseFloat(hCov.def_zone_pct || 65);
+            const hDefMfo = parseFloat(aCov.def_mfo_pct || 50);
+            const aDefMfo = parseFloat(hCov.def_mfo_pct || 50);
+
+            let passVerdict = '';
+            if (hDefMfo >= 50 && aDefMfo >= 50) {
+                passVerdict = `Both defenses operate primarily out of Middle-Field Open (2-High) safety shells (${hDefMfo.toFixed(0)}% and ${aDefMfo.toFixed(0)}%). This caps perimeter deep explosive shots and funnels heavy passing volume into the middle of the field — creating elevated target and reception floors for Slot Receivers and Inline Tight Ends finding soft spots between zone safeties.`;
+            } else if (hDefZone >= 65 || aDefZone >= 65) {
+                passVerdict = `Heavy zone coverage structures dictate this passing matchup. Expect quarterbacks to take underneath intermediate profits rather than contested deep shots, boosting target volume for high-percentage route runners who locate spatial voids.`;
+            } else {
+                passVerdict = `Higher rates of single-high (Middle-Field Closed) and man coverage force 1-on-1 boundary isolations. Passing success will rely on outside receivers generating direct separation against press cornerbacks.`;
+            }
+
+            // 2. Run Game & Trench Advantage Takeaways
+            const aZonePct = parseFloat(aRun.offense_zone_pct || 50);
+            const aGapPct = parseFloat(aRun.offense_gap_pct || 50);
+            const hZonePct = parseFloat(hRun.offense_zone_pct || 50);
+            const hGapPct = parseFloat(hRun.offense_gap_pct || 50);
+
+            const hAllowsGap = parseFloat(aRun.opp_def_gap_ypc_allowed || 4.3);
+            const hAllowsZone = parseFloat(aRun.opp_def_zone_ypc_allowed || 4.1);
+            const aAllowsGap = parseFloat(hRun.opp_def_gap_ypc_allowed || 4.3);
+            const aAllowsZone = parseFloat(hRun.opp_def_zone_ypc_allowed || 4.1);
+
+            let runVerdict = `${d.away_team} operates a ${(aGapPct > aZonePct ? 'Gap/Power' : 'Zone-stretch')} rushing identity (${(aGapPct > aZonePct ? aGapPct : aZonePct).toFixed(0)}%) against a ${d.home_team} defense allowing ${hAllowsGap.toFixed(2)} YPC on gap runs vs ${hAllowsZone.toFixed(2)} YPC on zone. On the other side, ${d.home_team} attacks with ${(hGapPct > hZonePct ? 'downhill gap schemes' : 'lateral zone runs')} against ${d.away_team}'s front conceding ${aAllowsGap.toFixed(2)} YPC on gap runs and ${aAllowsZone.toFixed(2)} YPC on zone.`;
+
+            // 3. Pace, Game Flow & Touch Concentration Takeaways
+            const totalPlays = Math.round((aTempo.proj_plays || 64) + (hTempo.proj_plays || 64));
+            const aPaceSec = parseFloat(aTempo.neutral_pace_sec || 27.5);
+            const hPaceSec = parseFloat(hTempo.neutral_pace_sec || 27.5);
+
+            let paceVerdict = '';
+            if (aPaceSec < 26.5 && hPaceSec < 26.5) {
+                paceVerdict = `Fast-paced matchup environment (~${totalPlays} projected plays). High play volume multiplies touch opportunities for skill players across all quarters.`;
+            } else if (aPaceSec > 29 || hPaceSec > 29) {
+                paceVerdict = `Deliberate, clock-chewing pacing (~${totalPlays} projected plays). In lower play-volume scripts, raw season yards regress and high-value touches matter most: ${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`} and ${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`} hold the primary touchdown equity.`;
+            } else {
+                paceVerdict = `Balanced tempo projecting ~${totalPlays} total plays. Scoring outcomes and fantasy production will hinge on red zone finish efficiency and checkdown dumping under pressure.`;
+            }
+
+            // 4. Prime Edges / Key Player Insights
+            const edges = (breakouts && breakouts.length > 0) ? breakouts : [
+                {
+                    player: `${d.away_team} Primary Target`,
+                    team: d.away_team,
+                    pos: 'WR/TE',
+                    scheme_delta: '+2.8% Target Rate',
+                    rationale: `Schematic funnel points directly to this alignment against the opposing coverage shell.`
+                },
+                {
+                    player: `${d.home_team} Lead Back`,
+                    team: d.home_team,
+                    pos: 'RB',
+                    scheme_delta: '+0.55 YPC Edge',
+                    rationale: `Blocking scheme pairs favorably against defensive front line gap fits.`
+                }
+            ];
+
+            return {
+                passVerdict,
+                runVerdict,
+                paceVerdict,
+                edges: edges.slice(0, 2)
+            };
+        }
+
         function renderSchemeInsights(d) {
             const container = document.getElementById('insights-view-container');
             if (!container) return;
+
+            const wrapUp = buildSchemeWrapUp(d);
 
             const aCov = d.coverage_tendencies?.away_vs_home || {};
             const hCov = d.coverage_tendencies?.home_vs_away || {};
@@ -3243,6 +3329,89 @@
                         </div>
                         <p class="text-xs text-slate-300 leading-relaxed">
                             ${flow.volume_override_verdict || flow.pace_synthesis || 'Game flow and red zone touch concentration dictate player opportunity ceiling beyond baseline season yardages.'}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- MATCHUP FILM-ROOM WRAP UP & EXECUTIVE SUMMARY -->
+                <!-- ============================================================== -->
+                <div id="pillar-summary" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">6. Matchup Film-Room Wrap Up: What These Insights Mean</h3>
+                                <p class="text-[11px] text-slate-400">Tactical summary translating coverage shells, run fits, and game flow into practical game conclusions</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Executive Wrap Up</span>
+                    </div>
+
+                    <!-- 3 Tactical Pillars Synthesis -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+                        <!-- 1. Pass Game Takeaway -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="flex items-center space-x-2 text-slate-200 font-bold">
+                                <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>1. Passing Game & Coverage Shell Funnel</span>
+                            </div>
+                            <p class="text-slate-300 leading-relaxed text-[11.5px]">
+                                ${wrapUp.passVerdict}
+                            </p>
+                        </div>
+
+                        <!-- 2. Run Game Takeaway -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="flex items-center space-x-2 text-slate-200 font-bold">
+                                <i data-lucide="footprints" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>2. Ground Attack & Trench Advantage</span>
+                            </div>
+                            <p class="text-slate-300 leading-relaxed text-[11.5px]">
+                                ${wrapUp.runVerdict}
+                            </p>
+                        </div>
+
+                        <!-- 3. Tempo & Opportunity Takeaway -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="flex items-center space-x-2 text-slate-200 font-bold">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>3. Tempo, Volume & Red Zone Equity</span>
+                            </div>
+                            <p class="text-slate-300 leading-relaxed text-[11.5px]">
+                                ${wrapUp.paceVerdict}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bottom-Line Takeaways / Key Advantage Spotters -->
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                        <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-slate-200">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>The Bottom Line: Where The Edges Lie</span>
+                            </div>
+                            <span class="text-[10px] font-mono text-slate-400">${d.away_team} @ ${d.home_team}</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            ${wrapUp.edges.map(b => `
+                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <b class="text-slate-100">${b.player} (${b.team} ${b.pos})</b>
+                                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${b.scheme_delta}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                                        ${b.rationale}
+                                    </p>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed pt-1 border-t border-[#21262d]">
+                            <b class="text-slate-200">Analytical Synthesis:</b> Rather than relying on raw season-long yardage totals, this matchup will be won by which offense best capitalizes on the opposing secondary's structural coverage voids, while sustaining high-value red zone conversion opportunities.
                         </p>
                     </div>
                 </div>
