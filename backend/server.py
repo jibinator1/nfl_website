@@ -15,6 +15,7 @@ import pandas as pd
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 
@@ -27,6 +28,7 @@ from backend.analytics import (
     compute_match_history,
     compute_floor_streak_df
 )
+from backend.scheme_insights import compute_scheme_insights
 
 load_dotenv()
 
@@ -97,6 +99,19 @@ app.add_middleware(
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_DIR = os.path.join(ROOT_DIR, 'frontend')
 
+# Mount static files and direct asset directories for frontend
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+    js_dir = os.path.join(FRONTEND_DIR, 'js')
+    if os.path.exists(js_dir):
+        app.mount("/js", StaticFiles(directory=js_dir), name="js")
+    css_dir = os.path.join(FRONTEND_DIR, 'css')
+    if os.path.exists(css_dir):
+        app.mount("/css", StaticFiles(directory=css_dir), name="css")
+    data_dir = os.path.join(FRONTEND_DIR, 'data')
+    if os.path.exists(data_dir):
+        app.mount("/data", StaticFiles(directory=data_dir), name="data")
+
 # Initialize Data Loader singleton (seasons 2023-2026)
 engine = NFLDataLoader(seasons=[2023, 2024, 2025, 2026])
 _data_lock = threading.Lock()
@@ -124,10 +139,10 @@ async def favicon():
 @app.get("/index.html", response_class=HTMLResponse)
 async def serve_index():
     candidates = [
-        os.path.join(ROOT_DIR, "index.html"),
         os.path.join(FRONTEND_DIR, "index.html"),
-        os.path.join(os.getcwd(), "index.html"),
+        os.path.join(ROOT_DIR, "index.html"),
         os.path.join(os.getcwd(), "frontend", "index.html"),
+        os.path.join(os.getcwd(), "index.html"),
         "index.html",
     ]
     for p in candidates:
@@ -374,6 +389,33 @@ async def export_matchups_excel_endpoint(
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             headers={"Content-Disposition": f'attachment; filename="{filename}"'}
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/scheme-insights")
+async def get_scheme_insights_endpoint(
+    home_team: str = Query(..., description="Home Team Abbreviation"),
+    away_team: str = Query(..., description="Away Team Abbreviation"),
+    season: int = Query(2026, description="NFL Season (e.g. 2026, 2025)"),
+    week: int = Query(1, description="NFL Week Number")
+):
+    """
+    Returns 5-pillar scheme analytics:
+    1. Defensive Coverage Tendencies (Zone vs Man, MFO vs MFC sets)
+    2. Run-Scheme Splits (Zone vs Gap rushing vs defense vulnerabilities)
+    3. Positional Target Rates (Slot vs Outside WR, Inline TE, target rates vs coverage)
+    4. Efficiency by Context (Scheme-specific YPC/YPR breakout spotters)
+    5. Game-Flow & Tempo (Time of possession, neutral pace, red zone touch share, check-downs)
+    """
+    try:
+        data = compute_scheme_insights(
+            home_team=home_team.upper(),
+            away_team=away_team.upper(),
+            season=season,
+            week=week
+        )
+        return sanitize_nan(data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
