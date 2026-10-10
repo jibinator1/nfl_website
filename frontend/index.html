@@ -208,7 +208,7 @@
                 <span>Player Floor Streaks</span>
             </button>
             <button onclick="switchTab('insights')" id="tab-btn-insights" class="py-2.5 px-1 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center space-x-2 transition whitespace-nowrap">
-                <i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>
+                <i data-lucide="brain" class="w-4 h-4 text-slate-400"></i>
                 <span>Insights</span>
             </button>
         </div>
@@ -490,10 +490,10 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <h2 class="text-sm font-bold text-slate-100 flex items-center space-x-2">
-                                <i data-lucide="brain" class="w-4 h-4 text-purple-400"></i>
+                                <i data-lucide="brain" class="w-4 h-4 text-slate-400"></i>
                                 <span>Scheme-Based Matchup Insights</span>
                             </h2>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-purple-500/15 text-purple-300 border border-purple-500/30">5 Film-Room Pillars</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-200 border border-[#30363d]">5 Analytical Pillars</span>
                         </div>
                         <p class="text-xs text-slate-400 mt-1">
                             Deep analytical scheme cross-referencing: Coverage Tendencies (Zone vs Man, MFO vs MFC), Run-Scheme Splits, Alignment Target Rates, Scheme Efficiency Breakout Spotters, and Tempo / Game Flow.
@@ -504,10 +504,10 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center bg-[#21262d] border border-[#30363d] rounded-lg p-1 space-x-2 text-xs">
                             <span class="text-slate-400 font-medium text-[11px] pl-2 flex items-center gap-1">
-                                <i data-lucide="crosshair" class="w-3.5 h-3.5 text-purple-400"></i>
+                                <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
                                 <span>Matchup:</span>
                             </span>
-                            <select id="insights-matchup-select" onchange="onInsightsMatchupSelectChange(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-purple-500 font-medium cursor-pointer max-w-[260px] sm:max-w-xs truncate">
+                            <select id="insights-matchup-select" onchange="onInsightsMatchupSelectChange(this.value)" class="bg-[#161b22] border border-[#30363d] text-slate-200 rounded px-2.5 py-1 text-xs outline-none focus:border-slate-500 font-medium cursor-pointer max-w-[260px] sm:max-w-xs truncate">
                                 <option value="">Select a game...</option>
                             </select>
                         </div>
@@ -521,24 +521,24 @@
 
                 <!-- 5 Pillars Navigation Quick-Jumps -->
                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 border-t border-[#21262d]">
-                    <a href="#pillar-coverage" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="shield" class="w-3.5 h-3.5 text-cyan-400 shrink-0"></i>
+                    <a href="#pillar-coverage" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">1. Coverage</span>
                     </a>
-                    <a href="#pillar-run" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="footprints" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                    <a href="#pillar-run" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="footprints" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">2. Run Splits</span>
                     </a>
-                    <a href="#pillar-alignment" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+                    <a href="#pillar-alignment" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="target" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">3. Alignment Targets</span>
                     </a>
-                    <a href="#pillar-breakouts" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="zap" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+                    <a href="#pillar-breakouts" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">4. Breakouts</span>
                     </a>
-                    <a href="#pillar-tempo" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 flex items-center justify-center space-x-1.5 text-center transition col-span-2 sm:col-span-1">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+                    <a href="#pillar-tempo" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition col-span-2 sm:col-span-1">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">5. Tempo & Pace</span>
                     </a>
                 </div>
@@ -547,7 +547,7 @@
             <!-- Insights Dynamic Container -->
             <div id="insights-view-container" class="space-y-5">
                 <div class="glass-panel rounded-xl p-12 text-center text-slate-400 space-y-3">
-                    <i data-lucide="mouse-pointer-click" class="w-8 h-8 mx-auto text-purple-400 opacity-80"></i>
+                    <i data-lucide="mouse-pointer-click" class="w-7 h-7 mx-auto text-slate-500"></i>
                     <p class="text-sm font-semibold text-slate-200">Select any matchup from the dropdown or click a game on Schedule & Matchups</p>
                     <p class="text-xs text-slate-500 max-w-md mx-auto">Clicking any game card immediately loads its complete 5-pillar scheme breakdown, defensive coverage tendencies, and breakout spotters.</p>
                 </div>
@@ -1741,8 +1741,8 @@
                             <span class="font-mono text-slate-400">${g.gametime ? g.gametime + ' ET' : 'TBD'}</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="event.stopPropagation(); openMatchupInsights('${g.home_team}', '${g.away_team}', ${g.week || 1})" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 flex items-center space-x-1 transition cursor-pointer" title="View Scheme Insights for this matchup">
-                                <i data-lucide="brain" class="w-3 h-3 text-purple-400"></i>
+                            <button onclick="event.stopPropagation(); openMatchupInsights('${g.home_team}', '${g.away_team}', ${g.week || 1})" class="px-2 py-0.5 rounded text-[10px] font-medium bg-[#21262d] hover:bg-[#30363d] text-slate-300 hover:text-slate-100 border border-[#30363d] flex items-center space-x-1.5 transition cursor-pointer" title="View Scheme Insights for this matchup">
+                                <i data-lucide="brain" class="w-3 h-3 text-slate-400"></i>
                                 <span>Insights</span>
                             </button>
                             ${oddsBadgeHtml}
@@ -2493,7 +2493,7 @@
             isInsightsLoading = true;
             container.innerHTML = `
                 <div class="glass-panel rounded-xl p-12 text-center text-slate-400 space-y-3">
-                    <i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto text-purple-400"></i>
+                    <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-slate-400"></i>
                     <p class="text-sm font-semibold text-slate-200">Analyzing ${awayTeam} @ ${homeTeam} Scheme Profiles...</p>
                     <p class="text-xs text-slate-500 max-w-md mx-auto">Cross-referencing Zone vs Man coverage shells, run splits, and breakout spotters.</p>
                 </div>
@@ -2557,11 +2557,11 @@
                 <div class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#30363d] pb-4">
                         <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-black text-slate-100 font-mono text-base shadow-inner">
+                            <div class="w-10 h-10 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-extrabold text-slate-200 font-mono text-sm shadow-inner shrink-0">
                                 ${d.away_team}
                             </div>
-                            <div class="text-xs font-bold text-slate-400">@</div>
-                            <div class="w-12 h-12 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-black text-slate-100 font-mono text-base shadow-inner">
+                            <div class="text-xs font-bold text-slate-500">@</div>
+                            <div class="w-10 h-10 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-extrabold text-slate-200 font-mono text-sm shadow-inner shrink-0">
                                 ${d.home_team}
                             </div>
                             <div>
@@ -2571,20 +2571,20 @@
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-1 rounded text-xs font-mono font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                                5 Scheme Pillars Ingested
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">
+                                5 Scheme Pillars
                             </span>
-                            <span class="px-2.5 py-1 rounded text-xs font-mono font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                                Active Model Match
+                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">
+                                Active Model
                             </span>
                         </div>
                     </div>
 
-                    <!-- Executive Film Room Quote Banner -->
-                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 flex items-start space-x-3">
-                        <i data-lucide="sparkles" class="w-4 h-4 text-purple-400 mt-0.5 shrink-0"></i>
+                    <!-- Film Room Analytical Thesis Banner -->
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3 flex items-start space-x-2.5">
+                        <i data-lucide="info" class="w-4 h-4 text-slate-400 mt-0.5 shrink-0"></i>
                         <div class="text-xs text-slate-300 leading-relaxed">
-                            <b class="text-purple-300">Film-Room Thesis:</b> ${d.thesis_quote || 'Scheme cross-referencing isolates whether passing concepts exploit middle-field open safeties, downhill gap blocking pushes light boxes, and tempo concentrates situational volume.'}
+                            <b class="text-slate-100">Film-Room Thesis:</b> ${d.thesis_quote || 'Scheme cross-referencing isolates whether passing concepts exploit middle-field open safeties, downhill gap blocking pushes light boxes, and tempo concentrates situational volume.'}
                         </div>
                     </div>
                 </div>
@@ -2594,16 +2594,16 @@
                 <!-- ============================================================== -->
                 <div id="pillar-coverage" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="p-1.5 rounded-lg bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
-                                <i data-lucide="shield" class="w-4 h-4"></i>
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-slate-100">1. Defensive Coverage Tendencies</h3>
                                 <p class="text-[11px] text-slate-400">Zone vs Man rates, Middle-Field Open (MFO) vs Closed (MFC) safety shells, and blitz tendencies</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#21262d] text-cyan-300 border border-[#30363d]">Video Ref: 0:49, 17:53</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 0:49, 17:53</span>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -2611,7 +2611,7 @@
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Offense vs ${d.home_team} Defense</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">${aCov.def_archetype || 'Hybrid Secondary'}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${aCov.def_archetype || 'Hybrid Secondary'}</span>
                             </div>
 
                             <!-- Zone vs Man Bar -->
@@ -2621,8 +2621,8 @@
                                     <span>Man Coverage: <b>${fmtPct(aCov.def_man_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
-                                    <div class="bg-cyan-500 h-full" style="width: ${aCov.def_zone_pct || 65}%"></div>
-                                    <div class="bg-indigo-500 h-full" style="width: ${aCov.def_man_pct || 35}%"></div>
+                                    <div class="bg-slate-300 h-full" style="width: ${aCov.def_zone_pct || 65}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${aCov.def_man_pct || 35}%"></div>
                                 </div>
                             </div>
 
@@ -2633,8 +2633,8 @@
                                     <span>Middle-Field Closed (1-High / MFC): <b>${fmtPct(aCov.def_mfc_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
-                                    <div class="bg-emerald-500 h-full" style="width: ${aCov.def_mfo_pct || 55}%"></div>
-                                    <div class="bg-amber-500 h-full" style="width: ${aCov.def_mfc_pct || 45}%"></div>
+                                    <div class="bg-slate-300 h-full" style="width: ${aCov.def_mfo_pct || 55}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${aCov.def_mfc_pct || 45}%"></div>
                                 </div>
                             </div>
 
@@ -2671,12 +2671,12 @@
 
                             <!-- Exploit & Vulnerability Callout -->
                             <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-[11px] space-y-1">
-                                <div class="text-slate-400 flex items-center gap-1 font-semibold">
-                                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
+                                <div class="text-slate-300 flex items-center gap-1 font-semibold">
+                                    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
                                     <span>Secondary Vulnerability:</span>
                                 </div>
-                                <p class="text-slate-300 leading-relaxed">${aCov.vulnerability_note || 'Middle of field vulnerable to seam routes when rolling single-high.'}</p>
-                                <p class="text-cyan-300/90 pt-1 font-medium">${aCov.offense_exploit || 'Exploitable via slot option routes and high-low boundary concepts.'}</p>
+                                <p class="text-slate-400 leading-relaxed">${aCov.vulnerability_note || 'Middle of field vulnerable to seam routes when rolling single-high.'}</p>
+                                <p class="text-slate-300 pt-0.5 font-medium">${aCov.offense_exploit || 'Exploitable via slot option routes and high-low boundary concepts.'}</p>
                             </div>
                         </div>
 
@@ -2684,7 +2684,7 @@
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Offense vs ${d.away_team} Defense</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">${hCov.def_archetype || 'Hybrid Secondary'}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${hCov.def_archetype || 'Hybrid Secondary'}</span>
                             </div>
 
                             <!-- Zone vs Man Bar -->
@@ -2694,8 +2694,8 @@
                                     <span>Man Coverage: <b>${fmtPct(hCov.def_man_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
-                                    <div class="bg-cyan-500 h-full" style="width: ${hCov.def_zone_pct || 65}%"></div>
-                                    <div class="bg-indigo-500 h-full" style="width: ${hCov.def_man_pct || 35}%"></div>
+                                    <div class="bg-slate-300 h-full" style="width: ${hCov.def_zone_pct || 65}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${hCov.def_man_pct || 35}%"></div>
                                 </div>
                             </div>
 
@@ -2706,8 +2706,8 @@
                                     <span>Middle-Field Closed (1-High / MFC): <b>${fmtPct(hCov.def_mfc_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
-                                    <div class="bg-emerald-500 h-full" style="width: ${hCov.def_mfo_pct || 55}%"></div>
-                                    <div class="bg-amber-500 h-full" style="width: ${hCov.def_mfc_pct || 45}%"></div>
+                                    <div class="bg-slate-300 h-full" style="width: ${hCov.def_mfo_pct || 55}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${hCov.def_mfc_pct || 45}%"></div>
                                 </div>
                             </div>
 
@@ -2744,12 +2744,12 @@
 
                             <!-- Exploit & Vulnerability Callout -->
                             <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-[11px] space-y-1">
-                                <div class="text-slate-400 flex items-center gap-1 font-semibold">
-                                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-amber-400"></i>
+                                <div class="text-slate-300 flex items-center gap-1 font-semibold">
+                                    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
                                     <span>Secondary Vulnerability:</span>
                                 </div>
-                                <p class="text-slate-300 leading-relaxed">${hCov.vulnerability_note || 'Two-high safeties concede intermediate soft spots behind linebackers.'}</p>
-                                <p class="text-cyan-300/90 pt-1 font-medium">${hCov.offense_exploit || 'Exploitable via intermediate crossing routes and tight end seam shots.'}</p>
+                                <p class="text-slate-400 leading-relaxed">${hCov.vulnerability_note || 'Two-high safeties concede intermediate soft spots behind linebackers.'}</p>
+                                <p class="text-slate-300 pt-0.5 font-medium">${hCov.offense_exploit || 'Exploitable via intermediate crossing routes and tight end seam shots.'}</p>
                             </div>
                         </div>
                     </div>
@@ -2760,16 +2760,16 @@
                 <!-- ============================================================== -->
                 <div id="pillar-run" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="p-1.5 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                                <i data-lucide="footprints" class="w-4 h-4"></i>
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="footprints" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-slate-100">2. Run-Scheme Splits & Defensive Front Vulnerabilities</h3>
                                 <p class="text-[11px] text-slate-400">Zone vs Man/Gap rushing style vs defense run-stopping efficiency by concept</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#21262d] text-amber-300 border border-[#30363d]">Video Ref: 4:58, 12:00</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 4:58, 12:00</span>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -2777,7 +2777,7 @@
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Ground Attack</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-semibold ${aRun.scheme_advantage === 'Exploit Advantage' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : (aRun.scheme_advantage === 'Disadvantage' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'bg-[#21262d] text-slate-300 border border-[#30363d]')}">${aRun.scheme_advantage || 'Neutral Front'}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${aRun.scheme_advantage || 'Neutral Front'}</span>
                             </div>
 
                             <!-- Zone vs Gap Run Ratio -->
@@ -2787,8 +2787,8 @@
                                     <span>Gap/Man Runs: <b>${fmtPct(aRun.offense_gap_pct)}</b> (${fmtDec(aRun.gap_ypc)} YPC)</span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
-                                    <div class="bg-amber-500 h-full" style="width: ${aRun.offense_zone_pct || 50}%"></div>
-                                    <div class="bg-orange-500 h-full" style="width: ${aRun.offense_gap_pct || 50}%"></div>
+                                    <div class="bg-slate-300 h-full" style="width: ${aRun.offense_zone_pct || 50}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${aRun.offense_gap_pct || 50}%"></div>
                                 </div>
                             </div>
 
@@ -2807,7 +2807,7 @@
                             </div>
 
                             <p class="text-xs text-slate-300 bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] leading-relaxed">
-                                <b class="text-amber-400">Diagnostic:</b> ${aRun.alignment_diagnostic || `${d.away_team} offensive run concepts test ${d.home_team}'s interior gap discipline.`}
+                                <b class="text-slate-200">Diagnostic:</b> ${aRun.alignment_diagnostic || `${d.away_team} offensive run concepts test ${d.home_team}'s interior gap discipline.`}
                             </p>
                         </div>
 
@@ -2815,7 +2815,7 @@
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Ground Attack</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-semibold ${hRun.scheme_advantage === 'Exploit Advantage' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : (hRun.scheme_advantage === 'Disadvantage' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'bg-[#21262d] text-slate-300 border border-[#30363d]')}">${hRun.scheme_advantage || 'Neutral Front'}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${hRun.scheme_advantage || 'Neutral Front'}</span>
                             </div>
 
                             <!-- Zone vs Gap Run Ratio -->
@@ -2825,8 +2825,8 @@
                                     <span>Gap/Man Runs: <b>${fmtPct(hRun.offense_gap_pct)}</b> (${fmtDec(hRun.gap_ypc)} YPC)</span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
-                                    <div class="bg-amber-500 h-full" style="width: ${hRun.offense_zone_pct || 50}%"></div>
-                                    <div class="bg-orange-500 h-full" style="width: ${hRun.offense_gap_pct || 50}%"></div>
+                                    <div class="bg-slate-300 h-full" style="width: ${hRun.offense_zone_pct || 50}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${hRun.offense_gap_pct || 50}%"></div>
                                 </div>
                             </div>
 
@@ -2845,7 +2845,7 @@
                             </div>
 
                             <p class="text-xs text-slate-300 bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] leading-relaxed">
-                                <b class="text-amber-400">Diagnostic:</b> ${hRun.alignment_diagnostic || `${d.home_team} offensive run concepts test ${d.away_team}'s interior gap discipline.`}
+                                <b class="text-slate-200">Diagnostic:</b> ${hRun.alignment_diagnostic || `${d.home_team} offensive run concepts test ${d.away_team}'s interior gap discipline.`}
                             </p>
                         </div>
                     </div>
@@ -2856,16 +2856,16 @@
                 <!-- ============================================================== -->
                 <div id="pillar-alignment" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="p-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                                <i data-lucide="target" class="w-4 h-4"></i>
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="target" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-slate-100">3. Positional Target Rates & Alignment Matchups</h3>
                                 <p class="text-[11px] text-slate-400">Target frequency by alignment (Slot vs Outside WR, Inline TE, Backfield RB) against coverage shell</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#21262d] text-emerald-300 border border-[#30363d]">Video Ref: 2:40, 10:47, 14:12</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 2:40, 10:47, 14:12</span>
                     </div>
 
                     <!-- Alignment Shares Overview Grid -->
@@ -2875,19 +2875,19 @@
                             <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Slot WR</span>
-                                    <b class="text-emerald-400">${fmtPct(aDist.slot_wr_pct || 30)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.slot_wr_pct || 30)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Outside WR</span>
-                                    <b class="text-cyan-400">${fmtPct(aDist.wide_wr_pct || 42)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.wide_wr_pct || 42)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Inline TE</span>
-                                    <b class="text-amber-400">${fmtPct(aDist.inline_te_pct || 18)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.inline_te_pct || 18)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Backfield RB</span>
-                                    <b class="text-purple-400">${fmtPct(aDist.backfield_rb_pct || 10)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.backfield_rb_pct || 10)}</b>
                                 </div>
                             </div>
                         </div>
@@ -2897,19 +2897,19 @@
                             <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Slot WR</span>
-                                    <b class="text-emerald-400">${fmtPct(hDist.slot_wr_pct || 32)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.slot_wr_pct || 32)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Outside WR</span>
-                                    <b class="text-cyan-400">${fmtPct(hDist.wide_wr_pct || 40)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.wide_wr_pct || 40)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Inline TE</span>
-                                    <b class="text-amber-400">${fmtPct(hDist.inline_te_pct || 18)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.inline_te_pct || 18)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Backfield RB</span>
-                                    <b class="text-purple-400">${fmtPct(hDist.backfield_rb_pct || 10)}</b>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.backfield_rb_pct || 10)}</b>
                                 </div>
                             </div>
                         </div>
@@ -2937,13 +2937,13 @@
                                         <td class="py-2 px-2 text-center text-slate-300 font-bold">${p.team}</td>
                                         <td class="py-2 px-2 text-center text-slate-400">${p.pos}</td>
                                         <td class="py-2 px-3 text-slate-300">
-                                            ${p.slot_pct > 40 ? `<span class="text-emerald-400">Slot (${p.slot_pct}%)</span>` : (p.inline_pct > 30 ? `<span class="text-amber-400">Inline TE (${p.inline_pct}%)</span>` : `<span class="text-cyan-400">Outside (${p.outside_pct}%)</span>`)}
+                                            ${p.slot_pct > 40 ? `<span>Slot (${p.slot_pct}%)</span>` : (p.inline_pct > 30 ? `<span>Inline TE (${p.inline_pct}%)</span>` : `<span>Outside (${p.outside_pct}%)</span>`)}
                                         </td>
                                         <td class="py-2 px-2 text-right font-bold text-slate-200">${fmtPct(p.tgt_zone)}</td>
                                         <td class="py-2 px-2 text-right text-slate-400">${fmtPct(p.tgt_man)}</td>
-                                        <td class="py-2 px-2 text-right text-emerald-400 font-bold">${fmtDec(p.yprr_zone || p.yprr_man || 1.8)}</td>
+                                        <td class="py-2 px-2 text-right text-slate-100 font-bold">${fmtDec(p.yprr_zone || p.yprr_man || 1.8)}</td>
                                         <td class="py-2 px-3 font-sans text-slate-300 text-[11px]">
-                                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${p.boost_tier === 'High Boost' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : (p.boost_tier === 'Moderate Boost' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : 'bg-[#161b22] text-slate-400 border border-[#30363d]')} mr-1">
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-300 border border-[#30363d] mr-1">
                                                 ${p.boost_tier || 'Neutral'}
                                             </span>
                                             ${p.expected_boost || 'Standard target look rate within progression.'}
@@ -2960,21 +2960,21 @@
                 <!-- ============================================================== -->
                 <div id="pillar-breakouts" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="p-1.5 rounded-lg bg-purple-500/15 text-purple-400 border border-purple-500/30">
-                                <i data-lucide="zap" class="w-4 h-4"></i>
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-slate-100">4. Efficiency by Context & Breakout Spotters</h3>
                                 <p class="text-[11px] text-slate-400">Scheme-specific YPC/YPR splits identifying players statistically primed for breakouts</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#21262d] text-purple-300 border border-[#30363d]">Video Ref: 12:05</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 12:05</span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
                         ${breakouts.map(b => `
-                            <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3 hover:border-purple-500/50 transition">
+                            <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3 hover:border-slate-500 transition">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-2">
                                         <span class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center font-bold font-mono text-xs text-slate-200">
@@ -2985,7 +2985,7 @@
                                             <span class="text-[10px] text-slate-400 font-mono">${b.pos} • ${b.scheme_type}</span>
                                         </div>
                                     </div>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 whitespace-nowrap">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#21262d] text-slate-300 border border-[#30363d] whitespace-nowrap">
                                         ${b.verdict}
                                     </span>
                                 </div>
@@ -2993,13 +2993,13 @@
                                 <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1 text-xs font-mono">
                                     <div class="flex justify-between text-slate-300">
                                         <span>Scheme Metric:</span>
-                                        <b class="text-emerald-400">${b.context_metric}</b>
+                                        <b class="text-slate-100">${b.context_metric}</b>
                                     </div>
                                     <div class="flex justify-between text-slate-400 text-[11px]">
                                         <span>Baseline Split:</span>
                                         <span>${b.season_baseline}</span>
                                     </div>
-                                    <div class="flex justify-between text-purple-300 text-[11px] font-bold border-t border-[#21262d] pt-1">
+                                    <div class="flex justify-between text-slate-200 text-[11px] font-semibold border-t border-[#21262d] pt-1">
                                         <span>Scheme Edge:</span>
                                         <span>${b.scheme_delta}</span>
                                     </div>
@@ -3010,7 +3010,7 @@
                                 </p>
                                 ${b.causal_mechanism ? `
                                     <p class="text-[10.5px] text-slate-400 font-mono bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <b class="text-slate-300">Causal Mechanism:</b> ${b.causal_mechanism}
+                                        <b class="text-slate-300 font-sans">Causal Mechanism:</b> ${b.causal_mechanism}
                                     </p>
                                 ` : ''}
                             </div>
@@ -3023,16 +3023,16 @@
                 <!-- ============================================================== -->
                 <div id="pillar-tempo" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2">
-                            <div class="p-1.5 rounded-lg bg-blue-500/15 text-blue-400 border border-blue-500/30">
-                                <i data-lucide="clock" class="w-4 h-4"></i>
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-slate-100">5. Game-Flow, Tempo & Situational Volume Override</h3>
                                 <p class="text-[11px] text-slate-400">Pace of play, time of possession, red zone touch concentration, and check-down rates that override talent projections</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#21262d] text-blue-300 border border-[#30363d]">Video Ref: 6:17, 26:54</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 6:17, 26:54</span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3040,7 +3040,7 @@
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Situational Pace</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">Pace Rank #${aTempo.pace_rank || 16}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">Pace Rank #${aTempo.pace_rank || 16}</span>
                             </div>
 
                             <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
@@ -3054,14 +3054,14 @@
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Checkdown Rate</span>
-                                    <b class="text-cyan-400">${fmtPct(aTempo.checkdown_pct || 14)}</b>
+                                    <b class="text-slate-200 font-bold">${fmtPct(aTempo.checkdown_pct || 14)}</b>
                                 </div>
                             </div>
 
                             <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-xs space-y-1">
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
                                     <span>RZ Touch Leader:</span>
-                                    <b class="text-emerald-400">${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`}</b>
+                                    <b class="text-slate-200">${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`}</b>
                                 </div>
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
                                     <span>RZ Pass Rate: <b>${fmtPct(aTempo.rz_pass_rate || 52)}</b></span>
@@ -3074,7 +3074,7 @@
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Situational Pace</span>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-semibold bg-[#21262d] text-slate-300 border border-[#30363d]">Pace Rank #${hTempo.pace_rank || 16}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">Pace Rank #${hTempo.pace_rank || 16}</span>
                             </div>
 
                             <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
@@ -3088,14 +3088,14 @@
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9px]">Checkdown Rate</span>
-                                    <b class="text-cyan-400">${fmtPct(hTempo.checkdown_pct || 14)}</b>
+                                    <b class="text-slate-200 font-bold">${fmtPct(hTempo.checkdown_pct || 14)}</b>
                                 </div>
                             </div>
 
                             <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-xs space-y-1">
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
                                     <span>RZ Touch Leader:</span>
-                                    <b class="text-emerald-400">${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`}</b>
+                                    <b class="text-slate-200">${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`}</b>
                                 </div>
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
                                     <span>RZ Pass Rate: <b>${fmtPct(hTempo.rz_pass_rate || 52)}</b></span>
@@ -3107,8 +3107,8 @@
 
                     <!-- Volume Override Synthesis -->
                     <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-1.5">
-                        <div class="flex items-center space-x-2 text-xs font-bold text-blue-300">
-                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                        <div class="flex items-center space-x-2 text-xs font-bold text-slate-200">
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
                             <span>Situational Volume Override Verdict</span>
                         </div>
                         <p class="text-xs text-slate-300 leading-relaxed">
