@@ -117,22 +117,22 @@
             bottom: calc(100% + 8px);
             left: 50%;
             transform: translateX(-50%) translateY(4px);
-            width: 250px;
+            width: 290px;
             max-width: calc(100vw - 32px);
-            padding: 8px 11px;
+            padding: 9px 12px;
             background: rgba(18, 22, 28, 0.98);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border: 1px solid #30363d;
-            border-radius: 8px;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8), 0 2px 6px rgba(0, 0, 0, 0.5);
+            border-radius: 9px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(0, 0, 0, 0.5);
             color: #c9d1d9;
             font-size: 11px;
             line-height: 1.45;
             text-transform: none;
             letter-spacing: normal;
             pointer-events: none;
-            z-index: 100;
+            z-index: 9999;
             transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.18s;
             transition-delay: 0s;
         }
@@ -1844,15 +1844,15 @@
                             <span class="stat-info-trigger" title="${explanation ? '' : label}">
                                 ${label}
                                 ${explanation ? `
-                                    <div class="stat-info-box">
-                                        <div class="font-bold text-slate-100 mb-1 flex items-center space-x-1.5 border-b border-[#30363d] pb-1 text-left">
+                                    <span class="stat-info-box block">
+                                        <span class="font-bold text-slate-100 mb-1 flex items-center space-x-1.5 border-b border-[#30363d] pb-1 text-left block">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-cyan-400 shrink-0 inline-block mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                                             <span>${label}</span>
-                                        </div>
-                                        <div class="text-slate-300 text-[10.5px] leading-relaxed text-left normal-case">
+                                        </span>
+                                        <span class="text-slate-300 text-[10.5px] leading-relaxed text-left normal-case block">
                                             ${explanation}
-                                        </div>
-                                    </div>
+                                        </span>
+                                    </span>
                                 ` : ''}
                             </span>
                         </div>
@@ -1947,15 +1947,15 @@
                             <div class="text-center">
                                 <span class="stat-info-trigger">
                                     PER-GAME STAT
-                                    <div class="stat-info-box">
-                                        <div class="font-bold text-slate-100 mb-1 flex items-center gap-1.5 border-b border-[#30363d] pb-1 text-left">
-                                            <i data-lucide="info" class="w-3 h-3 text-slate-400 shrink-0"></i>
+                                    <span class="stat-info-box block">
+                                        <span class="font-bold text-slate-100 mb-1 flex items-center gap-1.5 border-b border-[#30363d] pb-1 text-left block">
+                                            <i data-lucide="info" class="w-3 h-3 text-slate-400 shrink-0 inline"></i>
                                             <span>Per-Game Team Stats (Median Baselines)</span>
-                                        </div>
-                                        <div class="text-slate-300 text-[10.5px] leading-relaxed text-left normal-case">
+                                        </span>
+                                        <span class="text-slate-300 text-[10.5px] leading-relaxed text-left normal-case block">
                                             Head-to-head offensive volume & efficiency vs defensive resistance. Positional defense metrics (vs RB1, RB2, WR1, WR2, TE1, TE2) utilize player median baselines to isolate true defensive containment from single-game blowout outliers. Hover over any individual stat below for its exact definition.
-                                        </div>
-                                    </div>
+                                        </span>
+                                    </span>
                                 </span>
                                 ${a.is_shrunk || h.is_shrunk ? '<span class="text-[8px] text-amber-400/90 font-mono block normal-case font-normal tracking-normal">(Empirical Bayes Shrunk with Prior)</span>' : ''}
                             </div>
@@ -2681,119 +2681,590 @@
         const SCHEME_EXPLANATIONS = {
             'Cover 1': {
                 title: 'Cover 1 (Man Coverage)',
-                desc: 'Man-to-man coverage across receivers with 1 single-high safety (Middle-Field Closed). Aggressive contest on boundaries; vulnerable to crossing routes and deep 1-on-1 go balls.'
+                badge: '1-High Man',
+                desc: '1 deep safety protects the deep center while corners and linebackers shadow receivers 1-on-1.',
+                what: '1 deep free safety roams the middle of the field while 5 underneath defenders play tight 1-on-1 man coverage on every eligible receiver.',
+                why: 'Exploitable via crossing routes, mesh concepts, and deep 1-on-1 boundary go balls. Favors explosive WR Receiving Yards overs.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <circle cx="125" cy="18" r="6" fill="#ef4444"/>
+                    <text x="125" y="21" fill="#fff" font-size="6" font-weight="bold" text-anchor="middle">FS</text>
+                    <path d="M 105 18 Q 125 10 145 18" stroke="#f87171" stroke-width="1.5" stroke-dasharray="2,2" fill="none"/>
+                    <text x="125" y="29" fill="#f87171" font-size="6" text-anchor="middle" font-weight="bold">Single-High Deep Post</text>
+                    <circle cx="45" cy="68" r="4.5" fill="#facc15"/>
+                    <text x="45" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">WR</text>
+                    <rect x="37" y="52" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="45" y="60" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <line x1="45" y1="52" x2="45" y2="35" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2,2"/>
+                    <circle cx="105" cy="68" r="4.5" fill="#38bdf8"/>
+                    <text x="105" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">SL</text>
+                    <rect x="97" y="52" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="105" y="60" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">NB</text>
+                    <path d="M 105 63 L 105 45 Q 115 42 185 38" stroke="#facc15" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <polygon points="188,38 181,34 181,42" fill="#facc15"/>
+                    <text x="175" y="32" fill="#facc15" font-size="6.5" font-weight="bold">Crosser Wins vs Man</text>
+                    <circle cx="205" cy="68" r="4.5" fill="#facc15"/>
+                    <text x="205" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">WR</text>
+                    <rect x="197" y="52" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="205" y="60" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                </svg>`
             },
             'Cover 2': {
                 title: 'Cover 2 (2-High Zone)',
-                desc: 'Zone defense featuring 2 deep safeties dividing deep halves (Middle-Field Open) and 5 underneath zones. Strong against boundary deep shots; vulnerable in deep middle seams and sideline honey holes.'
+                badge: '2-High Zone',
+                desc: '2 deep safeties divide deep halves, leaving 5 underneath zone defenders.',
+                what: 'Two deep safeties split high to defend the deep halves of the field, while 5 underneath defenders patrol the short flats and middle hooks.',
+                why: 'Vulnerable in deep middle seams between the two safeties and sideline "honey holes" behind corners. Boosts TE & Slot Receiving Yards.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="20" y="8" width="100" height="34" rx="4" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="70" y="20" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">Deep 1/2 Zone</text>
+                    <circle cx="70" cy="28" r="5" fill="#ef4444"/>
+                    <text x="70" y="31" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">S</text>
+                    <rect x="130" y="8" width="100" height="34" rx="4" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="180" y="20" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">Deep 1/2 Zone</text>
+                    <circle cx="180" cy="28" r="5" fill="#ef4444"/>
+                    <text x="180" y="31" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">S</text>
+                    <rect x="25" y="52" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="33" y="60" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <rect x="209" y="52" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="217" y="60" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <path d="M 125 63 L 125 15" stroke="#facc15" stroke-width="2.2" stroke-linecap="round"/>
+                    <polygon points="125,11 120,18 130,18" fill="#facc15"/>
+                    <text x="125" y="48" fill="#facc15" font-size="6.5" font-weight="bold" text-anchor="middle">Middle Seam Void</text>
+                </svg>`
             },
             'Cover 3': {
                 title: 'Cover 3 (1-High Zone)',
-                desc: 'Zone coverage with 3 deep defenders (single-high safety + 2 boundary corners) and 4 underneath defenders. Capping deep balls; vulnerable to flat routes, curl-flat soft spots, and outside 4-vertical seams.'
+                badge: '1-High Zone',
+                desc: '3 deep zone defenders (safety + 2 corners) with 4 underneath defenders.',
+                what: '3 deep defenders each cover a deep third (1 center safety + 2 outside cornerbacks), backed by 4 underneath defenders patrolling curls and flats.',
+                why: 'Vulnerable in the underneath flats and seam voids between deep thirds. High-percentage throws favor Slot WR & TE Receptions.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="18" y="8" width="66" height="34" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="51" y="19" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">Deep 1/3</text>
+                    <rect x="43" y="24" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="51" y="32" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <rect x="92" y="8" width="66" height="34" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="125" y="19" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">Deep 1/3 (Post)</text>
+                    <circle cx="125" cy="29" r="5" fill="#ef4444"/>
+                    <text x="125" y="32" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">FS</text>
+                    <rect x="166" y="8" width="66" height="34" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="199" y="19" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">Deep 1/3</text>
+                    <rect x="191" y="24" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="199" y="32" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <path d="M 90 63 L 90 52 Q 85 46 25 46" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="21,46 28,42 28,50" fill="#facc15"/>
+                    <text x="42" y="57" fill="#facc15" font-size="6.5" font-weight="bold">Soft Flat Pocket</text>
+                </svg>`
             },
             'Cover 4': {
                 title: 'Cover 4 Quarters (2-High Zone)',
-                desc: '4-deep zone shell where corners and safeties each defend a deep fourth (Middle-Field Open). Premier anti-explosive pass defense; soft against underneath intermediate digs and delayed run pushes.'
+                badge: 'Quarters Zone',
+                desc: '4 deep defenders each guard a deep fourth, eliminating explosive passes.',
+                what: '4 deep defenders (2 corners + 2 safeties) each cover a deep fourth of the field, eliminating deep boundary shots and vertical posts.',
+                why: 'Leaves underneath intermediate voids. Offenses attack with crossing digs, checkdowns, and inside rushes against light boxes. Back RB Rushing Yards.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="16" y="8" width="50" height="32" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="41" y="18" fill="#f87171" font-size="5.5" font-weight="bold" text-anchor="middle">1/4 (CB)</text>
+                    <rect x="70" y="8" width="52" height="32" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="96" y="18" fill="#f87171" font-size="5.5" font-weight="bold" text-anchor="middle">1/4 (S)</text>
+                    <rect x="128" y="8" width="52" height="32" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="154" y="18" fill="#f87171" font-size="5.5" font-weight="bold" text-anchor="middle">1/4 (S)</text>
+                    <rect x="184" y="8" width="50" height="32" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="209" y="18" fill="#f87171" font-size="5.5" font-weight="bold" text-anchor="middle">1/4 (CB)</text>
+                    <path d="M 45 63 L 45 48 L 175 48" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="179,48 172,44 172,52" fill="#facc15"/>
+                    <text x="110" y="58" fill="#facc15" font-size="6.5" font-weight="bold">Underneath In-Breaking Dig</text>
+                </svg>`
             },
             'Cover 6': {
                 title: 'Cover 6 Split (Hybrid Zone)',
-                desc: 'Hybrid split-field zone combining Cover 4 on the passing strength side and Cover 2 on the weakside (4 + 2 = 6). Designed to handle asymmetric route combinations and isolate top vertical threats.'
+                badge: 'Hybrid Split',
+                desc: 'Split-field zone: Cover 4 to passing strength, Cover 2 to weakside.',
+                what: 'Split-field coverage combining Cover 4 (quarters) on the passing strength side with Cover 2 (deep half) on the weakside (4 + 2 = 6).',
+                why: 'Neutralizes the primary receiver side while opening honey holes on the Cover 2 side. Target weakside WR / TE Receptions.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="18" y="8" width="102" height="34" rx="3" fill="rgba(56, 189, 248, 0.1)" stroke="#38bdf8" stroke-dasharray="2,2"/>
+                    <text x="69" y="19" fill="#38bdf8" font-size="6" font-weight="bold" text-anchor="middle">Strongside: Cover 4</text>
+                    <rect x="28" y="24" width="15" height="10" rx="2" fill="#38bdf8"/>
+                    <text x="35" y="32" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <circle cx="85" cy="29" r="5" fill="#38bdf8"/>
+                    <text x="85" y="32" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">S</text>
+                    <rect x="130" y="8" width="102" height="34" rx="3" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="181" y="19" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">Weakside: Cover 2</text>
+                    <circle cx="180" cy="28" r="5" fill="#ef4444"/>
+                    <text x="180" y="31" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">S</text>
+                    <rect x="210" y="52" width="15" height="10" rx="2" fill="#ef4444"/>
+                    <text x="217" y="60" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <path d="M 170 63 L 170 42 Q 175 36 215 36" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="219,36 212,32 212,40" fill="#facc15"/>
+                    <text x="175" y="54" fill="#facc15" font-size="6.5" font-weight="bold">Weakside Honey Hole</text>
+                </svg>`
             },
             'Blitz %': {
                 title: 'Blitz Rate',
-                desc: 'Percentage of opponent dropbacks where the defense rushes 5 or more pass rushers to manufacture quick pressure and disrupt QB timing.'
+                badge: 'Aggressive Rush',
+                desc: 'Defense rushes 5+ defenders to generate rapid pressure on QB.',
+                what: 'Percentage of dropbacks where the defense rushes 5 or more defenders to collapse the pocket before routes can develop.',
+                why: 'Vacates coverage zones and creates 1-on-1 matchups. Heavy blitzing fuels quick-release Slot Receptions and RB checkdown catches.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="58" x2="235" y2="58" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="54" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <path d="M 60 38 L 75 58" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="77,61 70,55 77,50" fill="#ef4444"/>
+                    <path d="M 95 38 L 100 58" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="101,61 95,55 102,52" fill="#ef4444"/>
+                    <path d="M 125 32 L 125 58" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="125,62 120,55 130,55" fill="#ef4444"/>
+                    <path d="M 155 38 L 150 58" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="149,61 148,52 155,55" fill="#ef4444"/>
+                    <path d="M 190 38 L 175 58" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="173,61 173,50 180,55" fill="#ef4444"/>
+                    <text x="125" y="24" fill="#f87171" font-size="6.5" font-weight="bold" text-anchor="middle">5+ Defender Pressure Wave</text>
+                    <circle cx="125" cy="74" r="5" fill="#3b82f6"/>
+                    <text x="125" y="77" fill="#fff" font-size="5" font-weight="bold" text-anchor="middle">QB</text>
+                    <path d="M 132 74 Q 170 74 210 50" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-dasharray="3,2"/>
+                    <polygon points="213,48 206,47 208,54" fill="#38bdf8"/>
+                    <text x="180" y="76" fill="#38bdf8" font-size="6" font-weight="bold">Quick Hot Slant</text>
+                </svg>`
             },
             'Zone Coverage': {
                 title: 'Zone Coverage',
-                desc: 'Defenders drop into assigned spatial zones rather than shadowing individual receivers. Prioritizes rallying to the ball and limiting yards after catch, but creates soft voids between zones.'
+                badge: 'Spatial Coverage',
+                desc: 'Defenders cover assigned field areas with eyes on QB.',
+                what: 'Defenders drop into designated spatial zones rather than shadowing receivers, keeping eyes on the quarterback to rally to the ball.',
+                why: 'Creates soft voids between zones. Patient passers exploit zones with high-percentage underneath throws; favors Reception volume props.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="25" y="38" width="55" height="24" rx="4" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="52" y="52" fill="#f87171" font-size="5.5" font-weight="bold" text-anchor="middle">Flat Zone</text>
+                    <rect x="95" y="38" width="60" height="24" rx="4" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="125" y="52" fill="#f87171" font-size="5.5" font-weight="bold" text-anchor="middle">Hook Zone</text>
+                    <rect x="170" y="38" width="55" height="24" rx="4" fill="rgba(239, 68, 68, 0.12)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="197" y="52" fill="#f87171" font-size="5.5" font-weight="bold" text-anchor="middle">Flat Zone</text>
+                    <path d="M 75 68 L 78 48 Q 80 44 85 44" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="87" cy="44" r="3.5" fill="#facc15"/>
+                    <text x="87" y="35" fill="#facc15" font-size="6.5" font-weight="bold" text-anchor="middle">Void Sitter (High Receptions)</text>
+                </svg>`
             },
             'Man Coverage': {
                 title: 'Man Coverage',
-                desc: 'Defenders shadow assigned receivers in 1-on-1 coverage. Demands elite corner athleticism and tight contest ability, but is vulnerable if receivers create separation or if the QB scrambles.'
+                badge: '1-on-1 Shadow',
+                desc: 'Defenders shadow assigned receivers in direct 1-on-1 matchups.',
+                what: 'Defenders shadow assigned receivers stride for stride in 1-on-1 isolation without primary zone handoffs.',
+                why: 'Elite route runners generate huge separation on sharp cuts and crossing routes. Target WR Receiving Yards and explosive play props.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <circle cx="50" cy="68" r="4.5" fill="#facc15"/>
+                    <text x="50" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">WR</text>
+                    <circle cx="50" cy="56" r="4.5" fill="#ef4444"/>
+                    <text x="50" y="59" fill="#fff" font-size="5" font-weight="bold" text-anchor="middle">CB</text>
+                    <path d="M 50 63 L 50 40 L 70 25" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="73,23 66,23 70,30" fill="#facc15"/>
+                    <text x="85" y="28" fill="#facc15" font-size="6" font-weight="bold">Separation Break</text>
+                    <circle cx="160" cy="68" r="4.5" fill="#38bdf8"/>
+                    <text x="160" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">WR</text>
+                    <circle cx="160" cy="56" r="4.5" fill="#ef4444"/>
+                    <text x="160" y="59" fill="#fff" font-size="5" font-weight="bold" text-anchor="middle">CB</text>
+                    <line x1="160" y1="52" x2="160" y2="28" stroke="#f87171" stroke-width="1.5" stroke-dasharray="2,2"/>
+                    <text x="160" y="20" fill="#f87171" font-size="6.5" font-weight="bold" text-anchor="middle">1-on-1 Tight Shadow Lock</text>
+                </svg>`
             },
             'Middle-Field Open': {
                 title: 'Middle-Field Open (MFO / 2-High)',
-                desc: 'Two deep safeties split high, dividing deep field halves and leaving the middle open. Designed to prevent boundary deep shots and cap explosive plays, opening up intermediate middle-of-field routes and light run boxes.'
+                badge: '2-High Shell',
+                desc: 'Two deep safeties split wide, leaving deep middle open.',
+                what: 'Two deep safeties split toward the numbers to protect the deep sidelines, leaving the deep center of the field open.',
+                why: 'Prevents explosive sideline bombs but concedes intermediate middle routes and light run boxes. Target TE Seams & RB Rushing Yards.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <circle cx="65" cy="22" r="5.5" fill="#ef4444"/>
+                    <text x="65" y="25" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">S</text>
+                    <circle cx="185" cy="22" r="5.5" fill="#ef4444"/>
+                    <text x="185" y="25" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">S</text>
+                    <rect x="95" y="14" width="60" height="24" rx="4" fill="rgba(16, 185, 129, 0.08)" stroke="#10b981" stroke-dasharray="3,2"/>
+                    <text x="125" y="28" fill="#10b981" font-size="6.5" font-weight="bold" text-anchor="middle">OPEN CENTER VOID</text>
+                    <path d="M 125 63 L 125 42" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="125,38 121,45 129,45" fill="#facc15"/>
+                </svg>`
             },
             'Middle-Field Closed': {
                 title: 'Middle-Field Closed (MFC / 1-High)',
-                desc: 'Single high safety patrols the middle of the field while the second safety walks into the box or robber zone. Closes deep middle seams and strengthens run defense, leaving outside cornerbacks in 1-on-1 isolation.'
+                badge: '1-High Shell',
+                desc: 'Single high safety patrols deep middle while second safety crowds box.',
+                what: 'A single deep safety patrols the post while the strong safety creeps down into the box or robber zone to stop the run.',
+                why: 'Closes off deep middle seams but leaves perimeter cornerbacks on 1-on-1 islands. Attack with outside WR Receiving Yards on go routes.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <circle cx="125" cy="18" r="6" fill="#ef4444"/>
+                    <text x="125" y="21" fill="#fff" font-size="6" font-weight="bold" text-anchor="middle">FS</text>
+                    <text x="125" y="30" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">Middle Closed</text>
+                    <circle cx="155" cy="52" r="5" fill="#ef4444"/>
+                    <text x="155" y="55" fill="#fff" font-size="5" font-weight="bold" text-anchor="middle">SS</text>
+                    <text x="180" y="55" fill="#f87171" font-size="5.5" font-weight="bold">8-Man Box</text>
+                    <path d="M 40 63 L 40 18" stroke="#facc15" stroke-width="2.2" stroke-linecap="round"/>
+                    <polygon points="40,14 36,21 44,21" fill="#facc15"/>
+                    <text x="50" y="22" fill="#facc15" font-size="6.5" font-weight="bold">Boundary 1-on-1 Go Ball</text>
+                </svg>`
             },
             'Zone Runs': {
                 title: 'Zone Rushing Scheme',
-                desc: 'Linemen step laterally in unison to stretch the front horizontally; the running back reads defensive flow and makes a single decisive cut into cutback lanes (Inside/Outside Zone).'
+                badge: 'Stretch & Cutback',
+                desc: 'Linemen step laterally to stretch defense until cutback opens.',
+                what: 'Offensive linemen step laterally in unison to stretch the front horizontally; running back reads defensive flow and plants for a single cut.',
+                why: 'Gouges over-pursuing defenses for big chunk gains. Agile, patient runners excel here; target primary RB Rushing Yards.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="52" x2="235" y2="52" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="48" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <path d="M 75 52 L 95 44" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="98,43 91,42 94,48" fill="#38bdf8"/>
+                    <path d="M 105 52 L 125 44" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="128,43 121,42 124,48" fill="#38bdf8"/>
+                    <path d="M 135 52 L 155 44" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="158,43 151,42 154,48" fill="#38bdf8"/>
+                    <text x="130" y="34" fill="#38bdf8" font-size="6" font-weight="bold">Linemen Flow Laterally</text>
+                    <circle cx="100" cy="74" r="5" fill="#facc15"/>
+                    <text x="100" y="77" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">RB</text>
+                    <path d="M 105 72 Q 140 68 145 60 Q 145 54 110 38" stroke="#facc15" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <polygon points="106,36 113,38 111,44" fill="#facc15"/>
+                    <text x="95" y="24" fill="#facc15" font-size="6.5" font-weight="bold">Decisive Cutback Lane</text>
+                </svg>`
             },
             'Gap/Man Runs': {
                 title: 'Gap / Power Rushing Scheme',
-                desc: 'Power, Counter, and Trap blocking using predetermined down-blocks and pulling linemen/lead blockers to kick out defenders and open an oversized point-of-attack gap.'
+                badge: 'Power & Pull',
+                desc: 'Down-blocks and pulling linemen open a predetermined point of attack.',
+                what: 'Power, counter, and trap blocking using predetermined down-blocks and pulling guards to kick out edge defenders and open a downhill gap.',
+                why: 'Physical downhill runs test interior anchor strength. Best suited for high-volume workhorses on Rushing Carries and goal-line TDs.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="52" x2="235" y2="52" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="48" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <circle cx="75" cy="58" r="4.5" fill="#38bdf8"/>
+                    <text x="75" y="61" fill="#000" font-size="4.5" font-weight="bold" text-anchor="middle">G</text>
+                    <path d="M 75 64 Q 100 70 145 64 Q 155 60 160 44" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <polygon points="161,40 156,47 165,47" fill="#38bdf8"/>
+                    <text x="100" y="80" fill="#38bdf8" font-size="6" font-weight="bold">Pulling Lead Blocker</text>
+                    <circle cx="120" cy="72" r="5" fill="#facc15"/>
+                    <text x="120" y="75" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">RB</text>
+                    <path d="M 125 70 Q 145 64 150 32" stroke="#facc15" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <polygon points="151,28 146,35 155,35" fill="#facc15"/>
+                    <text x="165" y="24" fill="#facc15" font-size="6.5" font-weight="bold">Point of Attack</text>
+                </svg>`
             },
             'vs Zone Runs': {
                 title: 'Run Defense vs Zone Concepts',
-                desc: 'Yards per carry allowed on opponent zone runs. Measures defensive lateral pursuit, edge setting, and discipline against cutbacks.'
+                badge: 'Perimeter Contain',
+                desc: 'Yards per carry allowed on opponent zone runs.',
+                what: 'Measures defensive edge containment and lateral pursuit discipline against outside and inside zone stretch schemes.',
+                why: 'Weak defenses allow high YPC on cutbacks. Target primary running back Rushing Yards overs against poor zone run defenses.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="52" x2="235" y2="52" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="48" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="50" y="42" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="58" y="50" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">DE</text>
+                    <path d="M 50 42 L 35 32" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+                    <text x="40" y="24" fill="#f87171" font-size="6" font-weight="bold">Set Edge / Contain</text>
+                    <rect x="115" y="42" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="123" y="50" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">DT</text>
+                    <path d="M 115 42 L 105 32" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+                    <text x="125" y="24" fill="#f87171" font-size="6" font-weight="bold">Shed Reach Block</text>
+                    <text x="125" y="76" fill="#64748b" font-size="6.5" font-weight="bold" text-anchor="middle">Lateral Pursuit Speed Limits YPC</text>
+                </svg>`
             },
             'vs Gap Runs': {
-                title: 'Run Defense vs Gap / Power Concepts',
-                desc: 'Yards per carry allowed on opponent gap/power runs. Tests interior defensive tackle anchor strength, point-of-attack violence, and linebacker run fits.'
+                title: 'Run Defense vs Gap Concepts',
+                badge: 'Interior Anchor',
+                desc: 'Yards per carry allowed on opponent power/gap runs.',
+                what: 'Measures interior defensive tackle anchor strength and linebacker run fits meeting pulling blockers at the line of scrimmage.',
+                why: 'Vulnerable defenses get driven backward at the point of attack. Target physical power back Rushing Carries and Anytime TDs.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="52" x2="235" y2="52" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="48" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="90" y="44" width="18" height="11" rx="2" fill="#ef4444"/>
+                    <text x="99" y="52" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">DT</text>
+                    <rect x="135" y="44" width="18" height="11" rx="2" fill="#ef4444"/>
+                    <text x="144" y="52" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">DT</text>
+                    <rect x="110" y="24" width="22" height="12" rx="2" fill="#ef4444"/>
+                    <text x="121" y="32" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">MLB</text>
+                    <line x1="121" y1="36" x2="121" y2="48" stroke="#f87171" stroke-width="2"/>
+                    <polygon points="121,50 117,45 125,45" fill="#f87171"/>
+                    <text x="125" y="16" fill="#f87171" font-size="6.5" font-weight="bold" text-anchor="middle">Plug A-Gap / Meet Puller at LOS</text>
+                    <text x="125" y="78" fill="#64748b" font-size="6.5" font-weight="bold" text-anchor="middle">Interior Anchor Resists Downhill Drive</text>
+                </svg>`
             },
             'Slot WR': {
                 title: 'Slot Wide Receiver Alignment',
-                desc: 'Receivers aligned inside between the offensive tackle and the boundary receiver. Typically targeted on quick slants, option routes, and seam routes against nickel CBs or linebackers.'
+                badge: 'Inside Alignment',
+                desc: 'Receiver aligned inside between offensive tackle and boundary receiver.',
+                what: 'Aligned inside between the offensive tackle and perimeter receiver, isolated against nickel CBs, safeties, or linebackers.',
+                why: 'Operates in wide 2-way option space. High target floor for quick slants, seams, and option routes. High floor for Reception props.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="75" y="64" width="12" height="8" rx="1.5" fill="#475569"/>
+                    <text x="81" y="71" fill="#fff" font-size="5" text-anchor="middle">OT</text>
+                    <circle cx="215" cy="68" r="4.5" fill="#64748b"/>
+                    <text x="215" y="71" fill="#fff" font-size="4.5" text-anchor="middle">OUT</text>
+                    <circle cx="150" cy="68" r="5.5" fill="#facc15"/>
+                    <text x="150" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">SLOT</text>
+                    <path d="M 150 62 L 150 42 Q 155 35 185 30" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="188,30 181,27 182,35" fill="#facc15"/>
+                    <path d="M 150 42 Q 145 35 115 30" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2,2" stroke-linecap="round"/>
+                    <polygon points="112,30 119,27 118,35" fill="#38bdf8"/>
+                    <text x="150" y="20" fill="#facc15" font-size="6.5" font-weight="bold" text-anchor="middle">Two-Way Option Space</text>
+                </svg>`
             },
             'Outside WR': {
-                title: 'Outside / Boundary WR Alignment',
-                desc: 'Receivers aligned wide near the sideline boundary. Targeted on perimeter isolations, deep go-balls, comebacks, and contested boundary passes.'
+                title: 'Outside Boundary WR Alignment',
+                badge: 'Perimeter Alignment',
+                desc: 'Receiver aligned wide on sideline perimeter in single coverage.',
+                what: 'Aligned wide near the sideline boundary, frequently isolated in 1-on-1 matchups against starting perimeter cornerbacks.',
+                why: 'Commands vertical boundary go balls, comeback routes, and end-zone fade targets. Primary driver of WR Receiving Yards overs.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="225" y1="10" x2="225" y2="82" stroke="#475569" stroke-width="2"/>
+                    <text x="228" y="22" fill="#64748b" font-size="6.5" font-family="monospace">SIDELINE</text>
+                    <line x1="15" y1="68" x2="225" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <circle cx="195" cy="68" r="5.5" fill="#facc15"/>
+                    <text x="195" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">WR1</text>
+                    <rect x="187" y="50" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="195" y="58" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <path d="M 195 62 L 195 18" stroke="#facc15" stroke-width="2.5" stroke-linecap="round"/>
+                    <polygon points="195,14 190,21 200,21" fill="#facc15"/>
+                    <text x="125" y="28" fill="#facc15" font-size="6.5" font-weight="bold" text-anchor="middle">1-on-1 Perimeter Isolation</text>
+                    <text x="125" y="44" fill="#64748b" font-size="6" text-anchor="middle">High Yards Per Catch & Air Yards</text>
+                </svg>`
             },
             'Inline TE': {
                 title: 'Inline Tight End Alignment',
-                desc: 'Tight end attached directly to the offensive line on the line of scrimmage. Frequently attacks seam routes, shallow crossers, and underneath flats against linebackers or strong safeties.'
+                badge: 'Attached Line TE',
+                desc: 'Tight end attached directly adjacent to offensive tackle on line of scrimmage.',
+                what: 'Aligned on the line of scrimmage directly adjacent to the tackle, creating 6-man pass protection or releasing up the seam.',
+                why: 'Exploits linebackers and safeties in intermediate seam voids and play-action flat crossers. Premier TE Red Zone Target signal.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <rect x="95" y="64" width="14" height="8" rx="1.5" fill="#475569"/>
+                    <text x="102" y="71" fill="#fff" font-size="5" text-anchor="middle">OT</text>
+                    <circle cx="120" cy="68" r="5.5" fill="#facc15"/>
+                    <text x="120" y="71" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">TE</text>
+                    <path d="M 120 62 L 120 48 Q 120 38 150 24" stroke="#facc15" stroke-width="2.2" stroke-linecap="round"/>
+                    <polygon points="153,22 146,24 149,30" fill="#facc15"/>
+                    <text x="160" y="42" fill="#facc15" font-size="6.5" font-weight="bold">Inline Seam Release</text>
+                    <text x="160" y="54" fill="#64748b" font-size="6">Mismatches vs LBs / Safeties</text>
+                </svg>`
             },
             'Backfield RB': {
                 title: 'Backfield Running Back Target Share',
-                desc: 'Passes directed to running backs on screens, checkdowns, swing routes, or wheel releases out of the backfield.'
+                badge: 'Backfield Receiver',
+                desc: 'Pass targets directed to running backs releasing from backfield.',
+                what: 'Running backs targeted on checkdowns, swing routes, screens, or angle releases originating from behind the line of scrimmage.',
+                why: 'Punishes defenses dropping 2 safeties deep. High completion percentage directly boosting RB Receptions props.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="15" y1="58" x2="235" y2="58" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="54" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
+                    <circle cx="100" cy="66" r="4.5" fill="#3b82f6"/>
+                    <text x="100" y="69" fill="#fff" font-size="4.5" font-weight="bold" text-anchor="middle">QB</text>
+                    <circle cx="100" cy="78" r="5" fill="#facc15"/>
+                    <text x="100" y="81" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">RB</text>
+                    <path d="M 106 78 Q 145 80 175 66 Q 195 56 205 38" stroke="#facc15" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <polygon points="207,34 202,41 209,42" fill="#facc15"/>
+                    <text x="175" y="30" fill="#facc15" font-size="6.5" font-weight="bold">Angle / Wheel in Space</text>
+                    <text x="125" y="42" fill="#38bdf8" font-size="6" font-weight="bold">Safety Valve Checkdown</text>
+                </svg>`
             },
             'Tgt% vs Zone': {
                 title: 'Target Share vs Zone Coverage',
-                desc: 'Percentage of team pass attempts directed to this player when the opposing defense is running zone coverage. Identifies zone-beater targets who find soft spots.'
+                badge: 'Zone Share',
+                desc: 'Percentage of team pass attempts directed to this player when facing zone coverage.',
+                what: 'Share of passes targeted to this receiver against zone defenses.',
+                why: 'High target share vs zone identifies receivers who settle into soft coverage pockets. Favors high Reception volume props.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <rect x="25" y="20" width="90" height="50" rx="4" fill="rgba(56, 189, 248, 0.08)" stroke="#38bdf8" stroke-dasharray="2,2"/>
+                    <text x="70" y="32" fill="#38bdf8" font-size="6.5" font-weight="bold" text-anchor="middle">Zone Coverage Defense</text>
+                    <rect x="140" y="24" width="95" height="42" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="187" y="38" fill="#facc15" font-size="7" font-weight="bold" text-anchor="middle">Target Share: 28%+</text>
+                    <path d="M 115 45 L 140 45" stroke="#facc15" stroke-width="2"/>
+                    <polygon points="142,45 136,42 136,48" fill="#facc15"/>
+                    <text x="187" y="54" fill="#94a3b8" font-size="6" text-anchor="middle">Diagnoses Soft Voids</text>
+                </svg>`
             },
             'Tgt% vs Man': {
                 title: 'Target Share vs Man Coverage',
-                desc: 'Percentage of team pass attempts directed to this player when facing man-to-man coverage. Highlights alpha separators who win 1-on-1 matchups.'
+                badge: 'Man Alpha Share',
+                desc: 'Percentage of team pass attempts directed to this player when facing man-to-man coverage.',
+                what: 'Share of passes thrown to this receiver when facing 1-on-1 man defense.',
+                why: 'Separators who win against man coverage command fast QB trust on crucial downs. Direct signal for WR Receiving Yards & TDs.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <circle cx="50" cy="45" r="7" fill="#facc15"/>
+                    <text x="50" y="48" fill="#000" font-size="6" font-weight="bold" text-anchor="middle">WR1</text>
+                    <line x1="57" y1="45" x2="85" y2="45" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2,2"/>
+                    <circle cx="92" cy="45" r="7" fill="#ef4444"/>
+                    <text x="92" y="48" fill="#fff" font-size="6" font-weight="bold" text-anchor="middle">CB</text>
+                    <rect x="135" y="24" width="100" height="42" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="185" y="38" fill="#facc15" font-size="7" font-weight="bold" text-anchor="middle">1-on-1 Win Alpha: 32%+</text>
+                    <text x="185" y="54" fill="#94a3b8" font-size="6" text-anchor="middle">High Yards & TD Share</text>
+                </svg>`
             },
             'YPRR': {
                 title: 'Yards Per Route Run (YPRR)',
-                desc: 'Total receiving yards divided by total pass routes run. The premier efficiency stat that filters out snap count to measure how dynamically a receiver wins per route.'
+                badge: 'Efficiency Metric',
+                desc: 'Total receiving yards divided by total pass routes run.',
+                what: 'The premier per-snap efficiency metric: total receiving yards divided by pass routes run.',
+                why: 'YPRR > 2.0 indicates an elite separator; > 2.5 is an All-Pro alpha. The strongest leading indicator of receiving yard breakouts.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <rect x="18" y="16" width="98" height="58" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="67" y="30" fill="#94a3b8" font-size="6.5" font-weight="bold" text-anchor="middle">EFFICIENCY SCALE</text>
+                    <text x="67" y="45" fill="#facc15" font-size="9" font-weight="bold" text-anchor="middle">> 2.25 YPRR</text>
+                    <text x="67" y="60" fill="#10b981" font-size="6" font-weight="bold" text-anchor="middle">Elite WR1 Tier</text>
+                    <rect x="130" y="16" width="102" height="58" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="181" y="32" fill="#94a3b8" font-size="6.5" font-weight="bold" text-anchor="middle">CALCULATION</text>
+                    <text x="181" y="48" fill="#38bdf8" font-size="7.5" font-weight="bold" text-anchor="middle">Rec Yds ÷ Routes</text>
+                    <text x="181" y="62" fill="#64748b" font-size="6" text-anchor="middle">Filters out snap count</text>
+                </svg>`
             },
             'Scheme Edge': {
                 title: 'Scheme Edge (Delta)',
-                desc: 'The statistical difference between a player\'s efficiency against this specific defensive scheme versus their season baseline. A positive delta indicates a matchup ripe for a statistical breakout.'
+                badge: 'Matchup Delta',
+                desc: 'Statistical difference between player efficiency against this scheme vs season baseline.',
+                what: 'The statistical difference between a player\'s efficiency against this specific defensive scheme versus their season baseline.',
+                why: 'A positive delta (> +15%) flags an exploitable mismatch where defensive weaknesses play into the player\'s top traits.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <line x1="25" y1="65" x2="225" y2="65" stroke="#334155" stroke-width="1.5"/>
+                    <rect x="50" y="45" width="40" height="20" rx="2" fill="#475569"/>
+                    <text x="70" y="40" fill="#94a3b8" font-size="6" font-weight="bold" text-anchor="middle">Baseline 1.8</text>
+                    <rect x="140" y="22" width="40" height="43" rx="2" fill="#10b981"/>
+                    <text x="160" y="17" fill="#10b981" font-size="6.5" font-weight="bold" text-anchor="middle">Vs Scheme 2.4</text>
+                    <path d="M 95 40 Q 115 25 135 25" stroke="#facc15" stroke-width="2" fill="none"/>
+                    <polygon points="137,25 130,22 130,28" fill="#facc15"/>
+                    <text x="115" y="18" fill="#facc15" font-size="7" font-weight="bold" text-anchor="middle">+33% Edge</text>
+                </svg>`
             },
             'Causal Mechanism': {
                 title: 'Causal Mechanism',
-                desc: 'The underlying schematic interaction causing the advantage (e.g. slot receiver option routes matching up against single-high linebackers, or light front-six boxes).'
+                badge: 'Tactical Rationale',
+                desc: 'The underlying schematic interaction causing the matchup advantage.',
+                what: 'The tactical interaction between offensive route design and defensive shell mechanics creating the statistical edge.',
+                why: 'Explains why the matchup wins on tape (e.g. slot option routes against linebackers or light front-six boxes).',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <rect x="18" y="22" width="68" height="44" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="52" y="38" fill="#38bdf8" font-size="6.5" font-weight="bold" text-anchor="middle">Defensive Shell</text>
+                    <text x="52" y="52" fill="#94a3b8" font-size="5.5" text-anchor="middle">e.g. Cover 3 Zone</text>
+                    <path d="M 90 44 L 115 44" stroke="#facc15" stroke-width="2"/>
+                    <polygon points="117,44 111,41 111,47" fill="#facc15"/>
+                    <rect x="120" y="16" width="112" height="56" rx="4" fill="#161b22" stroke="#10b981"/>
+                    <text x="176" y="32" fill="#10b981" font-size="7" font-weight="bold" text-anchor="middle">Tactical Vulnerability</text>
+                    <text x="176" y="46" fill="#facc15" font-size="6" text-anchor="middle">Void in Curl/Flat seam</text>
+                    <text x="176" y="58" fill="#94a3b8" font-size="5.5" text-anchor="middle">Target high-percentage pass</text>
+                </svg>`
             },
             'Neutral Pace': {
                 title: 'Neutral Situation Pace',
-                desc: 'Average seconds elapsed between snaps in neutral game scripts (game score within 7 points, outside 2-minute drills). Sub-26s indicates fast pace creating high play volume.'
+                badge: 'Seconds / Snap',
+                desc: 'Average seconds elapsed between snaps in neutral game scripts (score within 7 pts).',
+                what: 'Average seconds per snap when the game score is within 7 points (outside 2-minute drills).',
+                why: 'Sub-26s indicates fast pace generating 5–8 extra plays, raising total passing, rushing, and receiving opportunity volume.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <circle cx="65" cy="45" r="24" fill="#161b22" stroke="#38bdf8" stroke-width="2"/>
+                    <line x1="65" y1="45" x2="65" y2="30" stroke="#facc15" stroke-width="2"/>
+                    <line x1="65" y1="45" x2="76" y2="45" stroke="#facc15" stroke-width="2"/>
+                    <text x="65" y="60" fill="#38bdf8" font-size="7" font-weight="bold" text-anchor="middle">PACE</text>
+                    <rect x="110" y="22" width="122" height="46" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="171" y="36" fill="#10b981" font-size="7" font-weight="bold" text-anchor="middle">&lt; 26.5s per snap = FAST</text>
+                    <text x="171" y="49" fill="#94a3b8" font-size="6" text-anchor="middle">Neutral Game Script (±7 pts)</text>
+                    <text x="171" y="60" fill="#facc15" font-size="5.5" text-anchor="middle">Generates extra offensive plays</text>
+                </svg>`
             },
             'Proj Plays': {
                 title: 'Projected Play Volume',
-                desc: 'Projected total offensive plays based on combined team tempo, neutral seconds-per-snap, and pass/run ratio.'
+                badge: 'Play Volume',
+                desc: 'Estimated total offensive plays based on combined team tempo and pass/run splits.',
+                what: 'Forecasted offensive snaps based on combined team tempo, run/pass tendencies, and opponent pace.',
+                why: 'High projected plays (> 66 plays) expand total opportunity volume across all player prop markets.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <rect x="25" y="24" width="75" height="42" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="62" y="40" fill="#94a3b8" font-size="6" font-weight="bold" text-anchor="middle">Average NFL Game</text>
+                    <text x="62" y="54" fill="#cbd5e1" font-size="8" font-weight="bold" text-anchor="middle">~62.5 Plays</text>
+                    <rect x="120" y="18" width="105" height="54" rx="4" fill="#161b22" stroke="#10b981"/>
+                    <text x="172" y="34" fill="#10b981" font-size="7" font-weight="bold" text-anchor="middle">High-Tempo Matchup</text>
+                    <text x="172" y="48" fill="#facc15" font-size="9" font-weight="bold" text-anchor="middle">68+ Plays</text>
+                    <text x="172" y="62" fill="#64748b" font-size="6" text-anchor="middle">Expands overall prop volume</text>
+                </svg>`
             },
             'Checkdown Rate': {
                 title: 'QB Checkdown Frequency',
-                desc: 'Percentage of QB dropbacks where the quarterback dumps the ball off to a running back or underneath outlet rather than pushing downfield.'
+                badge: 'Dumpoff %',
+                desc: 'Percentage of QB dropbacks resulting in short dumpoffs to running backs.',
+                what: 'Percentage of dropbacks where the quarterback dumps the ball off to a running back or underneath safety valve.',
+                why: 'Elevated checkdown rates (> 12%) directly fuel RB Reception overs when facing conservative 2-high safeties.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <circle cx="45" cy="55" r="5.5" fill="#3b82f6"/>
+                    <text x="45" y="58" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">QB</text>
+                    <path d="M 52 55 Q 75 52 105 58" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                    <polygon points="107,58 101,55 101,61" fill="#38bdf8"/>
+                    <circle cx="115" cy="60" r="5.5" fill="#facc15"/>
+                    <text x="115" y="63" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">RB</text>
+                    <rect x="140" y="22" width="95" height="46" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="187" y="36" fill="#facc15" font-size="6.5" font-weight="bold" text-anchor="middle">Checkdown Outlet</text>
+                    <text x="187" y="49" fill="#94a3b8" font-size="6" text-anchor="middle">High RB Receptions floor</text>
+                    <text x="187" y="60" fill="#64748b" font-size="5.5" text-anchor="middle">Defenses in 2-high shells</text>
+                </svg>`
             },
             'RZ Touch Leader': {
                 title: 'Red Zone Touch Concentration',
-                desc: 'The primary skill player commanding the greatest share of designed touches (carries + targets) inside the opponent\'s 20-yard line.'
+                badge: 'Goal Line Alpha',
+                desc: 'The primary skill player commanding the greatest share of designed touches inside the 20-yard line.',
+                what: 'The primary offensive skill player commanding the lion\'s share of carries and targets inside the opponent 20-yard line.',
+                why: 'The definitive indicator for Anytime Touchdown (ATD) value and first touchdown scorer predictions.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <rect x="25" y="15" width="200" height="20" rx="3" fill="rgba(239, 68, 68, 0.15)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="125" y="28" fill="#f87171" font-size="7" font-weight="bold" text-anchor="middle">RED ZONE (&lt; 20 YD LINE)</text>
+                    <rect x="55" y="44" width="140" height="34" rx="4" fill="#161b22" stroke="#facc15"/>
+                    <text x="125" y="58" fill="#facc15" font-size="8" font-weight="bold" text-anchor="middle">Carries + Targets Share &gt; 40%</text>
+                    <text x="125" y="70" fill="#10b981" font-size="6.5" font-weight="bold" text-anchor="middle">Anytime Touchdown (ATD) Anchor</text>
+                </svg>`
             },
             'RZ Pass Rate': {
                 title: 'Red Zone Pass Calling Rate',
-                desc: 'Percentage of offensive plays called as passing attempts when positioned inside the 20-yard line.'
+                badge: 'RZ Pass Rate',
+                desc: 'Percentage of offensive plays called as passing attempts inside the 20-yard line.',
+                what: 'Percentage of offensive plays called as pass attempts inside the opponent 20-yard line.',
+                why: 'High pass rates (> 55%) signal passing TD upside for QBs, WRs, and TEs over ground-and-pound rushing touchdowns.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <rect x="25" y="22" width="95" height="46" rx="4" fill="#161b22" stroke="#38bdf8"/>
+                    <text x="72" y="36" fill="#38bdf8" font-size="7" font-weight="bold" text-anchor="middle">Pass Call &gt; 55%</text>
+                    <text x="72" y="49" fill="#94a3b8" font-size="6" text-anchor="middle">Passing TD Equity</text>
+                    <text x="72" y="60" fill="#cbd5e1" font-size="5.5" text-anchor="middle">WR / TE Red Zone Targets</text>
+                    <rect x="130" y="22" width="95" height="46" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="177" y="36" fill="#94a3b8" font-size="7" font-weight="bold" text-anchor="middle">Run-Heavy &lt; 45%</text>
+                    <text x="177" y="49" fill="#94a3b8" font-size="6" text-anchor="middle">Goal-Line RB Carries</text>
+                    <text x="177" y="60" fill="#64748b" font-size="5.5" text-anchor="middle">RB Rush TD Upside</text>
+                </svg>`
             },
             '3rd Down Pass Rate': {
                 title: '3rd Down Passing Frequency',
-                desc: 'Percentage of 3rd down snaps called as passes, indicating offensive dependency on QB dropbacks in high-leverage situations.'
+                badge: '3rd Down Pass %',
+                desc: 'Percentage of 3rd down snaps called as passes.',
+                what: 'Percentage of 3rd down snaps where the offense calls a pass play.',
+                why: 'Measures offensive pass reliance in obvious conversion scenarios, directly exposing pass protection to exotic blitzes.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
+                    <rect x="25" y="22" width="200" height="48" rx="4" fill="#161b22" stroke="#30363d"/>
+                    <text x="125" y="36" fill="#facc15" font-size="7.5" font-weight="bold" text-anchor="middle">High 3rd Down Pass Rate (&gt; 65%)</text>
+                    <text x="125" y="50" fill="#ef4444" font-size="6.5" font-weight="bold" text-anchor="middle">High Blitz Exposure &amp; Sacks</text>
+                    <text x="125" y="62" fill="#94a3b8" font-size="6" text-anchor="middle">QB Drops back into aggressive pressure packages</text>
+                </svg>`
             }
         };
 
@@ -2808,7 +3279,40 @@
 
             const iconSvg = showIcon ? `<svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-slate-400 group-hover:text-slate-200 ml-1 inline shrink-0 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>` : '';
 
-            return `<span class="stat-info-trigger group inline-flex items-center cursor-help border-b border-dotted border-slate-500/70 hover:border-slate-300 text-slate-300 hover:text-slate-100 transition-colors" tabindex="0" title="${label}: ${info.desc}"><span class="inline-flex items-center">${label}${iconSvg}</span><span class="${posClass} block"><span class="font-bold text-slate-100 mb-1 flex items-center space-x-1.5 border-b border-[#30363d] pb-1 text-left block"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400 shrink-0 inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>${info.title}</span></span><span class="text-[10.5px] text-slate-300 font-sans leading-relaxed text-left normal-case block">${info.desc}</span></span></span>`;
+            const titleText = info.title || label;
+            const badgeHtml = info.badge ? `<span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">${info.badge}</span>` : '';
+            const visualHtml = info.svg ? `<span class="block my-2 border border-[#21262d] rounded overflow-hidden shadow-inner bg-[#0c1017]">${info.svg}</span>` : '';
+
+            let bodyHtml = '';
+            if (info.what && info.why) {
+                bodyHtml = `
+                    <span class="block text-[10.5px] leading-relaxed text-slate-200 mb-1.5 text-left">
+                        <span class="text-amber-400 font-bold font-mono text-[9.5px] uppercase block tracking-wider mb-0.5">Structure</span>
+                        <span class="block">${info.what}</span>
+                    </span>
+                    <span class="block text-[10px] leading-relaxed text-emerald-300/95 bg-emerald-950/20 p-1.5 rounded border border-emerald-900/40 text-left">
+                        <span class="text-emerald-400 font-bold font-mono text-[9px] uppercase block tracking-wider mb-0.5">Offense Exploit</span>
+                        <span class="block">${info.why}</span>
+                    </span>
+                `;
+            } else {
+                bodyHtml = `<span class="text-[10.5px] text-slate-300 font-sans leading-relaxed text-left normal-case block">${info.desc || ''}</span>`;
+            }
+
+            return `<span class="stat-info-trigger group inline-flex items-center cursor-help border-b border-dotted border-slate-500/70 hover:border-slate-300 text-slate-300 hover:text-slate-100 transition-colors" tabindex="0">` +
+                `<span class="inline-flex items-center">${label}${iconSvg}</span>` +
+                `<span class="${posClass} block">` +
+                    `<span class="font-bold text-slate-100 mb-1 flex items-center justify-between border-b border-[#30363d] pb-1 text-left block">` +
+                        `<span class="flex items-center space-x-1.5 truncate">` +
+                            `<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400 shrink-0 inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>` +
+                            `<span class="truncate">${titleText}</span>` +
+                        `</span>` +
+                        `${badgeHtml}` +
+                    `</span>` +
+                    `${visualHtml}` +
+                    `${bodyHtml}` +
+                `</span>` +
+            `</span>`;
         }
 
         // ==========================================================================
