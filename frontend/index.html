@@ -146,11 +146,41 @@
             border-style: solid;
             border-color: #30363d transparent transparent transparent;
         }
-        .stat-info-trigger:hover .stat-info-box {
+        .stat-info-trigger:hover .stat-info-box,
+        .stat-info-trigger:focus .stat-info-box,
+        .stat-info-trigger:focus-within .stat-info-box {
             visibility: visible;
             opacity: 1;
             transform: translateX(-50%) translateY(0);
             transition-delay: 0.12s;
+        }
+        .stat-info-box-left {
+            left: 0;
+            transform: translateX(0) translateY(4px);
+        }
+        .stat-info-box-left::after {
+            left: 18px;
+            transform: none;
+        }
+        .stat-info-trigger:hover .stat-info-box-left,
+        .stat-info-trigger:focus .stat-info-box-left,
+        .stat-info-trigger:focus-within .stat-info-box-left {
+            transform: translateX(0) translateY(0);
+        }
+        .stat-info-box-right {
+            left: auto;
+            right: 0;
+            transform: translateX(0) translateY(4px);
+        }
+        .stat-info-box-right::after {
+            left: auto;
+            right: 18px;
+            transform: none;
+        }
+        .stat-info-trigger:hover .stat-info-box-right,
+        .stat-info-trigger:focus .stat-info-box-right,
+        .stat-info-trigger:focus-within .stat-info-box-right {
+            transform: translateX(0) translateY(0);
         }
 
         /* Custom scrollbar */
@@ -2525,6 +2555,142 @@
             }
         }
 
+        // ==========================================================================
+        // Scheme Insights Tooltips & Analytical Definitions
+        // ==========================================================================
+        const SCHEME_EXPLANATIONS = {
+            'Cover 1': {
+                title: 'Cover 1 (Man Coverage)',
+                desc: 'Man-to-man coverage across receivers with 1 single-high safety (Middle-Field Closed). Aggressive contest on boundaries; vulnerable to crossing routes and deep 1-on-1 go balls.'
+            },
+            'Cover 2': {
+                title: 'Cover 2 (2-High Zone)',
+                desc: 'Zone defense featuring 2 deep safeties dividing deep halves (Middle-Field Open) and 5 underneath zones. Strong against boundary deep shots; vulnerable in deep middle seams and sideline honey holes.'
+            },
+            'Cover 3': {
+                title: 'Cover 3 (1-High Zone)',
+                desc: 'Zone coverage with 3 deep defenders (single-high safety + 2 boundary corners) and 4 underneath defenders. Capping deep balls; vulnerable to flat routes, curl-flat soft spots, and outside 4-vertical seams.'
+            },
+            'Cover 4': {
+                title: 'Cover 4 Quarters (2-High Zone)',
+                desc: '4-deep zone shell where corners and safeties each defend a deep fourth (Middle-Field Open). Premier anti-explosive pass defense; soft against underneath intermediate digs and delayed run pushes.'
+            },
+            'Cover 6': {
+                title: 'Cover 6 Split (Hybrid Zone)',
+                desc: 'Hybrid split-field zone combining Cover 4 on the passing strength side and Cover 2 on the weakside (4 + 2 = 6). Designed to handle asymmetric route combinations and isolate top vertical threats.'
+            },
+            'Blitz %': {
+                title: 'Blitz Rate',
+                desc: 'Percentage of opponent dropbacks where the defense rushes 5 or more pass rushers to manufacture quick pressure and disrupt QB timing.'
+            },
+            'Zone Coverage': {
+                title: 'Zone Coverage',
+                desc: 'Defenders drop into assigned spatial zones rather than shadowing individual receivers. Prioritizes rallying to the ball and limiting yards after catch, but creates soft voids between zones.'
+            },
+            'Man Coverage': {
+                title: 'Man Coverage',
+                desc: 'Defenders shadow assigned receivers in 1-on-1 coverage. Demands elite corner athleticism and tight contest ability, but is vulnerable if receivers create separation or if the QB scrambles.'
+            },
+            'Middle-Field Open': {
+                title: 'Middle-Field Open (MFO / 2-High)',
+                desc: 'Two deep safeties split high, dividing deep field halves and leaving the middle open. Designed to prevent boundary deep shots and cap explosive plays, opening up intermediate middle-of-field routes and light run boxes.'
+            },
+            'Middle-Field Closed': {
+                title: 'Middle-Field Closed (MFC / 1-High)',
+                desc: 'Single high safety patrols the middle of the field while the second safety walks into the box or robber zone. Closes deep middle seams and strengthens run defense, leaving outside cornerbacks in 1-on-1 isolation.'
+            },
+            'Zone Runs': {
+                title: 'Zone Rushing Scheme',
+                desc: 'Linemen step laterally in unison to stretch the front horizontally; the running back reads defensive flow and makes a single decisive cut into cutback lanes (Inside/Outside Zone).'
+            },
+            'Gap/Man Runs': {
+                title: 'Gap / Power Rushing Scheme',
+                desc: 'Power, Counter, and Trap blocking using predetermined down-blocks and pulling linemen/lead blockers to kick out defenders and open an oversized point-of-attack gap.'
+            },
+            'vs Zone Runs': {
+                title: 'Run Defense vs Zone Concepts',
+                desc: 'Yards per carry allowed on opponent zone runs. Measures defensive lateral pursuit, edge setting, and discipline against cutbacks.'
+            },
+            'vs Gap Runs': {
+                title: 'Run Defense vs Gap / Power Concepts',
+                desc: 'Yards per carry allowed on opponent gap/power runs. Tests interior defensive tackle anchor strength, point-of-attack violence, and linebacker run fits.'
+            },
+            'Slot WR': {
+                title: 'Slot Wide Receiver Alignment',
+                desc: 'Receivers aligned inside between the offensive tackle and the boundary receiver. Typically targeted on quick slants, option routes, and seam routes against nickel CBs or linebackers.'
+            },
+            'Outside WR': {
+                title: 'Outside / Boundary WR Alignment',
+                desc: 'Receivers aligned wide near the sideline boundary. Targeted on perimeter isolations, deep go-balls, comebacks, and contested boundary passes.'
+            },
+            'Inline TE': {
+                title: 'Inline Tight End Alignment',
+                desc: 'Tight end attached directly to the offensive line on the line of scrimmage. Frequently attacks seam routes, shallow crossers, and underneath flats against linebackers or strong safeties.'
+            },
+            'Backfield RB': {
+                title: 'Backfield Running Back Target Share',
+                desc: 'Passes directed to running backs on screens, checkdowns, swing routes, or wheel releases out of the backfield.'
+            },
+            'Tgt% vs Zone': {
+                title: 'Target Share vs Zone Coverage',
+                desc: 'Percentage of team pass attempts directed to this player when the opposing defense is running zone coverage. Identifies zone-beater targets who find soft spots.'
+            },
+            'Tgt% vs Man': {
+                title: 'Target Share vs Man Coverage',
+                desc: 'Percentage of team pass attempts directed to this player when facing man-to-man coverage. Highlights alpha separators who win 1-on-1 matchups.'
+            },
+            'YPRR': {
+                title: 'Yards Per Route Run (YPRR)',
+                desc: 'Total receiving yards divided by total pass routes run. The premier efficiency stat that filters out snap count to measure how dynamically a receiver wins per route.'
+            },
+            'Scheme Edge': {
+                title: 'Scheme Edge (Delta)',
+                desc: 'The statistical difference between a player\'s efficiency against this specific defensive scheme versus their season baseline. A positive delta indicates a matchup ripe for a statistical breakout.'
+            },
+            'Causal Mechanism': {
+                title: 'Causal Mechanism',
+                desc: 'The underlying schematic interaction causing the advantage (e.g. slot receiver option routes matching up against single-high linebackers, or light front-six boxes).'
+            },
+            'Neutral Pace': {
+                title: 'Neutral Situation Pace',
+                desc: 'Average seconds elapsed between snaps in neutral game scripts (game score within 7 points, outside 2-minute drills). Sub-26s indicates fast pace creating high play volume.'
+            },
+            'Proj Plays': {
+                title: 'Projected Play Volume',
+                desc: 'Projected total offensive plays based on combined team tempo, neutral seconds-per-snap, and pass/run ratio.'
+            },
+            'Checkdown Rate': {
+                title: 'QB Checkdown Frequency',
+                desc: 'Percentage of QB dropbacks where the quarterback dumps the ball off to a running back or underneath outlet rather than pushing downfield.'
+            },
+            'RZ Touch Leader': {
+                title: 'Red Zone Touch Concentration',
+                desc: 'The primary skill player commanding the greatest share of designed touches (carries + targets) inside the opponent\'s 20-yard line.'
+            },
+            'RZ Pass Rate': {
+                title: 'Red Zone Pass Calling Rate',
+                desc: 'Percentage of offensive plays called as passing attempts when positioned inside the 20-yard line.'
+            },
+            '3rd Down Pass Rate': {
+                title: '3rd Down Passing Frequency',
+                desc: 'Percentage of 3rd down snaps called as passes, indicating offensive dependency on QB dropbacks in high-leverage situations.'
+            }
+        };
+
+        function renderSchemeTip(key, customLabel = null, position = 'center', showIcon = true) {
+            const info = SCHEME_EXPLANATIONS[key];
+            const label = customLabel || key;
+            if (!info) return label;
+
+            let posClass = 'stat-info-box';
+            if (position === 'left') posClass += ' stat-info-box-left';
+            else if (position === 'right') posClass += ' stat-info-box-right';
+
+            const iconSvg = showIcon ? `<svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-slate-400 group-hover:text-slate-200 ml-1 inline shrink-0 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>` : '';
+
+            return `<span class="stat-info-trigger group inline-flex items-center cursor-help border-b border-dotted border-slate-500/70 hover:border-slate-300 text-slate-300 hover:text-slate-100 transition-colors" tabindex="0" title="${label}: ${info.desc}"><span class="inline-flex items-center">${label}${iconSvg}</span><div class="${posClass}"><div class="font-bold text-slate-100 mb-1 flex items-center space-x-1.5 border-b border-[#30363d] pb-1 text-left"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400 shrink-0 inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>${info.title}</span></div><div class="text-[10.5px] text-slate-300 font-sans leading-relaxed text-left normal-case">${info.desc}</div></div></span>`;
+        }
+
         function renderSchemeInsights(d) {
             const container = document.getElementById('insights-view-container');
             if (!container) return;
@@ -2581,8 +2747,8 @@
                             <!-- Zone vs Man Bar -->
                             <div class="space-y-1">
                                 <div class="flex justify-between text-[11px] font-mono text-slate-300">
-                                    <span>Zone Coverage: <b>${fmtPct(aCov.def_zone_pct)}</b></span>
-                                    <span>Man Coverage: <b>${fmtPct(aCov.def_man_pct)}</b></span>
+                                    <span>${renderSchemeTip('Zone Coverage', 'Zone Coverage', 'left')}: <b>${fmtPct(aCov.def_zone_pct)}</b></span>
+                                    <span>${renderSchemeTip('Man Coverage', 'Man Coverage', 'right')}: <b>${fmtPct(aCov.def_man_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
                                     <div class="bg-slate-300 h-full" style="width: ${aCov.def_zone_pct || 65}%"></div>
@@ -2593,8 +2759,8 @@
                             <!-- MFO vs MFC Bar -->
                             <div class="space-y-1">
                                 <div class="flex justify-between text-[11px] font-mono text-slate-300">
-                                    <span>Middle-Field Open (2-High / MFO): <b>${fmtPct(aCov.def_mfo_pct)}</b></span>
-                                    <span>Middle-Field Closed (1-High / MFC): <b>${fmtPct(aCov.def_mfc_pct)}</b></span>
+                                    <span>${renderSchemeTip('Middle-Field Open', 'MFO (2-High)', 'left')}: <b>${fmtPct(aCov.def_mfo_pct)}</b></span>
+                                    <span>${renderSchemeTip('Middle-Field Closed', 'MFC (1-High)', 'right')}: <b>${fmtPct(aCov.def_mfc_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
                                     <div class="bg-slate-300 h-full" style="width: ${aCov.def_mfo_pct || 55}%"></div>
@@ -2607,27 +2773,27 @@
                                 <div class="text-[10px] font-bold text-slate-500 uppercase">Coverage Shell Distribution</div>
                                 <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono">
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 1</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 1', 'Cover 1', 'left')}</span>
                                         <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 1 (Man)'] || aCov.shells?.cover_1 || 22)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 2</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 2', 'Cover 2', 'center')}</span>
                                         <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 2 (MFO)'] || aCov.shells?.cover_2 || 18)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 3</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 3', 'Cover 3', 'right')}</span>
                                         <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 3 (MFC)'] || aCov.shells?.cover_3 || 26)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 4</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 4', 'Cover 4', 'left')}</span>
                                         <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 4 Quarters (MFO)'] || aCov.shells?.cover_4 || 22)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 6</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 6', 'Cover 6', 'center')}</span>
                                         <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 6 Split (MFO)'] || aCov.shells?.cover_6 || 12)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Blitz %</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'right')}</span>
                                         <b class="text-slate-200">${fmtPct(aCov.blitz_pct || 28)}</b>
                                     </div>
                                 </div>
@@ -2654,8 +2820,8 @@
                             <!-- Zone vs Man Bar -->
                             <div class="space-y-1">
                                 <div class="flex justify-between text-[11px] font-mono text-slate-300">
-                                    <span>Zone Coverage: <b>${fmtPct(hCov.def_zone_pct)}</b></span>
-                                    <span>Man Coverage: <b>${fmtPct(hCov.def_man_pct)}</b></span>
+                                    <span>${renderSchemeTip('Zone Coverage', 'Zone Coverage', 'left')}: <b>${fmtPct(hCov.def_zone_pct)}</b></span>
+                                    <span>${renderSchemeTip('Man Coverage', 'Man Coverage', 'right')}: <b>${fmtPct(hCov.def_man_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
                                     <div class="bg-slate-300 h-full" style="width: ${hCov.def_zone_pct || 65}%"></div>
@@ -2666,8 +2832,8 @@
                             <!-- MFO vs MFC Bar -->
                             <div class="space-y-1">
                                 <div class="flex justify-between text-[11px] font-mono text-slate-300">
-                                    <span>Middle-Field Open (2-High / MFO): <b>${fmtPct(hCov.def_mfo_pct)}</b></span>
-                                    <span>Middle-Field Closed (1-High / MFC): <b>${fmtPct(hCov.def_mfc_pct)}</b></span>
+                                    <span>${renderSchemeTip('Middle-Field Open', 'MFO (2-High)', 'left')}: <b>${fmtPct(hCov.def_mfo_pct)}</b></span>
+                                    <span>${renderSchemeTip('Middle-Field Closed', 'MFC (1-High)', 'right')}: <b>${fmtPct(hCov.def_mfc_pct)}</b></span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
                                     <div class="bg-slate-300 h-full" style="width: ${hCov.def_mfo_pct || 55}%"></div>
@@ -2680,27 +2846,27 @@
                                 <div class="text-[10px] font-bold text-slate-500 uppercase">Coverage Shell Distribution</div>
                                 <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono">
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 1</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 1', 'Cover 1', 'left')}</span>
                                         <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 1 (Man)'] || hCov.shells?.cover_1 || 22)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 2</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 2', 'Cover 2', 'center')}</span>
                                         <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 2 (MFO)'] || hCov.shells?.cover_2 || 18)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 3</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 3', 'Cover 3', 'right')}</span>
                                         <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 3 (MFC)'] || hCov.shells?.cover_3 || 26)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 4</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 4', 'Cover 4', 'left')}</span>
                                         <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 4 Quarters (MFO)'] || hCov.shells?.cover_4 || 22)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Cover 6</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 6', 'Cover 6', 'center')}</span>
                                         <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 6 Split (MFO)'] || hCov.shells?.cover_6 || 12)}</b>
                                     </div>
                                     <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                        <span class="text-slate-400 block text-[9px]">Blitz %</span>
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'right')}</span>
                                         <b class="text-slate-200">${fmtPct(hCov.blitz_pct || 28)}</b>
                                     </div>
                                 </div>
@@ -2747,8 +2913,8 @@
                             <!-- Zone vs Gap Run Ratio -->
                             <div class="space-y-1">
                                 <div class="flex justify-between text-[11px] font-mono text-slate-300">
-                                    <span>Zone Runs: <b>${fmtPct(aRun.offense_zone_pct)}</b> (${fmtDec(aRun.zone_ypc)} YPC)</span>
-                                    <span>Gap/Man Runs: <b>${fmtPct(aRun.offense_gap_pct)}</b> (${fmtDec(aRun.gap_ypc)} YPC)</span>
+                                    <span>${renderSchemeTip('Zone Runs', 'Zone Runs', 'left')}: <b>${fmtPct(aRun.offense_zone_pct)}</b> (${fmtDec(aRun.zone_ypc)} YPC)</span>
+                                    <span>${renderSchemeTip('Gap/Man Runs', 'Gap/Man Runs', 'right')}: <b>${fmtPct(aRun.offense_gap_pct)}</b> (${fmtDec(aRun.gap_ypc)} YPC)</span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
                                     <div class="bg-slate-300 h-full" style="width: ${aRun.offense_zone_pct || 50}%"></div>
@@ -2759,12 +2925,12 @@
                             <!-- Opponent Defense Vulnerability Breakdown -->
                             <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1">
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
-                                    <span class="text-slate-400 block text-[10px]">${d.home_team} vs Zone Runs</span>
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Zone Runs', `${d.home_team} vs Zone Runs`, 'left')}</span>
                                     <div class="text-slate-200 font-bold">${fmtDec(aRun.opp_def_zone_ypc_allowed)} YPC Allowed</div>
                                     <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(aRun.opp_def_zone_rank)}">Rank #${aRun.opp_def_zone_rank || '--'}</span>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
-                                    <span class="text-slate-400 block text-[10px]">${d.home_team} vs Gap Runs</span>
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Gap Runs', `${d.home_team} vs Gap Runs`, 'right')}</span>
                                     <div class="text-slate-200 font-bold">${fmtDec(aRun.opp_def_gap_ypc_allowed)} YPC Allowed</div>
                                     <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(aRun.opp_def_gap_rank)}">Rank #${aRun.opp_def_gap_rank || '--'}</span>
                                 </div>
@@ -2785,8 +2951,8 @@
                             <!-- Zone vs Gap Run Ratio -->
                             <div class="space-y-1">
                                 <div class="flex justify-between text-[11px] font-mono text-slate-300">
-                                    <span>Zone Runs: <b>${fmtPct(hRun.offense_zone_pct)}</b> (${fmtDec(hRun.zone_ypc)} YPC)</span>
-                                    <span>Gap/Man Runs: <b>${fmtPct(hRun.offense_gap_pct)}</b> (${fmtDec(hRun.gap_ypc)} YPC)</span>
+                                    <span>${renderSchemeTip('Zone Runs', 'Zone Runs', 'left')}: <b>${fmtPct(hRun.offense_zone_pct)}</b> (${fmtDec(hRun.zone_ypc)} YPC)</span>
+                                    <span>${renderSchemeTip('Gap/Man Runs', 'Gap/Man Runs', 'right')}: <b>${fmtPct(hRun.offense_gap_pct)}</b> (${fmtDec(hRun.gap_ypc)} YPC)</span>
                                 </div>
                                 <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
                                     <div class="bg-slate-300 h-full" style="width: ${hRun.offense_zone_pct || 50}%"></div>
@@ -2797,12 +2963,12 @@
                             <!-- Opponent Defense Vulnerability Breakdown -->
                             <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1">
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
-                                    <span class="text-slate-400 block text-[10px]">${d.away_team} vs Zone Runs</span>
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Zone Runs', `${d.away_team} vs Zone Runs`, 'left')}</span>
                                     <div class="text-slate-200 font-bold">${fmtDec(hRun.opp_def_zone_ypc_allowed)} YPC Allowed</div>
                                     <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(hRun.opp_def_zone_rank)}">Rank #${hRun.opp_def_zone_rank || '--'}</span>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
-                                    <span class="text-slate-400 block text-[10px]">${d.away_team} vs Gap Runs</span>
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Gap Runs', `${d.away_team} vs Gap Runs`, 'right')}</span>
                                     <div class="text-slate-200 font-bold">${fmtDec(hRun.opp_def_gap_ypc_allowed)} YPC Allowed</div>
                                     <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(hRun.opp_def_gap_rank)}">Rank #${hRun.opp_def_gap_rank || '--'}</span>
                                 </div>
@@ -2838,19 +3004,19 @@
                             <div class="text-xs font-bold font-mono text-slate-200">${d.away_team} Alignment Target Shares</div>
                             <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Slot WR</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Slot WR', 'Slot WR', 'left')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(aDist.slot_wr_pct || 30)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Outside WR</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Outside WR', 'Outside WR', 'center')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(aDist.wide_wr_pct || 42)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Inline TE</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Inline TE', 'Inline TE', 'center')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(aDist.inline_te_pct || 18)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Backfield RB</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Backfield RB', 'Backfield RB', 'right')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(aDist.backfield_rb_pct || 10)}</b>
                                 </div>
                             </div>
@@ -2860,19 +3026,19 @@
                             <div class="text-xs font-bold font-mono text-slate-200">${d.home_team} Alignment Target Shares</div>
                             <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Slot WR</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Slot WR', 'Slot WR', 'left')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(hDist.slot_wr_pct || 32)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Outside WR</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Outside WR', 'Outside WR', 'center')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(hDist.wide_wr_pct || 40)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Inline TE</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Inline TE', 'Inline TE', 'center')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(hDist.inline_te_pct || 18)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Backfield RB</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Backfield RB', 'Backfield RB', 'right')}</span>
                                     <b class="text-slate-100 font-bold">${fmtPct(hDist.backfield_rb_pct || 10)}</b>
                                 </div>
                             </div>
@@ -2888,9 +3054,9 @@
                                     <th class="py-2 px-2 text-center">Team</th>
                                     <th class="py-2 px-2 text-center">Pos</th>
                                     <th class="py-2 px-3">Primary Alignment</th>
-                                    <th class="py-2 px-2 text-right">Tgt% vs Zone</th>
-                                    <th class="py-2 px-2 text-right">Tgt% vs Man</th>
-                                    <th class="py-2 px-2 text-right">YPRR</th>
+                                    <th class="py-2 px-2 text-right">${renderSchemeTip('Tgt% vs Zone', 'Tgt% Zone', 'center')}</th>
+                                    <th class="py-2 px-2 text-right">${renderSchemeTip('Tgt% vs Man', 'Tgt% Man', 'center')}</th>
+                                    <th class="py-2 px-2 text-right">${renderSchemeTip('YPRR', 'YPRR', 'right')}</th>
                                     <th class="py-2 px-3">Coverage Matchup Diagnostic</th>
                                 </tr>
                             </thead>
@@ -2964,7 +3130,7 @@
                                         <span>${b.season_baseline}</span>
                                     </div>
                                     <div class="flex justify-between text-slate-200 text-[11px] font-semibold border-t border-[#21262d] pt-1">
-                                        <span>Scheme Edge:</span>
+                                        <span>${renderSchemeTip('Scheme Edge', 'Scheme Edge', 'left')}:</span>
                                         <span>${b.scheme_delta}</span>
                                     </div>
                                 </div>
@@ -2974,7 +3140,7 @@
                                 </p>
                                 ${b.causal_mechanism ? `
                                     <p class="text-[10.5px] text-slate-400 font-mono bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <b class="text-slate-300 font-sans">Causal Mechanism:</b> ${b.causal_mechanism}
+                                        <b class="text-slate-300 font-sans">${renderSchemeTip('Causal Mechanism', 'Causal Mechanism', 'left')}:</b> ${b.causal_mechanism}
                                     </p>
                                 ` : ''}
                             </div>
@@ -3009,27 +3175,27 @@
 
                             <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Neutral Pace</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Neutral Pace', 'Neutral Pace', 'left')}</span>
                                     <b class="text-slate-200">${aTempo.neutral_pace_sec || 27.5}s/snap</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Proj Plays</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Proj Plays', 'Proj Plays', 'center')}</span>
                                     <b class="text-slate-200">${aTempo.proj_plays || 64}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Checkdown Rate</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Checkdown Rate', 'Checkdown Rate', 'right')}</span>
                                     <b class="text-slate-200 font-bold">${fmtPct(aTempo.checkdown_pct || 14)}</b>
                                 </div>
                             </div>
 
                             <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-xs space-y-1">
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
-                                    <span>RZ Touch Leader:</span>
+                                    <span>${renderSchemeTip('RZ Touch Leader', 'RZ Touch Leader', 'left')}:</span>
                                     <b class="text-slate-200">${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`}</b>
                                 </div>
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
-                                    <span>RZ Pass Rate: <b>${fmtPct(aTempo.rz_pass_rate || 52)}</b></span>
-                                    <span>3rd Down Pass Rate: <b>${fmtPct(aTempo.third_down_pass_rate || 70)}</b></span>
+                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b>${fmtPct(aTempo.rz_pass_rate || 52)}</b></span>
+                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b>${fmtPct(aTempo.third_down_pass_rate || 70)}</b></span>
                                 </div>
                             </div>
                         </div>
@@ -3043,27 +3209,27 @@
 
                             <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Neutral Pace</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Neutral Pace', 'Neutral Pace', 'left')}</span>
                                     <b class="text-slate-200">${hTempo.neutral_pace_sec || 27.5}s/snap</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Proj Plays</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Proj Plays', 'Proj Plays', 'center')}</span>
                                     <b class="text-slate-200">${hTempo.proj_plays || 64}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9px]">Checkdown Rate</span>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Checkdown Rate', 'Checkdown Rate', 'right')}</span>
                                     <b class="text-slate-200 font-bold">${fmtPct(hTempo.checkdown_pct || 14)}</b>
                                 </div>
                             </div>
 
                             <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-xs space-y-1">
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
-                                    <span>RZ Touch Leader:</span>
+                                    <span>${renderSchemeTip('RZ Touch Leader', 'RZ Touch Leader', 'left')}:</span>
                                     <b class="text-slate-200">${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`}</b>
                                 </div>
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
-                                    <span>RZ Pass Rate: <b>${fmtPct(hTempo.rz_pass_rate || 52)}</b></span>
-                                    <span>3rd Down Pass Rate: <b>${fmtPct(hTempo.third_down_pass_rate || 70)}</b></span>
+                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b>${fmtPct(hTempo.rz_pass_rate || 52)}</b></span>
+                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b>${fmtPct(hTempo.third_down_pass_rate || 70)}</b></span>
                                 </div>
                             </div>
                         </div>
