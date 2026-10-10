@@ -3036,11 +3036,11 @@
 
             let passVerdict = '';
             if (hDefMfo >= 50 && aDefMfo >= 50) {
-                passVerdict = `Both defenses operate primarily out of Middle-Field Open (2-High) safety shells (${hDefMfo.toFixed(0)}% and ${aDefMfo.toFixed(0)}%). This caps perimeter deep explosive shots and funnels heavy passing volume into the middle of the field — creating elevated target and reception floors for Slot Receivers and Inline Tight Ends finding soft spots between zone safeties.`;
+                passVerdict = `Both defenses operate primarily out of Middle-Field Open (2-High) safety shells (${hDefMfo.toFixed(0)}% and ${aDefMfo.toFixed(0)}%). This caps perimeter deep explosive shots and funnels volume inside. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Receptions</b> over receiving yards for Slot Receivers and Tight End close catches settling into underneath voids, or <b>Receiving Yards</b> on vertical seam routes straight down the hashmarks.</span>`;
             } else if (hDefZone >= 65 || aDefZone >= 65) {
-                passVerdict = `Heavy zone coverage structures dictate this passing matchup. Expect quarterbacks to take underneath intermediate profits rather than contested deep shots, boosting target volume for high-percentage route runners who locate spatial voids.`;
+                passVerdict = `Heavy zone coverage structures dictate this passing matchup. Defenses prioritize keeping plays in front of them. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Receptions</b> on short throws, quick option routes, and backfield checkdowns rather than contested deep yardage totals.</span>`;
             } else {
-                passVerdict = `Higher rates of single-high (Middle-Field Closed) and man coverage force 1-on-1 boundary isolations. Passing success will rely on outside receivers generating direct separation against press cornerbacks.`;
+                passVerdict = `Higher rates of single-high (Middle-Field Closed) and man coverage force 1-on-1 boundary isolations. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Receiving Yards</b> on boundary go routes and vertical shots. With single coverage outside, chunk explosive yardage outweighs raw reception volume.</span>`;
             }
 
             // 2. Run Game & Trench Advantage Takeaways
@@ -3054,7 +3054,7 @@
             const aAllowsGap = parseFloat(hRun.opp_def_gap_ypc_allowed || 4.3);
             const aAllowsZone = parseFloat(hRun.opp_def_zone_ypc_allowed || 4.1);
 
-            let runVerdict = `${d.away_team} operates a ${(aGapPct > aZonePct ? 'Gap/Power' : 'Zone-stretch')} rushing identity (${(aGapPct > aZonePct ? aGapPct : aZonePct).toFixed(0)}%) against a ${d.home_team} defense allowing ${hAllowsGap.toFixed(2)} YPC on gap runs vs ${hAllowsZone.toFixed(2)} YPC on zone. On the other side, ${d.home_team} attacks with ${(hGapPct > hZonePct ? 'downhill gap schemes' : 'lateral zone runs')} against ${d.away_team}'s front conceding ${aAllowsGap.toFixed(2)} YPC on gap runs and ${aAllowsZone.toFixed(2)} YPC on zone.`;
+            let runVerdict = `${d.away_team} operates a ${(aGapPct > aZonePct ? 'Gap/Power' : 'Zone-stretch')} rushing identity (${(aGapPct > aZonePct ? aGapPct : aZonePct).toFixed(0)}%) against a ${d.home_team} defense allowing ${hAllowsGap.toFixed(2)} YPC on gap runs vs ${hAllowsZone.toFixed(2)} YPC on zone. On the other side, ${d.home_team} attacks with ${(hGapPct > hZonePct ? 'downhill gap schemes' : 'lateral zone runs')} against ${d.away_team}'s front conceding ${aAllowsGap.toFixed(2)} YPC on gap runs and ${aAllowsZone.toFixed(2)} YPC on zone. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Rushing Yards</b> for primary running backs on their dominant rushing scheme, plus quarterback scramble rushing yards against man coverage looks where defenders' backs are turned.</span>`;
 
             // 3. Pace, Game Flow & Touch Concentration Takeaways
             const totalPlays = Math.round((aTempo.proj_plays || 64) + (hTempo.proj_plays || 64));
@@ -3075,16 +3075,20 @@
                 {
                     player: `${d.away_team} Primary Target`,
                     team: d.away_team,
-                    pos: 'WR/TE',
+                    pos: 'WR',
+                    stat_focus: 'Receiving Yards',
+                    prop_angle: 'Prop Target: Receiving Yards (Deep Balls)',
                     scheme_delta: '+2.8% Target Rate',
-                    rationale: `Schematic funnel points directly to this alignment against the opposing coverage shell.`
+                    rationale: `Target receiving yards over receptions. Schematic funnel points directly to boundary isolation against opposing single coverage.`
                 },
                 {
                     player: `${d.home_team} Lead Back`,
                     team: d.home_team,
                     pos: 'RB',
+                    stat_focus: 'Rushing Yards',
+                    prop_angle: 'Prop Target: Rushing Yards (Ground Attack)',
                     scheme_delta: '+0.55 YPC Edge',
-                    rationale: `Blocking scheme pairs favorably against defensive front line gap fits.`
+                    rationale: `Target rushing yards / carries. Blocking scheme pairs favorably against defensive front line gap fits.`
                 }
             ];
 
@@ -3602,6 +3606,18 @@
                                         </span>
                                     </div>
 
+                                    ${(b.prop_angle || b.stat_focus) ? `
+                                        <div class="bg-[#161b22] px-2.5 py-1.5 rounded-lg border border-[#21262d] flex items-center justify-between text-[11px] font-mono">
+                                            <span class="text-slate-400 flex items-center gap-1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+                                                <span class="text-slate-300 font-semibold">Prop Focus:</span>
+                                            </span>
+                                            <span class="font-bold px-2 py-0.5 rounded text-[10px] ${b.stat_focus === 'Receiving Yards' ? 'text-amber-300 bg-amber-950/40 border border-amber-800/50' : (b.stat_focus === 'Receptions' ? 'text-emerald-300 bg-emerald-950/40 border border-emerald-800/50' : 'text-sky-300 bg-sky-950/40 border border-sky-800/50')}">
+                                                ${(b.prop_angle || b.stat_focus).replace(/^Prop Target:\s*/, '')}
+                                            </span>
+                                        </div>
+                                    ` : ''}
+
                                     <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1 text-xs font-mono">
                                         <div class="flex justify-between text-slate-300">
                                             <span>Scheme Metric:</span>
@@ -3802,12 +3818,20 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                             ${wrapUp.edges.map(b => `
-                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1">
+                                <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] space-y-1.5">
                                     <div class="flex items-center justify-between">
-                                        <b class="text-slate-100">${b.player} (${b.team} ${b.pos})</b>
+                                        <b class="text-slate-100 font-sans text-xs">${b.player} <span class="text-slate-400 font-mono text-[11px]">(${b.team} ${b.pos})</span></b>
                                         <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${b.scheme_delta}</span>
                                     </div>
-                                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                                    ${(b.prop_angle || b.stat_focus) ? `
+                                        <div>
+                                            <span class="inline-flex items-center space-x-1.5 text-[10.5px] font-mono px-2 py-0.5 rounded ${b.stat_focus === 'Receiving Yards' ? 'text-amber-300 bg-amber-950/40 border border-amber-800/50' : (b.stat_focus === 'Receptions' ? 'text-emerald-300 bg-emerald-950/40 border border-emerald-800/50' : 'text-sky-300 bg-sky-950/40 border border-sky-800/50')}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+                                                <span>${(b.prop_angle || b.stat_focus).replace(/^Prop Target:\s*/, '')}</span>
+                                            </span>
+                                        </div>
+                                    ` : ''}
+                                    <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
                                         ${formatInsightsText(b.rationale)}
                                     </p>
                                 </div>
@@ -3925,23 +3949,31 @@
             }
 
             const TEAM_ROSTERS_2026 = {
-                'NE': { wr1: 'A.J. Brown', wr2: 'DeMario Douglas', te: 'Hunter Henry', rb: 'Rhamondre Stevenson' },
-                'PHI': { wr1: 'DeVonta Smith', wr2: 'Dontayvion Wicks', te: 'Dallas Goedert', rb: 'Saquon Barkley' },
-                'KC': { wr1: 'Xavier Worthy', wr2: 'Rashee Rice', te: 'Travis Kelce', rb: 'Isiah Pacheco' },
-                'BAL': { wr1: 'Zay Flowers', wr2: 'Rashod Bateman', te: 'Mark Andrews', rb: 'Derrick Henry' },
-                'DET': { wr1: 'Amon-Ra St. Brown', wr2: 'Jameson Williams', te: 'Sam LaPorta', rb: 'Jahmyr Gibbs' },
-                'SF': { wr1: 'Deebo Samuel', wr2: 'Ricky Pearsall', te: 'George Kittle', rb: 'Christian McCaffrey' },
-                'BUF': { wr1: 'Khalil Shakir', wr2: 'Keon Coleman', te: 'Dalton Kincaid', rb: 'James Cook' },
-                'CIN': { wr1: 'Ja\'Marr Chase', wr2: 'Tee Higgins', te: 'Mike Gesicki', rb: 'Chase Brown' },
-                'DAL': { wr1: 'CeeDee Lamb', wr2: 'Jalen Tolbert', te: 'Jake Ferguson', rb: 'Rico Dowdle' },
-                'MIN': { wr1: 'Justin Jefferson', wr2: 'Jordan Addison', te: 'T.J. Hockenson', rb: 'Aaron Jones' },
-                'MIA': { wr1: 'Tyreek Hill', wr2: 'Jaylen Waddle', te: 'Jonnu Smith', rb: 'De\'Von Achane' },
-                'GB': { wr1: 'Jayden Reed', wr2: 'Christian Watson', te: 'Tucker Kraft', rb: 'Josh Jacobs' },
-                'HOU': { wr1: 'Nico Collins', wr2: 'Tank Dell', te: 'Dalton Schultz', rb: 'Joe Mixon' }
+                'NE': { qb: 'Drake Maye', qb_mobile: true, wr1: 'A.J. Brown', wr2: 'DeMario Douglas', te: 'Hunter Henry', rb: 'Rhamondre Stevenson' },
+                'PHI': { qb: 'Jalen Hurts', qb_mobile: true, wr1: 'DeVonta Smith', wr2: 'Dontayvion Wicks', te: 'Dallas Goedert', rb: 'Saquon Barkley' },
+                'KC': { qb: 'Patrick Mahomes', qb_mobile: true, wr1: 'Xavier Worthy', wr2: 'Rashee Rice', te: 'Travis Kelce', rb: 'Isiah Pacheco' },
+                'BAL': { qb: 'Lamar Jackson', qb_mobile: true, wr1: 'Zay Flowers', wr2: 'Rashod Bateman', te: 'Mark Andrews', rb: 'Derrick Henry' },
+                'DET': { qb: 'Jared Goff', qb_mobile: false, wr1: 'Amon-Ra St. Brown', wr2: 'Jameson Williams', te: 'Sam LaPorta', rb: 'Jahmyr Gibbs' },
+                'SF': { qb: 'Brock Purdy', qb_mobile: false, wr1: 'Deebo Samuel', wr2: 'Ricky Pearsall', te: 'George Kittle', rb: 'Christian McCaffrey' },
+                'BUF': { qb: 'Josh Allen', qb_mobile: true, wr1: 'Khalil Shakir', wr2: 'Keon Coleman', te: 'Dalton Kincaid', rb: 'James Cook' },
+                'CIN': { qb: 'Joe Burrow', qb_mobile: false, wr1: 'Ja\'Marr Chase', wr2: 'Tee Higgins', te: 'Mike Gesicki', rb: 'Chase Brown' },
+                'DAL': { qb: 'Dak Prescott', qb_mobile: false, wr1: 'CeeDee Lamb', wr2: 'Jalen Tolbert', te: 'Jake Ferguson', rb: 'Rico Dowdle' },
+                'MIN': { qb: 'Sam Darnold', qb_mobile: false, wr1: 'Justin Jefferson', wr2: 'Jordan Addison', te: 'T.J. Hockenson', rb: 'Aaron Jones' },
+                'MIA': { qb: 'Tua Tagovailoa', qb_mobile: false, wr1: 'Tyreek Hill', wr2: 'Jaylen Waddle', te: 'Jonnu Smith', rb: 'De\'Von Achane' },
+                'GB': { qb: 'Jordan Love', qb_mobile: false, wr1: 'Jayden Reed', wr2: 'Christian Watson', te: 'Tucker Kraft', rb: 'Josh Jacobs' },
+                'HOU': { qb: 'C.J. Stroud', qb_mobile: false, wr1: 'Nico Collins', wr2: 'Tank Dell', te: 'Dalton Schultz', rb: 'Joe Mixon' },
+                'SEA': { qb: 'Geno Smith', qb_mobile: false, wr1: 'DK Metcalf', wr2: 'Jaxon Smith-Njigba', te: 'Noah Fant', rb: 'Kenneth Walker III' },
+                'WAS': { qb: 'Jayden Daniels', qb_mobile: true, wr1: 'Terry McLaurin', wr2: 'Luke McCaffrey', te: 'Zach Ertz', rb: 'Brian Robinson Jr.' },
+                'LAC': { qb: 'Justin Herbert', qb_mobile: false, wr1: 'Ladd McConkey', wr2: 'Quentin Johnston', te: 'Will Dissly', rb: 'J.K. Dobbins' },
+                'ARI': { qb: 'Kyler Murray', qb_mobile: true, wr1: 'Marvin Harrison Jr.', wr2: 'Michael Wilson', te: 'Trey McBride', rb: 'James Conner' },
+                'CHI': { qb: 'Caleb Williams', qb_mobile: true, wr1: 'DJ Moore', wr2: 'Rome Odunze', te: 'Cole Kmet', rb: 'D\'Andre Swift' },
+                'DEN': { qb: 'Bo Nix', qb_mobile: true, wr1: 'Courtland Sutton', wr2: 'Lil\'Jordan Humphrey', te: 'Greg Dulcich', rb: 'Javonte Williams' },
+                'IND': { qb: 'Anthony Richardson', qb_mobile: true, wr1: 'Michael Pittman Jr.', wr2: 'Josh Downs', te: 'Kylen Granson', rb: 'Jonathan Taylor' },
+                'NYG': { qb: 'Daniel Jones', qb_mobile: true, wr1: 'Malik Nabers', wr2: 'Wan\'Dale Robinson', te: 'Theo Johnson', rb: 'Tyrone Tracy Jr.' }
             };
 
-            const aRoster = TEAM_ROSTERS_2026[a] || { wr1: `${a} Primary WR`, wr2: `${a} Slot WR`, te: `${a} Starting TE`, rb: `${a} Lead Back` };
-            const hRoster = TEAM_ROSTERS_2026[h] || { wr1: `${h} Primary WR`, wr2: `${h} Slot WR`, te: `${h} Starting TE`, rb: `${h} Lead Back` };
+            const aRoster = TEAM_ROSTERS_2026[a] || { qb: `${a} Starting QB`, qb_mobile: false, wr1: `${a} Primary WR`, wr2: `${a} Slot WR`, te: `${a} Starting TE`, rb: `${a} Lead Back` };
+            const hRoster = TEAM_ROSTERS_2026[h] || { qb: `${h} Starting QB`, qb_mobile: false, wr1: `${h} Primary WR`, wr2: `${h} Slot WR`, te: `${h} Starting TE`, rb: `${h} Lead Back` };
 
             return {
                 home_team: h,
@@ -4038,52 +4070,73 @@
                 },
                 efficiency_breakouts: [
                     {
-                        player: aRoster.wr1,
-                        team: a,
-                        pos: 'WR',
-                        scheme_type: 'Boundary Alpha',
-                        context_metric: '28.5% Tgt Share vs Zone',
-                        season_baseline: '32.0% vs Man',
-                        scheme_delta: '+6.5% vs Zone Shell',
-                        verdict: 'PRIME BREAKOUT SPOT',
-                        rationale: `Faces ${h} defense deploying ${hZone}% Zone. Wins isolated 1-on-1 boundary matchups with explosive perimeter separation.`,
-                        causal_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.'
-                    },
-                    {
-                        player: aRoster.rb,
-                        team: a,
-                        pos: 'RB',
-                        scheme_type: 'Outside Zone Edge',
-                        context_metric: '4.60 YPC on Zone Concepts',
-                        season_baseline: '4.20 Gap YPC',
-                        scheme_delta: '+0.40 YPC Zone Edge',
-                        verdict: 'HIGH EFFICIENCY GROUND EDGE',
-                        rationale: `Perimeter stretch zone concepts attack ${h}'s lateral gap flow vulnerability.`,
-                        causal_mechanism: 'Perimeter stretch schemes exploit slow-flowing edge defenders, opening cutback lanes for primary backs.'
-                    },
-                    {
-                        player: hRoster.wr1,
-                        team: h,
-                        pos: 'WR',
-                        scheme_type: 'Boundary Alpha',
-                        context_metric: '27.5% Tgt Share vs Man',
-                        season_baseline: '21.5% vs Zone',
-                        scheme_delta: '+6.0% vs Man Coverage',
-                        verdict: 'PRIME BREAKOUT SPOT',
-                        rationale: `Wins isolated 1-on-1 boundary matchups with explosive perimeter separation against ${a}'s single-high looks.`,
-                        causal_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.'
-                    },
-                    {
                         player: hRoster.rb,
                         team: h,
                         pos: 'RB',
-                        scheme_type: 'Gap Power Edge',
+                        scheme_type: 'Downhill Ground Edge',
+                        stat_focus: 'Rushing Yards',
+                        prop_angle: 'Prop Target: Rushing Yards (Ground Attack)',
                         context_metric: '4.70 YPC on Gap Concepts',
                         season_baseline: '4.10 Zone YPC',
                         scheme_delta: '+0.60 YPC Gap Edge',
                         verdict: 'HIGH EFFICIENCY GROUND EDGE',
-                        rationale: `Downhill power concepts exploit ${a}'s lighter box personnel and interior gap fits.`,
+                        rationale: `Target rushing yards / carries. Downhill gap power concepts exploit ${a}'s interior defensive line gap fits (${aOppDefGapYpc} YPC allowed).`,
                         causal_mechanism: 'Defenses with poor interior gap discipline yield elevated yards before contact to downhill primary ballcarriers.'
+                    },
+                    {
+                        player: aRoster.wr1,
+                        team: a,
+                        pos: 'WR',
+                        scheme_type: 'Boundary Deep Ball Threat',
+                        stat_focus: 'Receiving Yards',
+                        prop_angle: 'Prop Target: Receiving Yards (Deep Balls)',
+                        context_metric: '28.5% Tgt Share vs Zone',
+                        season_baseline: '32.0% vs Man',
+                        scheme_delta: '+6.5% vs Zone Shell',
+                        verdict: 'PRIME BREAKOUT SPOT',
+                        rationale: `Target receiving yards over receptions. 1-on-1 boundary go routes and vertical shots attack soft single coverage on the perimeter, yielding explosive chunk yardage rather than high volume catches.`,
+                        causal_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.'
+                    },
+                    {
+                        player: aRoster.te,
+                        team: a,
+                        pos: 'TE',
+                        scheme_type: 'TE Close Catches / Middle Voids',
+                        stat_focus: 'Receptions',
+                        prop_angle: 'Prop Target: Receptions (TE Close Catches)',
+                        context_metric: '21.0% Tgt Share vs Zone (2.10 YPRR)',
+                        season_baseline: '16.5% vs Man',
+                        scheme_delta: '+4.5% Zone Target Funnel',
+                        verdict: 'HIGH RECEPTION FLOOR',
+                        rationale: `Target receptions on close catches over receiving yards. Short hook and drag routes settle into soft intermediate voids between linebackers in ${h}'s ${hZone}% zone shell for dependable, chain-moving close catches.`,
+                        causal_mechanism: 'Linebackers drop deep in zone coverage, leaving tight ends uncovered on short-to-intermediate crossing and sit routes.'
+                    },
+                    (hRoster.qb_mobile || aRoster.qb_mobile) ? {
+                        player: hRoster.qb_mobile ? hRoster.qb : aRoster.qb,
+                        team: hRoster.qb_mobile ? h : a,
+                        pos: 'QB',
+                        scheme_type: 'QB Scramble / Mobility Edge',
+                        stat_focus: 'Rushing Yards',
+                        prop_angle: 'Prop Target: Rushing Yards (QB Scramble vs Man)',
+                        context_metric: '6.5 Scramble YPC vs Man Shell',
+                        season_baseline: '3.8 YPC on Designed Runs',
+                        scheme_delta: '+14.5 Scramble Yds Edge',
+                        verdict: 'PRIME RUSHING CEILING',
+                        rationale: `Target rushing yards over passing props. Defensive backs turn their backs in man coverage to chase receivers downfield, opening wide scramble lanes for ${(hRoster.qb_mobile ? hRoster.qb : aRoster.qb)} to pick up chunk rushing yards.`,
+                        causal_mechanism: 'Man-to-man coverage forces defensive backs to turn away from the pocket, vacating intermediate lanes for mobile QBs to scramble for chunk rushing yards.'
+                    } : {
+                        player: hRoster.wr2 || `${h} Slot WR`,
+                        team: h,
+                        pos: 'WR',
+                        scheme_type: 'Slot Underneath Volume',
+                        stat_focus: 'Receptions',
+                        prop_angle: 'Prop Target: Receptions (Short Throws)',
+                        context_metric: '25.0% Slot Tgt Share vs Zone',
+                        season_baseline: '19.5% vs Man',
+                        scheme_delta: '+5.5% vs Zone Shell',
+                        verdict: 'HIGH RECEPTION FLOOR',
+                        rationale: `Target receptions over receiving yards. Quick slot option routes and crossing routes find soft cushions against the zone shell, providing a high-volume reception floor.`,
+                        causal_mechanism: 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.'
                     }
                 ],
                 game_flow_tempo: {
