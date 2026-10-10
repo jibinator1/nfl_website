@@ -2553,42 +2553,6 @@
             };
 
             const html = `
-                <!-- Matchup Overview Banner -->
-                <div class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#30363d] pb-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-extrabold text-slate-200 font-mono text-sm shadow-inner shrink-0">
-                                ${d.away_team}
-                            </div>
-                            <div class="text-xs font-bold text-slate-500">@</div>
-                            <div class="w-10 h-10 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center font-extrabold text-slate-200 font-mono text-sm shadow-inner shrink-0">
-                                ${d.home_team}
-                            </div>
-                            <div>
-                                <h3 class="text-base font-bold text-slate-100">${d.away_team_name} @ ${d.home_team_name}</h3>
-                                <p class="text-xs text-slate-400 font-mono mt-0.5">Week ${d.week || 1} • Season ${d.season || 2026} • Film-Room Scheme Breakdown</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">
-                                5 Scheme Pillars
-                            </span>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">
-                                Active Model
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Film Room Analytical Thesis Banner -->
-                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3 flex items-start space-x-2.5">
-                        <i data-lucide="info" class="w-4 h-4 text-slate-400 mt-0.5 shrink-0"></i>
-                        <div class="text-xs text-slate-300 leading-relaxed">
-                            <b class="text-slate-100">Film-Room Thesis:</b> ${d.thesis_quote || 'Scheme cross-referencing isolates whether passing concepts exploit middle-field open safeties, downhill gap blocking pushes light boxes, and tempo concentrates situational volume.'}
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ============================================================== -->
                 <!-- PILLAR 1: DEFENSIVE COVERAGE TENDENCIES (0:49, 17:53) -->
                 <!-- ============================================================== -->
