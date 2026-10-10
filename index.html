@@ -183,6 +183,89 @@
             transform: translateX(0) translateY(0);
         }
 
+        /* Route / Football Concept Visual Diagram Cards */
+        .route-concept-trigger {
+            position: relative;
+            display: inline;
+            cursor: help;
+            border-bottom: 1.5px dashed rgba(56, 189, 248, 0.7);
+            color: #f1f5f9;
+            font-weight: 500;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .route-concept-trigger:hover,
+        .route-concept-trigger:focus {
+            color: #38bdf8;
+            border-bottom-color: #38bdf8;
+        }
+        .route-concept-card {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            width: 275px;
+            max-width: calc(100vw - 32px);
+            padding: 9px 11px;
+            background: rgba(18, 22, 28, 0.98);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid #30363d;
+            border-radius: 9px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.85), 0 2px 8px rgba(0, 0, 0, 0.5);
+            color: #c9d1d9;
+            font-size: 11px;
+            line-height: 1.45;
+            text-transform: none;
+            letter-spacing: normal;
+            pointer-events: none;
+            z-index: 120;
+            transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.18s;
+        }
+        .route-concept-card::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #30363d transparent transparent transparent;
+        }
+        .route-concept-trigger:hover .route-concept-card,
+        .route-concept-trigger:focus .route-concept-card {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .route-concept-card-left {
+            left: 0;
+            transform: translateX(0) translateY(4px);
+        }
+        .route-concept-card-left::after {
+            left: 20px;
+            transform: none;
+        }
+        .route-concept-trigger:hover .route-concept-card-left,
+        .route-concept-trigger:focus .route-concept-card-left {
+            transform: translateX(0) translateY(0);
+        }
+        .route-concept-card-right {
+            left: auto;
+            right: 0;
+            transform: translateX(0) translateY(4px);
+        }
+        .route-concept-card-right::after {
+            left: auto;
+            right: 20px;
+            transform: none;
+        }
+        .route-concept-trigger:hover .route-concept-card-right,
+        .route-concept-trigger:focus .route-concept-card-right {
+            transform: translateX(0) translateY(0);
+        }
+
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0d1117; }
@@ -2695,6 +2778,214 @@
             return `<span class="stat-info-trigger group inline-flex items-center cursor-help border-b border-dotted border-slate-500/70 hover:border-slate-300 text-slate-300 hover:text-slate-100 transition-colors" tabindex="0" title="${label}: ${info.desc}"><span class="inline-flex items-center">${label}${iconSvg}</span><div class="${posClass}"><div class="font-bold text-slate-100 mb-1 flex items-center space-x-1.5 border-b border-[#30363d] pb-1 text-left"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400 shrink-0 inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>${info.title}</span></div><div class="text-[10.5px] text-slate-300 font-sans leading-relaxed text-left normal-case">${info.desc}</div></div></span>`;
         }
 
+        // ==========================================================================
+        // Visual Route & Play Chalkboard Tooltips (Interactive on Hover)
+        // ==========================================================================
+        const FOOTBALL_ROUTE_VISUALS = {
+            'slot-option': {
+                title: 'Slot Option Route',
+                what: 'The inside slot receiver sprints 5 yards forward, watches where the defender is shading, and cuts toward open grass.',
+                why: 'Linebackers and zone safeties cannot react fast enough against a two-way cut in the middle of the field.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <text x="18" y="64" fill="#64748b" font-size="7.5" font-family="monospace">LOS</text>
+                    <circle cx="85" cy="68" r="4.5" fill="#3b82f6"/>
+                    <text x="85" y="71" fill="#fff" font-size="6" font-weight="bold" text-anchor="middle">C</text>
+                    <circle cx="85" cy="80" r="4.5" fill="#3b82f6"/>
+                    <text x="85" y="83" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">QB</text>
+                    <circle cx="145" cy="68" r="5.5" fill="#eab308"/>
+                    <text x="145" y="71" fill="#000" font-size="6" font-weight="bold" text-anchor="middle">WR</text>
+                    <path d="M 145 62 L 145 40" stroke="#facc15" stroke-width="2.2" fill="none"/>
+                    <path d="M 145 40 Q 150 30 190 28" stroke="#facc15" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <polygon points="193,28 186,24 186,32" fill="#facc15"/>
+                    <text x="195" y="22" fill="#facc15" font-size="6.5" font-weight="bold">Out Cut</text>
+                    <path d="M 145 40 Q 140 30 105 28" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3,2" fill="none" stroke-linecap="round"/>
+                    <polygon points="102,28 109,24 109,32" fill="#38bdf8"/>
+                    <text x="95" y="22" fill="#38bdf8" font-size="6.5" font-weight="bold">In Cut</text>
+                    <rect x="137" y="22" width="16" height="11" rx="2" fill="#ef4444"/>
+                    <text x="145" y="30" fill="#fff" font-size="6.5" font-weight="bold" text-anchor="middle">LB</text>
+                </svg>`
+            },
+            'high-low': {
+                title: 'High-Low Sideline Concept',
+                what: 'Two receivers attack the sideline at different depths (one deep at 15+ yards, one short at 5 yards).',
+                why: 'Traps a single boundary defender in a 2-on-1 bind: if he drops deep, throw short; if he steps up, throw deep.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="225" y1="10" x2="225" y2="82" stroke="#475569" stroke-width="2"/>
+                    <text x="228" y="20" fill="#64748b" font-size="7" font-family="monospace">SIDELINE</text>
+                    <line x1="15" y1="68" x2="225" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <circle cx="165" cy="68" r="5" fill="#eab308"/>
+                    <text x="165" y="71" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">WR1</text>
+                    <path d="M 165 63 L 165 22 Q 165 13 205 13" stroke="#facc15" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <polygon points="208,13 201,9 201,17" fill="#facc15"/>
+                    <text x="168" y="10" fill="#facc15" font-size="6.5" font-weight="bold">Deep Route (High)</text>
+                    <circle cx="125" cy="68" r="5" fill="#38bdf8"/>
+                    <text x="125" y="71" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">WR2</text>
+                    <path d="M 125 63 L 125 48 Q 130 45 200 45" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <polygon points="203,45 196,41 196,49" fill="#38bdf8"/>
+                    <text x="135" y="41" fill="#38bdf8" font-size="6.5" font-weight="bold">Flat Route (Low)</text>
+                    <rect x="175" y="26" width="18" height="12" rx="2" fill="#ef4444" stroke="#f87171" stroke-dasharray="2,2"/>
+                    <text x="184" y="35" fill="#fff" font-size="6.5" font-weight="bold" text-anchor="middle">CB</text>
+                    <text x="184" y="21" fill="#f87171" font-size="6" font-weight="bold" text-anchor="middle">2-on-1 Bind</text>
+                </svg>`
+            },
+            'seam-route': {
+                title: 'Vertical Seam Route',
+                what: 'A tight end or receiver sprints straight down the hashmarks between two split safeties.',
+                why: 'When defenses play two deep safeties, the middle of the field is wide open. The ball is thrown before safeties can close.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="15" y1="70" x2="235" y2="70" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <rect x="55" y="18" width="18" height="11" rx="2" fill="#ef4444"/>
+                    <text x="64" y="26" fill="#fff" font-size="6" font-weight="bold" text-anchor="middle">S</text>
+                    <rect x="175" y="18" width="18" height="11" rx="2" fill="#ef4444"/>
+                    <text x="184" y="26" fill="#fff" font-size="6" font-weight="bold" text-anchor="middle">S</text>
+                    <rect x="95" y="14" width="60" height="18" rx="3" fill="rgba(56,189,248,0.08)" stroke="#38bdf8" stroke-dasharray="2,2"/>
+                    <text x="125" y="25" fill="#38bdf8" font-size="6.5" font-weight="bold" text-anchor="middle">Vacated Middle Void</text>
+                    <circle cx="125" cy="70" r="5.5" fill="#eab308"/>
+                    <text x="125" y="73" fill="#000" font-size="6" font-weight="bold" text-anchor="middle">TE</text>
+                    <path d="M 125 64 L 125 12" stroke="#facc15" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <polygon points="125,8 120,15 130,15" fill="#facc15"/>
+                </svg>`
+            },
+            'crossing-routes': {
+                title: 'Mesh Crossing Routes',
+                what: 'Two receivers sprint horizontally across the field in opposite directions at shallow depth.',
+                why: 'The crossing paths create natural pick traffic that rubs off trailing man-to-man defenders.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <circle cx="45" cy="68" r="5" fill="#eab308"/>
+                    <text x="45" y="71" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">WR1</text>
+                    <path d="M 45 63 L 45 42 Q 50 38 195 38" stroke="#facc15" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <polygon points="198,38 191,34 191,42" fill="#facc15"/>
+                    <circle cx="205" cy="68" r="5" fill="#38bdf8"/>
+                    <text x="205" y="71" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">WR2</text>
+                    <path d="M 205 63 L 205 45 Q 200 45 55 45" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <polygon points="52,45 59,41 59,49" fill="#38bdf8"/>
+                    <circle cx="125" cy="41" r="8" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-dasharray="2,2"/>
+                    <text x="125" y="30" fill="#f87171" font-size="6.5" font-weight="bold" text-anchor="middle">Pick / Traffic Mesh</text>
+                </svg>`
+            },
+            'boundary-go': {
+                title: '1-on-1 Boundary Go Route',
+                what: 'An outside receiver sprints deep down the sideline against single coverage.',
+                why: 'Without safety help over the top, an elite wide receiver uses speed and size to win contested jump balls or separate cleanly.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="215" y1="10" x2="215" y2="80" stroke="#475569" stroke-width="2"/>
+                    <line x1="15" y1="70" x2="215" y2="70" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <circle cx="65" cy="76" r="4.5" fill="#3b82f6"/>
+                    <text x="65" y="79" fill="#fff" font-size="5.5" font-weight="bold" text-anchor="middle">QB</text>
+                    <circle cx="195" cy="70" r="5" fill="#eab308"/>
+                    <text x="195" y="73" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">WR</text>
+                    <rect x="187" y="56" width="16" height="10" rx="2" fill="#ef4444"/>
+                    <text x="195" y="64" fill="#fff" font-size="6" font-weight="bold" text-anchor="middle">CB</text>
+                    <path d="M 195 65 L 195 14" stroke="#facc15" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <polygon points="195,10 190,17 200,17" fill="#facc15"/>
+                    <path d="M 68 74 Q 130 18 193 14" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="3,2" fill="none"/>
+                    <text x="130" y="27" fill="#38bdf8" font-size="6.5" font-weight="bold" text-anchor="middle">Deep Ball Over Top</text>
+                </svg>`
+            },
+            'outside-zone': {
+                title: 'Perimeter Stretch Zone Run',
+                what: 'The offensive line moves sideways together toward the sideline, stretching the defensive front horizontally.',
+                why: 'Forces defenders to sprint sideways. When a defensive lineman over-pursues, the running back plants a foot and cuts back upfield.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="15" y1="62" x2="235" y2="62" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <path d="M 140 62 L 115 62" stroke="#38bdf8" stroke-width="2"/>
+                    <polygon points="112,62 118,59 118,65" fill="#38bdf8"/>
+                    <text x="125" y="55" fill="#38bdf8" font-size="6.5" text-anchor="middle">O-Line Flow Left</text>
+                    <circle cx="150" cy="78" r="5" fill="#eab308"/>
+                    <text x="150" y="81" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">RB</text>
+                    <path d="M 150 73 Q 110 70 80 60 Q 65 50 65 16" stroke="#facc15" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                    <polygon points="65,12 60,19 70,19" fill="#facc15"/>
+                    <text x="65" y="8" fill="#facc15" font-size="7" font-weight="bold" text-anchor="middle">Cutback Lane</text>
+                </svg>`
+            },
+            'gap-power': {
+                title: 'Downhill Gap / Power Run',
+                what: 'An offensive guard pulls across the formation to kick out the edge defender, opening a direct downhill hole.',
+                why: 'Creates double-team blocks on the interior tackle and brings extra lead blockers right to the hole for high-efficiency yards.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="15" y1="62" x2="235" y2="62" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <circle cx="160" cy="62" r="4.5" fill="#38bdf8"/>
+                    <text x="160" y="65" fill="#000" font-size="5" font-weight="bold" text-anchor="middle">G</text>
+                    <path d="M 160 66 Q 130 76 100 62" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <text x="130" y="80" fill="#38bdf8" font-size="6" font-weight="bold" text-anchor="middle">Pulling Guard Kick-Out</text>
+                    <circle cx="130" cy="76" r="5" fill="#eab308"/>
+                    <text x="130" y="79" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">RB</text>
+                    <path d="M 130 70 Q 115 62 110 16" stroke="#facc15" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <polygon points="110,12 105,19 115,19" fill="#facc15"/>
+                    <text x="110" y="8" fill="#facc15" font-size="7" font-weight="bold" text-anchor="middle">Downhill Gap Hole</text>
+                </svg>`
+            },
+            'checkdown': {
+                title: 'Safety Valve / Checkdown',
+                what: 'The quarterback dumps a quick, safe throw to the running back in the flat when deep routes are covered.',
+                why: 'Deep zone defenders drop back 15+ yards, leaving open space right in front of the line of scrimmage for easy free yards.',
+                svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
+                    <line x1="15" y1="58" x2="235" y2="58" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
+                    <circle cx="95" cy="74" r="4.5" fill="#3b82f6"/>
+                    <text x="95" y="77" fill="#fff" font-size="5" font-weight="bold" text-anchor="middle">QB</text>
+                    <rect x="75" y="62" width="14" height="9" rx="2" fill="#ef4444"/>
+                    <text x="82" y="69" fill="#fff" font-size="5" font-weight="bold" text-anchor="middle">RUSH</text>
+                    <circle cx="125" cy="74" r="5" fill="#eab308"/>
+                    <text x="125" y="77" fill="#000" font-size="5.5" font-weight="bold" text-anchor="middle">RB</text>
+                    <path d="M 130 74 Q 165 74 180 64" stroke="#facc15" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <polygon points="183,64 176,60 176,68" fill="#facc15"/>
+                    <path d="M 100 74 L 175 66" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2,2" fill="none"/>
+                    <text x="185" y="54" fill="#facc15" font-size="6.5" font-weight="bold">Empty Flat</text>
+                </svg>`
+            }
+        };
+
+        function renderRouteConcept(key, displayText, position = 'center') {
+            const concept = FOOTBALL_ROUTE_VISUALS[key];
+            if (!concept) return displayText;
+            let posClass = 'route-concept-card';
+            if (position === 'left') posClass += ' route-concept-card-left';
+            else if (position === 'right') posClass += ' route-concept-card-right';
+
+            return `<span class="route-concept-trigger" tabindex="0">` +
+                `<span class="route-concept-text">${displayText}</span>` +
+                `<div class="${posClass}">` +
+                    `<div class="font-bold text-slate-100 mb-1.5 flex items-center justify-between border-b border-[#30363d] pb-1.5 text-left">` +
+                        `<div class="flex items-center space-x-1.5">` +
+                            `<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-sky-400 shrink-0 inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 19 21 12 17 5 21 12 2"></polygon></svg>` +
+                            `<span class="text-xs font-semibold text-slate-100">${concept.title}</span>` +
+                        `</div>` +
+                        `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#21262d] text-sky-300 border border-[#30363d]">Play Diagram</span>` +
+                    `</div>` +
+                    `<div class="mb-2 rounded overflow-hidden border border-[#21262d]">${concept.svg}</div>` +
+                    `<div class="text-[10.5px] text-slate-300 font-sans leading-relaxed text-left normal-case space-y-1">` +
+                        `<p><b class="text-slate-100">What it does:</b> ${concept.what}</p>` +
+                        `<p class="text-slate-400 text-[10px]"><b class="text-slate-300">Why it works:</b> ${concept.why}</p>` +
+                    `</div>` +
+                `</div>` +
+            `</span>`;
+        }
+
+        function formatInsightsText(rawText) {
+            if (!rawText || typeof rawText !== 'string') return '';
+            let text = rawText;
+
+            const patterns = [
+                { regex: /\b(slot option routes?)\b/gi, key: 'slot-option' },
+                { regex: /\b(sideline high-low concepts?|high-low boundary concepts?|high-low concepts?)\b/gi, key: 'high-low' },
+                { regex: /\b(vertical seam routes?|vertical seam|seam routes?|seam passes)\b/gi, key: 'seam-route' },
+                { regex: /\b(mesh crossing (?:routes?|concepts?)|crossing routes?)\b/gi, key: 'crossing-routes' },
+                { regex: /\b(1-on-1 boundary go routes?|vertical boundary shots?|boundary go routes?)\b/gi, key: 'boundary-go' },
+                { regex: /\b(perimeter stretch zone|outside stretch concepts?|perimeter stretch|outside zone stretch)\b/gi, key: 'outside-zone' },
+                { regex: /\b(downhill gap (?:schemes?|concepts?|runs?)|gap power concepts?)\b/gi, key: 'gap-power' },
+                { regex: /\b(safety valve checkdowns?|check-down routes?|checkdowns?|check-downs?)\b/gi, key: 'checkdown' }
+            ];
+
+            for (const p of patterns) {
+                text = text.replace(p.regex, (match) => {
+                    return renderRouteConcept(p.key, match);
+                });
+            }
+            return text;
+        }
+
         function buildSchemeWrapUp(d) {
             const aCov = d.coverage_tendencies?.away_vs_home || {};
             const hCov = d.coverage_tendencies?.home_vs_away || {};
@@ -2886,13 +3177,25 @@
                             </div>
 
                             <!-- Exploit & Vulnerability Callout -->
-                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-[11px] space-y-1">
-                                <div class="text-slate-300 flex items-center gap-1 font-semibold">
-                                    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
-                                    <span>Secondary Vulnerability:</span>
+                            <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs space-y-2">
+                                <div>
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>Defensive Weakness:</span>
+                                    </span>
+                                    <p class="text-slate-300 leading-relaxed text-[11.5px] mt-0.5 font-sans">
+                                        ${formatInsightsText(aCov.vulnerability_note || `${d.home_team}'s defense drops 2 deep safeties to prevent long passes, leaving open cushions in the intermediate middle of the field.`)}
+                                    </p>
                                 </div>
-                                <p class="text-slate-400 leading-relaxed">${aCov.vulnerability_note || 'Middle of field vulnerable to seam routes when rolling single-high.'}</p>
-                                <p class="text-slate-300 pt-0.5 font-medium">${aCov.offense_exploit || 'Exploitable via slot option routes and high-low boundary concepts.'}</p>
+                                <div class="border-t border-[#21262d] pt-1.5">
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>How The Offense Attacks It (Hover plays for diagram):</span>
+                                    </span>
+                                    <p class="text-slate-200 leading-relaxed text-[11.5px] mt-0.5 font-sans font-medium">
+                                        ${formatInsightsText(aCov.offense_exploit || `${d.away_team} attacks this with quick inside passes (slot option routes) and seam routes straight down the hashmarks between the two safeties.`)}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
@@ -2959,13 +3262,25 @@
                             </div>
 
                             <!-- Exploit & Vulnerability Callout -->
-                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-[11px] space-y-1">
-                                <div class="text-slate-300 flex items-center gap-1 font-semibold">
-                                    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
-                                    <span>Secondary Vulnerability:</span>
+                            <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs space-y-2">
+                                <div>
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>Defensive Weakness:</span>
+                                    </span>
+                                    <p class="text-slate-300 leading-relaxed text-[11.5px] mt-0.5 font-sans">
+                                        ${formatInsightsText(hCov.vulnerability_note || `${d.away_team}'s defense drops 2 deep safeties to prevent long passes, leaving open cushions in the intermediate middle of the field.`)}
+                                    </p>
                                 </div>
-                                <p class="text-slate-400 leading-relaxed">${hCov.vulnerability_note || 'Two-high safeties concede intermediate soft spots behind linebackers.'}</p>
-                                <p class="text-slate-300 pt-0.5 font-medium">${hCov.offense_exploit || 'Exploitable via intermediate crossing routes and tight end seam shots.'}</p>
+                                <div class="border-t border-[#21262d] pt-1.5">
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>How The Offense Attacks It (Hover plays for diagram):</span>
+                                    </span>
+                                    <p class="text-slate-200 leading-relaxed text-[11.5px] mt-0.5 font-sans font-medium">
+                                        ${formatInsightsText(hCov.offense_exploit || `${d.home_team} attacks this with quick inside passes (slot option routes) and seam routes straight down the hashmarks between the two safeties.`)}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3023,7 +3338,7 @@
                             </div>
 
                             <p class="text-xs text-slate-300 bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] leading-relaxed">
-                                <b class="text-slate-200">Diagnostic:</b> ${aRun.alignment_diagnostic || `${d.away_team} offensive run concepts test ${d.home_team}'s interior gap discipline.`}
+                                <b class="text-slate-200">Diagnostic:</b> ${formatInsightsText(aRun.alignment_diagnostic || `${d.away_team} offensive run concepts test ${d.home_team}'s interior gap discipline.`)}
                             </p>
                         </div>
 
@@ -3061,7 +3376,7 @@
                             </div>
 
                             <p class="text-xs text-slate-300 bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] leading-relaxed">
-                                <b class="text-slate-200">Diagnostic:</b> ${hRun.alignment_diagnostic || `${d.home_team} offensive run concepts test ${d.away_team}'s interior gap discipline.`}
+                                <b class="text-slate-200">Diagnostic:</b> ${formatInsightsText(hRun.alignment_diagnostic || `${d.home_team} offensive run concepts test ${d.away_team}'s interior gap discipline.`)}
                             </p>
                         </div>
                     </div>
@@ -3162,7 +3477,7 @@
                                             <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-300 border border-[#30363d] mr-1">
                                                 ${p.boost_tier || 'Neutral'}
                                             </span>
-                                            ${p.expected_boost || 'Standard target look rate within progression.'}
+                                            ${formatInsightsText(p.expected_boost || 'Standard target look rate within progression.')}
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -3223,7 +3538,7 @@
                                     </div>
 
                                     <p class="text-xs text-slate-300 leading-relaxed">
-                                        ${b.rationale}
+                                        ${formatInsightsText(b.rationale)}
                                     </p>
                                 </div>
 
@@ -3234,7 +3549,7 @@
                                             <span>${renderSchemeTip('Causal Mechanism', 'Causal Mechanism', 'left')}</span>
                                         </div>
                                         <p class="text-slate-300 leading-relaxed font-sans text-[11px]">
-                                            ${(b.causal_mechanism || '').replace(/^[A-Z0-9]+-[A-Z0-9]+:\s*/, '')}
+                                            ${formatInsightsText((b.causal_mechanism || '').replace(/^[A-Z0-9]+-[A-Z0-9]+:\s*/, ''))}
                                         </p>
                                     </div>
                                 ` : ''}
@@ -3337,7 +3652,7 @@
                             <span>Situational Volume Override Verdict</span>
                         </div>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            ${flow.volume_override_verdict || flow.pace_synthesis || 'Game flow and red zone touch concentration dictate player opportunity ceiling beyond baseline season yardages.'}
+                            ${formatInsightsText(flow.volume_override_verdict || flow.pace_synthesis || 'Game flow and red zone touch concentration dictate player opportunity ceiling beyond baseline season yardages.')}
                         </p>
                     </div>
                 </div>
@@ -3368,7 +3683,7 @@
                                 <span>1. Passing Game & Coverage Shell Funnel</span>
                             </div>
                             <p class="text-slate-300 leading-relaxed text-[11.5px]">
-                                ${wrapUp.passVerdict}
+                                ${formatInsightsText(wrapUp.passVerdict)}
                             </p>
                         </div>
 
@@ -3379,7 +3694,7 @@
                                 <span>2. Ground Attack & Trench Advantage</span>
                             </div>
                             <p class="text-slate-300 leading-relaxed text-[11.5px]">
-                                ${wrapUp.runVerdict}
+                                ${formatInsightsText(wrapUp.runVerdict)}
                             </p>
                         </div>
 
@@ -3390,7 +3705,7 @@
                                 <span>3. Tempo, Volume & Red Zone Equity</span>
                             </div>
                             <p class="text-slate-300 leading-relaxed text-[11.5px]">
-                                ${wrapUp.paceVerdict}
+                                ${formatInsightsText(wrapUp.paceVerdict)}
                             </p>
                         </div>
                     </div>
@@ -3413,7 +3728,7 @@
                                         <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${b.scheme_delta}</span>
                                     </div>
                                     <p class="text-[11px] text-slate-400 leading-relaxed">
-                                        ${b.rationale}
+                                        ${formatInsightsText(b.rationale)}
                                     </p>
                                 </div>
                             `).join('')}
@@ -3446,6 +3761,25 @@
             const hMfo = 48 + ((seed * 2) % 22);
             const hMfc = 100 - hMfo;
 
+            const TEAM_ROSTERS_2026 = {
+                'NE': { wr1: 'A.J. Brown', wr2: 'DeMario Douglas', te: 'Hunter Henry', rb: 'Rhamondre Stevenson' },
+                'PHI': { wr1: 'DeVonta Smith', wr2: 'Dontayvion Wicks', te: 'Dallas Goedert', rb: 'Saquon Barkley' },
+                'KC': { wr1: 'Xavier Worthy', wr2: 'Rashee Rice', te: 'Travis Kelce', rb: 'Isiah Pacheco' },
+                'BAL': { wr1: 'Zay Flowers', wr2: 'Rashod Bateman', te: 'Mark Andrews', rb: 'Derrick Henry' },
+                'DET': { wr1: 'Amon-Ra St. Brown', wr2: 'Jameson Williams', te: 'Sam LaPorta', rb: 'Jahmyr Gibbs' },
+                'SF': { wr1: 'Deebo Samuel', wr2: 'Ricky Pearsall', te: 'George Kittle', rb: 'Christian McCaffrey' },
+                'BUF': { wr1: 'Khalil Shakir', wr2: 'Keon Coleman', te: 'Dalton Kincaid', rb: 'James Cook' },
+                'CIN': { wr1: 'Ja\'Marr Chase', wr2: 'Tee Higgins', te: 'Mike Gesicki', rb: 'Chase Brown' },
+                'DAL': { wr1: 'CeeDee Lamb', wr2: 'Jalen Tolbert', te: 'Jake Ferguson', rb: 'Rico Dowdle' },
+                'MIN': { wr1: 'Justin Jefferson', wr2: 'Jordan Addison', te: 'T.J. Hockenson', rb: 'Aaron Jones' },
+                'MIA': { wr1: 'Tyreek Hill', wr2: 'Jaylen Waddle', te: 'Jonnu Smith', rb: 'De\'Von Achane' },
+                'GB': { wr1: 'Jayden Reed', wr2: 'Christian Watson', te: 'Tucker Kraft', rb: 'Josh Jacobs' },
+                'HOU': { wr1: 'Nico Collins', wr2: 'Tank Dell', te: 'Dalton Schultz', rb: 'Joe Mixon' }
+            };
+
+            const aRoster = TEAM_ROSTERS_2026[a] || { wr1: `${a} Primary WR`, wr2: `${a} Slot WR`, te: `${a} Starting TE`, rb: `${a} Lead Back` };
+            const hRoster = TEAM_ROSTERS_2026[h] || { wr1: `${h} Primary WR`, wr2: `${h} Slot WR`, te: `${h} Starting TE`, rb: `${h} Lead Back` };
+
             return {
                 home_team: h,
                 home_team_name: h,
@@ -3465,8 +3799,8 @@
                         def_archetype: hZone > 65 ? "Two-High Match Quarters Shell" : "Disguised Single-High Cover 3",
                         shells: { "Cover 1 (Man)": 22, "Cover 2 (MFO)": 18, "Cover 3 (MFC)": 28, "Cover 4 Quarters (MFO)": 22, "Cover 6 Split (MFO)": 10 },
                         blitz_pct: 26,
-                        vulnerability_note: "Two-high shell concedes short intermediate voids in the hook/curl zones.",
-                        offense_exploit: "Exploitable via agile slot option routes and inline tight end seam passes."
+                        vulnerability_note: `${h}'s defense drops 2 deep safeties to prevent long passes, leaving open cushions in the intermediate middle of the field.`,
+                        offense_exploit: `${a} attacks this with quick inside passes (slot option routes) and seam routes straight down the hashmarks between the two safeties.`
                     },
                     home_vs_away: {
                         offense_team: h,
@@ -3478,8 +3812,8 @@
                         def_archetype: aZone > 65 ? "Two-High Match Quarters Shell" : "Disguised Single-High Cover 3",
                         shells: { "Cover 1 (Man)": 24, "Cover 2 (MFO)": 16, "Cover 3 (MFC)": 27, "Cover 4 Quarters (MFO)": 23, "Cover 6 Split (MFO)": 10 },
                         blitz_pct: 27,
-                        vulnerability_note: "Boundary cornerbacks concede cushion on early downs against play-action.",
-                        offense_exploit: "Exploitable via isolated deep boundary vertical shots on 1st down."
+                        vulnerability_note: `${a}'s defense drops 2 deep safeties to prevent long passes, leaving open cushions in the intermediate middle of the field.`,
+                        offense_exploit: `${h} attacks this with quick inside passes (slot option routes) and seam routes straight down the hashmarks between the two safeties.`
                     }
                 },
                 run_scheme_splits: {
@@ -3494,7 +3828,7 @@
                         opp_def_gap_ypc_allowed: 3.8,
                         opp_def_gap_rank: 8,
                         scheme_advantage: "Exploit Advantage",
-                        alignment_diagnostic: `${a} zone run concept aligns with ${h}'s lateral gap flow vulnerability.`
+                        alignment_diagnostic: `${a} perimeter stretch zone run concepts attack ${h}'s lateral gap flow vulnerability.`
                     },
                     home_unit: {
                         team: h,
@@ -3507,36 +3841,36 @@
                         opp_def_gap_ypc_allowed: 4.4,
                         opp_def_gap_rank: 21,
                         scheme_advantage: "Exploit Advantage",
-                        alignment_diagnostic: `${h} downhill gap concept attacks ${a}'s lighter box personnel.`
+                        alignment_diagnostic: `${h} downhill gap power concepts attack ${a}'s lighter box personnel.`
                     }
                 },
                 positional_target_rates: {
                     away_distribution: { slot_wr_pct: 32, wide_wr_pct: 40, inline_te_pct: 18, backfield_rb_pct: 10 },
                     home_distribution: { slot_wr_pct: 34, wide_wr_pct: 38, inline_te_pct: 18, backfield_rb_pct: 10 },
                     away_player_targets: [
-                        { name: `${a} Primary WR`, pos: 'WR', slot_pct: 68, outside_pct: 32, inline_pct: 0, tgt_zone: 28.5, tgt_man: 22.0, yprr_zone: 2.4, boost_tier: 'High Boost', expected_boost: `+18% Target Boost: High slot usage exploits ${hZone}% zone looks.` },
-                        { name: `${a} Starting TE`, pos: 'TE', slot_pct: 40, outside_pct: 10, inline_pct: 50, tgt_zone: 21.0, tgt_man: 16.5, yprr_zone: 2.1, boost_tier: 'High Boost', expected_boost: `+22% Target Boost: Seam routes exploit ${hMfo}% MFO safety split.` }
+                        { name: aRoster.wr1, pos: 'WR', slot_pct: 35, outside_pct: 65, inline_pct: 0, tgt_zone: 28.5, tgt_man: 32.0, yprr_zone: 2.6, boost_tier: 'High Boost', expected_boost: `+18% Target Boost: Boundary route-runner wins against soft perimeter cushions.` },
+                        { name: aRoster.te, pos: 'TE', slot_pct: 40, outside_pct: 10, inline_pct: 50, tgt_zone: 21.0, tgt_man: 16.5, yprr_zone: 2.1, boost_tier: 'High Boost', expected_boost: `+22% Target Boost: Seam routes exploit ${hMfo}% MFO safety split.` }
                     ],
                     home_player_targets: [
-                        { name: `${h} Primary WR`, pos: 'WR', slot_pct: 65, outside_pct: 35, inline_pct: 0, tgt_zone: 27.5, tgt_man: 21.5, yprr_zone: 2.3, boost_tier: 'High Boost', expected_boost: `+18% Target Boost: High slot usage exploits ${aZone}% zone looks.` },
-                        { name: `${h} Starting TE`, pos: 'TE', slot_pct: 42, outside_pct: 8, inline_pct: 50, tgt_zone: 22.0, tgt_man: 17.0, yprr_zone: 2.0, boost_tier: 'High Boost', expected_boost: `+22% Target Boost: Seam routes exploit ${aMfo}% MFO safety split.` }
+                        { name: hRoster.wr1, pos: 'WR', slot_pct: 38, outside_pct: 62, inline_pct: 0, tgt_zone: 27.5, tgt_man: 29.5, yprr_zone: 2.4, boost_tier: 'High Boost', expected_boost: `+18% Target Boost: Boundary route-runner wins against soft perimeter cushions.` },
+                        { name: hRoster.te, pos: 'TE', slot_pct: 42, outside_pct: 8, inline_pct: 50, tgt_zone: 22.0, tgt_man: 17.0, yprr_zone: 2.0, boost_tier: 'High Boost', expected_boost: `+22% Target Boost: Seam routes exploit ${aMfo}% MFO safety split.` }
                     ]
                 },
                 efficiency_breakouts: [
                     {
-                        player: `${a} Primary Weapon`,
+                        player: aRoster.wr1,
                         team: a,
                         pos: 'WR',
-                        scheme_type: 'Slot Mismatch',
+                        scheme_type: 'Boundary Alpha',
                         context_metric: '28.5% Tgt Share vs Zone',
-                        season_baseline: '22.0% vs Man',
+                        season_baseline: '32.0% vs Man',
                         scheme_delta: '+6.5% vs Zone Shell',
                         verdict: 'PRIME BREAKOUT SPOT',
-                        rationale: `Faces ${h} defense deploying ${hZone}% Zone. Target frequency spikes against soft intermediate two-high voids.`,
-                        causal_mechanism: 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.'
+                        rationale: `Faces ${h} defense deploying ${hZone}% Zone. Wins isolated 1-on-1 boundary matchups with explosive perimeter separation.`,
+                        causal_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.'
                     },
                     {
-                        player: `${a} Lead Back`,
+                        player: aRoster.rb,
                         team: a,
                         pos: 'RB',
                         scheme_type: 'Outside Zone Edge',
@@ -3548,7 +3882,7 @@
                         causal_mechanism: 'Perimeter stretch schemes exploit slow-flowing edge defenders, opening cutback lanes for primary backs.'
                     },
                     {
-                        player: `${h} Primary Weapon`,
+                        player: hRoster.wr1,
                         team: h,
                         pos: 'WR',
                         scheme_type: 'Boundary Alpha',
@@ -3560,7 +3894,7 @@
                         causal_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.'
                     },
                     {
-                        player: `${h} Lead Back`,
+                        player: hRoster.rb,
                         team: h,
                         pos: 'RB',
                         scheme_type: 'Gap Power Edge',
@@ -3573,8 +3907,8 @@
                     }
                 ],
                 game_flow_tempo: {
-                    away_tempo: { neutral_pace_sec: 27.4, pace_rank: 10, proj_plays: 65, checkdown_pct: 14.5, red_zone_touch_leader: `${a} Lead Back (62% RZ Share)`, rz_pass_rate: 54, third_down_pass_rate: 72 },
-                    home_tempo: { neutral_pace_sec: 26.8, pace_rank: 8, proj_plays: 67, checkdown_pct: 15.2, red_zone_touch_leader: `${h} Lead Back (58% RZ Share)`, rz_pass_rate: 56, third_down_pass_rate: 74 },
+                    away_tempo: { neutral_pace_sec: 27.4, pace_rank: 10, proj_plays: 65, checkdown_pct: 14.5, red_zone_touch_leader: `${aRoster.rb} (62% RZ Share)`, rz_pass_rate: 54, third_down_pass_rate: 72 },
+                    home_tempo: { neutral_pace_sec: 26.8, pace_rank: 8, proj_plays: 67, checkdown_pct: 15.2, red_zone_touch_leader: `${hRoster.rb} (58% RZ Share)`, rz_pass_rate: 56, third_down_pass_rate: 74 },
                     volume_override_verdict: `High neutral pace combined with concentrated goal-line touch shares dictates that situational volume will override flat yardage baselines in this matchup.`
                 }
             };

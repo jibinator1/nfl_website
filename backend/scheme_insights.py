@@ -229,13 +229,13 @@ TEAM_SCHEME_PROFILES: Dict[str, Dict[str, Any]] = {
             'identity': 'Saquon Barkley dynamic Inside/Outside Zone and Power with Jalen Hurts Tush Push.'
         },
         'target_alignment': {
-            'slot_wr_pct': 22.0, 'wide_wr_pct': 52.0, 'inline_te_pct': 16.5, 'backfield_rb_pct': 9.5,
+            'slot_wr_pct': 24.0, 'wide_wr_pct': 50.0, 'inline_te_pct': 16.5, 'backfield_rb_pct': 9.5,
             'short_pct': 38.0, 'intermediate_pct': 42.5, 'deep_pct': 19.5,
             'key_targets': [
-                {'name': 'A.J. Brown', 'pos': 'WR', 'slot_pct': 24, 'outside_pct': 76, 'inline_pct': 0, 'tgt_man': 34.5, 'tgt_zone': 28.5, 'yprr_man': 3.15, 'yprr_zone': 2.70},
-                {'name': 'DeVonta Smith', 'pos': 'WR', 'slot_pct': 44, 'outside_pct': 56, 'inline_pct': 0, 'tgt_man': 26.0, 'tgt_zone': 22.5, 'yprr_man': 2.20, 'yprr_zone': 2.05},
-                {'name': 'Dallas Goedert', 'pos': 'TE', 'slot_pct': 36, 'outside_pct': 8, 'inline_pct': 56, 'tgt_man': 18.5, 'tgt_zone': 21.0, 'yprr_man': 1.75, 'yprr_zone': 2.15},
-                {'name': 'Saquon Barkley', 'pos': 'RB', 'slot_pct': 8, 'outside_pct': 4, 'inline_pct': 0, 'tgt_man': 9.5, 'tgt_zone': 12.0, 'yprr_man': 1.05, 'yprr_zone': 1.35}
+                {'name': 'DeVonta Smith', 'pos': 'WR', 'slot_pct': 38, 'outside_pct': 62, 'inline_pct': 0, 'tgt_man': 29.5, 'tgt_zone': 27.0, 'yprr_man': 2.50, 'yprr_zone': 2.35},
+                {'name': 'Dontayvion Wicks', 'pos': 'WR', 'slot_pct': 42, 'outside_pct': 58, 'inline_pct': 0, 'tgt_man': 20.0, 'tgt_zone': 18.5, 'yprr_man': 1.85, 'yprr_zone': 1.75},
+                {'name': 'Dallas Goedert', 'pos': 'TE', 'slot_pct': 36, 'outside_pct': 8, 'inline_pct': 56, 'tgt_man': 21.5, 'tgt_zone': 23.0, 'yprr_man': 1.95, 'yprr_zone': 2.25},
+                {'name': 'Saquon Barkley', 'pos': 'RB', 'slot_pct': 8, 'outside_pct': 4, 'inline_pct': 0, 'tgt_man': 11.5, 'tgt_zone': 14.0, 'yprr_man': 1.25, 'yprr_zone': 1.55}
             ]
         },
         'tempo_situational': {
@@ -243,7 +243,7 @@ TEAM_SCHEME_PROFILES: Dict[str, Dict[str, Any]] = {
             'red_zone_touch_leader': 'Saquon Barkley & Jalen Hurts Tush Push',
             'rz_pass_rate': 38.5, 'third_down_pass_rate': 65.0,
             'checkdown_pct': 8.5,
-            'flow_verdict': 'A.J. Brown boundary isolation dominates man coverage; Barkley volume keeps team in ahead-of-chains scripts.'
+            'flow_verdict': 'DeVonta Smith boundary separation commands target share; Barkley volume keeps team in ahead-of-chains scripts.'
         }
     },
     'NE': {
@@ -268,10 +268,10 @@ TEAM_SCHEME_PROFILES: Dict[str, Dict[str, Any]] = {
             'slot_wr_pct': 28.0, 'wide_wr_pct': 38.0, 'inline_te_pct': 22.0, 'backfield_rb_pct': 12.0,
             'short_pct': 52.0, 'intermediate_pct': 33.0, 'deep_pct': 15.0,
             'key_targets': [
-                {'name': 'Hunter Henry', 'pos': 'TE', 'slot_pct': 38, 'outside_pct': 8, 'inline_pct': 54, 'tgt_man': 21.0, 'tgt_zone': 23.5, 'yprr_man': 1.65, 'yprr_zone': 1.95},
-                {'name': 'DeMario Douglas', 'pos': 'WR', 'slot_pct': 72, 'outside_pct': 28, 'inline_pct': 0, 'tgt_man': 24.5, 'tgt_zone': 22.0, 'yprr_man': 1.85, 'yprr_zone': 1.70},
-                {'name': 'Rhamondre Stevenson', 'pos': 'RB', 'slot_pct': 8, 'outside_pct': 4, 'inline_pct': 0, 'tgt_man': 11.5, 'tgt_zone': 15.0, 'yprr_man': 1.10, 'yprr_zone': 1.45},
-                {'name': 'K.J. Osborn', 'pos': 'WR', 'slot_pct': 35, 'outside_pct': 65, 'inline_pct': 0, 'tgt_man': 15.0, 'tgt_zone': 13.5, 'yprr_man': 1.30, 'yprr_zone': 1.25}
+                {'name': 'A.J. Brown', 'pos': 'WR', 'slot_pct': 24, 'outside_pct': 76, 'inline_pct': 0, 'tgt_man': 34.5, 'tgt_zone': 28.5, 'yprr_man': 3.15, 'yprr_zone': 2.70},
+                {'name': 'DeMario Douglas', 'pos': 'WR', 'slot_pct': 72, 'outside_pct': 28, 'inline_pct': 0, 'tgt_man': 22.5, 'tgt_zone': 21.0, 'yprr_man': 1.75, 'yprr_zone': 1.65},
+                {'name': 'Hunter Henry', 'pos': 'TE', 'slot_pct': 38, 'outside_pct': 8, 'inline_pct': 54, 'tgt_man': 19.0, 'tgt_zone': 21.5, 'yprr_man': 1.55, 'yprr_zone': 1.85},
+                {'name': 'Rhamondre Stevenson', 'pos': 'RB', 'slot_pct': 8, 'outside_pct': 4, 'inline_pct': 0, 'tgt_man': 10.5, 'tgt_zone': 13.5, 'yprr_man': 1.05, 'yprr_zone': 1.35}
             ]
         },
         'tempo_situational': {
@@ -279,7 +279,7 @@ TEAM_SCHEME_PROFILES: Dict[str, Dict[str, Any]] = {
             'red_zone_touch_leader': 'Rhamondre Stevenson (72% Goal-Line Share)',
             'rz_pass_rate': 39.0, 'third_down_pass_rate': 66.0,
             'checkdown_pct': 15.2,
-            'flow_verdict': 'Methodical ball-control offense; Stevenson is the primary engine while Hunter Henry serves as 3rd down chain-mover.'
+            'flow_verdict': 'A.J. Brown boundary isolation provides the explosive alpha X-receiver element while Stevenson controls the clock on early downs.'
         }
     },
     'SEA': {
@@ -445,54 +445,83 @@ def compute_scheme_insights(
     # Pillar 1: Defensive Coverage Tendencies & Shell Archetype (0:49, 17:53)
     # -------------------------------------------------------------
     # Matchup Battle 1: Away Offense vs Home Defense
+    # Matchup Battle 1: Away Offense vs Home Defense
+    h_cov = h_profile['coverage']
+    if h_cov['zone_pct'] >= 60.0:
+        if h_cov['mfo_pct'] >= 50.0:
+            a_vuln = f"{h_name}'s defense drops 2 deep safeties to prevent long passes, leaving open cushions in the intermediate middle of the field."
+            a_exploit = f"{a_name} attacks this with quick inside passes (slot option routes) and seam routes straight down the hashmarks between the two safeties."
+        else:
+            a_vuln = f"{h_name}'s defense keeps 1 deep safety in the middle, leaving open space along the sidelines and outside flats."
+            a_exploit = f"{a_name} attacks this with sideline high-low concepts and crossing routes that outrun zone defenders across the field."
+    else:
+        a_vuln = f"{h_name}'s defense plays aggressive man-to-man coverage, leaving cornerbacks alone with no safety help over the top."
+        a_exploit = f"{a_name} attacks this with 1-on-1 boundary go routes to isolated star receivers and mesh crossing routes that rub off defenders."
+
     a_vs_h_cov = {
         'offense_team': a_team,
         'defense_team': h_team,
-        'def_zone_pct': h_profile['coverage']['zone_pct'],
-        'def_man_pct': h_profile['coverage']['man_pct'],
-        'def_mfo_pct': h_profile['coverage']['mfo_pct'],
-        'def_mfc_pct': h_profile['coverage']['mfc_pct'],
-        'def_archetype': h_profile['coverage']['archetype'],
+        'def_zone_pct': h_cov['zone_pct'],
+        'def_man_pct': h_cov['man_pct'],
+        'def_mfo_pct': h_cov['mfo_pct'],
+        'def_mfc_pct': h_cov['mfc_pct'],
+        'def_archetype': h_cov['archetype'],
+        'vulnerability_note': a_vuln,
+        'offense_exploit': a_exploit,
         'shells': {
-            'Cover 1 (Man)': h_profile['coverage']['cover_1'],
-            'Cover 2 (MFO)': h_profile['coverage']['cover_2'],
-            'Cover 3 (MFC)': h_profile['coverage']['cover_3'],
-            'Cover 4 Quarters (MFO)': h_profile['coverage']['cover_4'],
-            'Cover 6 Split (MFO)': h_profile['coverage']['cover_6'],
-            'Cover 0 Blitz': h_profile['coverage']['cover_0']
+            'Cover 1 (Man)': h_cov['cover_1'],
+            'Cover 2 (MFO)': h_cov['cover_2'],
+            'Cover 3 (MFC)': h_cov['cover_3'],
+            'Cover 4 Quarters (MFO)': h_cov['cover_4'],
+            'Cover 6 Split (MFO)': h_cov['cover_6'],
+            'Cover 0 Blitz': h_cov['cover_0']
         },
         'shell_takeaway': (
-            f"{h_team} operates primarily in {h_profile['coverage']['mfo_pct']:.1f}% Middle-Field Open (MFO) "
+            f"{h_team} operates primarily in {h_cov['mfo_pct']:.1f}% Middle-Field Open (MFO) "
             f"sets, designed to eliminate 20+ yard boundary explosives against {a_team}'s passing attack. "
             f"This shell surrenders soft underneath cushions to slot receivers and inline tight ends."
-            if h_profile['coverage']['mfo_pct'] > 50 else
-            f"{h_team} plays {h_profile['coverage']['mfc_pct']:.1f}% Middle-Field Closed (MFC) single-high shells, "
+            if h_cov['mfo_pct'] > 50 else
+            f"{h_team} plays {h_cov['mfc_pct']:.1f}% Middle-Field Closed (MFC) single-high shells, "
             f"stacking 8 defenders in the box to choke interior runs and forcing 1-on-1 boundary matchups for {a_team} receivers."
         )
     }
 
     # Matchup Battle 2: Home Offense vs Away Defense
+    a_cov = a_profile['coverage']
+    if a_cov['zone_pct'] >= 60.0:
+        if a_cov['mfo_pct'] >= 50.0:
+            h_vuln = f"{a_name}'s defense protects against deep passes with two deep safeties, conceding high-percentage short middle completions."
+            h_exploit = f"{h_name} attacks this with quick inside passes (slot option routes) and vertical seam routes targeting vacated middle zones."
+        else:
+            h_vuln = f"{a_name}'s defense clamps down on the run with a crowded box, leaving 1-on-1 matchups on the outside edges."
+            h_exploit = f"{h_name} attacks this with sideline high-low concepts and crossing routes across the second level."
+    else:
+        h_vuln = f"{a_name}'s defense locks into tight man-to-man coverage without deep safety support."
+        h_exploit = f"{h_name} attacks this with 1-on-1 boundary go routes to perimeter alphas and mesh crossing routes that cause traffic."
+
     h_vs_a_cov = {
         'offense_team': h_team,
         'defense_team': a_team,
-        'def_zone_pct': a_profile['coverage']['zone_pct'],
-        'def_man_pct': a_profile['coverage']['man_pct'],
-        'def_mfo_pct': a_profile['coverage']['mfo_pct'],
-        'def_mfc_pct': a_profile['coverage']['mfc_pct'],
-        'def_archetype': a_profile['coverage']['archetype'],
+        'def_zone_pct': a_cov['zone_pct'],
+        'def_man_pct': a_cov['man_pct'],
+        'def_mfo_pct': a_cov['mfo_pct'],
+        'def_mfc_pct': a_cov['mfc_pct'],
+        'def_archetype': a_cov['archetype'],
+        'vulnerability_note': h_vuln,
+        'offense_exploit': h_exploit,
         'shells': {
-            'Cover 1 (Man)': a_profile['coverage']['cover_1'],
-            'Cover 2 (MFO)': a_profile['coverage']['cover_2'],
-            'Cover 3 (MFC)': a_profile['coverage']['cover_3'],
-            'Cover 4 Quarters (MFO)': a_profile['coverage']['cover_4'],
-            'Cover 6 Split (MFO)': a_profile['coverage']['cover_6'],
-            'Cover 0 Blitz': a_profile['coverage']['cover_0']
+            'Cover 1 (Man)': a_cov['cover_1'],
+            'Cover 2 (MFO)': a_cov['cover_2'],
+            'Cover 3 (MFC)': a_cov['cover_3'],
+            'Cover 4 Quarters (MFO)': a_cov['cover_4'],
+            'Cover 6 Split (MFO)': a_cov['cover_6'],
+            'Cover 0 Blitz': a_cov['cover_0']
         },
         'shell_takeaway': (
-            f"{a_team} deploys {a_profile['coverage']['mfo_pct']:.1f}% MFO shells. Expect {h_team} to leverage "
+            f"{a_team} deploys {a_cov['mfo_pct']:.1f}% MFO shells. Expect {h_team} to leverage "
             f"underneath intermediate crossing routes and check-downs to sustain long drives."
-            if a_profile['coverage']['mfo_pct'] > 50 else
-            f"{a_team} utilizes {a_profile['coverage']['mfc_pct']:.1f}% MFC single-high coverage. "
+            if a_cov['mfo_pct'] > 50 else
+            f"{a_team} utilizes {a_cov['mfc_pct']:.1f}% MFC single-high coverage. "
             f"Look for {h_team} to dial up vertical boundary shots against isolated cornerbacks."
         )
     }
@@ -667,6 +696,22 @@ def compute_scheme_insights(
                     'rationale': f"Faces {opp_code} defense utilizing {cov.get('man_pct', 30):.1f}% Man coverage. Wins isolated 1-on-1 boundary matchups with {p['yprr_man']:.2f} YPRR separation.",
                     'causal_mechanism': 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
                     'priority': 88.0 + delta + (p.get('tgt_man', 0) * 0.5)
+                })
+
+            # Outside WR attacking Zone boundary honey holes / deep cushion
+            elif pos == 'WR' and outside_share >= 55 and cov.get('zone_pct', 60) >= 60.0 and (p.get('yprr_zone', 0) >= 2.0 or p.get('tgt_zone', 0) >= 23.0):
+                cands.append({
+                    'player': p['name'],
+                    'team': team_code,
+                    'pos': 'WR',
+                    'scheme_type': 'Boundary Zone Voids',
+                    'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
+                    'season_baseline': f"{p.get('tgt_man', 20.0):.1f}% vs Man",
+                    'scheme_delta': f"{p['yprr_zone']:.2f} Zone YPRR Efficiency",
+                    'verdict': 'HIGH CEILING DEEP TARGET' if p.get('yprr_zone', 0) >= 2.4 else 'ELEVATED TARGET CEILING',
+                    'rationale': f"Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, boundary go routes and intermediate sideline comebacks target the honey-hole voids behind outside cornerbacks.",
+                    'causal_mechanism': 'Zone coverage safeties rotate inside, exposing the boundary sideline where elite outside receivers find soft spots in the cover cushion.',
+                    'priority': 91.0 + (p.get('yprr_zone', 0) * 2.0) + (p.get('tgt_zone', 0) * 0.4)
                 })
 
             # Backfield RB Checkdown / Valve vs Zone & Pressure
