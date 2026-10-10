@@ -567,21 +567,21 @@ def compute_scheme_insights(
         causal_mech = ""
 
         if slot_share > 50 and is_opp_zone_heavy:
-            expected_boost = f"+18% Target Boost: High slot frequency ({slot_share}%) exploits {opp_cov['zone_pct']:.0f}% opponent zone coverage."
+            expected_boost = f"+18% Target Boost: High slot frequency ({slot_share:.0f}%) exploits {opp_cov['zone_pct']:.0f}% opponent zone coverage."
             boost_tier = "High Boost"
-            causal_mech = "SLOT-M1: Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers."
+            causal_mech = "Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers."
         elif inline_share > 40 and is_opp_mfo:
             expected_boost = f"+22% Target Boost: Inline seam routes exploit {opp_cov['mfo_pct']:.0f}% Middle-Field Open (MFO) safety split."
             boost_tier = "High Boost"
-            causal_mech = "TE1-M2: Middle-field open two-safety split creates seam and size leverage mismatches for inline tight ends."
-        elif player.get('outside_pct', 0) > 65 and opp_cov['man_pct'] > 32:
+            causal_mech = "Middle-field open two-safety split creates seam and size leverage mismatches for inline tight ends."
+        elif player.get('outside_pct', 0) > 65 and opp_cov['man_pct'] > 32 and (player.get('tgt_man', 0) >= player.get('tgt_zone', 0)):
             expected_boost = f"+15% Target Boost: Alpha outside route-runner wins isolated 1-on-1s against {opp_cov['man_pct']:.0f}% Man coverage."
             boost_tier = "Moderate Boost"
-            causal_mech = "WR1-M3: High man coverage forces isolated 1-on-1 matchups on the boundary where elite alphas separate cleanly."
+            causal_mech = "High man coverage forces isolated 1-on-1 matchups on the boundary where elite alphas separate cleanly."
         elif player.get('pos') == 'RB' and (opp_cov.get('four_man_pressure_pct', 0) > 31 or opp_cov.get('blitz_pct', 0) > 27):
             expected_boost = f"+14% Target Boost: Aggressive defensive pass rush forces hot-read checkdowns to backfield valve."
             boost_tier = "Moderate Boost"
-            causal_mech = "RBREC-M4: Consistent pass rush pressure speeds up QB clock, forcing quick dump-offs to backfield outlets."
+            causal_mech = "Consistent pass rush pressure speeds up QB clock, forcing quick dump-offs to backfield outlets."
         else:
             expected_boost = "Baseline Look Rate: Steady volume within standard route distribution."
 
@@ -605,86 +605,182 @@ def compute_scheme_insights(
     # -------------------------------------------------------------
     # Pillar 4: Efficiency by Context & Scheme Splits (Breakout Spotters) (12:05)
     # -------------------------------------------------------------
-    # Generate breakout spotter cards
+    def _extract_team_breakouts(team_code: str, team_prof: Dict[str, Any], opp_code: str, opp_prof: Dict[str, Any]) -> List[Dict[str, Any]]:
+        cov = opp_prof['coverage']
+        run_def = opp_prof['run_scheme']
+        team_run = team_prof['run_scheme']
+        cands = []
+
+        # 1. Target alignment candidates
+        for p in team_prof.get('target_alignment', {}).get('key_targets', []):
+            slot_share = p.get('slot_pct', 0)
+            inline_share = p.get('inline_pct', 0)
+            outside_share = p.get('outside_pct', 0)
+            pos = p.get('pos', 'WR')
+
+            # Tight End Seam vs MFO / Zone
+            if pos == 'TE' and (cov.get('mfo_pct', 50) >= 50.0 or cov.get('zone_pct', 60) >= 60.0) and p.get('tgt_zone', 0) >= p.get('tgt_man', 0):
+                delta = p.get('tgt_zone', 0) - p.get('tgt_man', 0)
+                cands.append({
+                    'player': p['name'],
+                    'team': team_code,
+                    'pos': 'TE',
+                    'scheme_type': 'Seam Leverage',
+                    'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
+                    'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
+                    'scheme_delta': f"+{delta:.1f}% Seam Target Edge" if delta > 0 else f"{p['tgt_zone']:.1f}% TE Seam Funnel",
+                    'verdict': 'PRIME BREAKOUT SPOT' if cov.get('mfo_pct', 50) >= 55 else 'ELEVATED TARGET CEILING',
+                    'rationale': f"Attacks {opp_code}'s {cov.get('mfo_pct', 50):.1f}% Middle-Field Open (MFO) safety split. Inline seam routes exploit vacated deep middle.",
+                    'causal_mechanism': 'Middle-field open two-safety split creates vertical seam and size leverage mismatches for inline tight ends.',
+                    'priority': 90.0 + delta + (p.get('tgt_zone', 0) * 0.5)
+                })
+
+            # Slot WR mismatch vs Zone
+            elif pos == 'WR' and slot_share >= 35 and cov.get('zone_pct', 60) >= 55.0 and p.get('tgt_zone', 0) >= p.get('tgt_man', 0):
+                delta = p.get('tgt_zone', 0) - p.get('tgt_man', 0)
+                cands.append({
+                    'player': p['name'],
+                    'team': team_code,
+                    'pos': 'WR',
+                    'scheme_type': 'Slot Mismatch',
+                    'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
+                    'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
+                    'scheme_delta': f"+{delta:.1f}% vs Zone Shell" if delta > 0 else f"{p['tgt_zone']:.1f}% Target Share",
+                    'verdict': 'PRIME BREAKOUT SPOT' if delta >= 3.0 or p.get('tgt_zone', 0) >= 25 else 'ELEVATED TARGET CEILING',
+                    'rationale': f"Faces {opp_code} defense deploying {cov.get('zone_pct', 60):.1f}% Zone. Alignment in the slot ({slot_share:.0f}%) attacks soft intermediate voids.",
+                    'causal_mechanism': 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.',
+                    'priority': 92.0 + delta + (p.get('tgt_zone', 0) * 0.5)
+                })
+
+            # Outside Alpha vs Man
+            elif pos == 'WR' and outside_share >= 60 and cov.get('man_pct', 30) >= 32.0 and p.get('tgt_man', 0) > p.get('tgt_zone', 0) and p.get('yprr_man', 0) >= 2.0:
+                delta = p.get('tgt_man', 0) - p.get('tgt_zone', 0)
+                cands.append({
+                    'player': p['name'],
+                    'team': team_code,
+                    'pos': 'WR',
+                    'scheme_type': 'Boundary Alpha',
+                    'context_metric': f"{p['tgt_man']:.1f}% Tgt vs Man ({p['yprr_man']:.2f} YPRR)",
+                    'season_baseline': f"{p['tgt_zone']:.1f}% vs Zone",
+                    'scheme_delta': f"+{delta:.1f}% vs Man Coverage",
+                    'verdict': 'PRIME BREAKOUT SPOT' if delta >= 3.0 else 'ELEVATED TARGET CEILING',
+                    'rationale': f"Faces {opp_code} defense utilizing {cov.get('man_pct', 30):.1f}% Man coverage. Wins isolated 1-on-1 boundary matchups with {p['yprr_man']:.2f} YPRR separation.",
+                    'causal_mechanism': 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
+                    'priority': 88.0 + delta + (p.get('tgt_man', 0) * 0.5)
+                })
+
+            # Backfield RB Checkdown / Valve vs Zone & Pressure
+            elif pos == 'RB' and (cov.get('zone_pct', 60) >= 60.0 or cov.get('four_man_pressure_pct', 0) >= 24.0 or cov.get('blitz_pct', 0) >= 20.0):
+                delta = p.get('tgt_zone', 0) - p.get('tgt_man', 0)
+                cands.append({
+                    'player': p['name'],
+                    'team': team_code,
+                    'pos': 'RB',
+                    'scheme_type': 'Backfield Valve',
+                    'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
+                    'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
+                    'scheme_delta': f"+{delta:.1f}% Target Surge" if delta > 0 else f"{p['tgt_zone']:.1f}% Target Share",
+                    'verdict': 'ELEVATED TARGET CEILING',
+                    'rationale': f"Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, safety valve checkdowns funnel high-percentage receiving work into the flat.",
+                    'causal_mechanism': 'Zone coverage drops linebackers deep into hook zones, leaving running backs open on underneath flare and checkdown routes.',
+                    'priority': 85.0 + delta + (p.get('tgt_zone', 0) * 0.5)
+                })
+
+        # 2. Ground attack candidates
+        lead_rusher = team_prof.get('tempo_situational', {}).get('red_zone_touch_leader', f'{team_code} Lead Back').split(' (')[0]
+        zone_ypc = team_run.get('zone_ypc', 4.2)
+        gap_ypc = team_run.get('gap_ypc', 4.0)
+
+        if zone_ypc >= 4.5 or run_def.get('def_zone_rank', 16) >= 16:
+            delta = zone_ypc - gap_ypc
+            cands.append({
+                'player': lead_rusher,
+                'team': team_code,
+                'pos': 'RB',
+                'scheme_type': 'Outside Zone Edge',
+                'context_metric': f"{zone_ypc:.2f} YPC on Zone Carries",
+                'season_baseline': f"{gap_ypc:.2f} Gap YPC",
+                'scheme_delta': f"+{delta:.2f} YPC Zone Edge" if delta > 0 else f"{zone_ypc:.2f} Zone YPC",
+                'verdict': 'HIGH EFFICIENCY GROUND EDGE',
+                'rationale': f"{team_code} executes perimeter stretch zone against {opp_code}'s #{run_def.get('def_zone_rank', 16)} ranked Zone run defense ({run_def.get('def_zone_ypc_allowed', 4.3):.2f} YPC allowed).",
+                'causal_mechanism': 'Perimeter stretch schemes exploit slow-flowing edge defenders, opening cutback lanes for primary backs.',
+                'priority': 88.0 + (zone_ypc * 3.0)
+            })
+        elif gap_ypc >= 4.4 or run_def.get('def_gap_rank', 16) >= 16:
+            delta = gap_ypc - zone_ypc
+            cands.append({
+                'player': lead_rusher,
+                'team': team_code,
+                'pos': 'RB',
+                'scheme_type': 'Gap Power Edge',
+                'context_metric': f"{gap_ypc:.2f} YPC on Gap Carries",
+                'season_baseline': f"{zone_ypc:.2f} Zone YPC",
+                'scheme_delta': f"+{delta:.2f} YPC Gap Edge" if delta > 0 else f"{gap_ypc:.2f} Gap YPC",
+                'verdict': 'HIGH EFFICIENCY GROUND EDGE',
+                'rationale': f"{team_code} runs downhill gap schemes against {opp_code}'s #{run_def.get('def_gap_rank', 16)} ranked Gap run stop ({run_def.get('def_gap_ypc_allowed', 4.1):.2f} YPC allowed).",
+                'causal_mechanism': 'Defenses with poor interior gap discipline yield elevated yards before contact to downhill primary ballcarriers.',
+                'priority': 88.0 + (gap_ypc * 3.0)
+            })
+
+        # Fallback if no candidate found for team
+        if not cands and team_prof.get('target_alignment', {}).get('key_targets'):
+            top_p = team_prof['target_alignment']['key_targets'][0]
+            cands.append({
+                'player': top_p['name'],
+                'team': team_code,
+                'pos': top_p.get('pos', 'WR'),
+                'scheme_type': 'Primary Weapon',
+                'context_metric': f"{top_p.get('tgt_zone', 24):.1f}% Target Share",
+                'season_baseline': f"{top_p.get('tgt_man', 22):.1f}% vs Man",
+                'scheme_delta': f"+{abs(top_p.get('tgt_zone', 24) - top_p.get('tgt_man', 22)):.1f}% Target Focus",
+                'verdict': 'VOLUME PRIME CANDIDATE',
+                'rationale': f"Core offensive gameplan funnels prioritized target looks to {top_p['name']} across coverage alignments.",
+                'causal_mechanism': 'Primary weapon maintains prioritized route reads and designed quick-game touches across coverage alignments.',
+                'priority': 70.0
+            })
+
+        # Deduplicate candidates by player name and sort by priority descending
+        seen = set()
+        deduped = []
+        for c in sorted(cands, key=lambda x: x['priority'], reverse=True):
+            if c['player'] not in seen:
+                seen.add(c['player'])
+                c_clean = {k: v for k, v in c.items() if k != 'priority'}
+                deduped.append(c_clean)
+        return deduped
+
+    away_breakouts = _extract_team_breakouts(a_team, a_profile, h_team, h_profile)
+    home_breakouts = _extract_team_breakouts(h_team, h_profile, a_team, a_profile)
+
+    # Curate strictly between 2 and 4 players (balanced between Away and Home)
     breakouts = []
-    
-    # Check Away RB / WR / TE
-    for p in a_targets:
-        if p['boost_tier'] in ('High Boost', 'Moderate Boost'):
-            breakouts.append({
-                'player': p['name'],
-                'team': a_team,
-                'pos': p['pos'],
-                'scheme_type': 'Coverage Alignment Mismatch',
-                'context_metric': f"{p['tgt_zone']:.1f}% Tgt Share vs Zone ({p['yprr_zone']:.2f} YPRR)",
-                'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
-                'scheme_delta': f"+{(p['tgt_zone'] - p['tgt_man']):.1f}% Target Share Surge",
-                'verdict': 'PRIME BREAKOUT SPOT' if p['boost_tier'] == 'High Boost' else 'ELEVATED TARGET CEILING',
-                'rationale': f"Faces {h_team} defense deploying {h_profile['coverage']['zone_pct']:.1f}% Zone. Player averages +{(p['yprr_zone'] - p['yprr_man']):.2f} YPRR higher against zone shells.",
-                'causal_mechanism': p.get('causal_mechanism', '')
-            })
-    
-    # Check Home RB / WR / TE
-    for p in h_targets:
-        if p['boost_tier'] in ('High Boost', 'Moderate Boost'):
-            breakouts.append({
-                'player': p['name'],
-                'team': h_team,
-                'pos': p['pos'],
-                'scheme_type': 'Coverage Alignment Mismatch',
-                'context_metric': f"{p['tgt_zone']:.1f}% Tgt Share vs Zone ({p['yprr_zone']:.2f} YPRR)",
-                'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
-                'scheme_delta': f"+{(p['tgt_zone'] - p['tgt_man']):.1f}% Target Share Surge",
-                'verdict': 'PRIME BREAKOUT SPOT' if p['boost_tier'] == 'High Boost' else 'ELEVATED TARGET CEILING',
-                'rationale': f"Faces {a_team} defense deploying {a_profile['coverage']['zone_pct']:.1f}% Zone. Target frequency spikes against two-high shell.",
-                'causal_mechanism': p.get('causal_mechanism', '')
-            })
+    if len(away_breakouts) >= 2 and len(home_breakouts) >= 2:
+        breakouts = [away_breakouts[0], away_breakouts[1], home_breakouts[0], home_breakouts[1]]
+    elif len(away_breakouts) >= 1 and len(home_breakouts) >= 1:
+        breakouts = away_breakouts[:2] + home_breakouts[:2]
+    elif len(away_breakouts) >= 2:
+        breakouts = away_breakouts[:2]
+    elif len(home_breakouts) >= 2:
+        breakouts = home_breakouts[:2]
+    else:
+        breakouts = away_breakouts + home_breakouts
 
-    # Ground Breakout Candidate (Away)
-    a_lead_rusher = a_profile.get('tempo_situational', {}).get('red_zone_touch_leader', f"{a_team} Lead Back").split(' (')[0]
-    h_lead_rusher = h_profile.get('tempo_situational', {}).get('red_zone_touch_leader', f"{h_team} Lead Back").split(' (')[0]
-
-    if a_profile['run_scheme']['gap_ypc'] >= 4.4 and h_profile['run_scheme']['def_gap_rank'] >= 16:
+    # Guarantee total count is strictly 2 to 4 players
+    if len(breakouts) > 4:
+        breakouts = breakouts[:4]
+    elif len(breakouts) < 2:
+        other_team = h_team if (breakouts and breakouts[0]['team'] == a_team) else a_team
         breakouts.append({
-            'player': a_lead_rusher,
-            'team': a_team,
+            'player': f"{other_team} Lead Back",
+            'team': other_team,
             'pos': 'RB',
-            'scheme_type': 'Run Scheme Exploit (Gap/Power)',
-            'context_metric': f"{a_profile['run_scheme']['gap_ypc']:.2f} YPC on Gap Carries",
-            'season_baseline': f"{a_profile['run_scheme']['zone_ypc']:.2f} Zone YPC",
-            'scheme_delta': f"+{(a_profile['run_scheme']['gap_ypc'] - a_profile['run_scheme']['zone_ypc']):.2f} YPC Scheme Edge",
-            'verdict': 'HIGH EFFICIENCY RUSH BREAKOUT',
-            'rationale': f"{a_team} runs {a_profile['run_scheme']['offense_gap_pct']:.0f}% Gap against {h_team}'s #{h_profile['run_scheme']['def_gap_rank']} ranked Gap run stop ({h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC allowed).",
-            'causal_mechanism': 'RBRUSH-M5: Defenses with poor gap discipline yield elevated yards per carry to downhill primary ballcarriers.'
-        })
-
-    # Ground Breakout Candidate (Home)
-    if h_profile['run_scheme']['zone_ypc'] >= 4.4 and a_profile['run_scheme']['def_zone_rank'] >= 16:
-        breakouts.append({
-            'player': h_lead_rusher,
-            'team': h_team,
-            'pos': 'RB',
-            'scheme_type': 'Run Scheme Exploit (Outside Zone)',
-            'context_metric': f"{h_profile['run_scheme']['zone_ypc']:.2f} YPC on Zone Carries",
-            'season_baseline': f"{h_profile['run_scheme']['gap_ypc']:.2f} Gap YPC",
-            'scheme_delta': f"+{(h_profile['run_scheme']['zone_ypc'] - h_profile['run_scheme']['gap_ypc']):.2f} YPC Scheme Edge",
-            'verdict': 'HIGH EFFICIENCY RUSH BREAKOUT',
-            'rationale': f"{h_team} runs {h_profile['run_scheme']['offense_zone_pct']:.0f}% Zone against {a_team}'s #{a_profile['run_scheme']['def_zone_rank']} ranked Zone run defense ({a_profile['run_scheme']['def_zone_ypc_allowed']:.2f} YPC allowed).",
-            'causal_mechanism': 'RBRUSH-M5: Defenses with poor gap discipline yield elevated yards per carry to primary running backs.'
-        })
-
-    # Ensure at least 2 breakout spotters
-    if len(breakouts) == 0:
-        breakouts.append({
-            'player': f"{a_team} Primary Weapon",
-            'team': a_team,
-            'pos': 'WR',
-            'scheme_type': 'Contextual Target Funnel',
-            'context_metric': '24.5% Projected Target Share',
-            'season_baseline': '21.0% Season Average',
-            'scheme_delta': '+3.5% Target Concentration',
+            'scheme_type': 'Volume Edge',
+            'context_metric': '16+ Projected Touches',
+            'season_baseline': '14 Touches / Game',
+            'scheme_delta': '+2.5 Touch Ceiling',
             'verdict': 'VOLUME PRIME CANDIDATE',
-            'rationale': f'Matchup coverage shell forces passes directly into this player\'s primary alignment route tree.'
+            'rationale': 'Game script and red zone concentration create reliable touch volume floor.',
+            'causal_mechanism': 'Goal line touch consolidation elevates player floor regardless of defensive fronts.'
         })
 
     # -------------------------------------------------------------
