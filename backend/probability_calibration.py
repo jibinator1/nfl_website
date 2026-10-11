@@ -1,12 +1,11 @@
 """
 Post-hoc recalibration of model win probabilities against empirical outcomes.
-Fit on historical backtest data, applied at inference time.
+Fit on historical backtest data, applied at inference time using lightweight numpy interpolation.
 """
 import json
 import os
 import numpy as np
 from typing import Dict, Any, List, Tuple
-from sklearn.isotonic import IsotonicRegression
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _CALIB_PATHS = [
@@ -14,16 +13,20 @@ _CALIB_PATHS = [
     os.path.join(ROOT_DIR, "api", "data", "probability_calibration.json")
 ]
 _CALIB_PATH = _CALIB_PATHS[0]
-_CALIBRATORS: Dict[str, IsotonicRegression] = {}  # stat_focus -> IsotonicRegression
+_CALIBRATORS: Dict[str, Tuple[np.ndarray, np.ndarray]] = {}  # stat_focus -> (x_knots, y_knots)
 
 
-def fit_calibration(records_by_stat: Dict[str, List[Tuple[float, int]]]) -> Dict[str, IsotonicRegression]:
+def fit_calibration(records_by_stat: Dict[str, List[Tuple[float, int]]]) -> Dict[str, Any]:
     """
-    records_by_stat: dict stat_focus -> list of (p_model, outcome) tuples
-    outcome: 1 if prop hit, 0 otherwise
+    Fits isotonic regression and serializes knots to JSON.
+    Uses scikit-learn lazily (only required when refitting offline during backtesting).
     """
+    from sklearn.isotonic import IsotonicRegression
+
     global _CALIBRATORS
-    fitted = {}
+    calib_dict = {}
+    fitted_models = {}
+
     for stat, records in records_by_stat.items():
         if len(records) < 50:
             continue  # not enough data to fit
@@ -31,23 +34,22 @@ def fit_calibration(records_by_stat: Dict[str, List[Tuple[float, int]]]) -> Dict
         y = np.array([r[1] for r in records], dtype=float)
         iso = IsotonicRegression(out_of_bounds="clip", y_min=0.40, y_max=0.68)
         iso.fit(X, y)
-        fitted[stat] = iso
-        _CALIBRATORS[stat] = iso
+        fitted_models[stat] = iso
 
-        knots_count = len(getattr(iso, 'X_thresholds_', []))
-        y_min_val = float(iso.y_thresholds_.min()) if knots_count > 0 else 0.40
-        y_max_val = float(iso.y_thresholds_.max()) if knots_count > 0 else 0.68
-        print(f"[calib] {stat}: fitted on {len(records)} records, "
-              f"{knots_count} knots, range [{y_min_val:.3f}, {y_max_val:.3f}]")
-
-    calib_dict = {}
-    for stat, iso in _CALIBRATORS.items():
         x_th = getattr(iso, 'X_thresholds_', np.array([])).tolist()
         y_th = getattr(iso, 'y_thresholds_', np.array([])).tolist()
+
         calib_dict[stat] = {
             "x": x_th,
             "y": y_th
         }
+        _CALIBRATORS[stat] = (np.array(x_th, dtype=float), np.array(y_th, dtype=float))
+
+        knots_count = len(x_th)
+        y_min_val = float(min(y_th)) if y_th else 0.40
+        y_max_val = float(max(y_th)) if y_th else 0.68
+        print(f"[calib] {stat}: fitted on {len(records)} records, "
+              f"{knots_count} knots, range [{y_min_val:.3f}, {y_max_val:.3f}]")
 
     for p in _CALIB_PATHS:
         try:
@@ -58,10 +60,11 @@ def fit_calibration(records_by_stat: Dict[str, List[Tuple[float, int]]]) -> Dict
         except Exception as e:
             print(f"[calib] Warning saving {p}: {e}")
 
-    return _CALIBRATORS
+    return fitted_models
 
 
-def load_calibration() -> Dict[str, IsotonicRegression]:
+def load_calibration() -> Dict[str, Tuple[np.ndarray, np.ndarray]]:
+    """Loads calibration knots from disk. Pure JSON/numpy, zero heavy ML dependencies."""
     global _CALIBRATORS
     if _CALIBRATORS:
         return _CALIBRATORS
@@ -80,9 +83,10 @@ def load_calibration() -> Dict[str, IsotonicRegression]:
             raw = json.load(f)
         for stat, knots in raw.items():
             if knots.get("x") and knots.get("y"):
-                iso = IsotonicRegression(out_of_bounds="clip", y_min=0.40, y_max=0.68)
-                iso.fit(np.array(knots["x"], dtype=float), np.array(knots["y"], dtype=float))
-                _CALIBRATORS[stat] = iso
+                _CALIBRATORS[stat] = (
+                    np.array(knots["x"], dtype=float),
+                    np.array(knots["y"], dtype=float)
+                )
     except Exception as e:
         print(f"[calib] Error loading calibration from {found_path}: {e}")
 
@@ -90,13 +94,18 @@ def load_calibration() -> Dict[str, IsotonicRegression]:
 
 
 def recalibrate(p_model: float, stat_focus: str) -> float:
-    """Apply isotonic calibration to a raw model probability."""
+    """
+    Applies isotonic calibration using piecewise linear/step interpolation with out-of-bounds clipping.
+    Mathematically identical to scikit-learn's IsotonicRegression.predict([p_model])[0].
+    """
     cals = load_calibration()
-    iso = cals.get(stat_focus)
-    if iso is None:
-        return float(p_model)  # no calibration available, pass through
+    knots = cals.get(stat_focus)
+    if not knots or len(knots[0]) == 0 or len(knots[1]) == 0:
+        return float(p_model)
+
+    x_knots, y_knots = knots
     try:
-        pred = float(iso.predict(np.array([p_model]))[0])
-        return max(0.40, min(0.68, pred))
+        val = float(np.interp(p_model, x_knots, y_knots, left=y_knots[0], right=y_knots[-1]))
+        return max(0.40, min(0.68, val))
     except Exception:
         return float(p_model)

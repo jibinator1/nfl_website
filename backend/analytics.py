@@ -458,40 +458,40 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
             except Exception:
                 pass
 
-    # League Rankings (1 to 32)
-    df['rank_pts_scored'] = df['pts_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_rush_yds'] = df['rush_yds_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_pass_yds'] = df['pass_yds_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_total_yds'] = df['total_yds_per_game'].rank(ascending=False, method='min').astype(int)
-
-    df['rank_pts_allowed'] = df['pts_allowed_per_game'].rank(ascending=True, method='min').astype(int)
-    df['rank_rush_allowed'] = df['rush_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int)
-    df['rank_pass_allowed'] = df['pass_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int)
-    df['rank_total_allowed'] = df['total_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int)
-
-    df['rank_turnover_diff'] = df['turnover_diff'].rank(ascending=False, method='min').astype(int)
-    df['rank_sacks_forced'] = df['sacks_forced_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_sacks_suffered'] = df['sacks_suffered_per_game'].rank(ascending=True, method='min').astype(int)
-
-    df['rank_qb_rush_yds'] = df['qb_rush_yds_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_rb_rec_yds'] = df['rb_rec_yds_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_qb_rush_allowed'] = df['qb_rush_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int)
-    df['rank_rb_rec_allowed'] = df['rb_rec_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int)
-    df['rank_def_star_rb'] = df['def_star_rb_diff'].rank(ascending=True, method='min').astype(int)
-    df['rank_def_star_wr'] = df['def_star_wr_diff'].rank(ascending=True, method='min').astype(int)
-    df['rank_def_rb2'] = df['def_rb2_diff'].rank(ascending=True, method='min').astype(int)
-    df['rank_def_wr2'] = df['def_wr2_diff'].rank(ascending=True, method='min').astype(int)
-    df['rank_def_te1'] = df['def_te1_diff'].rank(ascending=True, method='min').astype(int)
-    df['rank_def_te2'] = df['def_te2_diff'].rank(ascending=True, method='min').astype(int)
-    # Volume & Efficiency Rankings
-    df['rank_carries'] = df['carries_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_pass_att'] = df['pass_att_per_game'].rank(ascending=False, method='min').astype(int)
-    df['rank_ypc'] = df['yds_per_carry'].rank(ascending=False, method='min').astype(int)
-    df['rank_ypa'] = df['yds_per_att'].rank(ascending=False, method='min').astype(int)
-    df['rank_opp_carries'] = df['opp_carries_per_game'].rank(ascending=True, method='min').astype(int)
-    df['rank_opp_pass_att'] = df['opp_pass_att_per_game'].rank(ascending=True, method='min').astype(int)
-    df['rank_opp_ypc'] = df['opp_yds_per_carry'].rank(ascending=True, method='min').astype(int)
-    df['rank_opp_ypa'] = df['opp_yds_per_att'].rank(ascending=True, method='min').astype(int)
+    # League Rankings (1 to 32) - concatenated in one batch to prevent DataFrame fragmentation
+    df = df.copy()
+    rank_dict = {
+        'rank_pts_scored': df['pts_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_rush_yds': df['rush_yds_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_pass_yds': df['pass_yds_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_total_yds': df['total_yds_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_pts_allowed': df['pts_allowed_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_rush_allowed': df['rush_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_pass_allowed': df['pass_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_total_allowed': df['total_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_turnover_diff': df['turnover_diff'].rank(ascending=False, method='min').astype(int),
+        'rank_sacks_forced': df['sacks_forced_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_sacks_suffered': df['sacks_suffered_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_qb_rush_yds': df['qb_rush_yds_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_rb_rec_yds': df['rb_rec_yds_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_qb_rush_allowed': df['qb_rush_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_rb_rec_allowed': df['rb_rec_yds_allowed_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_def_star_rb': df['def_star_rb_diff'].rank(ascending=True, method='min').astype(int),
+        'rank_def_star_wr': df['def_star_wr_diff'].rank(ascending=True, method='min').astype(int),
+        'rank_def_rb2': df['def_rb2_diff'].rank(ascending=True, method='min').astype(int),
+        'rank_def_wr2': df['def_wr2_diff'].rank(ascending=True, method='min').astype(int),
+        'rank_def_te1': df['def_te1_diff'].rank(ascending=True, method='min').astype(int),
+        'rank_def_te2': df['def_te2_diff'].rank(ascending=True, method='min').astype(int),
+        'rank_carries': df['carries_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_pass_att': df['pass_att_per_game'].rank(ascending=False, method='min').astype(int),
+        'rank_ypc': df['yds_per_carry'].rank(ascending=False, method='min').astype(int),
+        'rank_ypa': df['yds_per_att'].rank(ascending=False, method='min').astype(int),
+        'rank_opp_carries': df['opp_carries_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_opp_pass_att': df['opp_pass_att_per_game'].rank(ascending=True, method='min').astype(int),
+        'rank_opp_ypc': df['opp_yds_per_carry'].rank(ascending=True, method='min').astype(int),
+        'rank_opp_ypa': df['opp_yds_per_att'].rank(ascending=True, method='min').astype(int),
+    }
+    df = pd.concat([df, pd.DataFrame(rank_dict, index=df.index)], axis=1)
 
     df['def_composite_score'] = ((df['rank_pts_allowed'] + df['rank_rush_allowed'] + df['rank_pass_allowed']) / 3.0).round(1)
     df['def_overall_character'] = df['def_composite_score'].apply(
