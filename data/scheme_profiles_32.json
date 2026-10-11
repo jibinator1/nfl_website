@@ -93,7 +93,7 @@
       "pace_rank": 4,
       "proj_plays": 61.3,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "J.Love (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "J.Conner (Lead Goal-Line Share)",
       "rz_pass_rate": 58.7,
       "third_down_pass_rate": 70.7,
       "checkdown_pct": 25.6,
@@ -194,7 +194,7 @@
       "pace_rank": 26,
       "proj_plays": 65.1,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "Bi.Robinson (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "B.Robinson (Lead Goal-Line Share)",
       "rz_pass_rate": 45.5,
       "third_down_pass_rate": 75.7,
       "checkdown_pct": 22.0,
@@ -800,11 +800,11 @@
       "pace_rank": 10,
       "proj_plays": 66.7,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "Q.Judkins (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "N.Chubb (Lead Goal-Line Share)",
       "rz_pass_rate": 56.5,
       "third_down_pass_rate": 77.8,
       "checkdown_pct": 22.1,
-      "flow_verdict": "Offensive tempo guided by Q.Judkins red zone conversion and 22.1% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by N.Chubb red zone conversion and 22.1% check-down release rate."
     }
   },
   "DAL": {
@@ -901,11 +901,11 @@
       "pace_rank": 31,
       "proj_plays": 68.8,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "J.Williams (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "R.Dowdle (Lead Goal-Line Share)",
       "rz_pass_rate": 57.0,
       "third_down_pass_rate": 78.9,
       "checkdown_pct": 23.9,
-      "flow_verdict": "Offensive tempo guided by J.Williams red zone conversion and 23.9% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by R.Dowdle red zone conversion and 23.9% check-down release rate."
     }
   },
   "DEN": {
@@ -1002,11 +1002,11 @@
       "pace_rank": 13,
       "proj_plays": 65.4,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "J.Dobbins (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "J.Williams (Lead Goal-Line Share)",
       "rz_pass_rate": 53.0,
       "third_down_pass_rate": 77.5,
       "checkdown_pct": 30.3,
-      "flow_verdict": "Offensive tempo guided by B.Nix red zone conversion and 30.3% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by J.Williams red zone conversion and 30.3% check-down release rate."
     }
   },
   "DET": {
@@ -1204,7 +1204,7 @@
       "pace_rank": 11,
       "proj_plays": 68.4,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "M.Lloyd (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "J.Jacobs (Lead Goal-Line Share)",
       "rz_pass_rate": 45.7,
       "third_down_pass_rate": 72.2,
       "checkdown_pct": 25.9,
@@ -1305,7 +1305,7 @@
       "pace_rank": 28,
       "proj_plays": 68.5,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "D.Montgomery (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "J.Mixon (Lead Goal-Line Share)",
       "rz_pass_rate": 51.3,
       "third_down_pass_rate": 79.0,
       "checkdown_pct": 17.8,
@@ -1507,11 +1507,11 @@
       "pace_rank": 25,
       "proj_plays": 61.8,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "B.Tuten (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "T.Etienne Jr. (Lead Goal-Line Share)",
       "rz_pass_rate": 48.1,
       "third_down_pass_rate": 70.9,
       "checkdown_pct": 21.4,
-      "flow_verdict": "Offensive tempo guided by T.Etienne red zone conversion and 21.4% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by T.Etienne Jr. red zone conversion and 21.4% check-down release rate."
     }
   },
   "KC": {
@@ -1608,11 +1608,11 @@
       "pace_rank": 7,
       "proj_plays": 68.0,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "K.Walker (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "I.Pacheco (Lead Goal-Line Share)",
       "rz_pass_rate": 55.3,
       "third_down_pass_rate": 72.7,
       "checkdown_pct": 29.5,
-      "flow_verdict": "Offensive tempo guided by K.Hunt red zone conversion and 29.5% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by I.Pacheco red zone conversion and 29.5% check-down release rate."
     }
   },
   "LA": {
@@ -1810,11 +1810,11 @@
       "pace_rank": 30,
       "proj_plays": 67.1,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "O.Hampton (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "J.Dobbins (Lead Goal-Line Share)",
       "rz_pass_rate": 50.6,
       "third_down_pass_rate": 69.0,
       "checkdown_pct": 19.9,
-      "flow_verdict": "Offensive tempo guided by K.Vidal red zone conversion and 19.9% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by J.Dobbins red zone conversion and 19.9% check-down release rate."
     }
   },
   "LV": {
@@ -1911,11 +1911,11 @@
       "pace_rank": 5,
       "proj_plays": 61.4,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "A.Jeanty (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "A.Mattison (Lead Goal-Line Share)",
       "rz_pass_rate": 59.3,
       "third_down_pass_rate": 76.9,
       "checkdown_pct": 24.0,
-      "flow_verdict": "Offensive tempo guided by A.Jeanty red zone conversion and 24.0% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by A.Mattison red zone conversion and 24.0% check-down release rate."
     }
   },
   "MIA": {
@@ -2214,7 +2214,7 @@
       "pace_rank": 6,
       "proj_plays": 64.7,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "R.Stevenson (54% Goal-Line Share)",
+      "red_zone_touch_leader": "R.Stevenson (Lead Goal-Line Share)",
       "rz_pass_rate": 50.9,
       "third_down_pass_rate": 76.7,
       "checkdown_pct": 19.2,
@@ -2315,7 +2315,7 @@
       "pace_rank": 3,
       "proj_plays": 64.4,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "T.Etienne (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "A.Kamara (Lead Goal-Line Share)",
       "rz_pass_rate": 47.4,
       "third_down_pass_rate": 72.7,
       "checkdown_pct": 22.6,
@@ -2416,11 +2416,11 @@
       "pace_rank": 24,
       "proj_plays": 61.7,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "C.Skattebo (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "T.Tracy Jr. (Lead Goal-Line Share)",
       "rz_pass_rate": 49.7,
       "third_down_pass_rate": 74.0,
       "checkdown_pct": 23.6,
-      "flow_verdict": "Offensive tempo guided by T.Tracy red zone conversion and 23.6% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by T.Tracy Jr. red zone conversion and 23.6% check-down release rate."
     }
   },
   "NYJ": {
@@ -2618,7 +2618,7 @@
       "pace_rank": 28,
       "proj_plays": 68.5,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "S.Barkley (68% Goal-Line Share)",
+      "red_zone_touch_leader": "S.Barkley (Lead Goal-Line Share)",
       "rz_pass_rate": 35.6,
       "third_down_pass_rate": 62.4,
       "checkdown_pct": 18.9,
@@ -2719,11 +2719,11 @@
       "pace_rank": 27,
       "proj_plays": 63.6,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "J.Warren (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "N.Harris (Lead Goal-Line Share)",
       "rz_pass_rate": 48.1,
       "third_down_pass_rate": 77.1,
       "checkdown_pct": 28.0,
-      "flow_verdict": "Offensive tempo guided by J.Warren red zone conversion and 28.0% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by N.Harris red zone conversion and 28.0% check-down release rate."
     }
   },
   "SEA": {
@@ -2820,11 +2820,11 @@
       "pace_rank": 30,
       "proj_plays": 67.1,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "E.Wilson (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "K.Walker III (Lead Goal-Line Share)",
       "rz_pass_rate": 46.9,
       "third_down_pass_rate": 72.1,
       "checkdown_pct": 23.2,
-      "flow_verdict": "Offensive tempo guided by Z.Charbonnet red zone conversion and 23.2% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by K.Walker III red zone conversion and 23.2% check-down release rate."
     }
   },
   "SF": {
@@ -3224,11 +3224,11 @@
       "pace_rank": 29,
       "proj_plays": 67.0,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "J.Croskey-Merritt (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "B.Robinson Jr. (Lead Goal-Line Share)",
       "rz_pass_rate": 41.9,
       "third_down_pass_rate": 70.8,
       "checkdown_pct": 23.1,
-      "flow_verdict": "Offensive tempo guided by J.Daniels red zone conversion and 23.1% check-down release rate."
+      "flow_verdict": "Offensive tempo guided by B.Robinson Jr. red zone conversion and 23.1% check-down release rate."
     }
   }
 }

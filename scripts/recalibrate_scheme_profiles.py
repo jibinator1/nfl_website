@@ -189,6 +189,8 @@ for team_code, prof in profiles.items():
     prof['target_alignment']['wide_wr_pct'] = round(float(np.mean([w1_out, w2_out]) * 0.65), 1)
     prof['target_alignment']['inline_te_pct'] = round(float(te_inline * 0.38), 1)
     prof['target_alignment']['backfield_rb_pct'] = round(float(rb_base), 1)
+    prof['tempo_situational']['red_zone_touch_leader'] = f"{rb_name} (Lead Goal-Line Share)"
+    prof['tempo_situational']['flow_verdict'] = f"Offensive tempo guided by {rb_name} red zone conversion and {prof['tempo_situational'].get('checkdown_pct', 15.0):.1f}% check-down release rate."
     
     updated_teams += 1
 

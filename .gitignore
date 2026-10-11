@@ -49,3 +49,4 @@ out.txt
 last_run.txt
 *.log
 
+.agent/

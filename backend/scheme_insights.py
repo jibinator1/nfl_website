@@ -1166,44 +1166,82 @@ def compute_scheme_insights(
                 })
 
         # 2. Ground attack candidates (Lead Back)
-        lead_rusher = team_prof.get('tempo_situational', {}).get('red_zone_touch_leader', f'{team_code} Lead Back').split(' (')[0].split(' /')[0]
+        rb_targets = [t['name'] for t in team_prof.get('target_alignment', {}).get('key_targets', []) if t.get('pos') == 'RB']
+        if rb_targets:
+            lead_rusher = rb_targets[0]
+        else:
+            lead_rusher = team_prof.get('tempo_situational', {}).get('red_zone_touch_leader', f'{team_code} Lead Back').split(' (')[0].split(' /')[0].strip()
+
+        zone_pct = team_run.get('offense_zone_pct', 50.0)
+        gap_pct = team_run.get('offense_gap_pct', 50.0)
         zone_ypc = team_run.get('zone_ypc', 4.2)
         gap_ypc = team_run.get('gap_ypc', 4.0)
 
-        # Choose the dominant run scheme for primary back
-        if zone_ypc >= gap_ypc:
-            delta = zone_ypc - gap_ypc
+        # Determine dominant scheme and compare against opponent run defense
+        if zone_pct >= gap_pct:
+            dominant_scheme = 'Zone'
+            team_ypc = zone_ypc
+            opp_def_ypc = run_def.get('def_zone_ypc_allowed', 4.25)
+            opp_def_rank = run_def.get('def_zone_rank', 16)
+            scheme_label = 'Outside Zone Ground Edge'
+        else:
+            dominant_scheme = 'Gap'
+            team_ypc = gap_ypc
+            opp_def_ypc = run_def.get('def_gap_ypc_allowed', 4.15)
+            opp_def_rank = run_def.get('def_gap_rank', 16)
+            scheme_label = 'Gap Power Ground Edge'
+
+        if opp_def_rank <= 12 or opp_def_ypc <= 4.10:
+            # Stout run defense - downgrade priority so it does not displace real passing edges
             cands.append({
                 'player': lead_rusher,
                 'team': team_code,
                 'pos': 'RB',
-                'scheme_type': 'Outside Zone Ground Edge',
+                'scheme_type': scheme_label,
                 'stat_focus': 'Rushing Yards',
                 'prop_angle': 'Prop Target: Rushing Yards (Ground Attack)',
-                'context_metric': f"{zone_ypc:.2f} YPC on Zone Carries",
-                'season_baseline': f"{gap_ypc:.2f} Gap YPC",
-                'scheme_delta': f"+{delta:.2f} YPC Zone Edge" if delta > 0 else f"{zone_ypc:.2f} Zone YPC",
-                'verdict': 'HIGH EFFICIENCY GROUND EDGE',
-                'rationale': f"Target rushing yards / carries. {team_code} executes perimeter stretch zone against {opp_code}'s #{run_def.get('def_zone_rank', 16)} ranked Zone run defense ({run_def.get('def_zone_ypc_allowed', 4.3):.2f} YPC allowed).",
-                'causal_mechanism': 'Perimeter stretch schemes exploit slow-flowing edge defenders, opening cutback lanes for primary backs.',
-                'priority': 94.0 + (zone_ypc * 2.0)
+                'context_metric': f"{team_ypc:.2f} YPC ({dominant_scheme})",
+                'season_baseline': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC)",
+                'scheme_delta': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC Allowed)",
+                'verdict': 'TOUGH TRENCH MATCHUP',
+                'rationale': f"Proceed with caution on rushing props. {team_code}'s ground game faces {opp_code}'s stout #{opp_def_rank} ranked {dominant_scheme} run defense ({opp_def_ypc:.2f} YPC allowed). Trench penetration limits explosive rush lanes.",
+                'causal_mechanism': 'Elite front sevens maintain interior gap integrity and shed blocks quickly, bottling up early-down rushing attempts.',
+                'priority': 74.0 + (team_ypc * 1.5) - (15 - opp_def_rank) * 1.0
+            })
+        elif opp_def_rank >= 18 or opp_def_ypc >= 4.40:
+            # Vulnerable run defense - genuine matchup advantage
+            delta = round(opp_def_ypc - 4.25, 2)
+            cands.append({
+                'player': lead_rusher,
+                'team': team_code,
+                'pos': 'RB',
+                'scheme_type': scheme_label,
+                'stat_focus': 'Rushing Yards',
+                'prop_angle': 'Prop Target: Rushing Yards (Ground Attack)',
+                'context_metric': f"{team_ypc:.2f} YPC on {dominant_scheme} Carries",
+                'season_baseline': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC)",
+                'scheme_delta': f"+{delta:.2f} YPC Def Leakage" if delta > 0 else f"#{opp_def_rank} Def Mismatch",
+                'verdict': 'PRIME GROUND MISMATCH' if opp_def_rank >= 22 or opp_def_ypc >= 4.60 else 'HIGH EFFICIENCY GROUND EDGE',
+                'rationale': f"Target rushing yards / carries. {team_code} attacks {opp_code}'s vulnerable #{opp_def_rank} ranked {dominant_scheme} run defense ({opp_def_ypc:.2f} YPC allowed). Clean blocking boxes open consistent cutback and downhill lanes.",
+                'causal_mechanism': 'Defenses struggling with run fits yield elevated yards before contact, allowing primary ballcarriers to reach second-level burst.',
+                'priority': 93.0 + (opp_def_ypc - 4.20) * 8.0 + (team_ypc - 4.20) * 4.0
             })
         else:
-            delta = gap_ypc - zone_ypc
+            delta = round(team_ypc - 4.25, 2)
             cands.append({
                 'player': lead_rusher,
                 'team': team_code,
                 'pos': 'RB',
-                'scheme_type': 'Gap Power Ground Edge',
+                'scheme_type': scheme_label,
                 'stat_focus': 'Rushing Yards',
                 'prop_angle': 'Prop Target: Rushing Yards (Ground Attack)',
-                'context_metric': f"{gap_ypc:.2f} YPC on Gap Carries",
-                'season_baseline': f"{zone_ypc:.2f} Zone YPC",
-                'scheme_delta': f"+{delta:.2f} YPC Gap Edge" if delta > 0 else f"{gap_ypc:.2f} Gap YPC",
-                'verdict': 'HIGH EFFICIENCY GROUND EDGE',
-                'rationale': f"Target rushing yards / carries. {team_code} runs downhill gap schemes against {opp_code}'s #{run_def.get('def_gap_rank', 16)} ranked Gap run stop ({run_def.get('def_gap_ypc_allowed', 4.1):.2f} YPC allowed).",
-                'causal_mechanism': 'Defenses with poor interior gap discipline yield elevated yards before contact to downhill primary ballcarriers.',
-                'priority': 94.0 + (gap_ypc * 2.0)
+                'context_metric': f"{team_ypc:.2f} YPC ({dominant_scheme})",
+                'season_baseline': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC)",
+                'scheme_delta': f"+{delta:.2f} YPC Scheme Edge" if delta > 0 else f"{team_ypc:.2f} YPC Baseline",
+                'verdict': 'BALANCED GROUND ATTACK',
+                'rationale': f"Target rushing yards / carries. {team_code} operates balanced {dominant_scheme} ground concepts against {opp_code}'s #{opp_def_rank} ranked run front ({opp_def_ypc:.2f} YPC allowed).",
+                'causal_mechanism': 'Neutral trench matchup where run production relies on offensive execution and game-script volume.',
+                'priority': 85.0 + (team_ypc - 4.20) * 4.0
             })
 
         # 3. Mobile QB rushing candidate
@@ -1224,7 +1262,7 @@ def compute_scheme_insights(
                     'verdict': 'PRIME RUSHING CEILING',
                     'rationale': f"Target rushing yards over passing props. Faces {opp_code}'s heavy man coverage ({cov.get('man_pct', 30):.0f}%), where defensive backs turn their backs to chase receivers downfield, opening wide scramble lanes for {qb_name}.",
                     'causal_mechanism': 'Man-to-man coverage forces defensive backs to turn away from the pocket, vacating intermediate lanes for mobile QBs to scramble for chunk rushing yards.',
-                    'priority': 94.5
+                    'priority': 93.5 + cov.get('man_pct', 30) * 0.1
                 })
             elif cov.get('mfo_pct', 50) >= 48.0:
                 cands.append({
@@ -1240,7 +1278,7 @@ def compute_scheme_insights(
                     'verdict': 'ELEVATED RUSHING FLOOR',
                     'rationale': f"Target rushing yards. {opp_code} defends with 2 deep safeties ({cov.get('mfo_pct', 50):.0f}% MFO), lightening the defensive box to 6 defenders and creating wide lanes for {qb_name}'s designed power runs and scrambles.",
                     'causal_mechanism': 'Two-high safety shells remove an extra defender from the front box, creating numerical leverage for quarterback-designed rushes.',
-                    'priority': 92.5
+                    'priority': 91.5 + cov.get('mfo_pct', 50) * 0.05
                 })
 
         # Fallback if no candidate found for team
@@ -1262,77 +1300,31 @@ def compute_scheme_insights(
                 'priority': 70.0
             })
 
-        # Deduplicate candidates by player name and sort by priority descending
+        # Deduplicate candidates by player name and keep priority intact
         seen = set()
         deduped = []
-        for c in sorted(cands, key=lambda x: x['priority'], reverse=True):
+        for c in sorted(cands, key=lambda x: x.get('priority', 0), reverse=True):
             if c['player'] not in seen:
                 seen.add(c['player'])
-                c_clean = {k: v for k, v in c.items() if k != 'priority'}
-                deduped.append(c_clean)
+                deduped.append(c)
         return deduped
 
     away_cands = _extract_team_breakouts(a_team, a_profile, h_team, h_profile)
     home_cands = _extract_team_breakouts(h_team, h_profile, a_team, a_profile)
 
-    # Curate strictly between 2 and 4 players with guaranteed multi-position diversity
-    # Ensures we represent WR (deep yards or short receptions), RB (rushing yards), TE (close catches/seams), and mobile QB
+    # Combine all candidates from both teams and rank strictly by scheme edge priority
+    # No forced position quotas - selects the pure top 4 highest-conviction betting angles overall (WR, RB, TE, or QB)
+    all_cands = sorted(away_cands + home_cands, key=lambda x: x.get('priority', 0), reverse=True)
     selected: List[Dict[str, Any]] = []
     selected_players = set()
-    selected_positions = set()
 
-    def _add_cand(cand: Dict[str, Any]) -> bool:
-        if cand and cand['player'] not in selected_players:
-            selected.append(cand)
+    for cand in all_cands:
+        if cand['player'] not in selected_players:
             selected_players.add(cand['player'])
-            selected_positions.add(cand['pos'])
-            return True
-        return False
-
-    # 1. Pick top RB ground edge (Rushing Yards)
-    all_rbs = [c for c in away_cands + home_cands if c['pos'] == 'RB']
-    if all_rbs:
-        _add_cand(all_rbs[0])
-
-    # 2. Pick top WR edge (Receiving Yards if deep, Receptions if short)
-    all_wrs = [c for c in away_cands + home_cands if c['pos'] == 'WR']
-    if all_wrs:
-        _add_cand(all_wrs[0])
-
-    # 3. Pick top TE (close catches / seams) or Mobile QB (rushing yards / scrambles)
-    all_te_qb = [c for c in away_cands + home_cands if c['pos'] in ('TE', 'QB')]
-    if all_te_qb:
-        a_count = sum(1 for c in selected if c['team'] == a_team)
-        h_count = sum(1 for c in selected if c['team'] == h_team)
-        target_team = a_team if a_count < h_count else (h_team if h_count < a_count else None)
-        matching = [c for c in all_te_qb if target_team is None or c['team'] == target_team]
-        if matching:
-            _add_cand(matching[0])
-        else:
-            _add_cand(all_te_qb[0])
-
-    # 4. Fill 4th slot to complete a 4-player slate with maximum position & team balance
-    all_remaining = [c for c in away_cands + home_cands if c['player'] not in selected_players]
-    missing_positions = [pos for pos in ('TE', 'QB', 'RB', 'WR') if pos not in selected_positions]
-    added_4th = False
-    for mp in missing_positions:
-        pos_cands = [c for c in all_remaining if c['pos'] == mp]
-        if pos_cands:
-            a_count = sum(1 for c in selected if c['team'] == a_team)
-            h_count = sum(1 for c in selected if c['team'] == h_team)
-            target_team = a_team if a_count < h_count else (h_team if h_count < a_count else None)
-            team_cands = [c for c in pos_cands if target_team is None or c['team'] == target_team]
-            cand_to_add = team_cands[0] if team_cands else pos_cands[0]
-            if _add_cand(cand_to_add):
-                added_4th = True
+            c_clean = {k: v for k, v in cand.items() if k != 'priority'}
+            selected.append(c_clean)
+            if len(selected) == 4:
                 break
-
-    if not added_4th and all_remaining:
-        a_count = sum(1 for c in selected if c['team'] == a_team)
-        h_count = sum(1 for c in selected if c['team'] == h_team)
-        target_team = a_team if a_count < h_count else (h_team if h_count < a_count else None)
-        team_cands = [c for c in all_remaining if target_team is None or c['team'] == target_team]
-        _add_cand(team_cands[0] if team_cands else all_remaining[0])
 
     # Ensure strictly between 2 and 4 players
     breakouts = selected[:4]
