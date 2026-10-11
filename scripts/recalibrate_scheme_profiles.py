@@ -12,40 +12,40 @@ profile_path = 'data/scheme_profiles_32.json'
 with open(profile_path, 'r', encoding='utf-8') as f:
     profiles = json.load(f)
 
-# Known primary targets mapping for 2026/2025 NFL rosters to guarantee proper starter names
+# Verified primary targets mapping for 2026 NFL rosters based on latest games
 ROSTER_STARTERS = {
-    'ARI': {'wr1': 'M.Harrison Jr.', 'wr2': 'M.Wilson', 'te': 'T.McBride', 'rb': 'J.Conner'},
-    'ATL': {'wr1': 'D.London', 'wr2': 'J.Dotson', 'te': 'K.Pitts', 'rb': 'B.Robinson'},
+    'ARI': {'wr1': 'Mi.Wilson', 'wr2': 'K.Bourne', 'te': 'T.McBride', 'rb': 'J.Love'},
+    'ATL': {'wr1': 'D.London', 'wr2': 'J.Dotson', 'te': 'K.Pitts', 'rb': 'Bi.Robinson'},
     'BAL': {'wr1': 'Z.Flowers', 'wr2': 'R.Bateman', 'te': 'M.Andrews', 'rb': 'D.Henry'},
-    'BUF': {'wr1': 'K.Shakir', 'wr2': 'A.Cooper', 'te': 'D.Kincaid', 'rb': 'J.Cook'},
-    'CAR': {'wr1': 'A.Thielen', 'wr2': 'X.Legette', 'te': 'J.Sanders', 'rb': 'C.Hubbard'},
-    'CHI': {'wr1': 'DJ Moore', 'wr2': 'R.Odunze', 'te': 'C.Kmet', 'rb': 'D.Swift'},
-    'CIN': {'wr1': "J.Chase", 'wr2': 'T.Higgins', 'te': 'M.Gesicki', 'rb': 'C.Brown'},
-    'CLE': {'wr1': 'J.Jeudy', 'wr2': 'E.Moore', 'te': 'D.Njoku', 'rb': 'N.Chubb'},
-    'DAL': {'wr1': 'C.Lamb', 'wr2': 'G.Pickens', 'te': 'J.Ferguson', 'rb': 'R.Dowdle'},
-    'DEN': {'wr1': 'C.Sutton', 'wr2': 'J.Waddle', 'te': 'E.Engram', 'rb': 'J.Dobbins'},
-    'DET': {'wr1': 'A.St. Brown', 'wr2': 'Ja.Williams', 'te': 'S.LaPorta', 'rb': 'J.Gibbs'},
-    'GB':  {'wr1': 'J.Reed', 'wr2': 'C.Watson', 'te': 'T.Kraft', 'rb': 'J.Jacobs'},
-    'HOU': {'wr1': 'N.Collins', 'wr2': 'T.Dell', 'te': 'D.Schultz', 'rb': 'D.Montgomery'},
-    'IND': {'wr1': 'M.Pittman Jr.', 'wr2': 'J.Downs', 'te': 'K.Granson', 'rb': 'J.Taylor'},
-    'JAX': {'wr1': 'B.Thomas Jr.', 'wr2': 'C.Kirk', 'te': 'E.Engram', 'rb': 'T.Etienne Jr.'},
-    'KC':  {'wr1': 'X.Worthy', 'wr2': 'R.Rice', 'te': 'T.Kelce', 'rb': 'I.Pacheco'},
-    'LA':  {'wr1': 'P.Nacua', 'wr2': 'D.Adams', 'te': 'C.Parkinson', 'rb': 'K.Williams'},
-    'LAC': {'wr1': 'L.McConkey', 'wr2': 'Q.Johnston', 'te': 'W.Dissly', 'rb': 'J.Dobbins'},
-    'LV':  {'wr1': 'J.Meyers', 'wr2': 'T.Tucker', 'te': 'B.Bowers', 'rb': 'A.Mattison'},
-    'MIA': {'wr1': 'T.Hill', 'wr2': 'M.Washington', 'te': 'J.Smith', 'rb': 'D.Achane'},
-    'MIN': {'wr1': 'J.Jefferson', 'wr2': 'J.Addison', 'te': 'T.Hockenson', 'rb': 'A.Jones'},
-    'NE':  {'wr1': 'A.Brown', 'wr2': 'D.Douglas', 'te': 'H.Henry', 'rb': 'R.Stevenson'},
-    'NO':  {'wr1': 'C.Olave', 'wr2': 'R.Shaheed', 'te': 'J.Johnson', 'rb': 'A.Kamara'},
-    'NYG': {'wr1': 'M.Nabers', 'wr2': 'W.Robinson', 'te': 'T.Johnson', 'rb': 'T.Tracy Jr.'},
-    'NYJ': {'wr1': 'G.Wilson', 'wr2': 'A.Mitchell', 'te': 'T.Conklin', 'rb': 'B.Hall'},
-    'PHI': {'wr1': 'D.Smith', 'wr2': 'J.Dotson', 'te': 'D.Goedert', 'rb': 'S.Barkley'},
-    'PIT': {'wr1': 'D.Metcalf', 'wr2': 'C.Austin III', 'te': 'P.Freiermuth', 'rb': 'N.Harris'},
-    'SEA': {'wr1': 'J.Smith-Njigba', 'wr2': 'C.Kupp', 'te': 'N.Fant', 'rb': 'K.Walker III'},
-    'SF':  {'wr1': 'D.Samuel', 'wr2': 'M.Evans', 'te': 'G.Kittle', 'rb': 'C.McCaffrey'},
-    'TB':  {'wr1': 'C.Godwin', 'wr2': 'J.McMillan', 'te': 'C.Otton', 'rb': 'B.Irving'},
-    'TEN': {'wr1': 'C.Ridley', 'wr2': 'T.Boyd', 'te': 'C.Okonkwo', 'rb': 'T.Pollard'},
-    'WAS': {'wr1': 'T.McLaurin', 'wr2': 'S.Diggs', 'te': 'Z.Ertz', 'rb': 'B.Robinson Jr.'}
+    'BUF': {'wr1': 'K.Shakir', 'wr2': 'D.Moore', 'te': 'D.Kincaid', 'rb': 'J.Cook'},
+    'CAR': {'wr1': 'T.McMillan', 'wr2': 'J.Coker', 'te': 'D.Waller', 'rb': 'C.Hubbard'},
+    'CHI': {'wr1': 'L.Burden', 'wr2': 'K.Raymond', 'te': 'C.Loveland', 'rb': 'D.Swift'},
+    'CIN': {'wr1': "T.Higgins", 'wr2': 'J.Chase', 'te': 'M.Gesicki', 'rb': 'C.Brown'},
+    'CLE': {'wr1': 'K.Concepcion', 'wr2': 'D.Boston', 'te': 'H.Fannin', 'rb': 'Q.Judkins'},
+    'DAL': {'wr1': 'C.Lamb', 'wr2': 'G.Pickens', 'te': 'J.Ferguson', 'rb': 'J.Williams'},
+    'DEN': {'wr1': 'J.Waddle', 'wr2': 'C.Sutton', 'te': 'E.Engram', 'rb': 'J.Dobbins'},
+    'DET': {'wr1': 'A.St. Brown', 'wr2': 'J.Williams', 'te': 'S.LaPorta', 'rb': 'J.Gibbs'},
+    'GB':  {'wr1': 'M.Golden', 'wr2': 'C.Watson', 'te': 'T.Kraft', 'rb': 'M.Lloyd'},
+    'HOU': {'wr1': 'N.Collins', 'wr2': 'X.Hutchinson', 'te': 'D.Schultz', 'rb': 'D.Montgomery'},
+    'IND': {'wr1': 'J.Downs', 'wr2': 'K.Allen', 'te': 'T.Warren', 'rb': 'J.Taylor'},
+    'JAX': {'wr1': 'P.Washington', 'wr2': 'B.Thomas Jr.', 'te': 'B.Strange', 'rb': 'B.Tuten'},
+    'KC':  {'wr1': 'X.Worthy', 'wr2': 'R.Rice', 'te': 'T.Kelce', 'rb': 'K.Walker'},
+    'LA':  {'wr1': 'D.Adams', 'wr2': 'P.Nacua', 'te': 'T.Higbee', 'rb': 'K.Williams'},
+    'LAC': {'wr1': 'T.Harris', 'wr2': 'Q.Johnston', 'te': 'O.Gadsden', 'rb': 'O.Hampton'},
+    'LV':  {'wr1': 'T.Tucker', 'wr2': 'J.Nailor', 'te': 'B.Bowers', 'rb': 'A.Jeanty'},
+    'MIA': {'wr1': 'M.Washington', 'wr2': 'C.Bell', 'te': 'G.Dulcich', 'rb': 'D.Achane'},
+    'MIN': {'wr1': 'J.Addison', 'wr2': 'J.Jefferson', 'te': 'T.Hockenson', 'rb': 'A.Jones'},
+    'NE':  {'wr1': 'M.Hollins', 'wr2': 'R.Doubs', 'te': 'H.Henry', 'rb': 'R.Stevenson'},
+    'NO':  {'wr1': 'C.Olave', 'wr2': 'D.Vele', 'te': 'J.Johnson', 'rb': 'T.Etienne'},
+    'NYG': {'wr1': 'M.Nabers', 'wr2': 'M.Fields', 'te': 'I.Likely', 'rb': 'C.Skattebo'},
+    'NYJ': {'wr1': 'G.Wilson', 'wr2': 'A.Mitchell', 'te': 'K.Sadiq', 'rb': 'B.Hall'},
+    'PHI': {'wr1': 'D.Smith', 'wr2': 'D.Wicks', 'te': 'D.Goedert', 'rb': 'S.Barkley'},
+    'PIT': {'wr1': 'D.Metcalf', 'wr2': 'R.Wilson', 'te': 'P.Freiermuth', 'rb': 'J.Warren'},
+    'SEA': {'wr1': 'J.Smith-Njigba', 'wr2': 'R.Shaheed', 'te': 'A.Barner', 'rb': 'E.Wilson'},
+    'SF':  {'wr1': 'M.Evans', 'wr2': 'D.Samuel', 'te': 'G.Kittle', 'rb': 'C.McCaffrey'},
+    'TB':  {'wr1': 'E.Egbuka', 'wr2': 'C.Godwin', 'te': 'C.Otton', 'rb': 'B.Irving'},
+    'TEN': {'wr1': 'C.Tate', 'wr2': 'W.Robinson', 'te': 'G.Helm', 'rb': 'T.Pollard'},
+    'WAS': {'wr1': 'S.Diggs', 'wr2': 'T.McLaurin', 'te': 'C.Okonkwo', 'rb': 'J.Croskey-Merritt'}
 }
 
 # Empirical metrics by player from parquet
@@ -73,7 +73,7 @@ for p_name, p_df in recent.groupby('player_name'):
 print(f"Cached empirical metrics for {len(player_stats_cache)} players.")
 
 # Specific alignments based on real play styles
-SLOT_SPECIALISTS = {'K.Shakir', 'W.Robinson', 'J.Downs', 'L.McConkey', 'J.Reed', 'C.Lamb', 'A.St. Brown', 'R.Rice', 'D.Douglas'}
+SLOT_SPECIALISTS = {'P.Washington', 'K.Shakir', 'W.Robinson', 'J.Downs', 'L.McConkey', 'J.Reed', 'C.Lamb', 'A.St. Brown', 'R.Rice', 'D.Douglas', 'M.Washington', 'K.Raymond'}
 
 updated_teams = 0
 for team_code, prof in profiles.items():
@@ -106,14 +106,19 @@ for team_code, prof in profiles.items():
     w1_dat = get_p_dat(wr1_name, {'target_share': 0.28, 'air_yards_share': 0.35, 'ypt': 8.8, 'adot': 11.2})
     w1_base = max(24.0, min(34.0, w1_dat['target_share'] * 100))
     is_w1_slot = wr1_name in SLOT_SPECIALISTS
-    w1_slot = 54.0 if is_w1_slot else 26.0
+    w1_slot = 58.0 if is_w1_slot else 26.0
     w1_out = 100.0 - w1_slot
-    # WR1 alpha gets target boost vs Man
-    w1_man_mult = 1.14 + (w1_dat.get('air_yards_share', 0.3) * 0.08)
-    w1_tgt_man = round(w1_base * w1_man_mult, 1)
-    w1_tgt_zone = round(w1_base * 0.94, 1)
-    w1_yprr_m = round(max(2.40, min(3.20, (w1_dat['ypt'] * 0.28) + 0.35)), 2)
-    w1_yprr_z = round(max(2.10, min(2.75, (w1_dat['ypt'] * 0.25) + 0.20)), 2)
+    if is_w1_slot:
+        w1_tgt_zone = round(w1_base * 1.10, 1)
+        w1_tgt_man = round(w1_base * 0.92, 1)
+        w1_yprr_z = round(max(2.20, min(2.85, (w1_dat['ypt'] * 0.26) + 0.25)), 2)
+        w1_yprr_m = round(max(1.80, min(2.50, (w1_dat['ypt'] * 0.24) + 0.15)), 2)
+    else:
+        w1_man_mult = 1.14 + (w1_dat.get('air_yards_share', 0.3) * 0.08)
+        w1_tgt_man = round(w1_base * w1_man_mult, 1)
+        w1_tgt_zone = round(w1_base * 0.94, 1)
+        w1_yprr_m = round(max(2.40, min(3.20, (w1_dat['ypt'] * 0.28) + 0.35)), 2)
+        w1_yprr_z = round(max(2.10, min(2.75, (w1_dat['ypt'] * 0.25) + 0.20)), 2)
     
     # 2. WR2 stats
     w2_dat = get_p_dat(wr2_name, {'target_share': 0.18, 'air_yards_share': 0.24, 'ypt': 8.0, 'adot': 12.5})

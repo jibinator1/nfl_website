@@ -31,12 +31,12 @@ TEAM_NAMES = {
 
 # Starting Quarterbacks and mobility / rushing archetypes for all franchises
 STARTING_QBS = {
-    'ARI': ('Kyler Murray', True, 38.5, 7.1),
-    'ATL': ('Kirk Cousins', False, 4.2, 2.5),
+    'ARI': ('Jacoby Brissett', False, 10.8, 2.9),
+    'ATL': ('Michael Penix Jr.', False, 4.0, 2.5),
     'BAL': ('Lamar Jackson', True, 54.2, 7.4),
     'BUF': ('Josh Allen', True, 42.0, 6.2),
     'CAR': ('Bryce Young', False, 14.5, 4.8),
-    'CHI': ('Caleb Williams', True, 26.5, 6.0),
+    'CHI': ('Caleb Williams', True, 36.5, 6.5),
     'CIN': ('Joe Burrow', False, 8.5, 3.2),
     'CLE': ('Deshaun Watson', False, 18.0, 4.5),
     'DAL': ('Dak Prescott', False, 10.5, 3.8),
@@ -44,25 +44,25 @@ STARTING_QBS = {
     'DET': ('Jared Goff', False, 2.5, 2.1),
     'GB': ('Jordan Love', False, 7.5, 3.4),
     'HOU': ('C.J. Stroud', False, 12.0, 4.2),
-    'IND': ('Anthony Richardson', True, 45.0, 6.8),
-    'JAX': ('Trevor Lawrence', False, 16.5, 4.5),
+    'IND': ('Daniel Jones', True, 26.5, 5.2),
+    'JAX': ('Trevor Lawrence', False, 14.5, 4.2),
     'KC': ('Patrick Mahomes', True, 24.5, 6.5),
-    'LAC': ('Justin Herbert', False, 11.0, 4.0),
+    'LAC': ('Justin Herbert', False, 16.0, 4.5),
     'LAR': ('Matthew Stafford', False, 2.0, 1.8),
     'LA': ('Matthew Stafford', False, 2.0, 1.8),
-    'LV': ('Gardner Minshew', False, 9.0, 3.5),
-    'MIA': ('Tua Tagovailoa', False, 6.5, 2.8),
-    'MIN': ('Sam Darnold', False, 11.5, 3.9),
+    'LV': ('Kirk Cousins', False, 4.2, 2.5),
+    'MIA': ('Malik Willis', True, 28.0, 5.9),
+    'MIN': ('Kyler Murray', True, 38.5, 7.1),
     'NE': ('Drake Maye', True, 34.0, 6.8),
-    'NO': ('Derek Carr', False, 5.5, 2.4),
-    'NYG': ('Daniel Jones', True, 32.5, 5.9),
-    'NYJ': ('Aaron Rodgers', False, 3.0, 2.0),
+    'NO': ('Tyler Shough', False, 18.0, 4.5),
+    'NYG': ('Jameis Winston', False, 8.5, 3.2),
+    'NYJ': ('Geno Smith', False, 14.0, 4.5),
     'PHI': ('Jalen Hurts', True, 38.5, 4.8),
-    'PIT': ('Russell Wilson', False, 12.5, 4.2),
-    'SEA': ('Geno Smith', False, 14.0, 4.5),
-    'SF': ('Brock Purdy', False, 12.0, 4.2),
-    'TB': ('Baker Mayfield', False, 13.5, 4.6),
-    'TEN': ('Will Levis', False, 10.5, 3.8),
+    'PIT': ('Aaron Rodgers', False, 4.0, 1.8),
+    'SEA': ('Sam Darnold', False, 11.5, 3.9),
+    'SF': ('Brock Purdy', False, 14.0, 4.5),
+    'TB': ('Baker Mayfield', False, 16.5, 4.8),
+    'TEN': ('Cam Ward', True, 22.0, 5.0),
     'WAS': ('Jayden Daniels', True, 48.0, 7.0),
 }
 
@@ -637,6 +637,24 @@ def _ensure_parquet_loaded():
                 pass
         _PARQUET_LOADED = True
 
+_PLAYER_LATEST_TEAM: Dict[str, str] = {}
+
+def _build_player_latest_team_map():
+    global _PLAYER_LATEST_TEAM, _WEEKLY_DF
+    if _WEEKLY_DF is not None and not _PLAYER_LATEST_TEAM:
+        try:
+            sorted_w = _WEEKLY_DF.sort_values(['season', 'week'], ascending=[False, False])
+            by_name = sorted_w.groupby('player_name').first()['team'].to_dict()
+            by_disp = sorted_w.groupby('player_display_name').first()['team'].to_dict()
+            _PLAYER_LATEST_TEAM = {**by_name, **by_disp}
+        except Exception:
+            pass
+
+def _get_player_latest_team(player_name: str) -> Optional[str]:
+    _ensure_parquet_loaded()
+    _build_player_latest_team_map()
+    return _PLAYER_LATEST_TEAM.get(player_name)
+
 def _get_team_trench_metrics(team_code: str) -> Dict[str, Any]:
     global _TEAM_PBP_SUMMARY_DF
     default_metrics = {
@@ -787,8 +805,26 @@ def get_team_scheme_profile(team: str) -> Dict[str, Any]:
     _ensure_profiles_loaded()
     t = team.upper()
     if t in TEAM_SCHEME_PROFILES:
-        return copy.deepcopy(TEAM_SCHEME_PROFILES[t])
-    return _build_generic_team_profile(t)
+        prof = copy.deepcopy(TEAM_SCHEME_PROFILES[t])
+    else:
+        prof = _build_generic_team_profile(t)
+
+    # Dynamic roster verification: ensure all key targets actually belong to this franchise based on their latest game
+    if 'target_alignment' in prof and 'key_targets' in prof['target_alignment']:
+        validated_targets = []
+        for tg in prof['target_alignment']['key_targets']:
+            p_name = tg.get('name', '')
+            latest_tm = _get_player_latest_team(p_name)
+            latest_norm = 'LA' if latest_tm == 'LAR' else latest_tm
+            t_norm = 'LA' if t == 'LAR' else t
+            if latest_norm and latest_norm != t_norm:
+                # Player was traded or played their latest game for another team
+                continue
+            validated_targets.append(tg)
+        prof['target_alignment']['key_targets'] = validated_targets
+
+    return prof
+
 
 
 def compute_scheme_insights(
@@ -1118,6 +1154,12 @@ def compute_scheme_insights(
 
         # 1. Target alignment candidates (WR, TE, RB)
         for p in team_prof.get('target_alignment', {}).get('key_targets', []):
+            p_name = p.get('name', '')
+            p_latest = _get_player_latest_team(p_name)
+            latest_norm = 'LA' if p_latest == 'LAR' else p_latest
+            t_norm = 'LA' if team_code == 'LAR' else team_code
+            if latest_norm and latest_norm != t_norm:
+                continue
             slot_share = p.get('slot_pct', 0)
             inline_share = p.get('inline_pct', 0)
             outside_share = p.get('outside_pct', 0)
@@ -1378,6 +1420,11 @@ def compute_scheme_insights(
             lead_rusher = rb_targets[0]
         else:
             lead_rusher = team_prof.get('tempo_situational', {}).get('red_zone_touch_leader', f'{team_code} Lead Back').split(' (')[0].split(' /')[0].strip()
+        rb_latest = _get_player_latest_team(lead_rusher)
+        latest_norm = 'LA' if rb_latest == 'LAR' else rb_latest
+        t_norm = 'LA' if team_code == 'LAR' else team_code
+        if rb_latest and latest_norm != t_norm:
+            lead_rusher = f"{team_code} Lead Back"
 
         zone_pct = team_run.get('offense_zone_pct', 50.0)
         gap_pct = team_run.get('offense_gap_pct', 50.0)
@@ -1514,6 +1561,11 @@ def compute_scheme_insights(
         # 3. Mobile QB rushing candidate
         qb_info = STARTING_QBS.get(team_code, (f"{team_code} Starting QB", False, 10.0, 3.5))
         qb_name, qb_mobile, qb_ypg, qb_scramble_ypc = qb_info
+        qb_latest = _get_player_latest_team(qb_name)
+        latest_norm = 'LA' if qb_latest == 'LAR' else qb_latest
+        t_norm = 'LA' if team_code == 'LAR' else team_code
+        if qb_latest and latest_norm != t_norm:
+            qb_name = f"{team_code} Starting QB"
         if qb_mobile:
             if cov.get('man_pct', 30) >= 28.0 or cov.get('cover_1', 20) >= 18.0:
                 z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5

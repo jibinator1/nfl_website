@@ -74,4 +74,30 @@ def test_adams_on_rams():
     nyj_players = [b['player'] for b in nyj_breakouts if b['team'] == 'NYJ']
     assert 'D.Adams' not in nyj_players
 
+def test_jax_engram_and_washington():
+    res = compute_scheme_insights('PHI', 'JAX')
+    breakouts = res.get('efficiency_breakouts', [])
+    jax_players = [b['player'] for b in breakouts if b['team'] == 'JAX']
+    
+    # Evan Engram must NOT be on JAX
+    assert 'E.Engram' not in jax_players
+    
+    # Parker Washington is JAX WR1 and appears in JAX breakouts
+    assert 'P.Washington' in jax_players
+    
+    # Brenton Strange is JAX TE1
+    assert 'B.Strange' in jax_players
+
+def test_den_engram():
+    from backend.scheme_insights import get_team_scheme_profile
+    den_prof = get_team_scheme_profile('DEN')
+    den_targets = [t['name'] for t in den_prof['target_alignment']['key_targets']]
+    assert 'E.Engram' in den_targets
+
+    # Evan Engram should not be in JAX profile
+    jax_prof = get_team_scheme_profile('JAX')
+    jax_targets = [t['name'] for t in jax_prof['target_alignment']['key_targets']]
+    assert 'E.Engram' not in jax_targets
+    assert 'P.Washington' in jax_targets
+
 
