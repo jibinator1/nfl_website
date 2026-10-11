@@ -4594,11 +4594,11 @@
                         scheme_type: 'Boundary Deep Ball Threat',
                         stat_focus: 'Receiving Yards',
                         prop_angle: 'Prop Target: Receiving Yards (Deep Balls)',
-                        context_metric: '28.5% Tgt Share vs Zone',
-                        season_baseline: '32.0% vs Man',
-                        scheme_delta: '+6.5% vs Zone Shell',
+                        context_metric: `${(hMan >= 30 ? 32.5 : 28.5)}% Tgt Share vs Man`,
+                        season_baseline: `${(hMan >= 30 ? 26.5 : 23.5)}% vs Zone`,
+                        scheme_delta: `+${((hMan >= 30 ? 32.5 : 28.5) - (hMan >= 30 ? 26.5 : 23.5)).toFixed(1)}% vs Man Coverage`,
                         verdict: 'PRIME BREAKOUT SPOT',
-                        rationale: `Target receiving yards over receptions. 1-on-1 boundary go routes and vertical shots attack soft single coverage on the perimeter, yielding explosive chunk yardage rather than high volume catches.`,
+                        rationale: `Target receiving yards over receptions. 1-on-1 boundary go routes and vertical shots attack ${h}'s single-high/man looks (${hMan}%), yielding explosive chunk yardage rather than high volume catches.`,
                         causal_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.'
                     },
                     {
@@ -4608,9 +4608,9 @@
                         scheme_type: 'TE Close Catches / Middle Voids',
                         stat_focus: 'Receptions',
                         prop_angle: 'Prop Target: Receptions (TE Close Catches)',
-                        context_metric: '21.0% Tgt Share vs Zone (2.10 YPRR)',
-                        season_baseline: '16.5% vs Man',
-                        scheme_delta: '+4.5% Zone Target Funnel',
+                        context_metric: `${(hZone >= 60 ? 22.5 : 19.5)}% Tgt Share vs Zone (2.10 YPRR)`,
+                        season_baseline: `${(hZone >= 60 ? 16.5 : 15.0)}% vs Man`,
+                        scheme_delta: `+${((hZone >= 60 ? 22.5 : 19.5) - (hZone >= 60 ? 16.5 : 15.0)).toFixed(1)}% Zone Target Funnel`,
                         verdict: 'HIGH RECEPTION FLOOR',
                         rationale: `Target receptions on close catches over receiving yards. Short hook and drag routes settle into soft intermediate voids between linebackers in ${h}'s ${hZone}% zone shell for dependable, chain-moving close catches.`,
                         causal_mechanism: 'Linebackers drop deep in zone coverage, leaving tight ends uncovered on short-to-intermediate crossing and sit routes.'
