@@ -48,10 +48,10 @@
           "slot_pct": 26.0,
           "outside_pct": 74.0,
           "inline_pct": 0.0,
-          "tgt_man": 32.7,
-          "tgt_zone": 26.3,
-          "yprr_man": 2.81,
-          "yprr_zone": 2.4
+          "tgt_man": 27.7,
+          "tgt_zone": 22.6,
+          "yprr_man": 2.54,
+          "yprr_zone": 2.15
         },
         {
           "name": "M.Wilson",
@@ -135,8 +135,8 @@
       "identity": "Heavy Zone / Outside Stretch scheme featuring B.Robinson."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 10.7,
       "short_pct": 76.3,
@@ -157,13 +157,13 @@
         {
           "name": "D.Mooney",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 16.7,
-          "tgt_zone": 17.9,
-          "yprr_man": 1.97,
-          "yprr_zone": 1.84
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.63,
+          "yprr_zone": 2.23
         },
         {
           "name": "K.Pitts",
@@ -539,8 +539,8 @@
       "identity": "Balanced multi-concept run scheme featuring D.Swift."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 9.7,
       "short_pct": 71.2,
@@ -561,13 +561,13 @@
         {
           "name": "R.Odunze",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 19.5,
-          "tgt_zone": 20.9,
-          "yprr_man": 1.87,
-          "yprr_zone": 1.75
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.6,
+          "yprr_zone": 2.15
         },
         {
           "name": "C.Kmet",
@@ -640,8 +640,8 @@
       "identity": "Downhill Gap / Power / Duo interior attack led by C.Brown."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 12.8,
       "short_pct": 79.9,
@@ -662,13 +662,13 @@
         {
           "name": "T.Higgins",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 21.2,
-          "tgt_zone": 22.8,
-          "yprr_man": 2.12,
-          "yprr_zone": 1.98
+          "tgt_man": 25.7,
+          "tgt_zone": 20.8,
+          "yprr_man": 2.81,
+          "yprr_zone": 2.39
         },
         {
           "name": "M.Gesicki",
@@ -842,8 +842,8 @@
       "identity": "Downhill Gap / Power / Duo interior attack led by J.Williams."
     },
     "target_alignment": {
-      "slot_wr_pct": 23.4,
-      "wide_wr_pct": 41.6,
+      "slot_wr_pct": 24.1,
+      "wide_wr_pct": 41.0,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 9.5,
       "short_pct": 77.9,
@@ -862,15 +862,15 @@
           "yprr_zone": 2.37
         },
         {
-          "name": "J.Tolbert",
+          "name": "G.Pickens",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.74,
-          "yprr_zone": 1.62
+          "tgt_man": 28.0,
+          "tgt_zone": 22.7,
+          "yprr_man": 3.02,
+          "yprr_zone": 2.59
         },
         {
           "name": "J.Ferguson",
@@ -968,10 +968,10 @@
           "slot_pct": 18.0,
           "outside_pct": 82.0,
           "inline_pct": 0.0,
-          "tgt_man": 17.3,
-          "tgt_zone": 18.5,
-          "yprr_man": 1.94,
-          "yprr_zone": 1.81
+          "tgt_man": 15.4,
+          "tgt_zone": 16.5,
+          "yprr_man": 1.91,
+          "yprr_zone": 1.78
         },
         {
           "name": "G.Dulcich",
@@ -1145,8 +1145,8 @@
       "identity": "Balanced multi-concept run scheme featuring J.Jacobs."
     },
     "target_alignment": {
-      "slot_wr_pct": 23.4,
-      "wide_wr_pct": 41.6,
+      "slot_wr_pct": 24.1,
+      "wide_wr_pct": 41.0,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 9.5,
       "short_pct": 73.0,
@@ -1167,13 +1167,13 @@
         {
           "name": "C.Watson",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 17.1,
-          "tgt_zone": 18.3,
-          "yprr_man": 2.25,
-          "yprr_zone": 2.15
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 3.15,
+          "yprr_zone": 2.7
         },
         {
           "name": "T.Kraft",
@@ -1462,10 +1462,10 @@
           "slot_pct": 26.0,
           "outside_pct": 74.0,
           "inline_pct": 0.0,
-          "tgt_man": 32.7,
-          "tgt_zone": 26.3,
-          "yprr_man": 2.81,
-          "yprr_zone": 2.4
+          "tgt_man": 28.0,
+          "tgt_zone": 22.6,
+          "yprr_man": 2.84,
+          "yprr_zone": 2.42
         },
         {
           "name": "C.Kirk",
@@ -1953,8 +1953,8 @@
       "identity": "Heavy Zone / Outside Stretch scheme featuring D.Achane."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 16.0,
       "short_pct": 78.1,
@@ -1975,13 +1975,13 @@
         {
           "name": "J.Waddle",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 19.2,
-          "tgt_zone": 20.6,
-          "yprr_man": 2.12,
-          "yprr_zone": 1.99
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.81,
+          "yprr_zone": 2.4
         },
         {
           "name": "J.Smith",
@@ -2054,8 +2054,8 @@
       "identity": "Balanced multi-concept run scheme featuring A.Jones."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 11.9,
       "short_pct": 70.6,
@@ -2076,13 +2076,13 @@
         {
           "name": "J.Addison",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 19.3,
-          "tgt_zone": 20.7,
-          "yprr_man": 2.0,
-          "yprr_zone": 1.86
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.66,
+          "yprr_zone": 2.26
         },
         {
           "name": "T.Hockenson",
@@ -2256,8 +2256,8 @@
       "identity": "Balanced multi-concept run scheme featuring A.Kamara."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 16.0,
       "short_pct": 74.3,
@@ -2278,13 +2278,13 @@
         {
           "name": "R.Shaheed",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 17.0,
-          "tgt_zone": 18.2,
-          "yprr_man": 1.82,
-          "yprr_zone": 1.7
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.6,
+          "yprr_zone": 2.15
         },
         {
           "name": "J.Johnson",
@@ -2360,7 +2360,7 @@
       "slot_wr_pct": 30.6,
       "wide_wr_pct": 34.5,
       "inline_te_pct": 17.5,
-      "backfield_rb_pct": 12.0,
+      "backfield_rb_pct": 9.0,
       "short_pct": 75.9,
       "intermediate_pct": 8.6,
       "deep_pct": 15.5,
@@ -2404,10 +2404,10 @@
           "slot_pct": 10.0,
           "outside_pct": 5.0,
           "inline_pct": 0.0,
-          "tgt_man": 9.0,
-          "tgt_zone": 15.0,
-          "yprr_man": 0.94,
-          "yprr_zone": 1.43
+          "tgt_man": 6.8,
+          "tgt_zone": 11.2,
+          "yprr_man": 0.91,
+          "yprr_zone": 1.4
         }
       ]
     },
@@ -2458,8 +2458,8 @@
       "identity": "Balanced multi-concept run scheme featuring B.Hall."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 12.2,
       "short_pct": 76.2,
@@ -2480,13 +2480,13 @@
         {
           "name": "D.Adams",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 22.6,
-          "tgt_zone": 24.2,
-          "yprr_man": 1.86,
-          "yprr_zone": 1.73
+          "tgt_man": 30.7,
+          "tgt_zone": 24.9,
+          "yprr_man": 2.6,
+          "yprr_zone": 2.15
         },
         {
           "name": "T.Conklin",
@@ -2669,15 +2669,15 @@
       "deep_pct": 15.2,
       "key_targets": [
         {
-          "name": "G.Pickens",
+          "name": "C.Austin III",
           "pos": "WR",
           "slot_pct": 26.0,
           "outside_pct": 74.0,
           "inline_pct": 0.0,
-          "tgt_man": 28.2,
-          "tgt_zone": 22.7,
-          "yprr_man": 3.02,
-          "yprr_zone": 2.59
+          "tgt_man": 27.8,
+          "tgt_zone": 22.6,
+          "yprr_man": 2.63,
+          "yprr_zone": 2.24
         },
         {
           "name": "V.Jefferson",
@@ -2761,8 +2761,8 @@
       "identity": "Downhill Gap / Power / Duo interior attack led by Z.Charbonnet."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 12.0,
       "short_pct": 75.7,
@@ -2783,13 +2783,13 @@
         {
           "name": "J.Smith-Njigba",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 22.6,
-          "tgt_zone": 24.2,
-          "yprr_man": 2.25,
-          "yprr_zone": 2.15
+          "tgt_man": 30.7,
+          "tgt_zone": 24.9,
+          "yprr_man": 3.14,
+          "yprr_zone": 2.69
         },
         {
           "name": "N.Fant",
@@ -3168,7 +3168,7 @@
       "slot_wr_pct": 14.3,
       "wide_wr_pct": 50.7,
       "inline_te_pct": 17.5,
-      "backfield_rb_pct": 12.0,
+      "backfield_rb_pct": 10.7,
       "short_pct": 75.7,
       "intermediate_pct": 8.3,
       "deep_pct": 16.0,
@@ -3212,10 +3212,10 @@
           "slot_pct": 10.0,
           "outside_pct": 5.0,
           "inline_pct": 0.0,
-          "tgt_man": 9.0,
-          "tgt_zone": 15.0,
-          "yprr_man": 0.94,
-          "yprr_zone": 1.43
+          "tgt_man": 8.0,
+          "tgt_zone": 13.4,
+          "yprr_man": 1.1,
+          "yprr_zone": 1.64
         }
       ]
     },

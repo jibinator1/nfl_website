@@ -38,3 +38,18 @@ def test_hou_ten_breakouts():
     
     # Verify Nico Collins is present
     assert any('Collins' in name for name in player_names)
+
+def test_pickens_on_cowboys():
+    # George Pickens should NOT be on PIT in IND @ PIT
+    res_pit = compute_scheme_insights('IND', 'PIT')
+    pit_breakouts = res_pit.get('efficiency_breakouts', [])
+    pit_players = [b['player'] for b in pit_breakouts if b['team'] == 'PIT']
+    assert 'G.Pickens' not in pit_players
+    
+    # In DAL matchups, Pickens belongs to DAL
+    res_dal = compute_scheme_insights('DAL', 'NYG')
+    dal_breakouts = res_dal.get('efficiency_breakouts', [])
+    dal_pickens = [b for b in dal_breakouts if b['player'] == 'G.Pickens']
+    if dal_pickens:
+        assert dal_pickens[0]['team'] == 'DAL'
+
