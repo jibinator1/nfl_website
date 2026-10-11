@@ -4091,6 +4091,15 @@
                         <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${breakouts.length} Players Curated</span>
                     </div>
 
+                    <!-- Market Line Provenance & Validation Notice -->
+                    <div class="bg-amber-950/20 border border-amber-500/30 rounded-lg p-2.5 flex items-start gap-2.5 text-[11px] text-amber-200/90 leading-relaxed font-sans">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <div>
+                            <span class="font-bold text-amber-300">Market Validation Notice:</span>
+                            Live 2026 prop picks are matched against real sportsbook lines via <b class="text-amber-200">The Odds API</b> (DraftKings/FanDuel). Multi-season historical walk-forward backtesting (2023–2025) is currently frozen pending acquisition of complete historical closing prop lines from an institutional provider. Model edges reflect scheme projections vs current market lines and should be traded responsibly.
+                        </div>
+                    </div>
+
                     <div class="grid ${breakouts.length === 4 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : (breakouts.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2')} gap-3.5">
                         ${breakouts.map(b => `
                             <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 flex flex-col justify-between space-y-3 hover:border-slate-500 transition">
@@ -4116,9 +4125,14 @@
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
                                                 <span class="text-slate-300 font-semibold">Prop Focus:</span>
                                             </span>
-                                            <span class="font-bold px-2 py-0.5 rounded text-[10px] ${b.stat_focus === 'Receiving Yards' ? 'text-amber-300 bg-amber-950/40 border border-amber-800/50' : (b.stat_focus === 'Receptions' ? 'text-emerald-300 bg-emerald-950/40 border border-emerald-800/50' : 'text-sky-300 bg-sky-950/40 border border-sky-800/50')}">
-                                                ${(b.prop_angle || b.stat_focus).replace(/^Prop Target:\s*/, '')}
-                                            </span>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-extrabold px-1.5 py-0.2 rounded text-[9.5px] ${b.side === 'Under' ? 'text-amber-300 bg-amber-950/80 border border-amber-500/60' : 'text-emerald-300 bg-emerald-950/80 border border-emerald-500/60'}">
+                                                    ${(b.side || 'Over').toUpperCase()}
+                                                </span>
+                                                <span class="font-bold px-2 py-0.5 rounded text-[10px] ${b.stat_focus === 'Receiving Yards' ? 'text-amber-300 bg-amber-950/40 border border-amber-800/50' : (b.stat_focus === 'Receptions' ? 'text-emerald-300 bg-emerald-950/40 border border-emerald-800/50' : 'text-sky-300 bg-sky-950/40 border border-sky-800/50')}">
+                                                    ${(b.prop_angle || b.stat_focus).replace(/^Prop Target:\s*/, '')}
+                                                </span>
+                                            </div>
                                         </div>
                                     ` : ''}
 
@@ -4131,7 +4145,7 @@
                                                 </span>
                                                 <div class="flex items-center space-x-1.5">
                                                     <span class="font-bold text-emerald-400 text-xs">${b.win_prob_fmt || (b.win_prob * 100).toFixed(1) + '%'}</span>
-                                                    <span class="text-[9.5px] px-1.5 py-0.2 rounded font-bold ${b.confidence_tier && b.confidence_tier.includes('Grade A') ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-700/60' : 'bg-sky-950/60 text-sky-300 border border-sky-700/60'}">${b.confidence_tier ? b.confidence_tier.split(' ')[0] + ' ' + b.confidence_tier.split(' ')[1] : 'Grade A'}</span>
+                                                    <span class="text-[9.5px] px-1.5 py-0.2 rounded font-bold ${b.confidence_tier && b.confidence_tier.includes('Model-Flagged') ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-700/60' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${b.confidence_tier ? b.confidence_tier.split('(')[0].trim() : 'Model-Flagged'}</span>
                                                 </div>
                                             </div>
                                             <div class="flex items-center justify-between text-[11px] text-slate-300 border-t border-[#21262d] pt-1">

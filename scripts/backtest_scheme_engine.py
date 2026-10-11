@@ -134,16 +134,37 @@ def collect_historical_props(seasons: List[int] = [2023, 2024, 2025], max_weeks:
 
                     actual_row = p_rows.iloc[0]
 
+                    # 1. DNP / Inactive Filter (Sportsbooks VOID props on inactive players with 0 opportunity)
+                    if stat_focus in ('Receiving Yards', 'Receptions'):
+                        targets = float(actual_row.get('targets', 0.0) or 0.0)
+                        rec_yds = float(actual_row.get('receiving_yards', 0.0) or 0.0)
+                        receptions = float(actual_row.get('receptions', 0.0) or 0.0)
+                        if targets == 0 and rec_yds == 0 and receptions == 0:
+                            continue  # Player inactive / DNP -- real sportsbooks void the bet!
+
+                    if stat_focus == 'Rushing Yards':
+                        carries = float(actual_row.get('attempts', 0.0) or actual_row.get('rushing_attempts', 0.0) or 0.0)
+                        rush_yds = float(actual_row.get('rushing_yards', 0.0) or 0.0)
+                        if carries == 0 and rush_yds == 0:
+                            continue  # Player inactive / DNP -- real sportsbooks void the bet!
+
+                    # 2. Determine bet side (Over vs Under)
+                    side = b.get('side', '')
+                    if not side:
+                        tier_hint = b.get('confidence_tier', '')
+                        if 'Under' in tier_hint or 'Caution' in tier_hint or fair_line < mkt_line:
+                            side = 'Under'
+                        else:
+                            side = 'Over'
+
+                    is_over = (side == 'Over')
+
                     if stat_focus == 'Receiving Yards':
                         actual_val = float(actual_row.get('receiving_yards', 0.0) or 0.0)
-                        is_over = True
                     elif stat_focus == 'Receptions':
                         actual_val = float(actual_row.get('receptions', 0.0) or 0.0)
-                        is_over = True
                     elif stat_focus == 'Rushing Yards':
                         actual_val = float(actual_row.get('rushing_yards', 0.0) or 0.0)
-                        tier_hint = b.get('confidence_tier', '')
-                        is_over = ('Under' not in tier_hint and 'Caution' not in tier_hint)
                     else:
                         continue
 
@@ -228,13 +249,13 @@ def evaluate_split(
         # Assign tier strictly from calibrated probability
         ev_pct = ((p_cal - 0.5238) / 0.5238) * 100.0
         if ev_pct > 12.0:
-            tier = 'Grade A (Review / High Edge)'
+            tier = 'Model-Flagged Edge (Grade A)'
         elif p_cal >= 0.565:
-            tier = 'Grade A (High Conviction)'
+            tier = 'Model-Flagged Edge (Grade A)'
         elif p_cal >= 0.535:
-            tier = 'Grade B (Solid Edge)'
+            tier = 'Model-Flagged Edge (Grade B)'
         else:
-            tier = 'Grade C (Caution / Under)' if not row['is_over'] else 'Grade C (Marginal Edge)'
+            tier = 'Model-Neutral (Grade C)'
 
         cal_probs.append(p_cal)
         tiers.append(tier)
@@ -274,8 +295,7 @@ def evaluate_split(
     print("-" * 80)
     print(f"{'Tier':<32} {'Bets':<7} {'Record':<12} {'Hit Rate':<10} {'95% CI':<18} {'ROI%':<8}")
     print("-" * 80)
-    for tier_label in ['Grade A (High Conviction)', 'Grade A (Review / High Edge)',
-                       'Grade B (Solid Edge)', 'Grade C (Marginal Edge)', 'Grade C (Caution / Under)']:
+    for tier_label in ['Model-Flagged Edge (Grade A)', 'Model-Flagged Edge (Grade B)', 'Model-Neutral (Grade C)']:
         t_df = test_graded[test_graded['confidence_tier'] == tier_label]
         n = len(t_df)
         if n == 0:
@@ -288,15 +308,18 @@ def evaluate_split(
         ci_str = f"[{lo*100:.1f}%, {hi*100:.1f}%]"
         print(f"{tier_label:<32} {n:<7} {t_wins}W-{t_losses}L{'':<4} {t_hr:.1f}%{'':<4} {ci_str:<18} {t_roi:+.1f}%")
 
-    # Combine all Grade A
-    grade_a_df = test_graded[test_graded['confidence_tier'].str.startswith('Grade A')]
-    ga_n = len(grade_a_df)
+    # Combine all Model-Flagged
+    flagged_df = test_graded[test_graded['confidence_tier'].str.startswith('Model-Flagged')]
+    ga_n = len(flagged_df)
     if ga_n > 0:
-        ga_w = int((grade_a_df['won'] == 1).sum())
-        ga_l = int((grade_a_df['won'] == 0).sum())
+        ga_w = int((flagged_df['won'] == 1).sum())
+        ga_l = int((flagged_df['won'] == 0).sum())
         ga_hr = (ga_w / ga_n) * 100.0
-        ga_roi = (grade_a_df['profit'].sum() / ga_n) * 100.0
+        ga_roi = (flagged_df['profit'].sum() / ga_n) * 100.0
         ga_lo, ga_hi = wilson_ci(ga_w, ga_n)
+        ga_ci = f"[{ga_lo*100:.1f}%, {ga_hi*100:.1f}%]"
+        print("-" * 80)
+        print(f"{'ALL MODEL-FLAGGED (Grade A+B)':<32} {ga_n:<7} {ga_w}W-{ga_l}L{'':<4} {ga_hr:.1f}%{'':<4} {ga_ci:<18} {ga_roi:+.1f}%")
         print("-" * 80)
         print(f"{'ALL GRADE A COMBINED':<32} {ga_n:<7} {ga_w}W-{ga_l}L{'':<4} {ga_hr:.1f}%{'':<4} [{ga_lo*100:.1f}%, {ga_hi*100:.1f}%]{'':<2} {ga_roi:+.1f}%")
 

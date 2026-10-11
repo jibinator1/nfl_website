@@ -34,6 +34,7 @@ def test_scheme_top4_breakouts():
             assert 'EV' in b.get('ev_pct', ''), f"Missing EV in {b}"
             assert b.get('ev_pct_num', 0) <= 14.0, f"Implausibly large EV {b.get('ev_pct_num')} in {b}"
             assert 'Grade' in b.get('confidence_tier', ''), f"Missing confidence_tier in {b}"
+            assert b.get('side') in ('Over', 'Under'), f"Missing or invalid side in {b}"
             assert b.get('z_score', '').endswith('z'), f"Missing z_score in {b}"
 
 def test_hou_ten_breakouts():
