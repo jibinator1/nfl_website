@@ -20,13 +20,20 @@ def test_scheme_top4_breakouts():
         players = [b['player'] for b in breakouts]
         assert len(players) == len(set(players)), f"Duplicates in {a}@{h}: {players}"
         
-        # Verify clean structure
+        # Verify clean structure & market-aware probabilistic metrics
         for b in breakouts:
             assert 'priority' not in b, f"Priority leaked in {b['player']}"
             assert b['player'] and b['team'] and b['pos'], f"Missing basic info in {b}"
             assert b['stat_focus'] in ('Receiving Yards', 'Receptions', 'Rushing Yards'), f"Invalid stat_focus in {b}"
             assert b.get('scheme_delta'), f"Missing scheme_delta in {b}"
             assert b.get('rationale'), f"Missing rationale in {b}"
+            assert 0.40 <= b.get('win_prob', 0) <= 0.85, f"Invalid win_prob in {b}"
+            assert b.get('win_prob_fmt', '').endswith('%'), f"Invalid win_prob_fmt in {b}"
+            assert b.get('market_line'), f"Missing market_line in {b}"
+            assert b.get('fair_line'), f"Missing fair_line in {b}"
+            assert 'EV' in b.get('ev_pct', ''), f"Missing EV in {b}"
+            assert 'Grade' in b.get('confidence_tier', ''), f"Missing confidence_tier in {b}"
+            assert b.get('z_score', '').endswith('z'), f"Missing z_score in {b}"
 
 def test_hou_ten_breakouts():
     res = compute_scheme_insights('HOU', 'TEN')

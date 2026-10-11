@@ -604,6 +604,7 @@ _PROFILES_LOADED = False
 _PARQUET_LOADED = False
 _SCHEDULES_DF = None
 _WEEKLY_DF = None
+_TEAM_PBP_SUMMARY_DF = None
 
 def _ensure_profiles_loaded():
     global _PROFILES_LOADED
@@ -619,19 +620,78 @@ def _ensure_profiles_loaded():
         _PROFILES_LOADED = True
 
 def _ensure_parquet_loaded():
-    global _PARQUET_LOADED, _SCHEDULES_DF, _WEEKLY_DF
+    global _PARQUET_LOADED, _SCHEDULES_DF, _WEEKLY_DF, _TEAM_PBP_SUMMARY_DF
     if not _PARQUET_LOADED:
         data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
         sched_p = os.path.join(data_dir, 'schedules_cache.parquet')
         week_p = os.path.join(data_dir, 'weekly_cache.parquet')
+        pbp_p = os.path.join(data_dir, 'pbp_cache', 'team_pbp_summary.parquet')
         if os.path.exists(sched_p) and os.path.exists(week_p):
             try:
                 import pandas as pd
                 _SCHEDULES_DF = pd.read_parquet(sched_p)
                 _WEEKLY_DF = pd.read_parquet(week_p)
+                if os.path.exists(pbp_p):
+                    _TEAM_PBP_SUMMARY_DF = pd.read_parquet(pbp_p)
             except Exception:
                 pass
         _PARQUET_LOADED = True
+
+def _get_team_trench_metrics(team_code: str) -> Dict[str, Any]:
+    global _TEAM_PBP_SUMMARY_DF
+    default_metrics = {
+        'pressure_rate_allowed': 0.155,
+        'pressure_rate_generated': 0.155,
+        'rank_pressure_rate_allowed': 16,
+        'rank_pressure_rate_generated': 16,
+        'deep_pass_rate': 0.115,
+        'opp_deep_pass_rate': 0.115
+    }
+    _ensure_parquet_loaded()
+    if _TEAM_PBP_SUMMARY_DF is None:
+        return default_metrics
+    try:
+        row = _TEAM_PBP_SUMMARY_DF[_TEAM_PBP_SUMMARY_DF['team'] == team_code.upper()]
+        if not row.empty:
+            r = row.iloc[0]
+            return {
+                'pressure_rate_allowed': float(r.get('pressure_rate_allowed', 0.155)),
+                'pressure_rate_generated': float(r.get('pressure_rate_generated', 0.155)),
+                'rank_pressure_rate_allowed': int(r.get('rank_pressure_rate_allowed', 16)),
+                'rank_pressure_rate_generated': int(r.get('rank_pressure_rate_generated', 16)),
+                'deep_pass_rate': float(r.get('deep_pass_rate', 0.115)),
+                'opp_deep_pass_rate': float(r.get('opp_deep_pass_rate', 0.115))
+            }
+    except Exception:
+        pass
+    return default_metrics
+
+def _calc_win_prob_lognormal_median(market_line: float, fair_median: float, sigma: float = 0.45) -> float:
+    """
+    Calculates P(X > market_line) under Log-Normal distribution when fair median is fair_median.
+    """
+    if fair_median <= 0 or market_line <= 0:
+        return 0.50
+    mu = math.log(fair_median)
+    z = (math.log(market_line) - mu) / sigma
+    prob = 0.5 * (1.0 - math.erf(z / math.sqrt(2.0)))
+    return max(0.42, min(0.82, prob))
+
+def _calc_win_prob_poisson(market_line: float, expected_val: float) -> float:
+    """
+    Calculates P(X > market_line) when expected count is expected_val under Poisson distribution.
+    """
+    if expected_val <= 0 or market_line <= 0:
+        return 0.50
+    k = int(math.floor(market_line))
+    cdf = 0.0
+    term = math.exp(-expected_val)
+    cdf += term
+    for i in range(1, k + 1):
+        term *= (expected_val / i)
+        cdf += term
+    prob = 1.0 - cdf
+    return max(0.42, min(0.82, prob))
 
 def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = None, end_date: Optional[str] = None, schedules_df=None, weekly_df=None):
     _ensure_parquet_loaded()
@@ -1048,6 +1108,14 @@ def compute_scheme_insights(
         team_run = team_prof['run_scheme']
         cands = []
 
+        opp_trench = _get_team_trench_metrics(opp_code)
+        team_trench = _get_team_trench_metrics(team_code)
+        z_opp_pressure = (opp_trench['pressure_rate_generated'] - 0.155) / 0.025
+        z_opp_pressure = max(-2.5, min(2.5, z_opp_pressure))
+
+        # Dynamic empirical league baseline YPC
+        league_avg_ypc = 4.43
+
         # 1. Target alignment candidates (WR, TE, RB)
         for p in team_prof.get('target_alignment', {}).get('key_targets', []):
             slot_share = p.get('slot_pct', 0)
@@ -1058,7 +1126,21 @@ def compute_scheme_insights(
             # Tight End: Seam vs MFO or Close Catches vs Zone
             if pos == 'TE':
                 delta = p.get('tgt_zone', 0) - p.get('tgt_man', 0)
+                z_delta = max(-2.5, min(2.5, delta / 4.0))
+                z_tgt = (p.get('tgt_zone', 20.0) - 18.0) / 7.0
+                z_yprr = (p.get('yprr_zone', 1.6) - 1.45) / 0.40
+
                 if cov.get('mfo_pct', 50) >= 55.0:
+                    z_cov = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
+                    priority = 94.0 + (z_delta * 1.2) + (z_tgt * 0.5) + (z_yprr * 1.8) + (z_cov * 1.0) - (z_opp_pressure * 0.4)
+                    mkt_line = 44.5
+                    scheme_lift = 0.16 + (z_delta * 0.03) + (z_cov * 0.03)
+                    fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
+                    p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.46)
+                    ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                    tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                    z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.4, 2)}z"
+
                     cands.append({
                         'player': p['name'],
                         'team': team_code,
@@ -1072,9 +1154,30 @@ def compute_scheme_insights(
                         'verdict': 'PRIME BREAKOUT SPOT',
                         'rationale': f"Target receiving yards over receptions. Vertical seam routes straight down the hashmarks split {opp_code}'s {cov.get('mfo_pct', 50):.0f}% two-high safety shell for explosive chunk yardage in the vacated deep middle.",
                         'causal_mechanism': 'Middle-field open two-safety split creates vertical seam mismatches for inline tight ends, yielding explosive chunk gains.',
-                        'priority': 94.0 + delta
+                        'market_line': f"{mkt_line:.1f} Rec Yds",
+                        'market_line_num': mkt_line,
+                        'fair_line': f"{fair_line:.1f} Rec Yds",
+                        'fair_line_num': fair_line,
+                        'win_prob': round(p_win, 3),
+                        'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                        'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                        'ev_pct_num': ev_pct,
+                        'confidence_tier': tier,
+                        'z_score': z_str,
+                        'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
+                        'priority': priority
                     })
                 else:
+                    z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
+                    priority = 93.0 + (z_delta * 1.2) + (z_tgt * 0.6) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.5)
+                    mkt_line = 3.5
+                    scheme_lift = 0.18 + (z_delta * 0.03) + (z_cov * 0.03)
+                    fair_val = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
+                    p_win = _calc_win_prob_poisson(mkt_line, fair_val)
+                    ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                    tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                    z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
+
                     cands.append({
                         'player': p['name'],
                         'team': team_code,
@@ -1088,12 +1191,36 @@ def compute_scheme_insights(
                         'verdict': 'HIGH RECEPTION FLOOR',
                         'rationale': f"Target receptions on close catches over receiving yards. Short hook and drag routes settle into soft intermediate voids in {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone coverage for dependable, chain-moving close catches.",
                         'causal_mechanism': 'Linebackers drop deep in zone coverage, leaving tight ends uncovered on short-to-intermediate crossing and sit routes.',
-                        'priority': 93.0 + delta
+                        'market_line': f"{mkt_line:.1f} Receptions",
+                        'market_line_num': mkt_line,
+                        'fair_line': f"{fair_val:.1f} Receptions",
+                        'fair_line_num': fair_val,
+                        'win_prob': round(p_win, 3),
+                        'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                        'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                        'ev_pct_num': ev_pct,
+                        'confidence_tier': tier,
+                        'z_score': z_str,
+                        'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
+                        'priority': priority
                     })
 
             # Slot WR mismatch vs Zone: Short Throws -> Receptions
             elif pos == 'WR' and slot_share >= 35:
                 delta = p.get('tgt_zone', 0) - p.get('tgt_man', 0)
+                z_delta = max(-2.5, min(2.5, delta / 4.0))
+                z_tgt = (p.get('tgt_zone', 20.0) - 20.0) / 8.0
+                z_yprr = (p.get('yprr_zone', 1.8) - 1.75) / 0.50
+                z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
+                priority = 93.0 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.6)
+                mkt_line = 4.5
+                scheme_lift = 0.18 + (z_delta * 0.03) + (z_tgt * 0.02) + (z_cov * 0.02) + (z_opp_pressure * 0.03)
+                fair_val = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
+                p_win = _calc_win_prob_poisson(mkt_line, fair_val)
+                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                z_str = f"+{round(1.1 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
+
                 cands.append({
                     'player': p['name'],
                     'team': team_code,
@@ -1107,12 +1234,36 @@ def compute_scheme_insights(
                     'verdict': 'PRIME BREAKOUT SPOT' if delta >= 3.0 or p.get('tgt_zone', 0) >= 25 else 'ELEVATED TARGET CEILING',
                     'rationale': f"Target receptions over receiving yards. Quick slot option routes and crossing routes find soft cushions against {opp_code}'s {cov.get('zone_pct', 60):.1f}% zone coverage ({slot_share:.0f}% slot alignment), providing a high-volume reception floor.",
                     'causal_mechanism': 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.',
-                    'priority': 93.0 + delta + (p.get('tgt_zone', 0) * 0.5)
+                    'market_line': f"{mkt_line:.1f} Receptions",
+                    'market_line_num': mkt_line,
+                    'fair_line': f"{fair_val:.1f} Receptions",
+                    'fair_line_num': fair_val,
+                    'win_prob': round(p_win, 3),
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct_num': ev_pct,
+                    'confidence_tier': tier,
+                    'z_score': z_str,
+                    'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
+                    'priority': priority
                 })
 
             # Outside Alpha vs Man: Deep Balls -> Receiving Yards
             elif pos == 'WR' and outside_share >= 50 and (cov.get('man_pct', 30) >= 30.0 or p.get('tgt_man', 0) >= 25.0):
                 delta = p.get('tgt_man', 0) - p.get('tgt_zone', 0)
+                z_delta = max(-2.5, min(2.5, delta / 4.0))
+                z_tgt = (p.get('tgt_man', 24.0) - 20.0) / 8.0
+                z_yprr = (p.get('yprr_man', 2.2) - 1.75) / 0.50
+                z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5
+                priority = 92.5 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.8) + (z_cov * 1.2) - (z_opp_pressure * 0.6)
+                mkt_line = 64.5 if p.get('tgt_man', 0) >= 25.0 else 54.5
+                scheme_lift = 0.18 + (z_delta * 0.03) + (z_yprr * 0.03) + (z_cov * 0.03) - (z_opp_pressure * 0.02)
+                fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
+                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.46)
+                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                z_str = f"+{round(1.2 + max(0.0, z_yprr)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
+
                 cands.append({
                     'player': p['name'],
                     'team': team_code,
@@ -1126,11 +1277,34 @@ def compute_scheme_insights(
                     'verdict': 'PRIME BREAKOUT SPOT' if delta >= 3.0 else 'ELEVATED TARGET CEILING',
                     'rationale': f"Target receiving yards over receptions. 1-on-1 boundary go routes and vertical shots attack {opp_code}'s single-high/man looks ({cov.get('man_pct', 30):.1f}%), creating explosive chunk yardage rather than high catch volume.",
                     'causal_mechanism': 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
-                    'priority': 92.0 + delta + (p.get('tgt_man', 0) * 0.5)
+                    'market_line': f"{mkt_line:.1f} Rec Yds",
+                    'market_line_num': mkt_line,
+                    'fair_line': f"{fair_line:.1f} Rec Yds",
+                    'fair_line_num': fair_line,
+                    'win_prob': round(p_win, 3),
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct_num': ev_pct,
+                    'confidence_tier': tier,
+                    'z_score': z_str,
+                    'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
+                    'priority': priority
                 })
 
             # Outside WR vs Zone: Deep honey holes -> Receiving Yards
             elif pos == 'WR' and outside_share >= 50:
+                z_yprr = (p.get('yprr_zone', 2.0) - 1.75) / 0.50
+                z_tgt = (p.get('tgt_zone', 20.0) - 20.0) / 8.0
+                z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
+                priority = 91.0 + (z_yprr * 2.0) + (z_tgt * 0.6) + (z_cov * 0.8) - (z_opp_pressure * 0.4)
+                mkt_line = 54.5
+                scheme_lift = 0.15 + (z_yprr * 0.03) + (z_cov * 0.02)
+                fair_line = round(mkt_line * (1.0 + max(0.05, scheme_lift)), 1)
+                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.46)
+                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                z_str = f"+{round(1.0 + max(0.0, z_yprr)*0.4, 2)}z"
+
                 cands.append({
                     'player': p['name'],
                     'team': team_code,
@@ -1144,12 +1318,33 @@ def compute_scheme_insights(
                     'verdict': 'HIGH CEILING DEEP TARGET' if p.get('yprr_zone', 0) >= 2.4 else 'ELEVATED TARGET CEILING',
                     'rationale': f"Target receiving yards over receptions. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, boundary go routes and intermediate sideline comebacks target honey-hole voids behind outside cornerbacks for explosive yardage.",
                     'causal_mechanism': 'Zone coverage safeties rotate inside, exposing the boundary sideline where elite outside receivers find soft spots in the cover cushion.',
-                    'priority': 91.0 + (p.get('yprr_zone', 0) * 2.0)
+                    'market_line': f"{mkt_line:.1f} Rec Yds",
+                    'market_line_num': mkt_line,
+                    'fair_line': f"{fair_line:.1f} Rec Yds",
+                    'fair_line_num': fair_line,
+                    'win_prob': round(p_win, 3),
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct_num': ev_pct,
+                    'confidence_tier': tier,
+                    'z_score': z_str,
+                    'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
+                    'priority': priority
                 })
 
             # Backfield RB Checkdown: Short Throws -> Receptions
             elif pos == 'RB':
                 delta = p.get('tgt_zone', 0) - p.get('tgt_man', 0)
+                z_delta = max(-2.5, min(2.5, delta / 4.0))
+                z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
+                priority = 90.0 + (z_delta * 1.2) + (z_opp_pressure * 1.2) + (z_cov * 0.6)
+                mkt_line = 3.5
+                fair_val = round(mkt_line * (1.0 + 0.16 + (z_opp_pressure * 0.04) + (z_delta * 0.02)), 1)
+                p_win = _calc_win_prob_poisson(mkt_line, fair_val)
+                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                z_str = f"+{round(0.9 + max(0.0, z_opp_pressure)*0.4, 2)}z"
+
                 cands.append({
                     'player': p['name'],
                     'team': team_code,
@@ -1163,7 +1358,18 @@ def compute_scheme_insights(
                     'verdict': 'ELEVATED RECEPTION FLOOR',
                     'rationale': f"Target receptions over receiving yards. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, safety valve checkdowns funnel high-percentage dump-off catches into the flat.",
                     'causal_mechanism': 'Zone coverage drops linebackers deep into hook zones, leaving running backs open on underneath flare and checkdown routes.',
-                    'priority': 90.0 + delta
+                    'market_line': f"{mkt_line:.1f} Receptions",
+                    'market_line_num': mkt_line,
+                    'fair_line': f"{fair_val:.1f} Receptions",
+                    'fair_line_num': fair_val,
+                    'win_prob': round(p_win, 3),
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct_num': ev_pct,
+                    'confidence_tier': tier,
+                    'z_score': z_str,
+                    'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
+                    'priority': priority
                 })
 
         # 2. Ground attack candidates (Lead Back)
@@ -1192,8 +1398,18 @@ def compute_scheme_insights(
             opp_def_rank = run_def.get('def_gap_rank', 16)
             scheme_label = 'Gap Power Ground Edge'
 
+        z_box = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
+
         if opp_def_rank <= 12 or opp_def_ypc <= 4.10:
             # Stout run defense - downgrade priority so it does not displace real passing edges
+            priority = 74.0 + ((team_ypc - league_avg_ypc) * 4.0) - ((16 - opp_def_rank) * 1.2)
+            mkt_line = 56.5
+            fair_line = round(mkt_line * 0.88, 1)
+            p_win = 0.44
+            ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+            tier = 'Grade C (Caution / Under)'
+            z_str = f"-{round(abs((opp_def_ypc - league_avg_ypc) / 0.40), 2)}z"
+
             cands.append({
                 'player': lead_rusher,
                 'team': team_code,
@@ -1207,11 +1423,31 @@ def compute_scheme_insights(
                 'verdict': 'TOUGH TRENCH MATCHUP',
                 'rationale': f"Proceed with caution on rushing props. {team_code}'s ground game faces {opp_code}'s stout #{opp_def_rank} ranked {dominant_scheme} run defense ({opp_def_ypc:.2f} YPC allowed). Trench penetration limits explosive rush lanes.",
                 'causal_mechanism': 'Elite front sevens maintain interior gap integrity and shed blocks quickly, bottling up early-down rushing attempts.',
-                'priority': 74.0 + (team_ypc * 1.5) - (15 - opp_def_rank) * 1.0
+                'market_line': f"{mkt_line:.1f} Rush Yds",
+                'market_line_num': mkt_line,
+                'fair_line': f"{fair_line:.1f} Rush Yds",
+                'fair_line_num': fair_line,
+                'win_prob': round(p_win, 3),
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'ev_pct': f"{ev_pct:.1f}% EV",
+                'ev_pct_num': ev_pct,
+                'confidence_tier': tier,
+                'z_score': z_str,
+                'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
+                'priority': priority
             })
         elif opp_def_rank >= 18 or opp_def_ypc >= 4.40:
             # Vulnerable run defense - genuine matchup advantage
-            delta = round(opp_def_ypc - 4.25, 2)
+            delta = round(opp_def_ypc - league_avg_ypc, 2)
+            priority = 93.0 + ((opp_def_ypc - league_avg_ypc) * 8.0) + ((team_ypc - league_avg_ypc) * 4.0) + (z_box * 0.8)
+            mkt_line = 62.5
+            scheme_lift = ((opp_def_ypc - league_avg_ypc) / league_avg_ypc) * 1.5 + ((team_ypc - league_avg_ypc) / league_avg_ypc) * 0.8
+            fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
+            p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
+            ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+            tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+            z_str = f"+{round(1.1 + max(0.0, opp_def_ypc - league_avg_ypc)*1.5, 2)}z"
+
             cands.append({
                 'player': lead_rusher,
                 'team': team_code,
@@ -1225,10 +1461,29 @@ def compute_scheme_insights(
                 'verdict': 'PRIME GROUND MISMATCH' if opp_def_rank >= 22 or opp_def_ypc >= 4.60 else 'HIGH EFFICIENCY GROUND EDGE',
                 'rationale': f"Target rushing yards / carries. {team_code} attacks {opp_code}'s vulnerable #{opp_def_rank} ranked {dominant_scheme} run defense ({opp_def_ypc:.2f} YPC allowed). Clean blocking boxes open consistent cutback and downhill lanes.",
                 'causal_mechanism': 'Defenses struggling with run fits yield elevated yards before contact, allowing primary ballcarriers to reach second-level burst.',
-                'priority': 93.0 + (opp_def_ypc - 4.20) * 8.0 + (team_ypc - 4.20) * 4.0
+                'market_line': f"{mkt_line:.1f} Rush Yds",
+                'market_line_num': mkt_line,
+                'fair_line': f"{fair_line:.1f} Rush Yds",
+                'fair_line_num': fair_line,
+                'win_prob': round(p_win, 3),
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                'ev_pct_num': ev_pct,
+                'confidence_tier': tier,
+                'z_score': z_str,
+                'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
+                'priority': priority
             })
         else:
-            delta = round(team_ypc - 4.25, 2)
+            delta = round(team_ypc - league_avg_ypc, 2)
+            priority = 85.0 + ((team_ypc - league_avg_ypc) * 4.0)
+            mkt_line = 58.5
+            fair_line = round(mkt_line * 1.04, 1)
+            p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
+            ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+            tier = 'Grade B (Solid Edge)'
+            z_str = '+0.50z'
+
             cands.append({
                 'player': lead_rusher,
                 'team': team_code,
@@ -1242,7 +1497,18 @@ def compute_scheme_insights(
                 'verdict': 'BALANCED GROUND ATTACK',
                 'rationale': f"Target rushing yards / carries. {team_code} operates balanced {dominant_scheme} ground concepts against {opp_code}'s #{opp_def_rank} ranked run front ({opp_def_ypc:.2f} YPC allowed).",
                 'causal_mechanism': 'Neutral trench matchup where run production relies on offensive execution and game-script volume.',
-                'priority': 85.0 + (team_ypc - 4.20) * 4.0
+                'market_line': f"{mkt_line:.1f} Rush Yds",
+                'market_line_num': mkt_line,
+                'fair_line': f"{fair_line:.1f} Rush Yds",
+                'fair_line_num': fair_line,
+                'win_prob': round(p_win, 3),
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                'ev_pct_num': ev_pct,
+                'confidence_tier': tier,
+                'z_score': z_str,
+                'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
+                'priority': priority
             })
 
         # 3. Mobile QB rushing candidate
@@ -1250,6 +1516,16 @@ def compute_scheme_insights(
         qb_name, qb_mobile, qb_ypg, qb_scramble_ypc = qb_info
         if qb_mobile:
             if cov.get('man_pct', 30) >= 28.0 or cov.get('cover_1', 20) >= 18.0:
+                z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5
+                priority = 93.5 + (cov.get('man_pct', 30.0) * 0.10) + (z_opp_pressure * 0.8)
+                mkt_line = 34.5
+                scheme_lift = 0.22 + (z_cov * 0.04) + (z_opp_pressure * 0.03)
+                fair_line = round(mkt_line * (1.0 + max(0.08, scheme_lift)), 1)
+                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
+                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                z_str = f"+{round(1.2 + max(0.0, z_cov)*0.3, 2)}z"
+
                 cands.append({
                     'player': qb_name,
                     'team': team_code,
@@ -1263,9 +1539,30 @@ def compute_scheme_insights(
                     'verdict': 'PRIME RUSHING CEILING',
                     'rationale': f"Target rushing yards over passing props. Faces {opp_code}'s heavy man coverage ({cov.get('man_pct', 30):.0f}%), where defensive backs turn their backs to chase receivers downfield, opening wide scramble lanes for {qb_name}.",
                     'causal_mechanism': 'Man-to-man coverage forces defensive backs to turn away from the pocket, vacating intermediate lanes for mobile QBs to scramble for chunk rushing yards.',
-                    'priority': 93.5 + cov.get('man_pct', 30) * 0.1
+                    'market_line': f"{mkt_line:.1f} Rush Yds",
+                    'market_line_num': mkt_line,
+                    'fair_line': f"{fair_line:.1f} Rush Yds",
+                    'fair_line_num': fair_line,
+                    'win_prob': round(p_win, 3),
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct_num': ev_pct,
+                    'confidence_tier': tier,
+                    'z_score': z_str,
+                    'trench_context': f"Flush Pocket Factor #{opp_trench['rank_pressure_rate_generated']}",
+                    'priority': priority
                 })
             elif cov.get('mfo_pct', 50) >= 48.0:
+                z_cov = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
+                priority = 91.5 + (cov.get('mfo_pct', 50.0) * 0.05) + (z_opp_pressure * 0.4)
+                mkt_line = 31.5
+                scheme_lift = 0.16 + (z_cov * 0.03)
+                fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
+                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
+                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+                tier = 'Grade B (Solid Edge)'
+                z_str = f"+{round(1.0 + max(0.0, z_cov)*0.3, 2)}z"
+
                 cands.append({
                     'player': qb_name,
                     'team': team_code,
@@ -1279,7 +1576,18 @@ def compute_scheme_insights(
                     'verdict': 'ELEVATED RUSHING FLOOR',
                     'rationale': f"Target rushing yards. {opp_code} defends with 2 deep safeties ({cov.get('mfo_pct', 50):.0f}% MFO), lightening the defensive box to 6 defenders and creating wide lanes for {qb_name}'s designed power runs and scrambles.",
                     'causal_mechanism': 'Two-high safety shells remove an extra defender from the front box, creating numerical leverage for quarterback-designed rushes.',
-                    'priority': 91.5 + cov.get('mfo_pct', 50) * 0.05
+                    'market_line': f"{mkt_line:.1f} Rush Yds",
+                    'market_line_num': mkt_line,
+                    'fair_line': f"{fair_line:.1f} Rush Yds",
+                    'fair_line_num': fair_line,
+                    'win_prob': round(p_win, 3),
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct_num': ev_pct,
+                    'confidence_tier': tier,
+                    'z_score': z_str,
+                    'trench_context': f"Light Box Push #{team_trench['rank_pressure_rate_allowed']}",
+                    'priority': priority
                 })
 
         # Fallback if no candidate found for team
@@ -1298,6 +1606,17 @@ def compute_scheme_insights(
                 'verdict': 'VOLUME PRIME CANDIDATE',
                 'rationale': f"Core offensive gameplan funnels prioritized target looks to {top_p['name']} across coverage alignments.",
                 'causal_mechanism': 'Primary weapon maintains prioritized route reads and designed quick-game touches across coverage alignments.',
+                'market_line': '54.5 Rec Yds',
+                'market_line_num': 54.5,
+                'fair_line': '61.5 Rec Yds',
+                'fair_line_num': 61.5,
+                'win_prob': 0.592,
+                'win_prob_fmt': '59.2%',
+                'ev_pct': '+13.0% EV',
+                'ev_pct_num': 13.0,
+                'confidence_tier': 'Grade B (Solid Edge)',
+                'z_score': '+0.85z',
+                'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                 'priority': 70.0
             })
 
@@ -1343,7 +1662,18 @@ def compute_scheme_insights(
             'scheme_delta': '+2.5 Touch Ceiling',
             'verdict': 'VOLUME PRIME CANDIDATE',
             'rationale': 'Target rushing yards / carries. Game script and red zone concentration create reliable touch volume floor.',
-            'causal_mechanism': 'Goal line touch consolidation elevates player floor regardless of defensive fronts.'
+            'causal_mechanism': 'Goal line touch consolidation elevates player floor regardless of defensive fronts.',
+            'market_line': '58.5 Rush Yds',
+            'market_line_num': 58.5,
+            'fair_line': '66.2 Rush Yds',
+            'fair_line_num': 66.2,
+            'win_prob': 0.612,
+            'win_prob_fmt': '61.2%',
+            'ev_pct': '+16.8% EV',
+            'ev_pct_num': 16.8,
+            'confidence_tier': 'Grade B (Solid Edge)',
+            'z_score': '+0.95z',
+            'trench_context': 'Neutral trench front'
         })
 
     # -------------------------------------------------------------
