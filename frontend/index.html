@@ -4135,7 +4135,10 @@
                                                 </div>
                                             </div>
                                             <div class="flex items-center justify-between text-[11px] text-slate-300 border-t border-[#21262d] pt-1">
-                                                <span class="text-slate-400">Market vs Fair:</span>
+                                                <span class="text-slate-400 flex items-center gap-1.5">
+                                                    <span>Market vs Fair:</span>
+                                                    ${b.line_source ? `<span class="text-[8.5px] px-1 py-0.2 rounded font-mono ${b.line_source.includes('The Odds API') ? 'bg-amber-950/60 text-amber-300 border border-amber-600/50' : 'bg-slate-800 text-slate-400 border border-slate-700'}" title="${b.line_source}">${b.line_source.includes('The Odds API') ? 'ODDS API' : 'CONSENSUS'}</span>` : ''}
+                                                </span>
                                                 <span><b class="text-slate-300">${b.market_line || '--'}</b> <span class="text-slate-500">→</span> <b class="text-emerald-300">${b.fair_line || '--'}</b> <span class="text-emerald-400 font-bold ml-1">(${b.ev_pct || '+18% EV'})</span></span>
                                             </div>
                                             ${b.trench_context ? `

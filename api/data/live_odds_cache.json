@@ -1,0 +1,2994 @@
+{
+  "cached_at": "2026-10-11T16:46:34.890333+00:00",
+  "spread": {
+    "Jacksonville Jaguars_vs_Philadelphia Eagles": 1.5,
+    "Green Bay Packers_vs_Chicago Bears": 1.5,
+    "Miami Dolphins_vs_Cincinnati Bengals": 7.0,
+    "New York Jets_vs_Cleveland Browns": -2.5,
+    "Tennessee Titans_vs_Houston Texans": 6.5,
+    "Pittsburgh Steelers_vs_Indianapolis Colts": -3.0,
+    "New England Patriots_vs_Las Vegas Raiders": -3.5,
+    "New Orleans Saints_vs_Minnesota Vikings": 2.5,
+    "Washington Commanders_vs_New York Giants": -3.5,
+    "Los Angeles Chargers_vs_Denver Broncos": 3.5,
+    "Arizona Cardinals_vs_Detroit Lions": 5.5,
+    "Seattle Seahawks_vs_San Francisco 49ers": -3.0
+  },
+  "total": {
+    "Jacksonville Jaguars_vs_Philadelphia Eagles": 30.5,
+    "Green Bay Packers_vs_Chicago Bears": 46.5,
+    "Miami Dolphins_vs_Cincinnati Bengals": 44.5,
+    "New York Jets_vs_Cleveland Browns": 38.5,
+    "Tennessee Titans_vs_Houston Texans": 37.5,
+    "Pittsburgh Steelers_vs_Indianapolis Colts": 41.5,
+    "New England Patriots_vs_Las Vegas Raiders": 45.5,
+    "New Orleans Saints_vs_Minnesota Vikings": 41.5,
+    "Washington Commanders_vs_New York Giants": 41.5,
+    "Los Angeles Chargers_vs_Denver Broncos": 41.5,
+    "Arizona Cardinals_vs_Detroit Lions": 54.5,
+    "Seattle Seahawks_vs_San Francisco 49ers": 46.5
+  },
+  "player_reception_yds": {
+    "parker washington": 105.5,
+    "darius cooper": 71.5,
+    "brenton strange": 68.5,
+    "dontayvion wicks": 47.5,
+    "makai lemon": 36.5,
+    "jakobi meyers": 18.5,
+    "dallas goedert": 17.5,
+    "brian thomas": 0.5,
+    "bhayshul tuten": 24.5,
+    "christian watson": 64.5,
+    "matthew golden": 57.5,
+    "tucker kraft": 50.5,
+    "luther burden": 46.5,
+    "rome odunze": 41.5,
+    "colston loveland": 39.5,
+    "kalif raymond": 27.5,
+    "dandre swift": 19.5,
+    "marshawn lloyd": 14.5,
+    "skyy moore": 12.5,
+    "cole kmet": 9.5,
+    "jonnu smith": 7.5,
+    "jamarr chase": 78.5,
+    "tee higgins": 50.5,
+    "malik washington": 46.5,
+    "chris bell": 37.5,
+    "greg dulcich": 27.5,
+    "dohnte meyers": 25.5,
+    "mike gesicki": 25.5,
+    "chase brown": 22.5,
+    "kevin coleman jr": 18.5,
+    "ollie gordon": 10.5,
+    "will kacmarek": 6.5,
+    "garrett wilson": 69.5,
+    "denzel boston": 47.5,
+    "kc concepcion": 40.5,
+    "harold fannin jr": 34.5,
+    "kenyon sadiq": 27.5,
+    "isaiah williams": 22.5,
+    "quinshon judkins": 14.5,
+    "braelon allen": 13.5,
+    "mason taylor": 12.5,
+    "jerry jeudy": 12.5,
+    "raheim sanders": 11.5,
+    "nico collins": 76.5,
+    "carnell tate": 46.5,
+    "wandale robinson": 34.5,
+    "dalton schultz": 32.5,
+    "kayshon boutte": 24.5,
+    "jaylin noel": 20.5,
+    "elic ayomanor": 15.5,
+    "gunnar helm": 14.5,
+    "xavier hutchinson": 13.5,
+    "tyjae spears": 10.5,
+    "tony pollard": 9.5,
+    "calvin ridley": 8.5,
+    "woody marks": 8.5,
+    "david montgomery": 7.5,
+    "josh downs": 54.5,
+    "dk metcalf": 50.5,
+    "tyler warren": 41.5,
+    "roman wilson": 39.5,
+    "keenan allen": 29.5,
+    "pat freiermuth": 26.5,
+    "jaylen warren": 22.5,
+    "darnell washington": 21.5,
+    "germie bernard": 19.5,
+    "jonathan taylor": 16.5,
+    "laquon treadwell": 14.5,
+    "brock bowers": 72.5,
+    "romeo doubs": 48.5,
+    "tre tucker": 41.5,
+    "hunter henry": 38.5,
+    "michael mayer": 30.5,
+    "efton chism": 26.5,
+    "demario douglas": 25.5,
+    "ashton jeanty": 24.5,
+    "cody white": 22.5,
+    "rhamondre stevenson": 15.5,
+    "kyle williams": 13.5,
+    "eli raridon": 10.5,
+    "treveyon henderson": 7.5,
+    "dareke young": 6.5,
+    "mike washington jr": 3.5,
+    "chris olave": 80.5,
+    "justin jefferson": 78.5,
+    "juwan johnson": 43.5,
+    "t j hockenson": 42.5,
+    "devaughn vele": 40.5,
+    "aaron jones": 21.5,
+    "jauan jennings": 21.5,
+    "alvin kamara": 15.5,
+    "noah fant": 13.5,
+    "tai felton": 10.5,
+    "malik nabers": 56.5,
+    "isaiah likely": 43.5,
+    "terry mclaurin": 39.5,
+    "antonio williams": 37.5,
+    "chig okonkwo": 26.5,
+    "malachi fields": 25.5,
+    "darnell mooney": 18.5,
+    "cam skattebo": 13.5,
+    "rachaad white": 9.5,
+    "jacory croskey merritt": 4.5,
+    "jaylen waddle": 55.5,
+    "tre harris": 48.5,
+    "courtland sutton": 38.5,
+    "oronde gadsden": 34.5,
+    "rj harvey": 27.5,
+    "troy franklin": 18.5,
+    "evan engram": 18.5,
+    "marvin mims jr": 13.5,
+    "keaton mitchell": 11.5,
+    "omarion hampton": 6.5,
+    "trey mcbride": 84.5,
+    "amon ra st brown": 80.5,
+    "michael wilson": 79.5,
+    "jameson williams": 52.5,
+    "sam laporta": 52.5,
+    "jahmyr gibbs": 38.5,
+    "kendrick bourne": 31.5,
+    "isaac teslaa": 25.5,
+    "jeremiyah love": 10.5,
+    "elijah higgins": 9.5,
+    "tyler allgeier": 9.5,
+    "jaxon smith njigba": 98.5,
+    "george kittle": 54.5,
+    "mike evans": 49.5,
+    "christian mccaffrey": 36.5,
+    "deebo samuel": 34.5,
+    "cooper kupp": 24.5,
+    "aj barner": 23.5,
+    "rashid shaheed": 20.5,
+    "emanuel wilson": 12.5,
+    "tory horton": 10.5,
+    "george holani": 8.5
+  },
+  "player_receptions": {
+    "brenton strange": 7.5,
+    "parker washington": 5.5,
+    "dallas goedert": 4.5,
+    "makai lemon": 4.5,
+    "dontayvion wicks": 3.5,
+    "darius cooper": 2.5,
+    "jakobi meyers": 1.5,
+    "bhayshul tuten": 2.5,
+    "dameon pierce": 2.5,
+    "matthew golden": 4.5,
+    "tucker kraft": 4.5,
+    "christian watson": 4.5,
+    "luther burden": 4.5,
+    "colston loveland": 3.5,
+    "kalif raymond": 3.5,
+    "rome odunze": 2.5,
+    "dandre swift": 2.5,
+    "marshawn lloyd": 2.5,
+    "skyy moore": 1.5,
+    "cole kmet": 1.5,
+    "jonnu smith": 1.5,
+    "jamarr chase": 6.5,
+    "malik washington": 4.5,
+    "chase brown": 3.5,
+    "tee higgins": 3.5,
+    "greg dulcich": 2.5,
+    "chris bell": 2.5,
+    "mike gesicki": 2.5,
+    "dohnte meyers": 2.5,
+    "kevin coleman jr": 1.5,
+    "ollie gordon": 1.5,
+    "will kacmarek": 0.5,
+    "garrett wilson": 5.5,
+    "kc concepcion": 4.5,
+    "harold fannin jr": 4.5,
+    "denzel boston": 3.5,
+    "kenyon sadiq": 3.5,
+    "quinshon judkins": 2.5,
+    "braelon allen": 2.5,
+    "isaiah williams": 2.5,
+    "raheim sanders": 1.5,
+    "mason taylor": 1.5,
+    "jerry jeudy": 1.5,
+    "nico collins": 5.5,
+    "carnell tate": 4.5,
+    "wandale robinson": 4.5,
+    "dalton schultz": 3.5,
+    "gunnar helm": 2.5,
+    "kayshon boutte": 2.5,
+    "tyjae spears": 2.5,
+    "tony pollard": 1.5,
+    "jaylin noel": 1.5,
+    "woody marks": 1.5,
+    "elic ayomanor": 1.5,
+    "david montgomery": 1.5,
+    "xavier hutchinson": 1.5,
+    "calvin ridley": 0.5,
+    "tyler warren": 4.5,
+    "josh downs": 4.5,
+    "dk metcalf": 3.5,
+    "keenan allen": 3.5,
+    "pat freiermuth": 3.5,
+    "jaylen warren": 3.5,
+    "roman wilson": 2.5,
+    "jonathan taylor": 2.5,
+    "darnell washington": 2.5,
+    "germie bernard": 2.5,
+    "laquon treadwell": 1.5,
+    "brock bowers": 6.5,
+    "romeo doubs": 3.5,
+    "michael mayer": 3.5,
+    "tre tucker": 3.5,
+    "hunter henry": 3.5,
+    "ashton jeanty": 3.5,
+    "rhamondre stevenson": 2.5,
+    "demario douglas": 2.5,
+    "cody white": 2.5,
+    "efton chism": 1.5,
+    "treveyon henderson": 1.5,
+    "eli raridon": 1.5,
+    "kyle williams": 1.5,
+    "mike washington jr": 0.5,
+    "chris olave": 6.5,
+    "justin jefferson": 6.5,
+    "t j hockenson": 4.5,
+    "juwan johnson": 3.5,
+    "devaughn vele": 3.5,
+    "alvin kamara": 3.5,
+    "aaron jones": 2.5,
+    "jauan jennings": 1.5,
+    "noah fant": 1.5,
+    "tai felton": 1.5,
+    "malik nabers": 4.5,
+    "isaiah likely": 4.5,
+    "antonio williams": 3.5,
+    "terry mclaurin": 3.5,
+    "chig okonkwo": 3.5,
+    "malachi fields": 2.5,
+    "cam skattebo": 2.5,
+    "rachaad white": 1.5,
+    "darnell mooney": 1.5,
+    "jacory croskey merritt": 1.5,
+    "jaylen waddle": 4.5,
+    "tre harris": 4.5,
+    "rj harvey": 3.5,
+    "oronde gadsden": 3.5,
+    "courtland sutton": 3.5,
+    "evan engram": 2.5,
+    "troy franklin": 1.5,
+    "marvin mims jr": 1.5,
+    "omarion hampton": 1.5,
+    "trey mcbride": 8.5,
+    "amon ra st brown": 7.5,
+    "michael wilson": 6.5,
+    "sam laporta": 4.5,
+    "jahmyr gibbs": 4.5,
+    "jameson williams": 3.5,
+    "kendrick bourne": 3.5,
+    "jeremiyah love": 2.5,
+    "isaac teslaa": 2.5,
+    "tyler allgeier": 1.5,
+    "elijah higgins": 1.5,
+    "jaxon smith njigba": 6.5,
+    "christian mccaffrey": 4.5,
+    "george kittle": 4.5,
+    "mike evans": 3.5,
+    "deebo samuel": 3.5,
+    "aj barner": 2.5,
+    "cooper kupp": 2.5,
+    "rashid shaheed": 2.5,
+    "emanuel wilson": 1.5,
+    "george holani": 1.5,
+    "tory horton": 1.5
+  },
+  "player_rush_yds": {
+    "bhayshul tuten": 62.5,
+    "trevor lawrence": 25.5,
+    "chris rodriguez jr": 5.5,
+    "jalen hurts": 2.5,
+    "dameon pierce": 20.5,
+    "dandre swift": 84.5,
+    "kaleb johnson": 32.5,
+    "marshawn lloyd": 27.5,
+    "roschon johnson": 22.5,
+    "tyson bagent": 12.5,
+    "jordan love": 6.5,
+    "chase brown": 63.5,
+    "ollie gordon": 42.5,
+    "malik willis": 33.5,
+    "jaylen wright": 23.5,
+    "samaje perine": 15.5,
+    "joe burrow": 8.5,
+    "braelon allen": 71.5,
+    "quinshon judkins": 59.5,
+    "deshaun watson": 25.5,
+    "isaiah davis": 14.5,
+    "geno smith": 10.5,
+    "tony pollard": 51.5,
+    "david montgomery": 42.5,
+    "woody marks": 35.5,
+    "tyjae spears": 14.5,
+    "cam ward": 11.5,
+    "c j stroud": 10.5,
+    "jonathan taylor": 84.5,
+    "jaylen warren": 74.5,
+    "daniel jones": 9.5,
+    "aaron rodgers": 1.5,
+    "treveyon henderson": 46.5,
+    "ashton jeanty": 45.5,
+    "rhamondre stevenson": 37.5,
+    "drake maye": 32.5,
+    "mike washington jr": 31.5,
+    "kirk cousins": 0.5,
+    "aaron jones": 71.5,
+    "alvin kamara": 31.5,
+    "kendre miller": 23.5,
+    "kyler murray": 17.5,
+    "tyler shough": 11.5,
+    "cam skattebo": 61.5,
+    "jacory croskey merritt": 44.5,
+    "jayden daniels": 28.5,
+    "najee harris": 28.5,
+    "rachaad white": 20.5,
+    "jameis winston": 2.5,
+    "j k dobbins": 52.5,
+    "omarion hampton": 41.5,
+    "keaton mitchell": 32.5,
+    "rj harvey": 26.5,
+    "justin herbert": 24.5,
+    "bo nix": 14.5,
+    "jahmyr gibbs": 89.5,
+    "jeremiyah love": 45.5,
+    "tyler allgeier": 27.5,
+    "sione vaki": 8.5,
+    "jacoby brissett": 8.5,
+    "jared goff": 0.5,
+    "emanuel wilson": 64.5,
+    "christian mccaffrey": 49.5,
+    "brock purdy": 22.5,
+    "george holani": 20.5,
+    "kaelon black": 14.5,
+    "deebo samuel": 9.5,
+    "sam darnold": 3.5
+  },
+  "player_pass_yds": {
+    "trevor lawrence": 326.5,
+    "jalen hurts": 189.5,
+    "jordan love": 243.5,
+    "tyson bagent": 218.5,
+    "joe burrow": 258.5,
+    "malik willis": 194.5,
+    "geno smith": 194.5,
+    "deshaun watson": 191.5,
+    "c j stroud": 233.5,
+    "cam ward": 182.5,
+    "aaron rodgers": 216.5,
+    "daniel jones": 204.5,
+    "kirk cousins": 235.5,
+    "drake maye": 229.5,
+    "tyler shough": 236.5,
+    "kyler murray": 210.5,
+    "jameis winston": 201.5,
+    "jayden daniels": 190.5,
+    "bo nix": 221.5,
+    "justin herbert": 202.5,
+    "jared goff": 281.5,
+    "jacoby brissett": 269.5,
+    "sam darnold": 235.5,
+    "brock purdy": 227.5
+  },
+  "props_detailed": {
+    "parker washington": {
+      "Receiving Yards": {
+        "line": 105.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 5.5,
+        "sportsbook": "draftkings",
+        "price": 1.53,
+        "side": "Over"
+      }
+    },
+    "darius cooper": {
+      "Receiving Yards": {
+        "line": 71.5,
+        "sportsbook": "draftkings",
+        "price": 4.0,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 3.55,
+        "side": "Over"
+      }
+    },
+    "brenton strange": {
+      "Receiving Yards": {
+        "line": 68.5,
+        "sportsbook": "draftkings",
+        "price": 1.95,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 7.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "dontayvion wicks": {
+      "Receiving Yards": {
+        "line": 47.5,
+        "sportsbook": "draftkings",
+        "price": 3.05,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.75,
+        "side": "Over"
+      }
+    },
+    "makai lemon": {
+      "Receiving Yards": {
+        "line": 36.5,
+        "sportsbook": "draftkings",
+        "price": 3.15,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.8,
+        "side": "Over"
+      }
+    },
+    "jakobi meyers": {
+      "Receiving Yards": {
+        "line": 18.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.8,
+        "side": "Over"
+      }
+    },
+    "dallas goedert": {
+      "Receiving Yards": {
+        "line": 17.5,
+        "sportsbook": "draftkings",
+        "price": 2.45,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.2,
+        "side": "Over"
+      }
+    },
+    "brian thomas": {
+      "Receiving Yards": {
+        "line": 0.5,
+        "sportsbook": "betmgm",
+        "price": 2.7,
+        "side": "Over"
+      }
+    },
+    "bhayshul tuten": {
+      "Receiving Yards": {
+        "line": 24.5,
+        "sportsbook": "bovada",
+        "price": 3.4,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "bovada",
+        "price": 4.25,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 62.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      }
+    },
+    "dameon pierce": {
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "bovada",
+        "price": 3.1,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 20.5,
+        "sportsbook": "fanduel",
+        "price": 1.98,
+        "side": "Over"
+      }
+    },
+    "trevor lawrence": {
+      "Rushing Yards": {
+        "line": 25.5,
+        "sportsbook": "draftkings",
+        "price": 2.45,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 326.5,
+        "sportsbook": "draftkings",
+        "price": 1.83,
+        "side": "Over"
+      }
+    },
+    "chris rodriguez jr": {
+      "Rushing Yards": {
+        "line": 5.5,
+        "sportsbook": "draftkings",
+        "price": 2.5,
+        "side": "Over"
+      }
+    },
+    "jalen hurts": {
+      "Rushing Yards": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.55,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 189.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      }
+    },
+    "christian watson": {
+      "Receiving Yards": {
+        "line": 64.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.98,
+        "side": "Over"
+      }
+    },
+    "matthew golden": {
+      "Receiving Yards": {
+        "line": 57.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.85,
+        "side": "Over"
+      }
+    },
+    "tucker kraft": {
+      "Receiving Yards": {
+        "line": 50.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "luther burden": {
+      "Receiving Yards": {
+        "line": 46.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.08,
+        "side": "Over"
+      }
+    },
+    "rome odunze": {
+      "Receiving Yards": {
+        "line": 41.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.56,
+        "side": "Over"
+      }
+    },
+    "colston loveland": {
+      "Receiving Yards": {
+        "line": 39.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.71,
+        "side": "Over"
+      }
+    },
+    "kalif raymond": {
+      "Receiving Yards": {
+        "line": 27.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.35,
+        "side": "Over"
+      }
+    },
+    "dandre swift": {
+      "Receiving Yards": {
+        "line": 19.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 84.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "marshawn lloyd": {
+      "Receiving Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 27.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "skyy moore": {
+      "Receiving Yards": {
+        "line": 12.5,
+        "sportsbook": "draftkings",
+        "price": 1.85,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.08,
+        "side": "Over"
+      }
+    },
+    "cole kmet": {
+      "Receiving Yards": {
+        "line": 9.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.33,
+        "side": "Over"
+      }
+    },
+    "jonnu smith": {
+      "Receiving Yards": {
+        "line": 7.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.72,
+        "side": "Over"
+      }
+    },
+    "kaleb johnson": {
+      "Rushing Yards": {
+        "line": 32.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "roschon johnson": {
+      "Rushing Yards": {
+        "line": 22.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      }
+    },
+    "tyson bagent": {
+      "Rushing Yards": {
+        "line": 12.5,
+        "sportsbook": "draftkings",
+        "price": 1.96,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 218.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "jordan love": {
+      "Rushing Yards": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.97,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 243.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "jamarr chase": {
+      "Receiving Yards": {
+        "line": 78.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.83,
+        "side": "Over"
+      }
+    },
+    "tee higgins": {
+      "Receiving Yards": {
+        "line": 50.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.68,
+        "side": "Over"
+      }
+    },
+    "malik washington": {
+      "Receiving Yards": {
+        "line": 46.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.8,
+        "side": "Over"
+      }
+    },
+    "chris bell": {
+      "Receiving Yards": {
+        "line": 37.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.85,
+        "side": "Over"
+      }
+    },
+    "greg dulcich": {
+      "Receiving Yards": {
+        "line": 27.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.73,
+        "side": "Over"
+      }
+    },
+    "dohnte meyers": {
+      "Receiving Yards": {
+        "line": 25.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.08,
+        "side": "Over"
+      }
+    },
+    "mike gesicki": {
+      "Receiving Yards": {
+        "line": 25.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      }
+    },
+    "chase brown": {
+      "Receiving Yards": {
+        "line": 22.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.65,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 63.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "kevin coleman jr": {
+      "Receiving Yards": {
+        "line": 18.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.63,
+        "side": "Over"
+      }
+    },
+    "ollie gordon": {
+      "Receiving Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.72,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 42.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "will kacmarek": {
+      "Receiving Yards": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.95,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 0.5,
+        "sportsbook": "draftkings",
+        "price": 1.44,
+        "side": "Over"
+      }
+    },
+    "malik willis": {
+      "Rushing Yards": {
+        "line": 33.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 194.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "jaylen wright": {
+      "Rushing Yards": {
+        "line": 23.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      }
+    },
+    "samaje perine": {
+      "Rushing Yards": {
+        "line": 15.5,
+        "sportsbook": "draftkings",
+        "price": 1.94,
+        "side": "Over"
+      }
+    },
+    "joe burrow": {
+      "Rushing Yards": {
+        "line": 8.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 258.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "garrett wilson": {
+      "Receiving Yards": {
+        "line": 69.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 5.5,
+        "sportsbook": "draftkings",
+        "price": 1.75,
+        "side": "Over"
+      }
+    },
+    "denzel boston": {
+      "Receiving Yards": {
+        "line": 47.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.13,
+        "side": "Over"
+      }
+    },
+    "kc concepcion": {
+      "Receiving Yards": {
+        "line": 40.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.09,
+        "side": "Over"
+      }
+    },
+    "harold fannin jr": {
+      "Receiving Yards": {
+        "line": 34.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.22,
+        "side": "Over"
+      }
+    },
+    "kenyon sadiq": {
+      "Receiving Yards": {
+        "line": 27.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.23,
+        "side": "Over"
+      }
+    },
+    "isaiah williams": {
+      "Receiving Yards": {
+        "line": 22.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.08,
+        "side": "Over"
+      }
+    },
+    "quinshon judkins": {
+      "Receiving Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.85,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 59.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "braelon allen": {
+      "Receiving Yards": {
+        "line": 13.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.0,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 71.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "mason taylor": {
+      "Receiving Yards": {
+        "line": 12.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.72,
+        "side": "Over"
+      }
+    },
+    "jerry jeudy": {
+      "Receiving Yards": {
+        "line": 12.5,
+        "sportsbook": "draftkings",
+        "price": 1.94,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.19,
+        "side": "Over"
+      }
+    },
+    "raheim sanders": {
+      "Receiving Yards": {
+        "line": 11.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.61,
+        "side": "Over"
+      }
+    },
+    "deshaun watson": {
+      "Rushing Yards": {
+        "line": 25.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 191.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "isaiah davis": {
+      "Rushing Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      }
+    },
+    "geno smith": {
+      "Rushing Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 194.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "nico collins": {
+      "Receiving Yards": {
+        "line": 76.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 5.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      }
+    },
+    "carnell tate": {
+      "Receiving Yards": {
+        "line": 46.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.22,
+        "side": "Over"
+      }
+    },
+    "wandale robinson": {
+      "Receiving Yards": {
+        "line": 34.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.28,
+        "side": "Over"
+      }
+    },
+    "dalton schultz": {
+      "Receiving Yards": {
+        "line": 32.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.63,
+        "side": "Over"
+      }
+    },
+    "kayshon boutte": {
+      "Receiving Yards": {
+        "line": 24.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.25,
+        "side": "Over"
+      }
+    },
+    "jaylin noel": {
+      "Receiving Yards": {
+        "line": 20.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.69,
+        "side": "Over"
+      }
+    },
+    "elic ayomanor": {
+      "Receiving Yards": {
+        "line": 15.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.07,
+        "side": "Over"
+      }
+    },
+    "gunnar helm": {
+      "Receiving Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.22,
+        "side": "Over"
+      }
+    },
+    "xavier hutchinson": {
+      "Receiving Yards": {
+        "line": 13.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.39,
+        "side": "Over"
+      }
+    },
+    "tyjae spears": {
+      "Receiving Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.45,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "tony pollard": {
+      "Receiving Yards": {
+        "line": 9.5,
+        "sportsbook": "draftkings",
+        "price": 1.94,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.66,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 51.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "calvin ridley": {
+      "Receiving Yards": {
+        "line": 8.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 0.5,
+        "sportsbook": "draftkings",
+        "price": 1.5,
+        "side": "Over"
+      }
+    },
+    "woody marks": {
+      "Receiving Yards": {
+        "line": 8.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 35.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "david montgomery": {
+      "Receiving Yards": {
+        "line": 7.5,
+        "sportsbook": "draftkings",
+        "price": 1.97,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.13,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 42.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      }
+    },
+    "cam ward": {
+      "Rushing Yards": {
+        "line": 11.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 182.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "c j stroud": {
+      "Rushing Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.95,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 233.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "josh downs": {
+      "Receiving Yards": {
+        "line": 54.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.72,
+        "side": "Over"
+      }
+    },
+    "dk metcalf": {
+      "Receiving Yards": {
+        "line": 50.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.61,
+        "side": "Over"
+      }
+    },
+    "tyler warren": {
+      "Receiving Yards": {
+        "line": 41.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.68,
+        "side": "Over"
+      }
+    },
+    "roman wilson": {
+      "Receiving Yards": {
+        "line": 39.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.58,
+        "side": "Over"
+      }
+    },
+    "keenan allen": {
+      "Receiving Yards": {
+        "line": 29.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.08,
+        "side": "Over"
+      }
+    },
+    "pat freiermuth": {
+      "Receiving Yards": {
+        "line": 26.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.2,
+        "side": "Over"
+      }
+    },
+    "jaylen warren": {
+      "Receiving Yards": {
+        "line": 22.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.22,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 74.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "darnell washington": {
+      "Receiving Yards": {
+        "line": 21.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.34,
+        "side": "Over"
+      }
+    },
+    "germie bernard": {
+      "Receiving Yards": {
+        "line": 19.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.38,
+        "side": "Over"
+      }
+    },
+    "jonathan taylor": {
+      "Receiving Yards": {
+        "line": 16.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.79,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 84.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "laquon treadwell": {
+      "Receiving Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.09,
+        "side": "Over"
+      }
+    },
+    "daniel jones": {
+      "Rushing Yards": {
+        "line": 9.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 204.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "aaron rodgers": {
+      "Rushing Yards": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 216.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "brock bowers": {
+      "Receiving Yards": {
+        "line": 72.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.8,
+        "side": "Over"
+      }
+    },
+    "romeo doubs": {
+      "Receiving Yards": {
+        "line": 48.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.76,
+        "side": "Over"
+      }
+    },
+    "tre tucker": {
+      "Receiving Yards": {
+        "line": 41.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "hunter henry": {
+      "Receiving Yards": {
+        "line": 38.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.95,
+        "side": "Over"
+      }
+    },
+    "michael mayer": {
+      "Receiving Yards": {
+        "line": 30.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "efton chism": {
+      "Receiving Yards": {
+        "line": 26.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.54,
+        "side": "Over"
+      }
+    },
+    "demario douglas": {
+      "Receiving Yards": {
+        "line": 25.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "ashton jeanty": {
+      "Receiving Yards": {
+        "line": 24.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.01,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 45.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "cody white": {
+      "Receiving Yards": {
+        "line": 22.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.47,
+        "side": "Over"
+      }
+    },
+    "rhamondre stevenson": {
+      "Receiving Yards": {
+        "line": 15.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.82,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 37.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "kyle williams": {
+      "Receiving Yards": {
+        "line": 13.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.64,
+        "side": "Over"
+      }
+    },
+    "eli raridon": {
+      "Receiving Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.28,
+        "side": "Over"
+      }
+    },
+    "treveyon henderson": {
+      "Receiving Yards": {
+        "line": 7.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.25,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 46.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "dareke young": {
+      "Receiving Yards": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "mike washington jr": {
+      "Receiving Yards": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 0.5,
+        "sportsbook": "draftkings",
+        "price": 1.67,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 31.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "drake maye": {
+      "Rushing Yards": {
+        "line": 32.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 229.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "kirk cousins": {
+      "Rushing Yards": {
+        "line": 0.5,
+        "sportsbook": "draftkings",
+        "price": 1.94,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 235.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "chris olave": {
+      "Receiving Yards": {
+        "line": 80.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "justin jefferson": {
+      "Receiving Yards": {
+        "line": 78.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.99,
+        "side": "Over"
+      }
+    },
+    "juwan johnson": {
+      "Receiving Yards": {
+        "line": 43.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.65,
+        "side": "Over"
+      }
+    },
+    "t j hockenson": {
+      "Receiving Yards": {
+        "line": 42.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.95,
+        "side": "Over"
+      }
+    },
+    "devaughn vele": {
+      "Receiving Yards": {
+        "line": 40.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.67,
+        "side": "Over"
+      }
+    },
+    "aaron jones": {
+      "Receiving Yards": {
+        "line": 21.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.59,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 71.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "jauan jennings": {
+      "Receiving Yards": {
+        "line": 21.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.53,
+        "side": "Over"
+      }
+    },
+    "alvin kamara": {
+      "Receiving Yards": {
+        "line": 15.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.11,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 31.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "noah fant": {
+      "Receiving Yards": {
+        "line": 13.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.8,
+        "side": "Over"
+      }
+    },
+    "tai felton": {
+      "Receiving Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.31,
+        "side": "Over"
+      }
+    },
+    "kendre miller": {
+      "Rushing Yards": {
+        "line": 23.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "kyler murray": {
+      "Rushing Yards": {
+        "line": 17.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 210.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "tyler shough": {
+      "Rushing Yards": {
+        "line": 11.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 236.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "malik nabers": {
+      "Receiving Yards": {
+        "line": 56.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.69,
+        "side": "Over"
+      }
+    },
+    "isaiah likely": {
+      "Receiving Yards": {
+        "line": 43.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.79,
+        "side": "Over"
+      }
+    },
+    "terry mclaurin": {
+      "Receiving Yards": {
+        "line": 39.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.12,
+        "side": "Over"
+      }
+    },
+    "antonio williams": {
+      "Receiving Yards": {
+        "line": 37.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.94,
+        "side": "Over"
+      }
+    },
+    "chig okonkwo": {
+      "Receiving Yards": {
+        "line": 26.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.39,
+        "side": "Over"
+      }
+    },
+    "malachi fields": {
+      "Receiving Yards": {
+        "line": 25.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.39,
+        "side": "Over"
+      }
+    },
+    "darnell mooney": {
+      "Receiving Yards": {
+        "line": 18.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.94,
+        "side": "Over"
+      }
+    },
+    "cam skattebo": {
+      "Receiving Yards": {
+        "line": 13.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.48,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 61.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "rachaad white": {
+      "Receiving Yards": {
+        "line": 9.5,
+        "sportsbook": "draftkings",
+        "price": 1.95,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.69,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 20.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "jacory croskey merritt": {
+      "Receiving Yards": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.76,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 44.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "jayden daniels": {
+      "Rushing Yards": {
+        "line": 28.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 190.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "najee harris": {
+      "Rushing Yards": {
+        "line": 28.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "jameis winston": {
+      "Rushing Yards": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.83,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 201.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "jaylen waddle": {
+      "Receiving Yards": {
+        "line": 55.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.75,
+        "side": "Over"
+      }
+    },
+    "tre harris": {
+      "Receiving Yards": {
+        "line": 48.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 2.12,
+        "side": "Over"
+      }
+    },
+    "courtland sutton": {
+      "Receiving Yards": {
+        "line": 38.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.15,
+        "side": "Over"
+      }
+    },
+    "oronde gadsden": {
+      "Receiving Yards": {
+        "line": 34.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      }
+    },
+    "rj harvey": {
+      "Receiving Yards": {
+        "line": 27.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.62,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 26.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "troy franklin": {
+      "Receiving Yards": {
+        "line": 18.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.85,
+        "side": "Over"
+      }
+    },
+    "evan engram": {
+      "Receiving Yards": {
+        "line": 18.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.1,
+        "side": "Over"
+      }
+    },
+    "marvin mims jr": {
+      "Receiving Yards": {
+        "line": 13.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.0,
+        "side": "Over"
+      }
+    },
+    "keaton mitchell": {
+      "Receiving Yards": {
+        "line": 11.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 32.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      }
+    },
+    "omarion hampton": {
+      "Receiving Yards": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.83,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.27,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 41.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "j k dobbins": {
+      "Rushing Yards": {
+        "line": 52.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "justin herbert": {
+      "Rushing Yards": {
+        "line": 24.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 202.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "bo nix": {
+      "Rushing Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 221.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "trey mcbride": {
+      "Receiving Yards": {
+        "line": 84.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 8.5,
+        "sportsbook": "draftkings",
+        "price": 2.04,
+        "side": "Over"
+      }
+    },
+    "amon ra st brown": {
+      "Receiving Yards": {
+        "line": 80.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 7.5,
+        "sportsbook": "draftkings",
+        "price": 2.09,
+        "side": "Over"
+      }
+    },
+    "michael wilson": {
+      "Receiving Yards": {
+        "line": 79.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "jameson williams": {
+      "Receiving Yards": {
+        "line": 52.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.7,
+        "side": "Over"
+      }
+    },
+    "sam laporta": {
+      "Receiving Yards": {
+        "line": 52.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.68,
+        "side": "Over"
+      }
+    },
+    "jahmyr gibbs": {
+      "Receiving Yards": {
+        "line": 38.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 89.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "kendrick bourne": {
+      "Receiving Yards": {
+        "line": 31.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 2.0,
+        "side": "Over"
+      }
+    },
+    "isaac teslaa": {
+      "Receiving Yards": {
+        "line": 25.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.34,
+        "side": "Over"
+      }
+    },
+    "jeremiyah love": {
+      "Receiving Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.04,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 45.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "elijah higgins": {
+      "Receiving Yards": {
+        "line": 9.5,
+        "sportsbook": "draftkings",
+        "price": 1.85,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.3,
+        "side": "Over"
+      }
+    },
+    "tyler allgeier": {
+      "Receiving Yards": {
+        "line": 9.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.62,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 27.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "sione vaki": {
+      "Rushing Yards": {
+        "line": 8.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "jacoby brissett": {
+      "Rushing Yards": {
+        "line": 8.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 269.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "jared goff": {
+      "Rushing Yards": {
+        "line": 0.5,
+        "sportsbook": "draftkings",
+        "price": 1.81,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 281.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    },
+    "jaxon smith njigba": {
+      "Receiving Yards": {
+        "line": 98.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 6.5,
+        "sportsbook": "draftkings",
+        "price": 1.68,
+        "side": "Over"
+      }
+    },
+    "george kittle": {
+      "Receiving Yards": {
+        "line": 54.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      }
+    },
+    "mike evans": {
+      "Receiving Yards": {
+        "line": 49.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.67,
+        "side": "Over"
+      }
+    },
+    "christian mccaffrey": {
+      "Receiving Yards": {
+        "line": 36.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 4.5,
+        "sportsbook": "draftkings",
+        "price": 1.78,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 49.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "deebo samuel": {
+      "Receiving Yards": {
+        "line": 34.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 9.5,
+        "sportsbook": "draftkings",
+        "price": 1.87,
+        "side": "Over"
+      }
+    },
+    "cooper kupp": {
+      "Receiving Yards": {
+        "line": 24.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.05,
+        "side": "Over"
+      }
+    },
+    "aj barner": {
+      "Receiving Yards": {
+        "line": 23.5,
+        "sportsbook": "draftkings",
+        "price": 1.92,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 1.95,
+        "side": "Over"
+      }
+    },
+    "rashid shaheed": {
+      "Receiving Yards": {
+        "line": 20.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 2.5,
+        "sportsbook": "draftkings",
+        "price": 2.49,
+        "side": "Over"
+      }
+    },
+    "emanuel wilson": {
+      "Receiving Yards": {
+        "line": 12.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.62,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 64.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      }
+    },
+    "tory horton": {
+      "Receiving Yards": {
+        "line": 10.5,
+        "sportsbook": "draftkings",
+        "price": 1.91,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 2.6,
+        "side": "Over"
+      }
+    },
+    "george holani": {
+      "Receiving Yards": {
+        "line": 8.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      },
+      "Receptions": {
+        "line": 1.5,
+        "sportsbook": "draftkings",
+        "price": 1.67,
+        "side": "Over"
+      },
+      "Rushing Yards": {
+        "line": 20.5,
+        "sportsbook": "draftkings",
+        "price": 1.93,
+        "side": "Over"
+      }
+    },
+    "brock purdy": {
+      "Rushing Yards": {
+        "line": 22.5,
+        "sportsbook": "draftkings",
+        "price": 1.86,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 227.5,
+        "sportsbook": "draftkings",
+        "price": 1.88,
+        "side": "Over"
+      }
+    },
+    "kaelon black": {
+      "Rushing Yards": {
+        "line": 14.5,
+        "sportsbook": "draftkings",
+        "price": 1.89,
+        "side": "Over"
+      }
+    },
+    "sam darnold": {
+      "Rushing Yards": {
+        "line": 3.5,
+        "sportsbook": "draftkings",
+        "price": 1.83,
+        "side": "Over"
+      },
+      "Passing Yards": {
+        "line": 235.5,
+        "sportsbook": "draftkings",
+        "price": 1.9,
+        "side": "Over"
+      }
+    }
+  },
+  "events_meta": [
+    {
+      "id": "21b26266f3d78af02eb672e606275d95",
+      "home": "Jacksonville Jaguars",
+      "away": "Philadelphia Eagles",
+      "commence": "2026-10-11T13:32:30Z"
+    },
+    {
+      "id": "2caea57b1e5cfbba1334cfbfd46f6771",
+      "home": "Green Bay Packers",
+      "away": "Chicago Bears",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "c4647ca1201e6768501877267ca8251b",
+      "home": "Miami Dolphins",
+      "away": "Cincinnati Bengals",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "9db4ed15fe34fca1fb62f040cd244591",
+      "home": "New York Jets",
+      "away": "Cleveland Browns",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "cc52bba56e74f5cddbe9011046181c3d",
+      "home": "Tennessee Titans",
+      "away": "Houston Texans",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "448d7cf18c6db4c811ed82ded1b72867",
+      "home": "Pittsburgh Steelers",
+      "away": "Indianapolis Colts",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "6b024bad1abb54f597225e4ab9b39d89",
+      "home": "New England Patriots",
+      "away": "Las Vegas Raiders",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "2cda9bf0fbe35a2735f0dd8aaafe9eff",
+      "home": "New Orleans Saints",
+      "away": "Minnesota Vikings",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "fbffd0b7722fd81d68d5d62472dc80e8",
+      "home": "Washington Commanders",
+      "away": "New York Giants",
+      "commence": "2026-10-11T17:00:00Z"
+    },
+    {
+      "id": "d1d408fdfd272046fb517fe992a1c5a0",
+      "home": "Los Angeles Chargers",
+      "away": "Denver Broncos",
+      "commence": "2026-10-11T20:05:00Z"
+    },
+    {
+      "id": "f8e7f43f73aa983c5c99c189587f0118",
+      "home": "Arizona Cardinals",
+      "away": "Detroit Lions",
+      "commence": "2026-10-11T20:25:00Z"
+    },
+    {
+      "id": "8e5d515b10d8a5ffb324640ed60bcc55",
+      "home": "Seattle Seahawks",
+      "away": "San Francisco 49ers",
+      "commence": "2026-10-11T20:25:00Z"
+    }
+  ],
+  "key_stats": {
+    "556a91cf126c23a41b6b0d0fff2c20d1": {
+      "remaining": "6",
+      "used": "494",
+      "status": "active"
+    },
+    "0c4ef5ea63d88b0eb418d5e0afaefdaa": {
+      "remaining": "unknown",
+      "used": "unknown",
+      "status": "active"
+    },
+    "8d5cc711c32f61a7d5d9f6e2be632793": {
+      "remaining": "unknown",
+      "used": "unknown",
+      "status": "active"
+    }
+  }
+}

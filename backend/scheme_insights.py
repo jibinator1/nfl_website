@@ -784,6 +784,84 @@ def _shrunk_rate(observed: float, n: int, prior: float, k: float) -> float:
         return prior
     return round((n * observed + k * prior) / (n + k), 1)
 
+_ODDS_CACHE = None
+
+def _load_odds_cache() -> Dict[str, Any]:
+    global _ODDS_CACHE
+    if _ODDS_CACHE is not None:
+        return _ODDS_CACHE
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    candidate_paths = [
+        os.path.join(root_dir, 'data', 'live_odds_cache.json'),
+        os.path.join(root_dir, 'api', 'data', 'live_odds_cache.json'),
+        os.path.join(os.getcwd(), 'data', 'live_odds_cache.json'),
+        os.path.join(os.getcwd(), 'api', 'data', 'live_odds_cache.json')
+    ]
+    for p in candidate_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, 'r', encoding='utf-8') as f:
+                    _ODDS_CACHE = json.load(f)
+                    return _ODDS_CACHE
+            except Exception:
+                pass
+    _ODDS_CACHE = {}
+    return _ODDS_CACHE
+
+def _normalize_name_for_odds(name: str) -> str:
+    clean = str(name).lower().strip().replace('.', ' ').replace("'", "").replace('-', ' ')
+    for suffix in [' jr', ' sr', ' ii', ' iii', ' iv', ' v']:
+        if clean.endswith(suffix):
+            clean = clean[:-len(suffix)].strip()
+    return " ".join(clean.split())
+
+def _get_odds_api_line(player_name: str, stat_focus: str, default_line: float) -> Tuple[float, str]:
+    """
+    Looks up player's sharp market line from The Odds API live cache.
+    Returns (line, line_source).
+    """
+    cache = _load_odds_cache()
+    if not cache:
+        return default_line, "Consensus Baseline"
+
+    if stat_focus == 'Receiving Yards':
+        market_map = cache.get('player_reception_yds', {})
+    elif stat_focus == 'Receptions':
+        market_map = cache.get('player_receptions', {})
+    elif stat_focus == 'Rushing Yards':
+        market_map = cache.get('player_rush_yds', {})
+    elif stat_focus == 'Passing Yards':
+        market_map = cache.get('player_pass_yds', {})
+    else:
+        market_map = {}
+
+    qn = _normalize_name_for_odds(player_name)
+    line = market_map.get(qn)
+    matched_key = qn if line is not None else None
+
+    # Partial / abbreviated matching (e.g. 'P.Washington' -> 'parker washington')
+    if line is None:
+        q_parts = qn.split()
+        for k, v in market_map.items():
+            k_parts = k.split()
+            if len(q_parts) >= 2 and len(k_parts) >= 2:
+                if q_parts[-1] == k_parts[-1] and q_parts[0][0] == k_parts[0][0]:
+                    line = v
+                    matched_key = k
+                    break
+            elif q_parts and k_parts and q_parts[-1] == k_parts[-1]:
+                line = v
+                matched_key = k
+                break
+
+    if line is not None and matched_key:
+        details = cache.get('props_detailed', {}).get(matched_key, {})
+        book = details.get(stat_focus, {}).get('sportsbook', 'DraftKings')
+        book_title = book.title() if isinstance(book, str) else 'DraftKings'
+        return float(line), f"The Odds API ({book_title})"
+
+    return default_line, "Consensus Baseline"
+
 def _evaluate_prob_and_tier(
     mkt_line: float,
     fair_val: float,
@@ -1365,7 +1443,7 @@ def compute_scheme_insights(
                 if cov.get('mfo_pct', 50) >= 55.0:
                     z_cov = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
                     priority = 94.0 + (z_delta * 1.2) + (z_tgt * 0.5) + (z_yprr * 1.8) + (z_cov * 1.0) - (z_opp_pressure * 0.4)
-                    mkt_line = 44.5
+                    mkt_line, line_source = _get_odds_api_line(p['name'], 'Receiving Yards', 44.5)
                     raw_lift = 0.05 + (z_delta * 0.012) + (z_cov * 0.015) + (z_yprr * 0.01) - (z_opp_pressure * 0.008)
                     scheme_lift = max(-0.06, min(0.10, raw_lift))
                     model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1397,13 +1475,14 @@ def compute_scheme_insights(
                         'ev_pct_num': ev_pct,
                         'confidence_tier': tier,
                         'z_score': z_str,
+                        'line_source': line_source,
                         'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                         'priority': priority
                     })
                 else:
                     z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                     priority = 93.0 + (z_delta * 1.2) + (z_tgt * 0.6) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.5)
-                    mkt_line = 3.5
+                    mkt_line, line_source = _get_odds_api_line(p['name'], 'Receptions', 3.5)
                     raw_lift = 0.05 + (z_delta * 0.015) + (z_cov * 0.015) + (z_opp_pressure * 0.008)
                     scheme_lift = max(-0.06, min(0.12, raw_lift))
                     model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1435,6 +1514,7 @@ def compute_scheme_insights(
                         'ev_pct_num': ev_pct,
                         'confidence_tier': tier,
                         'z_score': z_str,
+                        'line_source': line_source,
                         'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                         'priority': priority
                     })
@@ -1447,7 +1527,7 @@ def compute_scheme_insights(
                 z_yprr = (p.get('yprr_zone', 1.8) - 1.75) / 0.50
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                 priority = 93.0 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.6)
-                mkt_line = 4.5
+                mkt_line, line_source = _get_odds_api_line(p['name'], 'Receptions', 4.5)
                 raw_lift = 0.06 + (z_delta * 0.015) + (z_tgt * 0.01) + (z_cov * 0.015) + (z_opp_pressure * 0.008)
                 scheme_lift = max(-0.06, min(0.12, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1479,6 +1559,7 @@ def compute_scheme_insights(
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'z_score': z_str,
+                    'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                     'priority': priority
                 })
@@ -1492,7 +1573,7 @@ def compute_scheme_insights(
                 z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5
                 priority = 92.5 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.8) + (z_cov * 1.2) - (z_opp_pressure * 0.6)
                 def_line = 64.5 if p.get('tgt_man', 0) >= 25.0 else 54.5
-                mkt_line = def_line
+                mkt_line, line_source = _get_odds_api_line(p['name'], 'Receiving Yards', def_line)
                 raw_lift = 0.05 + (z_delta * 0.012) + (z_yprr * 0.015) + (z_cov * 0.015) - (z_opp_pressure * 0.008)
                 scheme_lift = max(-0.06, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1524,6 +1605,7 @@ def compute_scheme_insights(
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'z_score': z_str,
+                    'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                     'priority': priority
                 })
@@ -1534,7 +1616,7 @@ def compute_scheme_insights(
                 z_tgt = (p.get('tgt_zone', 20.0) - 20.0) / 8.0
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                 priority = 91.0 + (z_yprr * 2.0) + (z_tgt * 0.6) + (z_cov * 0.8) - (z_opp_pressure * 0.4)
-                mkt_line = 54.5
+                mkt_line, line_source = _get_odds_api_line(p['name'], 'Receiving Yards', 54.5)
                 raw_lift = 0.04 + (z_yprr * 0.015) + (z_tgt * 0.01) + (z_cov * 0.01) - (z_opp_pressure * 0.008)
                 scheme_lift = max(-0.05, min(0.09, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1566,6 +1648,7 @@ def compute_scheme_insights(
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'z_score': z_str,
+                    'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                     'priority': priority
                 })
@@ -1576,7 +1659,7 @@ def compute_scheme_insights(
                 z_delta = max(-2.5, min(2.5, delta / 4.0))
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                 priority = 90.0 + (z_delta * 1.2) + (z_opp_pressure * 1.2) + (z_cov * 0.6)
-                mkt_line = 3.5
+                mkt_line, line_source = _get_odds_api_line(p['name'], 'Receptions', 3.5)
                 raw_lift = 0.05 + (z_delta * 0.01) + (z_opp_pressure * 0.015) + (z_cov * 0.01)
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1608,6 +1691,7 @@ def compute_scheme_insights(
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'z_score': z_str,
+                    'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                     'priority': priority
                 })
@@ -1648,7 +1732,7 @@ def compute_scheme_insights(
         if opp_def_rank <= 12 or opp_def_ypc <= 4.10:
             # Stout run defense - downgrade priority so it does not displace real passing edges
             priority = 74.0 + ((team_ypc - league_avg_ypc) * 4.0) - ((16 - opp_def_rank) * 1.2)
-            mkt_line = 56.5
+            mkt_line, line_source = _get_odds_api_line(lead_rusher, 'Rushing Yards', 56.5)
             model_fair = mkt_line * 0.94
             fair_line = _blend_with_market(model_fair, mkt_line)
             p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards', is_under=True)
@@ -1679,6 +1763,7 @@ def compute_scheme_insights(
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'z_score': z_str,
+                'line_source': line_source,
                 'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
                 'priority': priority
             })
@@ -1686,7 +1771,7 @@ def compute_scheme_insights(
             # Vulnerable run defense - genuine matchup advantage
             delta = round(opp_def_ypc - league_avg_ypc, 2)
             priority = 93.0 + ((opp_def_ypc - league_avg_ypc) * 8.0) + ((team_ypc - league_avg_ypc) * 4.0) + (z_box * 0.8)
-            mkt_line = 62.5
+            mkt_line, line_source = _get_odds_api_line(lead_rusher, 'Rushing Yards', 62.5)
             raw_lift = ((opp_def_ypc - league_avg_ypc) / league_avg_ypc) * 0.8 + ((team_ypc - league_avg_ypc) / league_avg_ypc) * 0.4 + (z_box * 0.01)
             scheme_lift = max(-0.05, min(0.10, raw_lift))
             model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1718,13 +1803,14 @@ def compute_scheme_insights(
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'z_score': z_str,
+                'line_source': line_source,
                 'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
                 'priority': priority
             })
         else:
             delta = round(team_ypc - league_avg_ypc, 2)
             priority = 85.0 + ((team_ypc - league_avg_ypc) * 4.0)
-            mkt_line = 58.5
+            mkt_line, line_source = _get_odds_api_line(lead_rusher, 'Rushing Yards', 58.5)
             model_fair = mkt_line * 1.02
             fair_line = _blend_with_market(model_fair, mkt_line)
             p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
@@ -1754,6 +1840,7 @@ def compute_scheme_insights(
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'z_score': z_str,
+                'line_source': line_source,
                 'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
                 'priority': priority
             })
@@ -1770,7 +1857,7 @@ def compute_scheme_insights(
             if cov.get('man_pct', 30) >= 28.0 or cov.get('cover_1', 20) >= 18.0:
                 z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5
                 priority = 93.5 + (cov.get('man_pct', 30.0) * 0.10) + (z_opp_pressure * 0.8)
-                mkt_line = 34.5
+                mkt_line, line_source = _get_odds_api_line(qb_name, 'Rushing Yards', 34.5)
                 raw_lift = 0.06 + (z_cov * 0.015) + (z_opp_pressure * 0.015)
                 scheme_lift = max(-0.05, min(0.12, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1802,13 +1889,14 @@ def compute_scheme_insights(
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'z_score': z_str,
+                    'line_source': line_source,
                     'trench_context': f"Flush Pocket Factor #{opp_trench['rank_pressure_rate_generated']}",
                     'priority': priority
                 })
             elif cov.get('mfo_pct', 50) >= 48.0:
                 z_cov = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
                 priority = 91.5 + (cov.get('mfo_pct', 50.0) * 0.05) + (z_opp_pressure * 0.4)
-                mkt_line = 31.5
+                mkt_line, line_source = _get_odds_api_line(qb_name, 'Rushing Yards', 31.5)
                 raw_lift = 0.05 + (z_cov * 0.012) + (z_opp_pressure * 0.01)
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
@@ -1840,6 +1928,7 @@ def compute_scheme_insights(
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'z_score': z_str,
+                    'line_source': line_source,
                     'trench_context': f"Light Box Push #{team_trench['rank_pressure_rate_allowed']}",
                     'priority': priority
                 })
@@ -1847,7 +1936,7 @@ def compute_scheme_insights(
         # Fallback if no candidate found for team
         if not cands and team_prof.get('target_alignment', {}).get('key_targets'):
             top_p = team_prof['target_alignment']['key_targets'][0]
-            fb_mkt = 54.5
+            fb_mkt, fb_source = _get_odds_api_line(top_p['name'], 'Receiving Yards', 54.5)
             fb_model = fb_mkt * 1.04
             fb_fair = _blend_with_market(fb_model, fb_mkt)
             p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
@@ -1875,6 +1964,7 @@ def compute_scheme_insights(
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'z_score': '+0.85z',
+                'line_source': fb_source,
                 'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                 'priority': 70.0
             })
@@ -1933,6 +2023,7 @@ def compute_scheme_insights(
             'ev_pct_num': 3.5,
             'confidence_tier': 'Grade B (Solid Edge)',
             'z_score': '+0.95z',
+            'line_source': 'Consensus Baseline',
             'trench_context': 'Neutral trench front'
         })
 
