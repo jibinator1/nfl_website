@@ -791,11 +791,11 @@ def _evaluate_prob_and_tier(
     sigma_or_r: float,
     stat_focus: Optional[str] = None,
     is_under: bool = False
-) -> Tuple[float, float, str]:
+) -> Tuple[float, float, str, float]:
     """
     Evaluates calibrated win probability, EV against standard -110 juice (52.38% breakeven),
     caps outliers to prevent implausible edges, applies post-hoc isotonic recalibration,
-    and assigns market-aware confidence tiers.
+    and assigns market-aware confidence tiers. Returns (p_win, ev_pct, tier, p_win_raw).
     """
     if is_count:
         p_win_raw = _calc_win_prob_nbinom(mkt_line, fair_val, r=sigma_or_r)
@@ -825,7 +825,7 @@ def _evaluate_prob_and_tier(
     else:
         tier = 'Grade C (Caution / Under)' if is_under else 'Grade C (Marginal Edge)'
 
-    return p_win, ev_pct, tier
+    return p_win, ev_pct, tier, p_win_raw
 
 _DYNAMIC_CTX_CACHE: Dict[Tuple, Any] = {}
 
@@ -1370,7 +1370,7 @@ def compute_scheme_insights(
                     scheme_lift = max(-0.06, min(0.10, raw_lift))
                     model_fair = mkt_line * (1.0 + scheme_lift)
                     fair_line = _blend_with_market(model_fair, mkt_line)
-                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'], stat_focus='Receiving Yards')
+                    p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'], stat_focus='Receiving Yards')
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.4, 2)}z"
 
                     cands.append({
@@ -1391,6 +1391,7 @@ def compute_scheme_insights(
                         'fair_line': f"{fair_line:.1f} Rec Yds",
                         'fair_line_num': fair_line,
                         'win_prob': round(p_win, 3),
+                        'win_prob_raw': round(p_raw, 3),
                         'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                         'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                         'ev_pct_num': ev_pct,
@@ -1407,7 +1408,7 @@ def compute_scheme_insights(
                     scheme_lift = max(-0.06, min(0.12, raw_lift))
                     model_fair = mkt_line * (1.0 + scheme_lift)
                     fair_val = _blend_with_market(model_fair, mkt_line)
-                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
+                    p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                     cands.append({
@@ -1428,6 +1429,7 @@ def compute_scheme_insights(
                         'fair_line': f"{fair_val:.1f} Receptions",
                         'fair_line_num': fair_val,
                         'win_prob': round(p_win, 3),
+                        'win_prob_raw': round(p_raw, 3),
                         'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                         'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                         'ev_pct_num': ev_pct,
@@ -1450,7 +1452,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.06, min(0.12, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_val = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=10.0, stat_focus='Receptions')
+                p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=10.0, stat_focus='Receptions')
                 z_str = f"+{round(1.1 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1471,6 +1473,7 @@ def compute_scheme_insights(
                     'fair_line': f"{fair_val:.1f} Receptions",
                     'fair_line_num': fair_val,
                     'win_prob': round(p_win, 3),
+                    'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
@@ -1494,7 +1497,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.06, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
+                p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
                 z_str = f"+{round(1.2 + max(0.0, z_yprr)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1515,6 +1518,7 @@ def compute_scheme_insights(
                     'fair_line': f"{fair_line:.1f} Rec Yds",
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
+                    'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
@@ -1535,7 +1539,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.05, min(0.09, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_honey'], stat_focus='Receiving Yards')
+                p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_honey'], stat_focus='Receiving Yards')
                 z_str = f"+{round(1.0 + max(0.0, z_yprr)*0.4, 2)}z"
 
                 cands.append({
@@ -1556,6 +1560,7 @@ def compute_scheme_insights(
                     'fair_line': f"{fair_line:.1f} Rec Yds",
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
+                    'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
@@ -1576,7 +1581,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_val = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
+                p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
                 z_str = f"+{round(0.9 + max(0.0, z_opp_pressure)*0.4, 2)}z"
 
                 cands.append({
@@ -1597,6 +1602,7 @@ def compute_scheme_insights(
                     'fair_line': f"{fair_val:.1f} Receptions",
                     'fair_line_num': fair_val,
                     'win_prob': round(p_win, 3),
+                    'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
@@ -1645,7 +1651,7 @@ def compute_scheme_insights(
             mkt_line = 56.5
             model_fair = mkt_line * 0.94
             fair_line = _blend_with_market(model_fair, mkt_line)
-            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards', is_under=True)
+            p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards', is_under=True)
             tier = 'Grade C (Caution / Under)'
             z_str = f"-{round(abs((opp_def_ypc - league_avg_ypc) / 0.40), 2)}z"
 
@@ -1667,6 +1673,7 @@ def compute_scheme_insights(
                 'fair_line': f"{fair_line:.1f} Rush Yds",
                 'fair_line_num': fair_line,
                 'win_prob': round(p_win, 3),
+                'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                 'ev_pct': f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
@@ -1684,7 +1691,7 @@ def compute_scheme_insights(
             scheme_lift = max(-0.05, min(0.10, raw_lift))
             model_fair = mkt_line * (1.0 + scheme_lift)
             fair_line = _blend_with_market(model_fair, mkt_line)
-            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
+            p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
             z_str = f"+{round(1.1 + max(0.0, opp_def_ypc - league_avg_ypc)*1.5, 2)}z"
 
             cands.append({
@@ -1705,6 +1712,7 @@ def compute_scheme_insights(
                 'fair_line': f"{fair_line:.1f} Rush Yds",
                 'fair_line_num': fair_line,
                 'win_prob': round(p_win, 3),
+                'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                 'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
@@ -1719,7 +1727,7 @@ def compute_scheme_insights(
             mkt_line = 58.5
             model_fair = mkt_line * 1.02
             fair_line = _blend_with_market(model_fair, mkt_line)
-            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
+            p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
             z_str = '+0.50z'
 
             cands.append({
@@ -1740,6 +1748,7 @@ def compute_scheme_insights(
                 'fair_line': f"{fair_line:.1f} Rush Yds",
                 'fair_line_num': fair_line,
                 'win_prob': round(p_win, 3),
+                'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                 'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
@@ -1766,7 +1775,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.05, min(0.12, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
+                p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
                 z_str = f"+{round(1.2 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1787,6 +1796,7 @@ def compute_scheme_insights(
                     'fair_line': f"{fair_line:.1f} Rush Yds",
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
+                    'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
@@ -1803,7 +1813,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
+                p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
                 z_str = f"+{round(1.0 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1824,6 +1834,7 @@ def compute_scheme_insights(
                     'fair_line': f"{fair_line:.1f} Rush Yds",
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
+                    'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
@@ -1839,7 +1850,7 @@ def compute_scheme_insights(
             fb_mkt = 54.5
             fb_model = fb_mkt * 1.04
             fb_fair = _blend_with_market(fb_model, fb_mkt)
-            p_win, ev_pct, tier = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
+            p_win, ev_pct, tier, p_raw = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
             cands.append({
                 'player': top_p['name'],
                 'team': team_code,
@@ -1858,6 +1869,7 @@ def compute_scheme_insights(
                 'fair_line': f"{fb_fair:.1f} Rec Yds",
                 'fair_line_num': fb_fair,
                 'win_prob': round(p_win, 3),
+                'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%",
                 'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
@@ -1915,6 +1927,7 @@ def compute_scheme_insights(
             'fair_line': '60.3 Rush Yds',
             'fair_line_num': 60.3,
             'win_prob': 0.542,
+            'win_prob_raw': 0.542,
             'win_prob_fmt': '54.2%',
             'ev_pct': '+3.5% EV',
             'ev_pct_num': 3.5,
