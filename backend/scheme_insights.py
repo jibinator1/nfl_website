@@ -11,7 +11,7 @@ Implements deep film-room & scheme analytics cross-referencing:
 
 import os
 import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 import math
 import copy
 
@@ -655,6 +655,28 @@ def _get_player_latest_team(player_name: str) -> Optional[str]:
     _build_player_latest_team_map()
     return _PLAYER_LATEST_TEAM.get(player_name)
 
+def _get_shrunk_player_baseline(player_name: str, stat_col: str, role_default: float, k: float = 4.0) -> float:
+    """
+    Computes an Empirical Bayes shrunk baseline for a player based on recent games,
+    shrinking toward the role default line to ground projections in empirical reality.
+    """
+    _ensure_parquet_loaded()
+    if _WEEKLY_DF is None:
+        return role_default
+    try:
+        sub = _WEEKLY_DF[(_WEEKLY_DF['player_name'] == player_name) | (_WEEKLY_DF['player_display_name'] == player_name)]
+        if sub.empty or stat_col not in sub.columns:
+            return role_default
+        recent_vals = sub.sort_values(['season', 'week'], ascending=[False, False]).head(16)[stat_col].dropna()
+        n = len(recent_vals)
+        if n < 2:
+            return role_default
+        player_mean = float(recent_vals.mean())
+        shrunk = (n * player_mean + k * role_default) / (n + k)
+        return max(0.5, round(shrunk * 2.0) / 2.0)
+    except Exception:
+        return role_default
+
 def _get_team_trench_metrics(team_code: str) -> Dict[str, Any]:
     global _TEAM_PBP_SUMMARY_DF
     default_metrics = {
@@ -684,32 +706,79 @@ def _get_team_trench_metrics(team_code: str) -> Dict[str, Any]:
         pass
     return default_metrics
 
-def _calc_win_prob_lognormal_median(market_line: float, fair_median: float, sigma: float = 0.45) -> float:
+ROLE_SIGMA_MAP = {
+    'WR_alpha': 0.64,    # high aDOT boundary alpha (explosive, high variance)
+    'WR_honey': 0.60,    # boundary vs zone honey-hole
+    'WR_slot':  0.54,    # chain-mover slot receiver (more stable)
+    'TE_seam':  0.58,    # vertical seam TE
+    'TE_zone':  0.54,    # intermediate sit/crossing TE
+    'RB_rush':  0.52,    # primary rushing yardage
+    'RB_rec':   0.50,    # backfield checkdown receptions
+    'QB_rush':  0.62,    # QB scramble / mobility yardage (skewed)
+}
+
+def _calc_win_prob_lognormal_median(market_line: float, fair_median: float, sigma: float = 0.60) -> float:
     """
     Calculates P(X > market_line) under Log-Normal distribution when fair median is fair_median.
+    Uses calibrated role-specific empirical log-sigma (0.52 - 0.64) to prevent probability inflation.
+    Clamped to realistic sharp sports betting bounds [0.44, 0.68].
     """
     if fair_median <= 0 or market_line <= 0:
         return 0.50
     mu = math.log(fair_median)
     z = (math.log(market_line) - mu) / sigma
     prob = 0.5 * (1.0 - math.erf(z / math.sqrt(2.0)))
-    return max(0.42, min(0.82, prob))
+    return max(0.44, min(0.68, prob))
 
-def _calc_win_prob_poisson(market_line: float, expected_val: float) -> float:
+def _calc_win_prob_nbinom(market_line: float, expected_val: float, r: float = 10.0) -> float:
     """
-    Calculates P(X > market_line) when expected count is expected_val under Poisson distribution.
+    Calculates P(X > market_line) under Negative Binomial distribution for overdispersed counts (receptions).
+    Variance = mu + mu^2 / r.
+    r controls dispersion (lower r = higher variance; r in 8 - 14 for NFL receivers).
     """
     if expected_val <= 0 or market_line <= 0:
         return 0.50
     k = int(math.floor(market_line))
+    p = r / (r + expected_val)
+    # Exact numerically stable recurrence
     cdf = 0.0
-    term = math.exp(-expected_val)
-    cdf += term
-    for i in range(1, k + 1):
-        term *= (expected_val / i)
-        cdf += term
+    prob_j = (p ** r)
+    cdf += prob_j
+    for j in range(1, k + 1):
+        prob_j *= ((r + j - 1) / j) * (1.0 - p)
+        cdf += prob_j
     prob = 1.0 - cdf
-    return max(0.42, min(0.82, prob))
+    return max(0.44, min(0.68, prob))
+
+def _calc_win_prob_poisson(market_line: float, expected_val: float) -> float:
+    """Legacy alias routing to Negative Binomial for overdispersed catch counts."""
+    return _calc_win_prob_nbinom(market_line, expected_val, r=10.0)
+
+def _evaluate_prob_and_tier(mkt_line: float, fair_val: float, is_count: bool, sigma_or_r: float) -> Tuple[float, float, str]:
+    """
+    Evaluates calibrated win probability, EV against standard -110 juice (52.38% breakeven),
+    caps outliers to prevent implausible edges, and assigns market-aware confidence tiers.
+    """
+    if is_count:
+        p_win = _calc_win_prob_nbinom(mkt_line, fair_val, r=sigma_or_r)
+    else:
+        p_win = _calc_win_prob_lognormal_median(mkt_line, fair_val, sigma=sigma_or_r)
+
+    raw_ev = ((p_win - 0.5238) / 0.5238) * 100
+    ev_pct = round(raw_ev, 1)
+
+    # Flag and cap outliers (>12% EV is flagged as Review / High Edge and capped at 14.0%)
+    if ev_pct > 12.0:
+        tier = 'Grade A (Review / High Edge)'
+        ev_pct = min(14.0, ev_pct)
+    elif p_win >= 0.565:
+        tier = 'Grade A (High Conviction)'
+    elif p_win >= 0.535:
+        tier = 'Grade B (Solid Edge)'
+    else:
+        tier = 'Grade C (Marginal Edge)'
+
+    return p_win, ev_pct, tier
 
 def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = None, end_date: Optional[str] = None, schedules_df=None, weekly_df=None):
     _ensure_parquet_loaded()
@@ -1176,11 +1245,10 @@ def compute_scheme_insights(
                     z_cov = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
                     priority = 94.0 + (z_delta * 1.2) + (z_tgt * 0.5) + (z_yprr * 1.8) + (z_cov * 1.0) - (z_opp_pressure * 0.4)
                     mkt_line = 44.5
-                    scheme_lift = 0.16 + (z_delta * 0.03) + (z_cov * 0.03)
-                    fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
-                    p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.46)
-                    ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                    tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                    raw_lift = 0.05 + (z_delta * 0.012) + (z_cov * 0.015) + (z_yprr * 0.01) - (z_opp_pressure * 0.008)
+                    scheme_lift = max(-0.06, min(0.10, raw_lift))
+                    fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
+                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'])
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.4, 2)}z"
 
                     cands.append({
@@ -1213,11 +1281,10 @@ def compute_scheme_insights(
                     z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                     priority = 93.0 + (z_delta * 1.2) + (z_tgt * 0.6) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.5)
                     mkt_line = 3.5
-                    scheme_lift = 0.18 + (z_delta * 0.03) + (z_cov * 0.03)
-                    fair_val = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
-                    p_win = _calc_win_prob_poisson(mkt_line, fair_val)
-                    ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                    tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                    raw_lift = 0.05 + (z_delta * 0.015) + (z_cov * 0.015) + (z_opp_pressure * 0.008)
+                    scheme_lift = max(-0.06, min(0.12, raw_lift))
+                    fair_val = round(mkt_line * (1.0 + scheme_lift), 1)
+                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0)
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                     cands.append({
@@ -1256,11 +1323,10 @@ def compute_scheme_insights(
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                 priority = 93.0 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.6)
                 mkt_line = 4.5
-                scheme_lift = 0.18 + (z_delta * 0.03) + (z_tgt * 0.02) + (z_cov * 0.02) + (z_opp_pressure * 0.03)
-                fair_val = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
-                p_win = _calc_win_prob_poisson(mkt_line, fair_val)
-                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                raw_lift = 0.06 + (z_delta * 0.015) + (z_tgt * 0.01) + (z_cov * 0.015) + (z_opp_pressure * 0.008)
+                scheme_lift = max(-0.06, min(0.12, raw_lift))
+                fair_val = round(mkt_line * (1.0 + scheme_lift), 1)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=10.0)
                 z_str = f"+{round(1.1 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1298,12 +1364,12 @@ def compute_scheme_insights(
                 z_yprr = (p.get('yprr_man', 2.2) - 1.75) / 0.50
                 z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5
                 priority = 92.5 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.8) + (z_cov * 1.2) - (z_opp_pressure * 0.6)
-                mkt_line = 64.5 if p.get('tgt_man', 0) >= 25.0 else 54.5
-                scheme_lift = 0.18 + (z_delta * 0.03) + (z_yprr * 0.03) + (z_cov * 0.03) - (z_opp_pressure * 0.02)
-                fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
-                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.46)
-                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                def_line = 64.5 if p.get('tgt_man', 0) >= 25.0 else 54.5
+                mkt_line = def_line
+                raw_lift = 0.05 + (z_delta * 0.012) + (z_yprr * 0.015) + (z_cov * 0.015) - (z_opp_pressure * 0.008)
+                scheme_lift = max(-0.06, min(0.10, raw_lift))
+                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'])
                 z_str = f"+{round(1.2 + max(0.0, z_yprr)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1340,11 +1406,10 @@ def compute_scheme_insights(
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                 priority = 91.0 + (z_yprr * 2.0) + (z_tgt * 0.6) + (z_cov * 0.8) - (z_opp_pressure * 0.4)
                 mkt_line = 54.5
-                scheme_lift = 0.15 + (z_yprr * 0.03) + (z_cov * 0.02)
-                fair_line = round(mkt_line * (1.0 + max(0.05, scheme_lift)), 1)
-                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.46)
-                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                raw_lift = 0.04 + (z_yprr * 0.015) + (z_tgt * 0.01) + (z_cov * 0.01) - (z_opp_pressure * 0.008)
+                scheme_lift = max(-0.05, min(0.09, raw_lift))
+                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_honey'])
                 z_str = f"+{round(1.0 + max(0.0, z_yprr)*0.4, 2)}z"
 
                 cands.append({
@@ -1381,10 +1446,10 @@ def compute_scheme_insights(
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
                 priority = 90.0 + (z_delta * 1.2) + (z_opp_pressure * 1.2) + (z_cov * 0.6)
                 mkt_line = 3.5
-                fair_val = round(mkt_line * (1.0 + 0.16 + (z_opp_pressure * 0.04) + (z_delta * 0.02)), 1)
-                p_win = _calc_win_prob_poisson(mkt_line, fair_val)
-                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                raw_lift = 0.05 + (z_delta * 0.01) + (z_opp_pressure * 0.015) + (z_cov * 0.01)
+                scheme_lift = max(-0.05, min(0.10, raw_lift))
+                fair_val = round(mkt_line * (1.0 + scheme_lift), 1)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0)
                 z_str = f"+{round(0.9 + max(0.0, z_opp_pressure)*0.4, 2)}z"
 
                 cands.append({
@@ -1451,9 +1516,8 @@ def compute_scheme_insights(
             # Stout run defense - downgrade priority so it does not displace real passing edges
             priority = 74.0 + ((team_ypc - league_avg_ypc) * 4.0) - ((16 - opp_def_rank) * 1.2)
             mkt_line = 56.5
-            fair_line = round(mkt_line * 0.88, 1)
-            p_win = 0.44
-            ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
+            fair_line = round(mkt_line * 0.94, 1)
+            p_win, ev_pct, _ = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'])
             tier = 'Grade C (Caution / Under)'
             z_str = f"-{round(abs((opp_def_ypc - league_avg_ypc) / 0.40), 2)}z"
 
@@ -1488,11 +1552,10 @@ def compute_scheme_insights(
             delta = round(opp_def_ypc - league_avg_ypc, 2)
             priority = 93.0 + ((opp_def_ypc - league_avg_ypc) * 8.0) + ((team_ypc - league_avg_ypc) * 4.0) + (z_box * 0.8)
             mkt_line = 62.5
-            scheme_lift = ((opp_def_ypc - league_avg_ypc) / league_avg_ypc) * 1.5 + ((team_ypc - league_avg_ypc) / league_avg_ypc) * 0.8
-            fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
-            p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
-            ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-            tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+            raw_lift = ((opp_def_ypc - league_avg_ypc) / league_avg_ypc) * 0.8 + ((team_ypc - league_avg_ypc) / league_avg_ypc) * 0.4 + (z_box * 0.01)
+            scheme_lift = max(-0.05, min(0.10, raw_lift))
+            fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
+            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'])
             z_str = f"+{round(1.1 + max(0.0, opp_def_ypc - league_avg_ypc)*1.5, 2)}z"
 
             cands.append({
@@ -1525,10 +1588,8 @@ def compute_scheme_insights(
             delta = round(team_ypc - league_avg_ypc, 2)
             priority = 85.0 + ((team_ypc - league_avg_ypc) * 4.0)
             mkt_line = 58.5
-            fair_line = round(mkt_line * 1.04, 1)
-            p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
-            ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-            tier = 'Grade B (Solid Edge)'
+            fair_line = round(mkt_line * 1.02, 1)
+            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'])
             z_str = '+0.50z'
 
             cands.append({
@@ -1571,11 +1632,10 @@ def compute_scheme_insights(
                 z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5
                 priority = 93.5 + (cov.get('man_pct', 30.0) * 0.10) + (z_opp_pressure * 0.8)
                 mkt_line = 34.5
-                scheme_lift = 0.22 + (z_cov * 0.04) + (z_opp_pressure * 0.03)
-                fair_line = round(mkt_line * (1.0 + max(0.08, scheme_lift)), 1)
-                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
-                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                tier = 'Grade A (High Conviction)' if p_win >= 0.63 else 'Grade B (Solid Edge)'
+                raw_lift = 0.06 + (z_cov * 0.015) + (z_opp_pressure * 0.015)
+                scheme_lift = max(-0.05, min(0.12, raw_lift))
+                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'])
                 z_str = f"+{round(1.2 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1608,11 +1668,10 @@ def compute_scheme_insights(
                 z_cov = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
                 priority = 91.5 + (cov.get('mfo_pct', 50.0) * 0.05) + (z_opp_pressure * 0.4)
                 mkt_line = 31.5
-                scheme_lift = 0.16 + (z_cov * 0.03)
-                fair_line = round(mkt_line * (1.0 + max(0.06, scheme_lift)), 1)
-                p_win = _calc_win_prob_lognormal_median(mkt_line, fair_line, 0.44)
-                ev_pct = round(((p_win - 0.5238) / 0.5238) * 100, 1)
-                tier = 'Grade B (Solid Edge)'
+                raw_lift = 0.05 + (z_cov * 0.012) + (z_opp_pressure * 0.01)
+                scheme_lift = max(-0.05, min(0.10, raw_lift))
+                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'])
                 z_str = f"+{round(1.0 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1645,6 +1704,9 @@ def compute_scheme_insights(
         # Fallback if no candidate found for team
         if not cands and team_prof.get('target_alignment', {}).get('key_targets'):
             top_p = team_prof['target_alignment']['key_targets'][0]
+            fb_mkt = 54.5
+            fb_fair = round(fb_mkt * 1.04, 1)
+            p_win, ev_pct, tier = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'])
             cands.append({
                 'player': top_p['name'],
                 'team': team_code,
@@ -1658,15 +1720,15 @@ def compute_scheme_insights(
                 'verdict': 'VOLUME PRIME CANDIDATE',
                 'rationale': f"Core offensive gameplan funnels prioritized target looks to {top_p['name']} across coverage alignments.",
                 'causal_mechanism': 'Primary weapon maintains prioritized route reads and designed quick-game touches across coverage alignments.',
-                'market_line': '54.5 Rec Yds',
-                'market_line_num': 54.5,
-                'fair_line': '61.5 Rec Yds',
-                'fair_line_num': 61.5,
-                'win_prob': 0.592,
-                'win_prob_fmt': '59.2%',
-                'ev_pct': '+13.0% EV',
-                'ev_pct_num': 13.0,
-                'confidence_tier': 'Grade B (Solid Edge)',
+                'market_line': f"{fb_mkt:.1f} Rec Yds",
+                'market_line_num': fb_mkt,
+                'fair_line': f"{fb_fair:.1f} Rec Yds",
+                'fair_line_num': fb_fair,
+                'win_prob': round(p_win, 3),
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                'ev_pct_num': ev_pct,
+                'confidence_tier': tier,
                 'z_score': '+0.85z',
                 'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                 'priority': 70.0

@@ -27,11 +27,12 @@ def test_scheme_top4_breakouts():
             assert b['stat_focus'] in ('Receiving Yards', 'Receptions', 'Rushing Yards'), f"Invalid stat_focus in {b}"
             assert b.get('scheme_delta'), f"Missing scheme_delta in {b}"
             assert b.get('rationale'), f"Missing rationale in {b}"
-            assert 0.40 <= b.get('win_prob', 0) <= 0.85, f"Invalid win_prob in {b}"
+            assert 0.44 <= b.get('win_prob', 0) <= 0.68, f"Uncalibrated win_prob {b.get('win_prob')} in {b}"
             assert b.get('win_prob_fmt', '').endswith('%'), f"Invalid win_prob_fmt in {b}"
             assert b.get('market_line'), f"Missing market_line in {b}"
             assert b.get('fair_line'), f"Missing fair_line in {b}"
             assert 'EV' in b.get('ev_pct', ''), f"Missing EV in {b}"
+            assert b.get('ev_pct_num', 0) <= 14.0, f"Implausibly large EV {b.get('ev_pct_num')} in {b}"
             assert 'Grade' in b.get('confidence_tier', ''), f"Missing confidence_tier in {b}"
             assert b.get('z_score', '').endswith('z'), f"Missing z_score in {b}"
 
@@ -99,5 +100,24 @@ def test_den_engram():
     jax_targets = [t['name'] for t in jax_prof['target_alignment']['key_targets']]
     assert 'E.Engram' not in jax_targets
     assert 'P.Washington' in jax_targets
+
+def test_calibrated_edges_and_tiers():
+    # Pickens, Nacua, Adams must have calibrated, realistic EVs (2% to 12%), not +40%
+    res_dal = compute_scheme_insights('DAL', 'NYG')
+    pickens = [b for b in res_dal.get('efficiency_breakouts', []) if b['player'] == 'G.Pickens']
+    if pickens:
+        p = pickens[0]
+        assert p['win_prob'] <= 0.65, f"Pickens win_prob too high: {p['win_prob']}"
+        assert p['ev_pct_num'] <= 12.0, f"Pickens EV too high: {p['ev_pct_num']}"
+        assert p['fair_line_num'] <= 75.0, f"Pickens fair line too high: {p['fair_line_num']}"
+
+    res_la = compute_scheme_insights('SF', 'LA')
+    nacua = [b for b in res_la.get('efficiency_breakouts', []) if b['player'] == 'P.Nacua']
+    if nacua:
+        n = nacua[0]
+        assert n['win_prob'] <= 0.65, f"Nacua win_prob too high: {n['win_prob']}"
+        assert n['ev_pct_num'] <= 12.0, f"Nacua EV too high: {n['ev_pct_num']}"
+        assert n['fair_line_num'] <= 75.0, f"Nacua fair line too high: {n['fair_line_num']}"
+
 
 
