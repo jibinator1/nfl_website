@@ -53,3 +53,18 @@ def test_pickens_on_cowboys():
     if dal_pickens:
         assert dal_pickens[0]['team'] == 'DAL'
 
+def test_adams_on_rams():
+    # Adams belongs to LA (LAR)
+    res_la = compute_scheme_insights('LA', 'SF')
+    la_breakouts = res_la.get('efficiency_breakouts', [])
+    la_adams = [b for b in la_breakouts if b['player'] == 'D.Adams']
+    if la_adams:
+        assert la_adams[0]['team'] == 'LA'
+    
+    # In NYJ matchups, Adams is NOT on NYJ
+    res_nyj = compute_scheme_insights('NYJ', 'NE')
+    nyj_breakouts = res_nyj.get('efficiency_breakouts', [])
+    nyj_players = [b['player'] for b in nyj_breakouts if b['team'] == 'NYJ']
+    assert 'D.Adams' not in nyj_players
+
+
