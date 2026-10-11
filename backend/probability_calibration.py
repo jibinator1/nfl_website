@@ -93,11 +93,31 @@ def load_calibration() -> Dict[str, Tuple[np.ndarray, np.ndarray]]:
     return _CALIBRATORS
 
 
-def recalibrate(p_model: float, stat_focus: str) -> float:
+def recalibrate(p_model: float, stat_focus: str, side: str = 'Over') -> float:
     """
     Applies isotonic calibration using piecewise linear/step interpolation with out-of-bounds clipping.
     Mathematically identical to scikit-learn's IsotonicRegression.predict([p_model])[0].
+
+    If side == 'Under':
+    Existing historical knots were fit strictly on Over distributions.
+    Under predictions remain uncalibrated passthroughs (identity mapping) until >=200 graded
+    Under outcomes are accumulated in live forward-testing.
     """
+    if side == 'Under':
+        cals = load_calibration()
+        under_key = f"{stat_focus}_Under"
+        if under_key in cals:
+            knots = cals[under_key]
+            if knots and len(knots[0]) > 0 and len(knots[1]) > 0:
+                x_knots, y_knots = knots
+                try:
+                    val = float(np.interp(p_model, x_knots, y_knots, left=y_knots[0], right=y_knots[-1]))
+                    return max(0.40, min(0.68, val))
+                except Exception:
+                    pass
+        # Passthrough identity for Under picks
+        return float(p_model)
+
     cals = load_calibration()
     knots = cals.get(stat_focus)
     if not knots or len(knots[0]) == 0 or len(knots[1]) == 0:
@@ -109,3 +129,12 @@ def recalibrate(p_model: float, stat_focus: str) -> float:
         return max(0.40, min(0.68, val))
     except Exception:
         return float(p_model)
+
+
+def is_stat_calibrated(stat_focus: str, side: str = 'Over') -> bool:
+    """Returns True if dedicated empirical calibration knots exist for this stat and side."""
+    cals = load_calibration()
+    if side == 'Under':
+        return f"{stat_focus}_Under" in cals
+    return stat_focus in cals
+

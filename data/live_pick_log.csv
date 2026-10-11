@@ -1,0 +1,112 @@
+logged_at,matchup,game_id,kickoff,player,team,pos,stat,side,market_line,fair_line,win_prob_raw,win_prob_cal,tier,line_source,ev_pct,calibration_status
+2026-10-11T17:41:00.404226+00:00,BAL @ KC,BAL_KC,,T.Kelce,KC,TE,Receiving Yards,Over,44.5 Rec Yds,45.8 Rec Yds,0.52,0.433,Model-Neutral (Grade C),Consensus Baseline,-17.3% EV,Calibrated
+2026-10-11T17:41:00.415347+00:00,BAL @ KC,BAL_KC,,Z.Flowers,BAL,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:41:00.420882+00:00,BAL @ KC,BAL_KC,,M.Andrews,BAL,TE,Receiving Yards,Over,44.5 Rec Yds,45.7 Rec Yds,0.518,0.42,Model-Neutral (Grade C),Consensus Baseline,-19.8% EV,Calibrated
+2026-10-11T17:41:00.427391+00:00,BAL @ KC,BAL_KC,,D.Henry,BAL,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:41:00.437575+00:00,LA @ SF,LA_SF,,P.Nacua,LA,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:41:00.446864+00:00,LA @ SF,LA_SF,,G.Kittle,SF,TE,Receiving Yards,Over,54.5 Rec Yds,56.1 Rec Yds,0.52,0.434,Model-Neutral (Grade C),The Odds API (Draftkings),-17.1% EV,Calibrated
+2026-10-11T17:41:00.454261+00:00,LA @ SF,LA_SF,,D.Adams,LA,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:41:00.459792+00:00,LA @ SF,LA_SF,,T.Higbee,LA,TE,Receiving Yards,Over,44.5 Rec Yds,45.8 Rec Yds,0.52,0.433,Model-Neutral (Grade C),Consensus Baseline,-17.3% EV,Calibrated
+2026-10-11T17:41:00.470305+00:00,NYG @ DAL,NYG_DAL,,G.Pickens,DAL,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:41:00.475930+00:00,NYG @ DAL,NYG_DAL,,M.Nabers,NYG,WR,Receiving Yards,Over,56.5 Rec Yds,58.1 Rec Yds,0.517,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.3% EV,Calibrated
+2026-10-11T17:41:00.482599+00:00,NYG @ DAL,NYG_DAL,,I.Likely,NYG,TE,Receptions,Over,4.5 Receptions,4.6 Receptions,0.468,0.465,Model-Neutral (Grade C),The Odds API (Draftkings),-11.3% EV,Calibrated
+2026-10-11T17:41:00.489656+00:00,NYG @ DAL,NYG_DAL,,C.Lamb,DAL,WR,Receptions,Over,4.5 Receptions,4.6 Receptions,0.465,0.459,Model-Neutral (Grade C),Consensus Baseline,-12.3% EV,Calibrated
+2026-10-11T17:41:00.500227+00:00,GB @ JAX,GB_JAX,,T.Kraft,GB,TE,Receiving Yards,Over,50.5 Rec Yds,52.0 Rec Yds,0.52,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T17:41:00.506531+00:00,GB @ JAX,GB_JAX,,M.Lloyd,GB,RB,Rushing Yards,Under,27.5 Rush Yds,26.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),The Odds API (Draftkings),+0.9% EV,Uncalibrated (Raw)
+2026-10-11T17:41:00.513317+00:00,GB @ JAX,GB_JAX,,B.Strange,JAX,TE,Receiving Yards,Over,68.5 Rec Yds,70.6 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T17:41:00.521389+00:00,GB @ JAX,GB_JAX,,C.Watson,GB,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.1% EV,Calibrated
+2026-10-11T17:41:00.531630+00:00,PIT @ DEN,PIT_DEN,,P.Freiermuth,PIT,TE,Receiving Yards,Over,26.5 Rec Yds,27.2 Rec Yds,0.518,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.3% EV,Calibrated
+2026-10-11T17:41:00.538654+00:00,PIT @ DEN,PIT_DEN,,J.Waddle,DEN,WR,Receiving Yards,Over,55.5 Rec Yds,57.2 Rec Yds,0.519,0.425,Model-Neutral (Grade C),The Odds API (Draftkings),-19.0% EV,Calibrated
+2026-10-11T17:41:00.546275+00:00,PIT @ DEN,PIT_DEN,,C.Sutton,DEN,WR,Receiving Yards,Over,38.5 Rec Yds,39.6 Rec Yds,0.518,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.3% EV,Calibrated
+2026-10-11T17:41:00.554300+00:00,PIT @ DEN,PIT_DEN,,D.Metcalf,PIT,WR,Receiving Yards,Over,50.5 Rec Yds,51.8 Rec Yds,0.516,0.4,Model-Neutral (Grade C),The Odds API (Draftkings),-23.6% EV,Calibrated
+2026-10-11T17:41:00.564811+00:00,SF @ CLE,SF_CLE,,G.Kittle,SF,TE,Receiving Yards,Over,54.5 Rec Yds,56.1 Rec Yds,0.52,0.434,Model-Neutral (Grade C),The Odds API (Draftkings),-17.1% EV,Calibrated
+2026-10-11T17:41:00.571873+00:00,SF @ CLE,SF_CLE,,D.Boston,CLE,WR,Receiving Yards,Over,47.5 Rec Yds,48.9 Rec Yds,0.518,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.1% EV,Calibrated
+2026-10-11T17:41:00.578441+00:00,SF @ CLE,SF_CLE,,H.Fannin,CLE,TE,Receiving Yards,Over,44.5 Rec Yds,45.8 Rec Yds,0.52,0.433,Model-Neutral (Grade C),Consensus Baseline,-17.3% EV,Calibrated
+2026-10-11T17:41:00.585950+00:00,SF @ CLE,SF_CLE,,K.Concepcion,CLE,WR,Receiving Yards,Over,40.5 Rec Yds,41.7 Rec Yds,0.518,0.419,Model-Neutral (Grade C),The Odds API (Draftkings),-20.0% EV,Calibrated
+2026-10-11T17:41:00.595972+00:00,KC @ TEN,KC_TEN,,T.Kelce,KC,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),Consensus Baseline,-12.3% EV,Calibrated
+2026-10-11T17:41:00.603486+00:00,KC @ TEN,KC_TEN,,C.Tate,TEN,WR,Receiving Yards,Over,46.5 Rec Yds,47.8 Rec Yds,0.517,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.3% EV,Calibrated
+2026-10-11T17:41:00.610497+00:00,KC @ TEN,KC_TEN,,T.Pollard,TEN,RB,Rushing Yards,Under,51.5 Rush Yds,49.6 Rush Yds,0.529,0.529,Model-Neutral (Grade C),The Odds API (Draftkings),+1.0% EV,Uncalibrated (Raw)
+2026-10-11T17:41:00.617538+00:00,KC @ TEN,KC_TEN,,Cam Ward,TEN,QB,Rushing Yards,Over,11.5 Rush Yds,11.8 Rush Yds,0.517,0.4,Model-Neutral (Grade C),The Odds API (Draftkings),-23.6% EV,Calibrated
+2026-10-11T17:41:00.627511+00:00,JAX @ PHI,JAX_PHI,,D.Goedert,PHI,TE,Receiving Yards,Over,17.5 Rec Yds,18.0 Rec Yds,0.519,0.429,Model-Neutral (Grade C),The Odds API (Draftkings),-18.0% EV,Calibrated
+2026-10-11T17:41:00.634567+00:00,JAX @ PHI,JAX_PHI,,B.Strange,JAX,TE,Receiving Yards,Over,68.5 Rec Yds,70.6 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T17:41:00.641688+00:00,JAX @ PHI,JAX_PHI,,S.Barkley,PHI,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:41:00.648349+00:00,JAX @ PHI,JAX_PHI,,D.Smith,PHI,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:45:11.707330+00:00,SF @ CLE,SF_CLE,,Q.Judkins,CLE,RB,Rushing Yards,Under,59.5 Rush Yds,57.4 Rush Yds,0.528,0.528,Model-Neutral (Grade C),The Odds API (Draftkings),+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:45:11.717700+00:00,KC @ TEN,KC_TEN,,K.Walker,KC,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:49:39.135740+00:00,TEN @ HOU,TEN_HOU,,T.Pollard,TEN,RB,Rushing Yards,Under,51.5 Rush Yds,49.6 Rush Yds,0.529,0.529,Model-Neutral (Grade C),The Odds API (Draftkings),+1.0% EV,Uncalibrated (Raw)
+2026-10-11T17:49:39.141817+00:00,TEN @ HOU,TEN_HOU,,D.Montgomery,HOU,RB,Rushing Yards,Under,42.5 Rush Yds,41.0 Rush Yds,0.528,0.528,Model-Neutral (Grade C),The Odds API (Draftkings),+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:49:39.146326+00:00,TEN @ HOU,TEN_HOU,,D.Schultz,HOU,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),The Odds API (Draftkings),-12.3% EV,Calibrated
+2026-10-11T17:49:39.152346+00:00,TEN @ HOU,TEN_HOU,,N.Collins,HOU,WR,Receiving Yards,Over,76.5 Rec Yds,78.6 Rec Yds,0.517,0.415,Model-Neutral (Grade C),The Odds API (Draftkings),-20.7% EV,Calibrated
+2026-10-11T17:49:39.355940+00:00,PIT @ IND,PIT_IND,,D.Metcalf,PIT,WR,Receiving Yards,Over,50.5 Rec Yds,52.0 Rec Yds,0.518,0.42,Model-Neutral (Grade C),The Odds API (Draftkings),-19.9% EV,Calibrated
+2026-10-11T17:49:39.360568+00:00,PIT @ IND,PIT_IND,,P.Freiermuth,PIT,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),The Odds API (Draftkings),-12.3% EV,Calibrated
+2026-10-11T17:49:39.367705+00:00,PIT @ IND,PIT_IND,,Daniel Jones,IND,QB,Rushing Yards,Over,9.5 Rush Yds,9.7 Rush Yds,0.513,0.4,Model-Neutral (Grade C),The Odds API (Draftkings),-23.6% EV,Calibrated
+2026-10-11T17:49:39.373160+00:00,PIT @ IND,PIT_IND,,J.Downs,IND,WR,Receptions,Over,4.5 Receptions,4.6 Receptions,0.465,0.459,Model-Neutral (Grade C),The Odds API (Draftkings),-12.3% EV,Calibrated
+2026-10-11T17:49:39.387912+00:00,SF @ LA,SF_LA,,P.Nacua,LA,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:49:39.395159+00:00,SF @ LA,SF_LA,,G.Kittle,SF,TE,Receiving Yards,Over,54.5 Rec Yds,56.1 Rec Yds,0.52,0.434,Model-Neutral (Grade C),The Odds API (Draftkings),-17.1% EV,Calibrated
+2026-10-11T17:49:39.401241+00:00,SF @ LA,SF_LA,,D.Adams,LA,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:49:39.410257+00:00,SF @ LA,SF_LA,,T.Higbee,LA,TE,Receiving Yards,Over,44.5 Rec Yds,45.8 Rec Yds,0.52,0.433,Model-Neutral (Grade C),Consensus Baseline,-17.3% EV,Calibrated
+2026-10-11T17:49:39.419798+00:00,NE @ NYJ,NE_NYJ,,H.Henry,NE,TE,Receiving Yards,Over,38.5 Rec Yds,39.7 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T17:49:39.426801+00:00,NE @ NYJ,NE_NYJ,,G.Wilson,NYJ,WR,Receiving Yards,Over,69.5 Rec Yds,71.6 Rec Yds,0.519,0.422,Model-Neutral (Grade C),The Odds API (Draftkings),-19.4% EV,Calibrated
+2026-10-11T17:49:39.433358+00:00,NE @ NYJ,NE_NYJ,,M.Hollins,NE,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:49:39.437860+00:00,NE @ NYJ,NE_NYJ,,R.Doubs,NE,WR,Receiving Yards,Over,48.5 Rec Yds,50.0 Rec Yds,0.519,0.426,Model-Neutral (Grade C),The Odds API (Draftkings),-18.7% EV,Calibrated
+2026-10-11T17:49:39.467488+00:00,GB @ CHI,GB_CHI,,C.Loveland,CHI,TE,Receiving Yards,Over,39.5 Rec Yds,40.7 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T17:49:39.473723+00:00,GB @ CHI,GB_CHI,,C.Watson,GB,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.1% EV,Calibrated
+2026-10-11T17:49:39.479905+00:00,GB @ CHI,GB_CHI,,L.Burden,CHI,WR,Receiving Yards,Over,46.5 Rec Yds,47.9 Rec Yds,0.518,0.422,Model-Neutral (Grade C),The Odds API (Draftkings),-19.5% EV,Calibrated
+2026-10-11T17:49:39.487412+00:00,GB @ CHI,GB_CHI,,T.Kraft,GB,TE,Receptions,Over,4.5 Receptions,4.6 Receptions,0.468,0.465,Model-Neutral (Grade C),The Odds API (Draftkings),-11.3% EV,Calibrated
+2026-10-11T17:49:39.662861+00:00,GB @ CHI,GB_CHI,,D.Swift,CHI,RB,Rushing Yards,Under,84.5 Rush Yds,82.2 Rush Yds,0.521,0.521,Model-Neutral (Grade C),The Odds API (Draftkings),-0.5% EV,Uncalibrated (Raw)
+2026-10-11T17:54:16.652783+00:00,TEN @ HOU,TEN_HOU,,J.Mixon,HOU,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:54:16.664892+00:00,GB @ DET,GB_DET,,S.LaPorta,DET,TE,Receiving Yards,Over,52.5 Rec Yds,54.1 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T17:54:16.669922+00:00,GB @ DET,GB_DET,,C.Watson,GB,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.1% EV,Calibrated
+2026-10-11T17:54:16.676006+00:00,GB @ DET,GB_DET,,T.Kraft,GB,TE,Receptions,Over,4.5 Receptions,4.6 Receptions,0.468,0.465,Model-Neutral (Grade C),The Odds API (Draftkings),-11.3% EV,Calibrated
+2026-10-11T17:54:16.680840+00:00,GB @ DET,GB_DET,,A.St. Brown,DET,WR,Receptions,Over,7.5 Receptions,7.8 Receptions,0.486,0.68,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T17:54:16.690860+00:00,MIN @ NO,MIN_NO,,T.Hockenson,MIN,TE,Receiving Yards,Over,42.5 Rec Yds,43.8 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T17:54:16.697362+00:00,MIN @ NO,MIN_NO,,J.Jefferson,MIN,WR,Receiving Yards,Over,78.5 Rec Yds,80.9 Rec Yds,0.519,0.424,Model-Neutral (Grade C),The Odds API (Draftkings),-19.0% EV,Calibrated
+2026-10-11T17:54:16.701886+00:00,MIN @ NO,MIN_NO,,C.Olave,NO,WR,Receiving Yards,Over,80.5 Rec Yds,82.9 Rec Yds,0.518,0.42,Model-Neutral (Grade C),The Odds API (Draftkings),-19.8% EV,Calibrated
+2026-10-11T17:54:16.705915+00:00,MIN @ NO,MIN_NO,,J.Johnson,NO,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),The Odds API (Draftkings),-12.3% EV,Calibrated
+2026-10-11T17:54:16.713926+00:00,DAL @ PHI,DAL_PHI,,D.Goedert,PHI,TE,Receptions,Over,4.5 Receptions,4.6 Receptions,0.468,0.465,Model-Neutral (Grade C),The Odds API (Draftkings),-11.3% EV,Calibrated
+2026-10-11T17:54:16.719432+00:00,DAL @ PHI,DAL_PHI,,D.Smith,PHI,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:54:16.723448+00:00,DAL @ PHI,DAL_PHI,,C.Lamb,DAL,WR,Receptions,Over,4.5 Receptions,4.7 Receptions,0.48,0.68,Model-Flagged (Grade A),Consensus Baseline,+14.0% EV,Calibrated
+2026-10-11T17:54:16.727952+00:00,DAL @ PHI,DAL_PHI,,G.Pickens,DAL,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T17:54:16.740972+00:00,MIA @ BUF,MIA_BUF,,G.Dulcich,MIA,TE,Receiving Yards,Over,27.5 Rec Yds,28.3 Rec Yds,0.52,0.433,Model-Neutral (Grade C),The Odds API (Draftkings),-17.4% EV,Calibrated
+2026-10-11T17:54:16.747479+00:00,MIA @ BUF,MIA_BUF,,J.Cook,BUF,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:54:16.752518+00:00,MIA @ BUF,MIA_BUF,,M.Washington,MIA,WR,Receptions,Over,4.5 Receptions,4.7 Receptions,0.48,0.68,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T17:54:16.756025+00:00,MIA @ BUF,MIA_BUF,,D.Kincaid,BUF,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),Consensus Baseline,-12.3% EV,Calibrated
+2026-10-11T17:59:36.416281+00:00,TEN @ HOU,TEN_HOU,,G.Helm,TEN,TE,Receptions,Over,2.5 Receptions,2.6 Receptions,0.467,0.459,Model-Neutral (Grade C),The Odds API (Draftkings),-12.3% EV,Calibrated
+2026-10-11T17:59:36.425817+00:00,BAL @ KC,BAL_KC,,K.Walker,KC,RB,Rushing Yards,Under,56.5 Rush Yds,54.7 Rush Yds,0.525,0.525,Model-Neutral (Grade C),Consensus Baseline,+0.2% EV,Uncalibrated (Raw)
+2026-10-11T17:59:36.439765+00:00,MIN @ NO,MIN_NO,,A.Jones,MIN,RB,Rushing Yards,Over,71.5 Rush Yds,73.3 Rush Yds,0.519,0.68,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T17:59:36.448829+00:00,DAL @ PHI,DAL_PHI,,Jalen Hurts,PHI,QB,Rushing Yards,Over,2.5 Rush Yds,2.6 Rush Yds,0.525,0.68,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T17:59:36.455901+00:00,DAL @ PHI,DAL_PHI,,J.Ferguson,DAL,TE,Receiving Yards,Over,44.5 Rec Yds,45.8 Rec Yds,0.52,0.433,Model-Neutral (Grade C),Consensus Baseline,-17.3% EV,Calibrated
+2026-10-11T17:59:36.465437+00:00,LA @ SF,LA_SF,,K.Williams,LA,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:59:36.470968+00:00,LA @ SF,LA_SF,,C.McCaffrey,SF,RB,Rushing Yards,Under,49.5 Rush Yds,48.0 Rush Yds,0.524,0.524,Model-Neutral (Grade C),The Odds API (Draftkings),-0.0% EV,Uncalibrated (Raw)
+2026-10-11T17:59:36.671815+00:00,PIT @ IND,PIT_IND,,T.Warren,IND,TE,Receiving Yards,Under,41.5 Rec Yds,40.4 Rec Yds,0.518,0.518,Model-Neutral (Grade C),The Odds API (Draftkings),-1.0% EV,Uncalibrated (Raw)
+2026-10-11T17:59:36.682666+00:00,NYG @ DAL,NYG_DAL,,J.Ferguson,DAL,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),Consensus Baseline,-12.3% EV,Calibrated
+2026-10-11T17:59:36.693792+00:00,SF @ LA,SF_LA,,K.Williams,LA,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T17:59:36.699951+00:00,SF @ LA,SF_LA,,C.McCaffrey,SF,RB,Rushing Yards,Under,49.5 Rush Yds,48.0 Rush Yds,0.524,0.524,Model-Neutral (Grade C),The Odds API (Draftkings),-0.0% EV,Uncalibrated (Raw)
+2026-10-11T17:59:36.711474+00:00,NE @ NYJ,NE_NYJ,,K.Sadiq,NYJ,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),The Odds API (Draftkings),-12.3% EV,Calibrated
+2026-10-11T17:59:36.722721+00:00,JAX @ PHI,JAX_PHI,,P.Washington,JAX,WR,Receptions,Over,5.5 Receptions,5.7 Receptions,0.478,0.651,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T17:59:36.914317+00:00,GB @ JAX,GB_JAX,,P.Washington,JAX,WR,Receptions,Over,5.5 Receptions,5.7 Receptions,0.478,0.651,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T17:59:36.924824+00:00,PIT @ DEN,PIT_DEN,,J.Warren,PIT,RB,Rushing Yards,Over,74.5 Rush Yds,76.5 Rush Yds,0.52,0.68,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T17:59:36.932142+00:00,PIT @ DEN,PIT_DEN,,E.Engram,DEN,TE,Receiving Yards,Under,18.5 Rec Yds,18.0 Rec Yds,0.519,0.519,Model-Neutral (Grade C),The Odds API (Draftkings),-0.9% EV,Uncalibrated (Raw)
+2026-10-11T17:59:36.946151+00:00,KC @ TEN,KC_TEN,,R.Rice,KC,WR,Receptions,Over,4.5 Receptions,4.6 Receptions,0.465,0.459,Model-Neutral (Grade C),Consensus Baseline,-12.3% EV,Calibrated
+2026-10-11T18:00:30.704105+00:00,PHI @ JAX,PHI_JAX,,P.Washington,JAX,WR,Receptions,Over,5.5 Receptions,5.7 Receptions,0.478,0.651,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T18:00:30.708748+00:00,PHI @ JAX,PHI_JAX,,S.Barkley,PHI,RB,Rushing Yards,Under,56.5 Rush Yds,54.5 Rush Yds,0.528,0.528,Model-Neutral (Grade C),Consensus Baseline,+0.7% EV,Uncalibrated (Raw)
+2026-10-11T18:00:30.713253+00:00,PHI @ JAX,PHI_JAX,,B.Strange,JAX,TE,Receiving Yards,Over,68.5 Rec Yds,70.6 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T18:00:30.720272+00:00,PHI @ JAX,PHI_JAX,,D.Goedert,PHI,TE,Receiving Yards,Over,17.5 Rec Yds,18.0 Rec Yds,0.519,0.429,Model-Neutral (Grade C),The Odds API (Draftkings),-18.0% EV,Calibrated
+2026-10-11T18:02:54.091134+00:00,TEN @ HOU,TEN_HOU,,C.Tate,TEN,WR,Receiving Yards,Over,46.5 Rec Yds,47.7 Rec Yds,0.516,0.4,Model-Neutral (Grade C),The Odds API (Draftkings),-23.6% EV,Calibrated
+2026-10-11T18:02:54.101405+00:00,BAL @ KC,BAL_KC,,X.Worthy,KC,WR,Receiving Yards,Over,64.5 Rec Yds,66.2 Rec Yds,0.516,0.404,Model-Neutral (Grade C),Consensus Baseline,-22.9% EV,Calibrated
+2026-10-11T18:02:54.121288+00:00,LA @ SF,LA_SF,,M.Evans,SF,WR,Receiving Yards,Over,49.5 Rec Yds,51.0 Rec Yds,0.519,0.423,Model-Neutral (Grade C),The Odds API (Draftkings),-19.3% EV,Calibrated
+2026-10-11T18:02:54.326079+00:00,SF @ LA,SF_LA,,M.Evans,SF,WR,Receiving Yards,Over,49.5 Rec Yds,51.0 Rec Yds,0.519,0.423,Model-Neutral (Grade C),The Odds API (Draftkings),-19.3% EV,Calibrated
+2026-10-11T18:02:54.482500+00:00,GB @ CHI,GB_CHI,,M.Golden,GB,WR,Receiving Yards,Over,57.5 Rec Yds,58.8 Rec Yds,0.514,0.4,Model-Neutral (Grade C),The Odds API (Draftkings),-23.6% EV,Calibrated
+2026-10-11T18:02:54.506104+00:00,GB @ JAX,GB_JAX,,B.Thomas Jr.,JAX,WR,Receiving Yards,Over,64.5 Rec Yds,66.4 Rec Yds,0.518,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.1% EV,Calibrated
+2026-10-11T18:02:54.518693+00:00,SF @ CLE,SF_CLE,,M.Evans,SF,WR,Receiving Yards,Over,49.5 Rec Yds,50.7 Rec Yds,0.515,0.4,Model-Neutral (Grade C),The Odds API (Draftkings),-23.6% EV,Calibrated
+2026-10-11T18:31:13.550796+00:00,DET @ ARI,DET_ARI,,S.LaPorta,DET,TE,Receiving Yards,Over,52.5 Rec Yds,54.1 Rec Yds,0.521,0.435,Model-Neutral (Grade C),The Odds API (Draftkings),-17.0% EV,Calibrated
+2026-10-11T18:31:13.560370+00:00,DET @ ARI,DET_ARI,,T.McBride,ARI,TE,Receptions,Over,8.5 Receptions,8.7 Receptions,0.478,0.646,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T18:31:13.566881+00:00,DET @ ARI,DET_ARI,,A.St. Brown,DET,WR,Receptions,Over,7.5 Receptions,7.8 Receptions,0.486,0.68,Model-Flagged (Grade A),The Odds API (Draftkings),+14.0% EV,Calibrated
+2026-10-11T18:31:13.574899+00:00,DET @ ARI,DET_ARI,,Mi.Wilson,ARI,WR,Receiving Yards,Over,79.5 Rec Yds,81.7 Rec Yds,0.517,0.418,Model-Neutral (Grade C),The Odds API (Draftkings),-20.3% EV,Calibrated
+2026-10-11T18:31:20.366031+00:00,DET @ ARI,DET_ARI,,J.Conner,ARI,RB,Rushing Yards,Under,56.5 Rush Yds,54.8 Rush Yds,0.523,0.523,Model-Neutral (Grade C),Consensus Baseline,-0.1% EV,Uncalibrated (Raw)
+2026-10-11T23:29:27.457847+00:00,TEN @ HOU,TEN_HOU,,TEN Slot WR,TEN,WR,Receptions,Over,4.5 Receptions,4.7 Receptions,0.48,0.68,Model-Flagged (Grade A),Consensus Baseline,+14.0% EV,Calibrated
+2026-10-11T23:29:27.465349+00:00,TEN @ HOU,TEN_HOU,,TEN TE1,TEN,TE,Receiving Yards,Over,44.5 Rec Yds,45.6 Rec Yds,0.517,0.414,Model-Neutral (Grade C),Consensus Baseline,-21.0% EV,Calibrated
+2026-10-11T23:29:27.474864+00:00,TEN @ HOU,TEN_HOU,,HOU Slot WR,HOU,WR,Receptions,Over,4.5 Receptions,4.6 Receptions,0.465,0.459,Model-Neutral (Grade C),Consensus Baseline,-12.3% EV,Calibrated
+2026-10-11T23:29:27.482864+00:00,TEN @ HOU,TEN_HOU,,HOU TE1,HOU,TE,Receptions,Over,3.5 Receptions,3.6 Receptions,0.468,0.459,Model-Neutral (Grade C),Consensus Baseline,-12.3% EV,Calibrated
+2026-10-11T23:33:41.404614+00:00,GB @ DET,GB_DET,,M.Golden,GB,WR,Receiving Yards,Over,57.5 Rec Yds,59.2 Rec Yds,0.518,0.419,Model-Neutral (Grade C),The Odds API (Draftkings),-20.0% EV,Calibrated
+2026-10-11T23:33:41.505606+00:00,JAX @ PHI,JAX_PHI,,B.Thomas Jr.,JAX,WR,Receiving Yards,Over,64.5 Rec Yds,66.3 Rec Yds,0.517,0.418,Model-Neutral (Grade C),Consensus Baseline,-20.3% EV,Calibrated

@@ -139,19 +139,44 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
         off_rb_rec = pd.DataFrame(columns=['team', 'total_rb_rec_yds', 'total_rb_receptions', 'total_rb_rec_tds'])
         def_rb_rec = pd.DataFrame(columns=['team', 'total_rb_rec_yds_allowed', 'total_rb_receptions_allowed', 'total_rb_rec_tds_allowed', 'total_rb_targets_faced'])
 
-    # Robust Positional Defense: RB1, RB2, WR1, WR2 (Outlier-Capped & Median-Based)
+    # Robust Positional Defense: RB1, RB2, WR1, WR2, TE1, TE2 (Outlier-Capped & Season-Aware Median-Based)
     if not rb_w.empty:
-        # Determine each team's RB1 and RB2 (leading rushers by carries/volume)
-        team_rbs = rb_w.groupby(['team', 'player_display_name'])['carries'].sum().reset_index()
-        team_rbs_sorted = team_rbs.sort_values(['team', 'carries'], ascending=[True, False])
-        top_rb1_list = team_rbs_sorted.groupby('team').nth(0)['player_display_name'].tolist()
-        top_rb2_list = team_rbs_sorted.groupby('team').nth(1)['player_display_name'].tolist()
+        # Determine each team's RB1 and RB2 (leading rushers by carries/volume per season when multi-season)
+        if 'season' in rb_w.columns and rb_w['season'].nunique() > 1:
+            team_rbs = rb_w.groupby(['season', 'team', 'player_display_name'])['carries'].sum().reset_index()
+            team_rbs_sorted = team_rbs.sort_values(['season', 'team', 'carries'], ascending=[True, True, False])
+            rb1_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_rbs_sorted.groupby(['season', 'team']).nth(0)['season'],
+                        team_rbs_sorted.groupby(['season', 'team']).nth(0)['team'],
+                        team_rbs_sorted.groupby(['season', 'team']).nth(0)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            rb2_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_rbs_sorted.groupby(['season', 'team']).nth(1)['season'],
+                        team_rbs_sorted.groupby(['season', 'team']).nth(1)['team'],
+                        team_rbs_sorted.groupby(['season', 'team']).nth(1)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            rb_pos_idx = rb_w.set_index(['season', 'team', 'player_display_name']).index
+            is_rb1 = rb_pos_idx.isin(rb1_idx)
+            is_rb2 = rb_pos_idx.isin(rb2_idx)
+        else:
+            team_rbs = rb_w.groupby(['team', 'player_display_name'])['carries'].sum().reset_index()
+            team_rbs_sorted = team_rbs.sort_values(['team', 'carries'], ascending=[True, False])
+            top_rb1_list = set(team_rbs_sorted.groupby('team').nth(0)['player_display_name'].tolist())
+            top_rb2_list = set(team_rbs_sorted.groupby('team').nth(1)['player_display_name'].tolist())
+            is_rb1 = rb_w['player_display_name'].isin(top_rb1_list)
+            is_rb2 = rb_w['player_display_name'].isin(top_rb2_list)
 
         # RB1: Filter out injury exits (<4 carries) and cap extreme single-game spikes
-        rb1_games = rb_w[rb_w['player_display_name'].isin(top_rb1_list) & (rb_w['carries'] >= 4)].copy()
+        rb1_games = rb_w[is_rb1 & (rb_w['carries'] >= 4)].copy()
         if not rb1_games.empty:
-            rb1_avgs = rb1_games.groupby('player_display_name')['rushing_yards'].median()
-            rb1_games['player_avg'] = rb1_games['player_display_name'].map(rb1_avgs)
+            if 'season' in rb1_games.columns and rb1_games['season'].nunique() > 1:
+                rb1_medians = rb1_games.groupby(['season', 'player_display_name'])['rushing_yards'].median().to_dict()
+                rb1_games['player_avg'] = rb1_games.set_index(['season', 'player_display_name']).index.map(rb1_medians)
+            else:
+                rb1_avgs = rb1_games.groupby('player_display_name')['rushing_yards'].median()
+                rb1_games['player_avg'] = rb1_games['player_display_name'].map(rb1_avgs)
             rb1_games['diff'] = rb1_games['rushing_yards'] - rb1_games['player_avg']
             # Winsorize / Cap single-game diff to prevent 1-game blowout distortion
             rb1_games['diff_capped'] = rb1_games['diff'].clip(lower=-40.0, upper=45.0)
@@ -168,10 +193,14 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
 
         # RB2: Filter injury exits (<2 touches) and cap diff
         rb2_touch_vol = rb_w['carries'] + (rb_w['targets'] if 'targets' in rb_w.columns else 0)
-        rb2_games = rb_w[rb_w['player_display_name'].isin(top_rb2_list) & (rb2_touch_vol >= 2)].copy()
+        rb2_games = rb_w[is_rb2 & (rb2_touch_vol >= 2)].copy()
         if not rb2_games.empty:
-            rb2_avgs = rb2_games.groupby('player_display_name')['rushing_yards'].median()
-            rb2_games['player_avg'] = rb2_games['player_display_name'].map(rb2_avgs)
+            if 'season' in rb2_games.columns and rb2_games['season'].nunique() > 1:
+                rb2_medians = rb2_games.groupby(['season', 'player_display_name'])['rushing_yards'].median().to_dict()
+                rb2_games['player_avg'] = rb2_games.set_index(['season', 'player_display_name']).index.map(rb2_medians)
+            else:
+                rb2_avgs = rb2_games.groupby('player_display_name')['rushing_yards'].median()
+                rb2_games['player_avg'] = rb2_games['player_display_name'].map(rb2_avgs)
             rb2_games['diff'] = rb2_games['rushing_yards'] - rb2_games['player_avg']
             rb2_games['diff_capped'] = rb2_games['diff'].clip(lower=-25.0, upper=35.0)
             def_rb2 = rb2_games.groupby('opponent_team').agg(
@@ -190,18 +219,43 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
     if wr_w.empty:
         wr_w = w[w['position'].isin(['WR', 'TE'])]
     if not wr_w.empty:
-        # Determine each team's WR1 and WR2 (leading receivers by receiving yards)
-        team_wrs = wr_w.groupby(['team', 'player_display_name'])['receiving_yards'].sum().reset_index()
-        team_wrs_sorted = team_wrs.sort_values(['team', 'receiving_yards'], ascending=[True, False])
-        top_wr1_list = team_wrs_sorted.groupby('team').nth(0)['player_display_name'].tolist()
-        top_wr2_list = team_wrs_sorted.groupby('team').nth(1)['player_display_name'].tolist()
+        # Determine each team's WR1 and WR2 (leading receivers by receiving yards per season when multi-season)
+        if 'season' in wr_w.columns and wr_w['season'].nunique() > 1:
+            team_wrs = wr_w.groupby(['season', 'team', 'player_display_name'])['receiving_yards'].sum().reset_index()
+            team_wrs_sorted = team_wrs.sort_values(['season', 'team', 'receiving_yards'], ascending=[True, True, False])
+            wr1_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_wrs_sorted.groupby(['season', 'team']).nth(0)['season'],
+                        team_wrs_sorted.groupby(['season', 'team']).nth(0)['team'],
+                        team_wrs_sorted.groupby(['season', 'team']).nth(0)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            wr2_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_wrs_sorted.groupby(['season', 'team']).nth(1)['season'],
+                        team_wrs_sorted.groupby(['season', 'team']).nth(1)['team'],
+                        team_wrs_sorted.groupby(['season', 'team']).nth(1)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            wr_pos_idx = wr_w.set_index(['season', 'team', 'player_display_name']).index
+            is_wr1 = wr_pos_idx.isin(wr1_idx)
+            is_wr2 = wr_pos_idx.isin(wr2_idx)
+        else:
+            team_wrs = wr_w.groupby(['team', 'player_display_name'])['receiving_yards'].sum().reset_index()
+            team_wrs_sorted = team_wrs.sort_values(['team', 'receiving_yards'], ascending=[True, False])
+            top_wr1_list = set(team_wrs_sorted.groupby('team').nth(0)['player_display_name'].tolist())
+            top_wr2_list = set(team_wrs_sorted.groupby('team').nth(1)['player_display_name'].tolist())
+            is_wr1 = wr_w['player_display_name'].isin(top_wr1_list)
+            is_wr2 = wr_w['player_display_name'].isin(top_wr2_list)
 
         # WR1: Filter out injury exits (<2 targets) and cap diff
         wr1_target_vol = wr_w['targets'] if 'targets' in wr_w.columns else pd.Series(2, index=wr_w.index)
-        wr1_games = wr_w[wr_w['player_display_name'].isin(top_wr1_list) & (wr1_target_vol >= 2)].copy()
+        wr1_games = wr_w[is_wr1 & (wr1_target_vol >= 2)].copy()
         if not wr1_games.empty:
-            wr1_avgs = wr1_games.groupby('player_display_name')['receiving_yards'].median()
-            wr1_games['player_avg'] = wr1_games['player_display_name'].map(wr1_avgs)
+            if 'season' in wr1_games.columns and wr1_games['season'].nunique() > 1:
+                wr1_medians = wr1_games.groupby(['season', 'player_display_name'])['receiving_yards'].median().to_dict()
+                wr1_games['player_avg'] = wr1_games.set_index(['season', 'player_display_name']).index.map(wr1_medians)
+            else:
+                wr1_avgs = wr1_games.groupby('player_display_name')['receiving_yards'].median()
+                wr1_games['player_avg'] = wr1_games['player_display_name'].map(wr1_avgs)
             wr1_games['diff'] = wr1_games['receiving_yards'] - wr1_games['player_avg']
             wr1_games['diff_capped'] = wr1_games['diff'].clip(lower=-45.0, upper=55.0)
             wr1_games['boomed'] = wr1_games['diff_capped'] > 0
@@ -216,10 +270,14 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
 
         # WR2: Filter out injury exits (<1 target) and cap diff
         wr2_target_vol = wr_w['targets'] if 'targets' in wr_w.columns else pd.Series(1, index=wr_w.index)
-        wr2_games = wr_w[wr_w['player_display_name'].isin(top_wr2_list) & (wr2_target_vol >= 1)].copy()
+        wr2_games = wr_w[is_wr2 & (wr2_target_vol >= 1)].copy()
         if not wr2_games.empty:
-            wr2_avgs = wr2_games.groupby('player_display_name')['receiving_yards'].median()
-            wr2_games['player_avg'] = wr2_games['player_display_name'].map(wr2_avgs)
+            if 'season' in wr2_games.columns and wr2_games['season'].nunique() > 1:
+                wr2_medians = wr2_games.groupby(['season', 'player_display_name'])['receiving_yards'].median().to_dict()
+                wr2_games['player_avg'] = wr2_games.set_index(['season', 'player_display_name']).index.map(wr2_medians)
+            else:
+                wr2_avgs = wr2_games.groupby('player_display_name')['receiving_yards'].median()
+                wr2_games['player_avg'] = wr2_games['player_display_name'].map(wr2_avgs)
             wr2_games['diff'] = wr2_games['receiving_yards'] - wr2_games['player_avg']
             wr2_games['diff_capped'] = wr2_games['diff'].clip(lower=-30.0, upper=40.0)
             def_wr2 = wr2_games.groupby('opponent_team').agg(
@@ -233,21 +291,46 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
         def_star_wr = pd.DataFrame(columns=['team', 'def_star_wr_games', 'def_star_wr_allowed', 'def_star_wr_diff', 'def_star_wr_boom_rate'])
         def_wr2 = pd.DataFrame(columns=['team', 'def_wr2_games', 'def_wr2_allowed', 'def_wr2_diff'])
 
-    # TE1 & TE2 Defense aggregates (Outlier-Capped & Median-Based)
+    # TE1 & TE2 Defense aggregates (Outlier-Capped & Season-Aware Median-Based)
     te_w = w[w['position'] == 'TE']
     if not te_w.empty:
-        # Determine each team's TE1 and TE2 (leading tight ends by receiving yards)
-        team_tes = te_w.groupby(['team', 'player_display_name'])['receiving_yards'].sum().reset_index()
-        team_tes_sorted = team_tes.sort_values(['team', 'receiving_yards'], ascending=[True, False])
-        top_te1_list = team_tes_sorted.groupby('team').nth(0)['player_display_name'].tolist()
-        top_te2_list = team_tes_sorted.groupby('team').nth(1)['player_display_name'].tolist()
+        # Determine each team's TE1 and TE2 (leading tight ends by receiving yards per season when multi-season)
+        if 'season' in te_w.columns and te_w['season'].nunique() > 1:
+            team_tes = te_w.groupby(['season', 'team', 'player_display_name'])['receiving_yards'].sum().reset_index()
+            team_tes_sorted = team_tes.sort_values(['season', 'team', 'receiving_yards'], ascending=[True, True, False])
+            te1_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_tes_sorted.groupby(['season', 'team']).nth(0)['season'],
+                        team_tes_sorted.groupby(['season', 'team']).nth(0)['team'],
+                        team_tes_sorted.groupby(['season', 'team']).nth(0)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            te2_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_tes_sorted.groupby(['season', 'team']).nth(1)['season'],
+                        team_tes_sorted.groupby(['season', 'team']).nth(1)['team'],
+                        team_tes_sorted.groupby(['season', 'team']).nth(1)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            te_pos_idx = te_w.set_index(['season', 'team', 'player_display_name']).index
+            is_te1 = te_pos_idx.isin(te1_idx)
+            is_te2 = te_pos_idx.isin(te2_idx)
+        else:
+            team_tes = te_w.groupby(['team', 'player_display_name'])['receiving_yards'].sum().reset_index()
+            team_tes_sorted = team_tes.sort_values(['team', 'receiving_yards'], ascending=[True, False])
+            top_te1_list = set(team_tes_sorted.groupby('team').nth(0)['player_display_name'].tolist())
+            top_te2_list = set(team_tes_sorted.groupby('team').nth(1)['player_display_name'].tolist())
+            is_te1 = te_w['player_display_name'].isin(top_te1_list)
+            is_te2 = te_w['player_display_name'].isin(top_te2_list)
 
         # TE1: Filter out injury exits (<1 target) and cap diff
         te1_target_vol = te_w['targets'] if 'targets' in te_w.columns else pd.Series(1, index=te_w.index)
-        te1_games = te_w[te_w['player_display_name'].isin(top_te1_list) & (te1_target_vol >= 1)].copy()
+        te1_games = te_w[is_te1 & (te1_target_vol >= 1)].copy()
         if not te1_games.empty:
-            te1_avgs = te1_games.groupby('player_display_name')['receiving_yards'].median()
-            te1_games['player_avg'] = te1_games['player_display_name'].map(te1_avgs)
+            if 'season' in te1_games.columns and te1_games['season'].nunique() > 1:
+                te1_medians = te1_games.groupby(['season', 'player_display_name'])['receiving_yards'].median().to_dict()
+                te1_games['player_avg'] = te1_games.set_index(['season', 'player_display_name']).index.map(te1_medians)
+            else:
+                te1_avgs = te1_games.groupby('player_display_name')['receiving_yards'].median()
+                te1_games['player_avg'] = te1_games['player_display_name'].map(te1_avgs)
             te1_games['diff'] = te1_games['receiving_yards'] - te1_games['player_avg']
             te1_games['diff_capped'] = te1_games['diff'].clip(lower=-30.0, upper=40.0)
             te1_games['boomed'] = te1_games['diff_capped'] > 0
@@ -262,10 +345,14 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
 
         # TE2: Filter out injury exits (<1 target) and cap diff
         te2_target_vol = te_w['targets'] if 'targets' in te_w.columns else pd.Series(1, index=te_w.index)
-        te2_games = te_w[te_w['player_display_name'].isin(top_te2_list) & (te2_target_vol >= 1)].copy()
+        te2_games = te_w[is_te2 & (te2_target_vol >= 1)].copy()
         if not te2_games.empty:
-            te2_avgs = te2_games.groupby('player_display_name')['receiving_yards'].median()
-            te2_games['player_avg'] = te2_games['player_display_name'].map(te2_avgs)
+            if 'season' in te2_games.columns and te2_games['season'].nunique() > 1:
+                te2_medians = te2_games.groupby(['season', 'player_display_name'])['receiving_yards'].median().to_dict()
+                te2_games['player_avg'] = te2_games.set_index(['season', 'player_display_name']).index.map(te2_medians)
+            else:
+                te2_avgs = te2_games.groupby('player_display_name')['receiving_yards'].median()
+                te2_games['player_avg'] = te2_games['player_display_name'].map(te2_avgs)
             te2_games['diff'] = te2_games['receiving_yards'] - te2_games['player_avg']
             te2_games['diff_capped'] = te2_games['diff'].clip(lower=-25.0, upper=35.0)
             def_te2 = te2_games.groupby('opponent_team').agg(
@@ -601,7 +688,10 @@ def compute_matchup_highlights(weekly_df, schedules_df, season=None, start_date=
     # -------------------------------------------------------------
     rbs = w[w['position'] == 'RB'].copy()
     if not rbs.empty:
-        rb_player_avg = rbs.groupby('player_id')['rushing_yards'].transform('median')
+        if 'season' in rbs.columns and rbs['season'].nunique() > 1:
+            rb_player_avg = rbs.groupby(['season', 'player_id'])['rushing_yards'].transform('median')
+        else:
+            rb_player_avg = rbs.groupby('player_id')['rushing_yards'].transform('median')
         rbs['yds_vs_avg'] = rbs['rushing_yards'] - rb_player_avg
         rbs['beat_avg'] = (rbs['yds_vs_avg'] > 0).astype(int)
 
@@ -1120,24 +1210,49 @@ def compute_defense_vs_position(weekly_df, schedules_df=None, stats_map=None, ho
     # RB1 Pool: exactly one RB1 for each team
     rb_pool = w[w['position'] == 'RB']
     if not rb_pool.empty:
-        team_rbs = rb_pool.groupby(['team', 'player_display_name'])['rushing_yards'].sum().reset_index()
-        top_rbs = team_rbs.sort_values(['team', 'rushing_yards'], ascending=[True, False]).groupby('team').first()['player_display_name'].tolist()
-        # RB1: Filter out injury exits (<4 carries) and cap extreme diffs to prevent blowout distortion
-        rb_star_games = rb_pool[rb_pool['player_display_name'].isin(top_rbs) & (rb_pool['carries'] >= 4)].copy()
-        if not rb_star_games.empty:
-            rb_avgs = rb_star_games.groupby('player_display_name')['rushing_yards'].median()
-            rb_star_games['player_avg'] = rb_star_games['player_display_name'].map(rb_avgs)
-            rb_star_games['diff'] = rb_star_games['rushing_yards'] - rb_star_games['player_avg']
-            rb_star_games['diff_capped'] = rb_star_games['diff'].clip(lower=-40.0, upper=45.0)
-            rb_star_games['boomed'] = rb_star_games['diff_capped'] > 0
-            rb_def_grp = rb_star_games.groupby('opponent_team').agg(
-                games=('rushing_yards', 'count'),
-                avg_allowed=('rushing_yards', 'median'),
-                avg_diff=('diff_capped', 'median'),
-                boom=('boomed', 'mean')
-            ).reset_index()
+        if 'season' in rb_pool.columns and rb_pool['season'].nunique() > 1:
+            team_rbs = rb_pool.groupby(['season', 'team', 'player_display_name'])['rushing_yards'].sum().reset_index()
+            team_rbs_sorted = team_rbs.sort_values(['season', 'team', 'rushing_yards'], ascending=[True, True, False])
+            rb1_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_rbs_sorted.groupby(['season', 'team']).nth(0)['season'],
+                        team_rbs_sorted.groupby(['season', 'team']).nth(0)['team'],
+                        team_rbs_sorted.groupby(['season', 'team']).nth(0)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            is_rb1 = rb_pool.set_index(['season', 'team', 'player_display_name']).index.isin(rb1_idx)
+            rb_star_games = rb_pool[is_rb1 & (rb_pool['carries'] >= 4)].copy()
+            if not rb_star_games.empty:
+                rb_medians = rb_star_games.groupby(['season', 'player_display_name'])['rushing_yards'].median().to_dict()
+                rb_star_games['player_avg'] = rb_star_games.set_index(['season', 'player_display_name']).index.map(rb_medians)
+                rb_star_games['diff'] = rb_star_games['rushing_yards'] - rb_star_games['player_avg']
+                rb_star_games['diff_capped'] = rb_star_games['diff'].clip(lower=-40.0, upper=45.0)
+                rb_star_games['boomed'] = rb_star_games['diff_capped'] > 0
+                rb_def_grp = rb_star_games.groupby('opponent_team').agg(
+                    games=('rushing_yards', 'count'),
+                    avg_allowed=('rushing_yards', 'median'),
+                    avg_diff=('diff_capped', 'median'),
+                    boom=('boomed', 'mean')
+                ).reset_index()
+            else:
+                rb_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])
         else:
-            rb_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])
+            team_rbs = rb_pool.groupby(['team', 'player_display_name'])['rushing_yards'].sum().reset_index()
+            top_rbs = team_rbs.sort_values(['team', 'rushing_yards'], ascending=[True, False]).groupby('team').first()['player_display_name'].tolist()
+            rb_star_games = rb_pool[rb_pool['player_display_name'].isin(top_rbs) & (rb_pool['carries'] >= 4)].copy()
+            if not rb_star_games.empty:
+                rb_avgs = rb_star_games.groupby('player_display_name')['rushing_yards'].median()
+                rb_star_games['player_avg'] = rb_star_games['player_display_name'].map(rb_avgs)
+                rb_star_games['diff'] = rb_star_games['rushing_yards'] - rb_star_games['player_avg']
+                rb_star_games['diff_capped'] = rb_star_games['diff'].clip(lower=-40.0, upper=45.0)
+                rb_star_games['boomed'] = rb_star_games['diff_capped'] > 0
+                rb_def_grp = rb_star_games.groupby('opponent_team').agg(
+                    games=('rushing_yards', 'count'),
+                    avg_allowed=('rushing_yards', 'median'),
+                    avg_diff=('diff_capped', 'median'),
+                    boom=('boomed', 'mean')
+                ).reset_index()
+            else:
+                rb_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])
     else:
         top_rbs = []
         rb_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])
@@ -1147,25 +1262,52 @@ def compute_defense_vs_position(weekly_df, schedules_df=None, stats_map=None, ho
     if wr_pool.empty:
         wr_pool = w[w['position'].isin(['WR', 'TE'])]
     if not wr_pool.empty:
-        team_wrs = wr_pool.groupby(['team', 'player_display_name'])['receiving_yards'].sum().reset_index()
-        top_wrs = team_wrs.sort_values(['team', 'receiving_yards'], ascending=[True, False]).groupby('team').first()['player_display_name'].tolist()
-        # WR1: Filter out injury exits (<2 targets) and cap extreme diffs
-        wr1_target_vol = wr_pool['targets'] if 'targets' in wr_pool.columns else pd.Series(2, index=wr_pool.index)
-        wr_star_games = wr_pool[wr_pool['player_display_name'].isin(top_wrs) & (wr1_target_vol >= 2)].copy()
-        if not wr_star_games.empty:
-            wr_avgs = wr_star_games.groupby('player_display_name')['receiving_yards'].median()
-            wr_star_games['player_avg'] = wr_star_games['player_display_name'].map(wr_avgs)
-            wr_star_games['diff'] = wr_star_games['receiving_yards'] - wr_star_games['player_avg']
-            wr_star_games['diff_capped'] = wr_star_games['diff'].clip(lower=-45.0, upper=55.0)
-            wr_star_games['boomed'] = wr_star_games['diff_capped'] > 0
-            wr_def_grp = wr_star_games.groupby('opponent_team').agg(
-                games=('receiving_yards', 'count'),
-                avg_allowed=('receiving_yards', 'median'),
-                avg_diff=('diff_capped', 'median'),
-                boom=('boomed', 'mean')
-            ).reset_index()
+        if 'season' in wr_pool.columns and wr_pool['season'].nunique() > 1:
+            team_wrs = wr_pool.groupby(['season', 'team', 'player_display_name'])['receiving_yards'].sum().reset_index()
+            team_wrs_sorted = team_wrs.sort_values(['season', 'team', 'receiving_yards'], ascending=[True, True, False])
+            wr1_idx = pd.MultiIndex.from_tuples(
+                set(zip(team_wrs_sorted.groupby(['season', 'team']).nth(0)['season'],
+                        team_wrs_sorted.groupby(['season', 'team']).nth(0)['team'],
+                        team_wrs_sorted.groupby(['season', 'team']).nth(0)['player_display_name'])),
+                names=['season', 'team', 'player_display_name']
+            )
+            is_wr1 = wr_pool.set_index(['season', 'team', 'player_display_name']).index.isin(wr1_idx)
+            wr1_target_vol = wr_pool['targets'] if 'targets' in wr_pool.columns else pd.Series(2, index=wr_pool.index)
+            wr_star_games = wr_pool[is_wr1 & (wr1_target_vol >= 2)].copy()
+            if not wr_star_games.empty:
+                wr_medians = wr_star_games.groupby(['season', 'player_display_name'])['receiving_yards'].median().to_dict()
+                wr_star_games['player_avg'] = wr_star_games.set_index(['season', 'player_display_name']).index.map(wr_medians)
+                wr_star_games['diff'] = wr_star_games['receiving_yards'] - wr_star_games['player_avg']
+                wr_star_games['diff_capped'] = wr_star_games['diff'].clip(lower=-45.0, upper=55.0)
+                wr_star_games['boomed'] = wr_star_games['diff_capped'] > 0
+                wr_def_grp = wr_star_games.groupby('opponent_team').agg(
+                    games=('receiving_yards', 'count'),
+                    avg_allowed=('receiving_yards', 'median'),
+                    avg_diff=('diff_capped', 'median'),
+                    boom=('boomed', 'mean')
+                ).reset_index()
+            else:
+                wr_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])
         else:
-            wr_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])
+            team_wrs = wr_pool.groupby(['team', 'player_display_name'])['receiving_yards'].sum().reset_index()
+            top_wrs = team_wrs.sort_values(['team', 'receiving_yards'], ascending=[True, False]).groupby('team').first()['player_display_name'].tolist()
+            # WR1: Filter out injury exits (<2 targets) and cap extreme diffs
+            wr1_target_vol = wr_pool['targets'] if 'targets' in wr_pool.columns else pd.Series(2, index=wr_pool.index)
+            wr_star_games = wr_pool[wr_pool['player_display_name'].isin(top_wrs) & (wr1_target_vol >= 2)].copy()
+            if not wr_star_games.empty:
+                wr_avgs = wr_star_games.groupby('player_display_name')['receiving_yards'].median()
+                wr_star_games['player_avg'] = wr_star_games['player_display_name'].map(wr_avgs)
+                wr_star_games['diff'] = wr_star_games['receiving_yards'] - wr_star_games['player_avg']
+                wr_star_games['diff_capped'] = wr_star_games['diff'].clip(lower=-45.0, upper=55.0)
+                wr_star_games['boomed'] = wr_star_games['diff_capped'] > 0
+                wr_def_grp = wr_star_games.groupby('opponent_team').agg(
+                    games=('receiving_yards', 'count'),
+                    avg_allowed=('receiving_yards', 'median'),
+                    avg_diff=('diff_capped', 'median'),
+                    boom=('boomed', 'mean')
+                ).reset_index()
+            else:
+                wr_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])
     else:
         top_wrs = []
         wr_def_grp = pd.DataFrame(columns=['opponent_team', 'games', 'avg_allowed', 'avg_diff', 'boom'])

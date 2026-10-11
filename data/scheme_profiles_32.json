@@ -1288,7 +1288,7 @@
           "yprr_zone": 2.02
         },
         {
-          "name": "D.Montgomery",
+          "name": "J.Mixon",
           "pos": "RB",
           "slot_pct": 10.0,
           "outside_pct": 5.0,
@@ -1305,11 +1305,11 @@
       "pace_rank": 8,
       "proj_plays": 62.5,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "D.Montgomery (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "Joe Mixon (Lead Goal-Line Share)",
       "rz_pass_rate": 63.6,
       "third_down_pass_rate": 79.2,
       "checkdown_pct": 10.6,
-      "flow_verdict": "Offensive tempo guided by D.Montgomery (Lead Goal-Line Share) and 10.6% check-down rate."
+      "flow_verdict": "Offensive tempo guided by Joe Mixon (Lead Goal-Line Share) and 10.6% check-down rate."
     }
   },
   "IND": {

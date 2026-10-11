@@ -249,11 +249,11 @@ def evaluate_split(
         # Assign tier strictly from calibrated probability
         ev_pct = ((p_cal - 0.5238) / 0.5238) * 100.0
         if ev_pct > 12.0:
-            tier = 'Model-Flagged Edge (Grade A)'
+            tier = 'Model-Flagged (Grade A)'
         elif p_cal >= 0.565:
-            tier = 'Model-Flagged Edge (Grade A)'
+            tier = 'Model-Flagged (Grade A)'
         elif p_cal >= 0.535:
-            tier = 'Model-Flagged Edge (Grade B)'
+            tier = 'Model-Flagged (Grade B)'
         else:
             tier = 'Model-Neutral (Grade C)'
 
@@ -295,7 +295,7 @@ def evaluate_split(
     print("-" * 80)
     print(f"{'Tier':<32} {'Bets':<7} {'Record':<12} {'Hit Rate':<10} {'95% CI':<18} {'ROI%':<8}")
     print("-" * 80)
-    for tier_label in ['Model-Flagged Edge (Grade A)', 'Model-Flagged Edge (Grade B)', 'Model-Neutral (Grade C)']:
+    for tier_label in ['Model-Flagged (Grade A)', 'Model-Flagged (Grade B)', 'Model-Neutral (Grade C)']:
         t_df = test_graded[test_graded['confidence_tier'] == tier_label]
         n = len(t_df)
         if n == 0:

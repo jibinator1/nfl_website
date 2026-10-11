@@ -15,7 +15,7 @@ from typing import Dict, Any, List, Optional, Tuple
 import math
 import copy
 
-from backend.probability_calibration import recalibrate
+from backend.probability_calibration import recalibrate, is_stat_calibrated
 
 TEAM_NAMES = {
     'ARI': 'Arizona Cardinals', 'ATL': 'Atlanta Falcons', 'BAL': 'Baltimore Ravens',
@@ -662,7 +662,22 @@ def _build_player_latest_team_map():
         except Exception:
             pass
 
+_ROSTER_OVERRIDES: Dict[str, str] = {
+    'D.Montgomery': 'DET',
+    'David Montgomery': 'DET',
+    'G.Pickens': 'DAL',
+    'George Pickens': 'DAL',
+    'D.Adams': 'LA',
+    'Davante Adams': 'LA',
+    'E.Engram': 'DEN',
+    'Evan Engram': 'DEN',
+    'J.Mixon': 'HOU',
+    'Joe Mixon': 'HOU',
+}
+
 def _get_player_latest_team(player_name: str) -> Optional[str]:
+    if player_name in _ROSTER_OVERRIDES:
+        return _ROSTER_OVERRIDES[player_name]
     _ensure_parquet_loaded()
     _build_player_latest_team_map()
     return _PLAYER_LATEST_TEAM.get(player_name)
@@ -869,13 +884,14 @@ def _evaluate_prob_and_tier(
     sigma_or_r: float,
     stat_focus: Optional[str] = None,
     is_under: Optional[bool] = None
-) -> Tuple[float, float, str, float, str]:
+) -> Tuple[float, float, str, float, str, bool, str]:
     """
-    Evaluates calibrated win probability, EV against standard -110 juice (52.38% breakeven),
-    caps outliers to prevent implausible edges, applies post-hoc isotonic recalibration,
-    and assigns market-aware confidence tiers.
+    Evaluates win probability, EV against standard -110 juice (52.38% breakeven),
+    caps outliers to prevent implausible edges, applies post-hoc isotonic recalibration
+    for Over picks (Under picks pass through uncalibrated raw probability until >=200 graded live outcomes),
+    and assigns honest internal model-conviction confidence tiers.
     Automatically detects 'Under' value when fair_val < mkt_line.
-    Returns (p_win, ev_pct, tier, p_win_raw, side).
+    Returns (p_win, ev_pct, tier, p_win_raw, side, is_calibrated, calib_status).
     """
     if is_under is None:
         is_under = bool(fair_val < mkt_line)
@@ -889,26 +905,32 @@ def _evaluate_prob_and_tier(
     p_win_raw = (1.0 - p_over_raw) if is_under else p_over_raw
 
     # Apply isotonic post-hoc recalibration if stat_focus is provided
+    # Under probabilities remain uncalibrated raw passthroughs to prevent Over curve bias
     if stat_focus:
-        p_win = recalibrate(p_win_raw, stat_focus)
+        p_win = recalibrate(p_win_raw, stat_focus, side=side)
+        is_calibrated = is_stat_calibrated(stat_focus, side=side)
     else:
         p_win = p_win_raw
+        is_calibrated = False
+
+    calib_status = 'Calibrated' if is_calibrated else 'Uncalibrated (Raw)'
 
     raw_ev = ((p_win - 0.5238) / 0.5238) * 100
     ev_pct = round(raw_ev, 1)
 
     # Flag and cap outliers (>12% EV capped at 14.0%)
+    # Honest terminology: 'Model-Flagged' relative to internal model conviction (reserving 'Edge' for verified OOS performance)
     if ev_pct > 12.0:
         ev_pct = min(14.0, ev_pct)
-        tier = 'Model-Flagged Edge (Grade A)'
+        tier = 'Model-Flagged (Grade A)'
     elif p_win >= 0.565:
-        tier = 'Model-Flagged Edge (Grade A)'
+        tier = 'Model-Flagged (Grade A)'
     elif p_win >= 0.535:
-        tier = 'Model-Flagged Edge (Grade B)'
+        tier = 'Model-Flagged (Grade B)'
     else:
         tier = 'Model-Neutral (Grade C)'
 
-    return p_win, ev_pct, tier, p_win_raw, side
+    return p_win, ev_pct, tier, p_win_raw, side, is_calibrated, calib_status
 
 _DYNAMIC_CTX_CACHE: Dict[Tuple, Any] = {}
 
@@ -1453,7 +1475,7 @@ def compute_scheme_insights(
                     scheme_lift = max(-0.06, min(0.10, raw_lift))
                     model_fair = mkt_line * (1.0 + scheme_lift)
                     fair_line = _blend_with_market(model_fair, mkt_line)
-                    p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'], stat_focus='Receiving Yards')
+                    p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'], stat_focus='Receiving Yards')
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.4, 2)}z"
 
                     cands.append({
@@ -1476,10 +1498,55 @@ def compute_scheme_insights(
                         'fair_line_num': fair_line,
                         'win_prob': round(p_win, 3),
                         'win_prob_raw': round(p_raw, 3),
-                        'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                        'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                         'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                         'ev_pct_num': ev_pct,
                         'confidence_tier': tier,
+                        'is_calibrated': is_calib,
+                        'calibration_status': calib_status,
+                        'z_score': z_str,
+                        'line_source': line_source,
+                        'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
+                        'priority': priority
+                    })
+                elif cov.get('mfc_pct', 50) >= 62.0 and p.get('yprr_zone', 1.6) <= 2.2:
+                    # Middle-Field Closed Wall (Cover 3/Cover 1) erases seam routes
+                    z_cov = (cov.get('mfc_pct', 50.0) - 50.0) / 8.0
+                    priority = 92.8 + (z_cov * 0.8) + (z_opp_pressure * 0.4) - (z_yprr * 0.3)
+                    mkt_line, line_source = _get_odds_api_line(p['name'], 'Receiving Yards', 44.5)
+                    raw_lift = -0.06 - (z_cov * 0.012) - (z_opp_pressure * 0.008)
+                    scheme_lift = max(-0.11, min(-0.04, raw_lift))
+                    model_fair = mkt_line * (1.0 + scheme_lift)
+                    fair_line = _blend_with_market(model_fair, mkt_line)
+                    p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'], stat_focus='Receiving Yards')
+                    z_str = f"-{round(1.0 + max(0.0, z_cov)*0.3, 2)}z"
+
+                    cands.append({
+                        'player': p['name'],
+                        'team': team_code,
+                        'pos': 'TE',
+                        'side': side,
+                        'scheme_type': 'Middle Closed Seam Suppression',
+                        'stat_focus': 'Receiving Yards',
+                        'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds (Middle Wall)",
+                        'context_metric': f"{cov.get('mfc_pct', 50):.0f}% MFC Middle Closed Shell",
+                        'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
+                        'scheme_delta': f"-{abs(scheme_lift*100):.1f}% Seam Suppression",
+                        'verdict': 'MIDDLE COVERAGE WALL',
+                        'rationale': f"Target UNDER {mkt_line:.1f} receiving yards. {opp_code}'s single-high / robber shell ({cov.get('mfc_pct', 50):.0f}% MFC) closes middle-field seams, eliminating chunk tight end targets.",
+                        'causal_mechanism': 'Middle-field closed safety rotations and stacked linebackers erase vertical seam windows between the numbers.',
+                        'market_line': f"{mkt_line:.1f} Rec Yds",
+                        'market_line_num': mkt_line,
+                        'fair_line': f"{fair_line:.1f} Rec Yds",
+                        'fair_line_num': fair_line,
+                        'win_prob': round(p_win, 3),
+                        'win_prob_raw': round(p_raw, 3),
+                        'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
+                        'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                        'ev_pct_num': ev_pct,
+                        'confidence_tier': tier,
+                        'is_calibrated': is_calib,
+                        'calibration_status': calib_status,
                         'z_score': z_str,
                         'line_source': line_source,
                         'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
@@ -1493,7 +1560,7 @@ def compute_scheme_insights(
                     scheme_lift = max(-0.06, min(0.12, raw_lift))
                     model_fair = mkt_line * (1.0 + scheme_lift)
                     fair_val = _blend_with_market(model_fair, mkt_line)
-                    p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
+                    p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                     cands.append({
@@ -1516,10 +1583,12 @@ def compute_scheme_insights(
                         'fair_line_num': fair_val,
                         'win_prob': round(p_win, 3),
                         'win_prob_raw': round(p_raw, 3),
-                        'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                        'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                         'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                         'ev_pct_num': ev_pct,
                         'confidence_tier': tier,
+                        'is_calibrated': is_calib,
+                        'calibration_status': calib_status,
                         'z_score': z_str,
                         'line_source': line_source,
                         'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
@@ -1533,13 +1602,14 @@ def compute_scheme_insights(
                 z_tgt = (p.get('tgt_zone', 20.0) - 20.0) / 8.0
                 z_yprr = (p.get('yprr_zone', 1.8) - 1.75) / 0.50
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
-                priority = 93.0 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.6)
+                base_pri = 94.5 if p.get('tgt_zone', 0) >= 25.0 else 93.0
+                priority = base_pri + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.5) + (z_cov * 1.0) + (z_opp_pressure * 0.6)
                 mkt_line, line_source = _get_odds_api_line(p['name'], 'Receptions', 4.5)
                 raw_lift = 0.06 + (z_delta * 0.015) + (z_tgt * 0.01) + (z_cov * 0.015) + (z_opp_pressure * 0.008)
                 scheme_lift = max(-0.06, min(0.12, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_val = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=10.0, stat_focus='Receptions')
+                p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=10.0, stat_focus='Receptions')
                 z_str = f"+{round(1.1 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1562,10 +1632,12 @@ def compute_scheme_insights(
                     'fair_line_num': fair_val,
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
-                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
+                    'is_calibrated': is_calib,
+                    'calibration_status': calib_status,
                     'z_score': z_str,
                     'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
@@ -1579,84 +1651,119 @@ def compute_scheme_insights(
                 z_tgt = (p.get('tgt_man', 24.0) - 20.0) / 8.0
                 z_yprr = (p.get('yprr_man', 2.2) - 1.75) / 0.50
                 z_cov = (cov.get('man_pct', 30.0) - 30.0) / 7.5
-                priority = 92.5 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.8) + (z_cov * 1.2) - (z_opp_pressure * 0.6)
+                priority = 93.5 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.8) + (z_cov * 1.2) - (z_opp_pressure * 0.6)
                 def_line = 64.5 if p.get('tgt_man', 0) >= 25.0 else 54.5
                 mkt_line, line_source = _get_odds_api_line(p['name'], 'Receiving Yards', def_line)
-                raw_lift = 0.05 + (z_delta * 0.012) + (z_yprr * 0.015) + (z_cov * 0.015) - (z_opp_pressure * 0.008)
-                scheme_lift = max(-0.06, min(0.10, raw_lift))
+
+                # Check if elite pass rush compromises deep boundary route development
+                is_man_rush_suppressed = (
+                    (z_opp_pressure >= 0.4 or opp_trench.get('rank_pressure_rate_generated', 16) <= 8)
+                    and p.get('yprr_man', 2.2) <= 2.1
+                    and mkt_line >= 48.0
+                )
+                if is_man_rush_suppressed:
+                    raw_lift = -0.05 - (z_opp_pressure * 0.012) + (z_yprr * 0.008)
+                    scheme_lift = max(-0.11, min(-0.03, raw_lift))
+                    priority = 93.0 + (z_opp_pressure * 0.8) - (z_yprr * 0.4)
+                    z_str = f"-{round(1.0 + max(0.0, z_opp_pressure)*0.3, 2)}z"
+                else:
+                    raw_lift = 0.05 + (z_delta * 0.012) + (z_yprr * 0.015) + (z_cov * 0.015) - (z_opp_pressure * 0.008)
+                    scheme_lift = max(-0.06, min(0.10, raw_lift))
+                    priority = 93.5 + (z_delta * 1.2) + (z_tgt * 0.8) + (z_yprr * 1.8) + (z_cov * 1.2) - (z_opp_pressure * 0.6)
+                    z_str = f"+{round(1.2 + max(0.0, z_yprr)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
+
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
-                z_str = f"+{round(1.2 + max(0.0, z_yprr)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
+                p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
 
                 cands.append({
                     'player': p['name'],
                     'team': team_code,
                     'pos': 'WR',
                     'side': side,
-                    'scheme_type': 'Boundary Deep Ball Threat',
+                    'scheme_type': 'Pass Rush Perimeter Suppression' if side == 'Under' else 'Boundary Deep Ball Threat',
                     'stat_focus': 'Receiving Yards',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds (Deep Balls)",
+                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds" + (" (Pocket Collapse)" if side == 'Under' else " (Deep Balls)"),
                     'context_metric': f"{p['tgt_man']:.1f}% Tgt vs Man ({p['yprr_man']:.2f} YPRR)",
                     'season_baseline': f"{p['tgt_zone']:.1f}% vs Zone",
-                    'scheme_delta': f"+{delta:.1f}% vs Man Coverage" if delta > 0 else f"{p['yprr_man']:.2f} Man YPRR",
-                    'verdict': 'PRIME BREAKOUT SPOT' if side == 'Over' and delta >= 3.0 else ('ELEVATED TARGET CEILING' if side == 'Over' else 'SHADOW RESISTANCE / UNDER'),
-                    'rationale': f"Target {side.lower()} receiving yards. 1-on-1 boundary go routes attack {opp_code}'s single-high/man looks ({cov.get('man_pct', 30):.1f}%), creating explosive chunk yardage." if side == 'Over' else f"Target UNDER {mkt_line:.1f} receiving yards. Matchup coverage caps explosive boundary opportunities below market expectation.",
-                    'causal_mechanism': 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
+                    'scheme_delta': f"-{abs(scheme_lift*100):.1f}% Rush Suppression" if side == 'Under' else (f"+{delta:.1f}% vs Man Coverage" if delta > 0 else f"{p['yprr_man']:.2f} Man YPRR"),
+                    'verdict': 'PERIMETER POCKET COLLAPSE' if side == 'Under' else ('PRIME BREAKOUT SPOT' if delta >= 3.0 else 'ELEVATED TARGET CEILING'),
+                    'rationale': f"Target UNDER {mkt_line:.1f} receiving yards. {opp_code}'s #{opp_trench.get('rank_pressure_rate_generated', 16)} pass rush penetrates before boundary 1-on-1 routes can develop downfield." if side == 'Under' else f"Target over receiving yards. 1-on-1 boundary go routes attack {opp_code}'s single-high/man looks ({cov.get('man_pct', 30):.1f}%), creating explosive chunk yardage.",
+                    'causal_mechanism': 'Rapid pocket collapse forces quick dump-offs and throwaways, eliminating deep-developing boundary target attempts.' if side == 'Under' else 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
                     'market_line': f"{mkt_line:.1f} Rec Yds",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_line:.1f} Rec Yds",
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
-                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
+                    'is_calibrated': is_calib,
+                    'calibration_status': calib_status,
                     'z_score': z_str,
                     'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
                     'priority': priority
                 })
 
-            # Outside WR vs Zone: Deep honey holes -> Receiving Yards
+            # Outside WR vs Zone: Deep honey holes OR Hostile Two-High/Pass-Rush Suppression -> Receiving Yards
             elif pos == 'WR' and outside_share >= 50:
                 z_yprr = (p.get('yprr_zone', 2.0) - 1.75) / 0.50
                 z_tgt = (p.get('tgt_zone', 20.0) - 20.0) / 8.0
                 z_cov = (cov.get('zone_pct', 60.0) - 60.0) / 8.0
-                priority = 91.0 + (z_yprr * 2.0) + (z_tgt * 0.6) + (z_cov * 0.8) - (z_opp_pressure * 0.4)
                 mkt_line, line_source = _get_odds_api_line(p['name'], 'Receiving Yards', 54.5)
-                raw_lift = 0.04 + (z_yprr * 0.015) + (z_tgt * 0.01) + (z_cov * 0.01) - (z_opp_pressure * 0.008)
-                scheme_lift = max(-0.05, min(0.09, raw_lift))
+
+                # Check for hostile passing spot: top pass rush + heavy two-high shell or bracket coverage
+                is_pass_suppressed = (
+                    (z_opp_pressure >= 0.4 or opp_trench.get('rank_pressure_rate_generated', 16) <= 10)
+                    and (cov.get('mfo_pct', 50.0) >= 55.0 or cov.get('zone_pct', 60.0) >= 65.0 or cov.get('mfc_pct', 50.0) >= 62.0)
+                    and mkt_line >= 44.0
+                    and (p.get('yprr_zone', 2.0) <= 2.2)
+                )
+
+                if is_pass_suppressed:
+                    raw_lift = -0.05 - (z_opp_pressure * 0.012) - (max(0.0, z_cov) * 0.01) + (z_yprr * 0.008)
+                    scheme_lift = max(-0.11, min(-0.03, raw_lift))
+                    priority = 92.5 + (z_opp_pressure * 0.8) + (max(0.0, z_cov) * 0.5) - (z_yprr * 0.4)
+                    z_str = f"-{round(1.0 + max(0.0, z_opp_pressure)*0.3, 2)}z"
+                else:
+                    raw_lift = 0.04 + (z_yprr * 0.015) + (z_tgt * 0.01) + (z_cov * 0.01) - (z_opp_pressure * 0.008)
+                    scheme_lift = max(-0.05, min(0.09, raw_lift))
+                    priority = 92.5 + (z_yprr * 2.0) + (z_tgt * 0.6) + (z_cov * 0.8) - (z_opp_pressure * 0.4)
+                    z_str = f"+{round(1.0 + max(0.0, z_yprr)*0.4, 2)}z"
+
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_honey'], stat_focus='Receiving Yards')
-                z_str = f"+{round(1.0 + max(0.0, z_yprr)*0.4, 2)}z"
+                p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_honey'], stat_focus='Receiving Yards')
 
                 cands.append({
                     'player': p['name'],
                     'team': team_code,
                     'pos': 'WR',
                     'side': side,
-                    'scheme_type': 'Boundary Zone Honey-Hole',
+                    'scheme_type': 'Boundary Deep Suppression' if side == 'Under' else 'Boundary Zone Honey-Hole',
                     'stat_focus': 'Receiving Yards',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds (Deep Balls)",
+                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds" + (" (Deep Coverage Wall)" if side == 'Under' else " (Deep Balls)"),
                     'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
                     'season_baseline': f"{p.get('tgt_man', 20.0):.1f}% vs Man",
-                    'scheme_delta': f"{p['yprr_zone']:.2f} Zone YPRR Efficiency",
-                    'verdict': 'HIGH CEILING DEEP TARGET' if side == 'Over' and p.get('yprr_zone', 0) >= 2.4 else ('ELEVATED TARGET CEILING' if side == 'Over' else 'CONTAINED CEILING / UNDER'),
-                    'rationale': f"Target {side.lower()} receiving yards. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, boundary go routes target honey-hole voids behind outside cornerbacks." if side == 'Over' else f"Target UNDER {mkt_line:.1f} receiving yards. Tight sideline cushions limit deep catch probability.",
-                    'causal_mechanism': 'Zone coverage safeties rotate inside, exposing the boundary sideline where elite outside receivers find soft spots in the cover cushion.',
+                    'scheme_delta': f"-{abs(scheme_lift*100):.1f}% Coverage Suppression" if side == 'Under' else f"{p['yprr_zone']:.2f} Zone YPRR Efficiency",
+                    'verdict': 'HEAVY PASS RUSH RESISTANCE' if side == 'Under' else ('HIGH CEILING DEEP TARGET' if p.get('yprr_zone', 0) >= 2.4 else 'ELEVATED TARGET CEILING'),
+                    'rationale': f"Target UNDER {mkt_line:.1f} receiving yards. {opp_code}'s #{opp_trench.get('rank_pressure_rate_generated', 16)} pass rush and two-high split safety shell ({cov.get('mfo_pct', 50):.0f}% MFO) cap explosive perimeter attempts below market line." if side == 'Under' else f"Target over receiving yards. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, boundary go routes target honey-hole voids behind outside cornerbacks.",
+                    'causal_mechanism': 'Two-high split safety shells bracket perimeter vertical routes while front penetration speeds up throw timing, keeping boundary yardage under total.' if side == 'Under' else 'Zone coverage safeties rotate inside, exposing the boundary sideline where elite outside receivers find soft spots in the cover cushion.',
                     'market_line': f"{mkt_line:.1f} Rec Yds",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_line:.1f} Rec Yds",
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
-                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
+                    'is_calibrated': is_calib,
+                    'calibration_status': calib_status,
                     'z_score': z_str,
                     'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
@@ -1674,7 +1781,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_val = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
+                p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
                 z_str = f"+{round(0.9 + max(0.0, z_opp_pressure)*0.4, 2)}z"
 
                 cands.append({
@@ -1697,10 +1804,12 @@ def compute_scheme_insights(
                     'fair_line_num': fair_val,
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
-                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
+                    'is_calibrated': is_calib,
+                    'calibration_status': calib_status,
                     'z_score': z_str,
                     'line_source': line_source,
                     'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
@@ -1741,12 +1850,22 @@ def compute_scheme_insights(
         z_box = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
 
         if opp_def_rank <= 12 or opp_def_ypc <= 4.10:
-            # Stout run defense - downgrade priority so it does not displace real passing edges
-            priority = 74.0 + ((team_ypc - league_avg_ypc) * 4.0) - ((16 - opp_def_rank) * 1.2)
             mkt_line, line_source = _get_odds_api_line(lead_rusher, 'Rushing Yards', 56.5)
-            model_fair = mkt_line * 0.94
+            # Elite run defenses (top 10 / <=4.15 YPC or <=3.90 YPC) get competitive scheme priority
+            is_elite_run_front = (opp_def_rank <= 10 and opp_def_ypc <= 4.15) or opp_def_ypc <= 3.90
+            if is_elite_run_front:
+                priority = 94.2 + ((league_avg_ypc - opp_def_ypc) * 4.5) + ((10 - min(10, opp_def_rank)) * 0.5)
+                raw_lift = -0.06 - max(0.0, (league_avg_ypc - opp_def_ypc) / league_avg_ypc) * 0.35
+                scheme_lift = max(-0.12, min(-0.04, raw_lift))
+                model_fair = mkt_line * (1.0 + scheme_lift)
+            else:
+                priority = 88.0 + ((league_avg_ypc - opp_def_ypc) * 3.0)
+                model_fair = mkt_line * 0.95
+
             fair_line = _blend_with_market(model_fair, mkt_line)
-            p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards', is_under=True)
+            p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(
+                mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards', is_under=True
+            )
             z_str = f"-{round(abs((opp_def_ypc - league_avg_ypc) / 0.40), 2)}z"
 
             cands.append({
@@ -1769,10 +1888,12 @@ def compute_scheme_insights(
                 'fair_line_num': fair_line,
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
-                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                 'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
+                'is_calibrated': is_calib,
+                'calibration_status': calib_status,
                 'z_score': z_str,
                 'line_source': line_source,
                 'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
@@ -1787,7 +1908,7 @@ def compute_scheme_insights(
             scheme_lift = max(-0.05, min(0.10, raw_lift))
             model_fair = mkt_line * (1.0 + scheme_lift)
             fair_line = _blend_with_market(model_fair, mkt_line)
-            p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
+            p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
             z_str = f"+{round(1.1 + max(0.0, opp_def_ypc - league_avg_ypc)*1.5, 2)}z"
 
             cands.append({
@@ -1810,10 +1931,12 @@ def compute_scheme_insights(
                 'fair_line_num': fair_line,
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
-                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                 'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
+                'is_calibrated': is_calib,
+                'calibration_status': calib_status,
                 'z_score': z_str,
                 'line_source': line_source,
                 'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
@@ -1825,7 +1948,7 @@ def compute_scheme_insights(
             mkt_line, line_source = _get_odds_api_line(lead_rusher, 'Rushing Yards', 58.5)
             model_fair = mkt_line * 1.02
             fair_line = _blend_with_market(model_fair, mkt_line)
-            p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
+            p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
             z_str = '+0.50z'
 
             cands.append({
@@ -1848,10 +1971,12 @@ def compute_scheme_insights(
                 'fair_line_num': fair_line,
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
-                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                 'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
+                'is_calibrated': is_calib,
+                'calibration_status': calib_status,
                 'z_score': z_str,
                 'line_source': line_source,
                 'trench_context': f"Interior Front #{opp_def_rank} vs Rush Block #{team_trench['rank_pressure_rate_allowed']}",
@@ -1875,7 +2000,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.05, min(0.12, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
+                p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
                 z_str = f"+{round(1.2 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1898,10 +2023,12 @@ def compute_scheme_insights(
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
-                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
+                    'is_calibrated': is_calib,
+                    'calibration_status': calib_status,
                     'z_score': z_str,
                     'line_source': line_source,
                     'trench_context': f"Flush Pocket Factor #{opp_trench['rank_pressure_rate_generated']}",
@@ -1915,7 +2042,7 @@ def compute_scheme_insights(
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
                 model_fair = mkt_line * (1.0 + scheme_lift)
                 fair_line = _blend_with_market(model_fair, mkt_line)
-                p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
+                p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
                 z_str = f"+{round(1.0 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1938,10 +2065,12 @@ def compute_scheme_insights(
                     'fair_line_num': fair_line,
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
-                    'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                    'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                     'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
+                    'is_calibrated': is_calib,
+                    'calibration_status': calib_status,
                     'z_score': z_str,
                     'line_source': line_source,
                     'trench_context': f"Light Box Push #{team_trench['rank_pressure_rate_allowed']}",
@@ -1954,7 +2083,7 @@ def compute_scheme_insights(
             fb_mkt, fb_source = _get_odds_api_line(top_p['name'], 'Receiving Yards', 54.5)
             fb_model = fb_mkt * 1.04
             fb_fair = _blend_with_market(fb_model, fb_mkt)
-            p_win, ev_pct, tier, p_raw, side = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
+            p_win, ev_pct, tier, p_raw, side, is_calib, calib_status = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
             cands.append({
                 'player': top_p['name'],
                 'team': team_code,
@@ -1975,10 +2104,12 @@ def compute_scheme_insights(
                 'fair_line_num': fb_fair,
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
-                'win_prob_fmt': f"{round(p_win * 100, 1)}%",
+                'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
                 'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
+                'is_calibrated': is_calib,
+                'calibration_status': calib_status,
                 'z_score': '+0.85z',
                 'line_source': fb_source,
                 'trench_context': f"Pocket Protection #{team_trench['rank_pressure_rate_allowed']} vs Rush #{opp_trench['rank_pressure_rate_generated']}",
@@ -1997,19 +2128,35 @@ def compute_scheme_insights(
     away_cands = _extract_team_breakouts(a_team, a_profile, h_team, h_profile)
     home_cands = _extract_team_breakouts(h_team, h_profile, a_team, a_profile)
 
-    # Combine all candidates from both teams and rank strictly by scheme edge priority
-    # No forced position quotas - selects the pure top 4 highest-conviction betting angles overall (WR, RB, TE, or QB)
+    # Combine all candidates from both teams and rank by scheme edge priority
+    # Select top 4 candidates with balanced team representation (max 2 per team so both sides of the matchup are featured)
     all_cands = sorted(away_cands + home_cands, key=lambda x: x.get('priority', 0), reverse=True)
     selected: List[Dict[str, Any]] = []
     selected_players = set()
+    team_counts = {a_team: 0, h_team: 0}
 
+    # Pass 1: up to 2 highest-priority candidates per team
     for cand in all_cands:
-        if cand['player'] not in selected_players:
-            selected_players.add(cand['player'])
+        p_name = cand['player']
+        t_code = cand['team']
+        if p_name not in selected_players and team_counts.get(t_code, 0) < 2:
+            selected_players.add(p_name)
+            team_counts[t_code] = team_counts.get(t_code, 0) + 1
             c_clean = {k: v for k, v in cand.items() if k != 'priority'}
             selected.append(c_clean)
             if len(selected) == 4:
                 break
+
+    # Pass 2: fill remaining slots if a team had fewer than 2 candidates
+    if len(selected) < 4:
+        for cand in all_cands:
+            p_name = cand['player']
+            if p_name not in selected_players:
+                selected_players.add(p_name)
+                c_clean = {k: v for k, v in cand.items() if k != 'priority'}
+                selected.append(c_clean)
+                if len(selected) == 4:
+                    break
 
     # Ensure strictly between 2 and 4 players
     breakouts = selected[:4]
@@ -2038,11 +2185,22 @@ def compute_scheme_insights(
             'win_prob_fmt': '54.2%',
             'ev_pct': '+3.5% EV',
             'ev_pct_num': 3.5,
-            'confidence_tier': 'Model-Flagged Edge (Grade B)',
+            'confidence_tier': 'Model-Flagged (Grade B)',
+            'is_calibrated': True,
+            'calibration_status': 'Calibrated',
             'z_score': '+0.95z',
             'line_source': 'Consensus Baseline',
             'trench_context': 'Neutral trench front'
         })
+
+    # Forward-test live pick logging
+    try:
+        from backend.pick_logger import log_pick
+        game_id_val = f"{a_team}_{h_team}"
+        for b in breakouts:
+            log_pick(b, game_id=game_id_val, kickoff="", matchup=f"{a_team} @ {h_team}")
+    except Exception:
+        pass
 
     # -------------------------------------------------------------
     # Pillar 5: Game-Flow, Tempo & Situational Usage Volume Predictors (6:17, 26:54)
