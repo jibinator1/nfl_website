@@ -119,5 +119,18 @@ def test_calibrated_edges_and_tiers():
         assert n['ev_pct_num'] <= 12.0, f"Nacua EV too high: {n['ev_pct_num']}"
         assert n['fair_line_num'] <= 75.0, f"Nacua fair line too high: {n['fair_line_num']}"
 
+def test_dynamic_situational_pace_by_season():
+    # 2026 (this year) for GB should be ~56.8% RZ pass rate, not static 45.7%
+    res26 = compute_scheme_insights('CHI', 'GB', season=2026)
+    gb_tempo_26 = res26.get('game_flow_tempo', {}).get('away_tempo', {})
+    assert gb_tempo_26.get('rz_pass_rate') == 56.8, f"Expected 56.8% RZ pass rate for GB in 2026, got {gb_tempo_26.get('rz_pass_rate')}"
+    assert gb_tempo_26.get('third_down_pass_rate') == 93.3
+
+    # 2024 season should dynamically reflect 2024 data (46.8% RZ pass rate)
+    res24 = compute_scheme_insights('CHI', 'GB', season=2024)
+    gb_tempo_24 = res24.get('game_flow_tempo', {}).get('away_tempo', {})
+    assert gb_tempo_24.get('rz_pass_rate') == 46.8, f"Expected 46.8% RZ pass rate for GB in 2024, got {gb_tempo_24.get('rz_pass_rate')}"
+
+
 
 

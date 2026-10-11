@@ -617,15 +617,23 @@ def _ensure_profiles_loaded():
                         TEAM_SCHEME_PROFILES.update(data)
             except Exception:
                 pass
-        _PROFILES_LOADED = True
+_SCHEDULES_DF = None
+_WEEKLY_DF = None
+_TEAM_PBP_SUMMARY_DF = None
+_TEAM_SITUATIONAL_DF = None
+_PARQUET_LOADED = False
 
 def _ensure_parquet_loaded():
-    global _PARQUET_LOADED, _SCHEDULES_DF, _WEEKLY_DF, _TEAM_PBP_SUMMARY_DF
+    global _PARQUET_LOADED, _SCHEDULES_DF, _WEEKLY_DF, _TEAM_PBP_SUMMARY_DF, _TEAM_SITUATIONAL_DF
     if not _PARQUET_LOADED:
         data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
         sched_p = os.path.join(data_dir, 'schedules_cache.parquet')
         week_p = os.path.join(data_dir, 'weekly_cache.parquet')
         pbp_p = os.path.join(data_dir, 'pbp_cache', 'team_pbp_summary.parquet')
+        sit_p = os.path.join(data_dir, 'pbp_cache', 'team_situational_game.parquet')
+        if not os.path.exists(sit_p):
+            sit_p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'api', 'data', 'pbp_cache', 'team_situational_game.parquet')
+
         if os.path.exists(sched_p) and os.path.exists(week_p):
             try:
                 import pandas as pd
@@ -633,6 +641,8 @@ def _ensure_parquet_loaded():
                 _WEEKLY_DF = pd.read_parquet(week_p)
                 if os.path.exists(pbp_p):
                     _TEAM_PBP_SUMMARY_DF = pd.read_parquet(pbp_p)
+                if os.path.exists(sit_p):
+                    _TEAM_SITUATIONAL_DF = pd.read_parquet(sit_p)
             except Exception:
                 pass
         _PARQUET_LOADED = True
@@ -840,6 +850,56 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
     ypc_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(team_def_ypc.items(), key=lambda x: x[1]))}
     ypa_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(team_def_ypa.items(), key=lambda x: x[1]))}
 
+    team_situational = {}
+    if _TEAM_SITUATIONAL_DF is not None and not _TEAM_SITUATIONAL_DF.empty:
+        sub_sit = _TEAM_SITUATIONAL_DF[_TEAM_SITUATIONAL_DF['game_id'].isin(game_ids)]
+        if sub_sit.empty:
+            sub_sit = _TEAM_SITUATIONAL_DF[_TEAM_SITUATIONAL_DF['season'] == eff_season]
+
+        team_paces = {}
+        for tm in unique_teams:
+            tm_data = sub_sit[sub_sit['team'] == tm]
+            if not tm_data.empty and tm_data['neutral_sec_per_play'].notna().any():
+                team_paces[tm] = float(tm_data['neutral_sec_per_play'].mean())
+            else:
+                team_paces[tm] = 28.0
+        pace_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(team_paces.items(), key=lambda x: x[1]))}
+
+        for tm in unique_teams:
+            tm_data = sub_sit[sub_sit['team'] == tm]
+            if not tm_data.empty:
+                rz_tot = int(tm_data['rz_total'].sum())
+                rz_p = int(tm_data['rz_pass'].sum())
+                rz_rate = round((rz_p / rz_tot) * 100.0, 1) if rz_tot > 0 else 50.0
+
+                d3_tot = int(tm_data['d3_total'].sum())
+                d3_p = int(tm_data['d3_pass'].sum())
+                d3_rate = round((d3_p / d3_tot) * 100.0, 1) if d3_tot > 0 else 70.0
+
+                passes = int(tm_data['passes'].sum())
+                chk = int(tm_data['checkdowns'].sum())
+                chk_rate = round((chk / passes) * 100.0, 1) if passes > 0 else 18.0
+
+                pace_sec = round(float(tm_data['neutral_sec_per_play'].mean()), 1)
+                proj_pl = round(float(tm_data['plays'].mean()), 1)
+                p_rank = pace_ranks.get(tm, 16)
+
+                leaders = tm_data.groupby('top_rz_rusher')['top_rz_rushes'].sum().sort_values(ascending=False)
+                top_p = leaders.index[0] if len(leaders) > 0 and leaders.index[0] else None
+                rz_leader_str = f"{top_p} (Lead Goal-Line Share)" if top_p else f"{tm} Primary Back"
+
+                team_situational[tm] = {
+                    'neutral_pace_sec': pace_sec,
+                    'pace_rank': p_rank,
+                    'proj_plays': proj_pl,
+                    'proj_top_pct': 50.0,
+                    'red_zone_touch_leader': rz_leader_str,
+                    'rz_pass_rate': rz_rate,
+                    'third_down_pass_rate': d3_rate,
+                    'checkdown_pct': chk_rate,
+                    'flow_verdict': f"Offensive tempo guided by {rz_leader_str} and {chk_rate:.1f}% check-down rate."
+                }
+
     if is_custom_date:
         if start_date >= '2026-08-01':
             sample_label = f"2026 Season ({start_date} to {end_date})"
@@ -866,6 +926,7 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
         'team_rush_ypc': team_rush_ypc,
         'team_coaches': team_coaches,
         'team_games_count': team_games_count,
+        'team_situational': team_situational,
         'sub_w': sub_w,
         'completed': completed
     }
@@ -996,6 +1057,13 @@ def compute_scheme_insights(
         if a_rush_ypc is not None:
             a_profile['run_scheme']['zone_ypc'] = round(a_rush_ypc * 1.01, 2)
             a_profile['run_scheme']['gap_ypc'] = round(a_rush_ypc * 0.99, 2)
+
+        # Dynamic Situational / Game Flow Metrics (Pillar 5)
+        if ctx.get('team_situational'):
+            if h_team in ctx['team_situational']:
+                h_profile['tempo_situational'] = ctx['team_situational'][h_team]
+            if a_team in ctx['team_situational']:
+                a_profile['tempo_situational'] = ctx['team_situational'][a_team]
 
         sample_window = {
             'season': ctx['season'],
