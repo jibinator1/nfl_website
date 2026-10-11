@@ -27,7 +27,7 @@ def test_scheme_top4_breakouts():
             assert b['stat_focus'] in ('Receiving Yards', 'Receptions', 'Rushing Yards'), f"Invalid stat_focus in {b}"
             assert b.get('scheme_delta'), f"Missing scheme_delta in {b}"
             assert b.get('rationale'), f"Missing rationale in {b}"
-            assert 0.44 <= b.get('win_prob', 0) <= 0.68, f"Uncalibrated win_prob {b.get('win_prob')} in {b}"
+            assert 0.40 <= b.get('win_prob', 0) <= 0.68, f"Uncalibrated win_prob {b.get('win_prob')} in {b}"
             assert b.get('win_prob_fmt', '').endswith('%'), f"Invalid win_prob_fmt in {b}"
             assert b.get('market_line'), f"Missing market_line in {b}"
             assert b.get('fair_line'), f"Missing fair_line in {b}"

@@ -4229,8 +4229,8 @@
                                     <b class="text-slate-200">${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`}</b>
                                 </div>
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
-                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b>${fmtPct(aTempo.rz_pass_rate || 52)}</b></span>
-                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b>${fmtPct(aTempo.third_down_pass_rate || 70)}</b></span>
+                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b class="cursor-help" title="${aTempo.rz_pass_context || ''}">${fmtPct(aTempo.rz_pass_rate_shrunk || aTempo.rz_pass_rate || 52)}${aTempo.rz_pass_rate_shrunk && aTempo.rz_pass_rate_shrunk !== aTempo.rz_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${aTempo.rz_pass_rate}% raw)</span>` : ''}</b></span>
+                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b class="cursor-help" title="${aTempo.third_down_context || ''}">${fmtPct(aTempo.third_down_pass_rate_shrunk || aTempo.third_down_pass_rate || 70)}${aTempo.third_down_pass_rate_shrunk && aTempo.third_down_pass_rate_shrunk !== aTempo.third_down_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${aTempo.third_down_pass_rate}% raw)</span>` : ''}</b></span>
                                 </div>
                             </div>
                         </div>
@@ -4263,8 +4263,8 @@
                                     <b class="text-slate-200">${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`}</b>
                                 </div>
                                 <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
-                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b>${fmtPct(hTempo.rz_pass_rate || 52)}</b></span>
-                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b>${fmtPct(hTempo.third_down_pass_rate || 70)}</b></span>
+                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b class="cursor-help" title="${hTempo.rz_pass_context || ''}">${fmtPct(hTempo.rz_pass_rate_shrunk || hTempo.rz_pass_rate || 52)}${hTempo.rz_pass_rate_shrunk && hTempo.rz_pass_rate_shrunk !== hTempo.rz_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${hTempo.rz_pass_rate}% raw)</span>` : ''}</b></span>
+                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b class="cursor-help" title="${hTempo.third_down_context || ''}">${fmtPct(hTempo.third_down_pass_rate_shrunk || hTempo.third_down_pass_rate || 70)}${hTempo.third_down_pass_rate_shrunk && hTempo.third_down_pass_rate_shrunk !== hTempo.third_down_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${hTempo.third_down_pass_rate}% raw)</span>` : ''}</b></span>
                                 </div>
                             </div>
                         </div>

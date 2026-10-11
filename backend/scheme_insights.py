@@ -15,6 +15,8 @@ from typing import Dict, Any, List, Optional, Tuple
 import math
 import copy
 
+from backend.probability_calibration import recalibrate
+
 TEAM_NAMES = {
     'ARI': 'Arizona Cardinals', 'ATL': 'Atlanta Falcons', 'BAL': 'Baltimore Ravens',
     'BUF': 'Buffalo Bills', 'CAR': 'Carolina Panthers', 'CHI': 'Chicago Bears',
@@ -764,15 +766,50 @@ def _calc_win_prob_poisson(market_line: float, expected_val: float) -> float:
     """Legacy alias routing to Negative Binomial for overdispersed catch counts."""
     return _calc_win_prob_nbinom(market_line, expected_val, r=10.0)
 
-def _evaluate_prob_and_tier(mkt_line: float, fair_val: float, is_count: bool, sigma_or_r: float) -> Tuple[float, float, str]:
+MARKET_ANCHOR_WEIGHT = 0.70
+
+def _blend_with_market(model_fair: float, market_line: float) -> float:
+    """
+    Prevents scheme factors from dominating the projection by anchoring to the liquid market line.
+    fair_line = 0.70 * market_line + 0.30 * model_fair
+    """
+    return round(MARKET_ANCHOR_WEIGHT * market_line + (1.0 - MARKET_ANCHOR_WEIGHT) * model_fair, 1)
+
+def _shrunk_rate(observed: float, n: int, prior: float, k: float) -> float:
+    """
+    Empirical Bayes shrinkage for small-sample rate metrics.
+    shrunk = (n * observed + k * prior) / (n + k)
+    """
+    if n <= 0:
+        return prior
+    return round((n * observed + k * prior) / (n + k), 1)
+
+def _evaluate_prob_and_tier(
+    mkt_line: float,
+    fair_val: float,
+    is_count: bool,
+    sigma_or_r: float,
+    stat_focus: Optional[str] = None,
+    is_under: bool = False
+) -> Tuple[float, float, str]:
     """
     Evaluates calibrated win probability, EV against standard -110 juice (52.38% breakeven),
-    caps outliers to prevent implausible edges, and assigns market-aware confidence tiers.
+    caps outliers to prevent implausible edges, applies post-hoc isotonic recalibration,
+    and assigns market-aware confidence tiers.
     """
     if is_count:
-        p_win = _calc_win_prob_nbinom(mkt_line, fair_val, r=sigma_or_r)
+        p_win_raw = _calc_win_prob_nbinom(mkt_line, fair_val, r=sigma_or_r)
     else:
-        p_win = _calc_win_prob_lognormal_median(mkt_line, fair_val, sigma=sigma_or_r)
+        p_win_raw = _calc_win_prob_lognormal_median(mkt_line, fair_val, sigma=sigma_or_r)
+
+    if is_under:
+        p_win_raw = 1.0 - p_win_raw
+
+    # Apply isotonic post-hoc recalibration if stat_focus is provided
+    if stat_focus:
+        p_win = recalibrate(p_win_raw, stat_focus)
+    else:
+        p_win = p_win_raw
 
     raw_ev = ((p_win - 0.5238) / 0.5238) * 100
     ev_pct = round(raw_ev, 1)
@@ -786,9 +823,11 @@ def _evaluate_prob_and_tier(mkt_line: float, fair_val: float, is_count: bool, si
     elif p_win >= 0.535:
         tier = 'Grade B (Solid Edge)'
     else:
-        tier = 'Grade C (Marginal Edge)'
+        tier = 'Grade C (Caution / Under)' if is_under else 'Grade C (Marginal Edge)'
 
     return p_win, ev_pct, tier
+
+_DYNAMIC_CTX_CACHE: Dict[Tuple, Any] = {}
 
 def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = None, end_date: Optional[str] = None, schedules_df=None, weekly_df=None):
     _ensure_parquet_loaded()
@@ -807,6 +846,10 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
     else:
         eff_season = int(season if season else 2026)
         sub_s = sub_s[sub_s['season'] == eff_season]
+
+    cache_key = (eff_season, start_date, end_date)
+    if cache_key in _DYNAMIC_CTX_CACHE:
+        return _DYNAMIC_CTX_CACHE[cache_key]
 
     completed = sub_s[sub_s['home_score'].notna()]
     if completed.empty:
@@ -888,6 +931,10 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
                 top_p = leaders.index[0] if len(leaders) > 0 and leaders.index[0] else None
                 rz_leader_str = f"{top_p} (Lead Goal-Line Share)" if top_p else f"{tm} Primary Back"
 
+                # Empirical Bayes shrinkage (RZ prior=50.0% k=40, 3rd Down prior=72.0% k=30)
+                rz_shrunk = _shrunk_rate(rz_rate, rz_tot, 50.0, 40.0)
+                d3_shrunk = _shrunk_rate(d3_rate, d3_tot, 72.0, 30.0)
+
                 team_situational[tm] = {
                     'neutral_pace_sec': pace_sec,
                     'pace_rank': p_rank,
@@ -895,9 +942,13 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
                     'proj_top_pct': 50.0,
                     'red_zone_touch_leader': rz_leader_str,
                     'rz_pass_rate': rz_rate,
+                    'rz_pass_rate_shrunk': rz_shrunk,
+                    'rz_pass_context': f"{rz_shrunk:.1f}% (raw {rz_rate:.1f}%, n={rz_tot})",
                     'third_down_pass_rate': d3_rate,
+                    'third_down_pass_rate_shrunk': d3_shrunk,
+                    'third_down_context': f"{d3_shrunk:.1f}% (raw {d3_rate:.1f}%, n={d3_tot})",
                     'checkdown_pct': chk_rate,
-                    'flow_verdict': f"Offensive tempo guided by {rz_leader_str} and {chk_rate:.1f}% check-down rate."
+                    'flow_verdict': f"Offensive tempo guided by {rz_leader_str} and {chk_rate:.1f}% check-down rate (RZ Pass: {rz_shrunk:.1f}% shrunk, 3rd Down: {d3_shrunk:.1f}% shrunk)."
                 }
 
     if is_custom_date:
@@ -913,7 +964,7 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
         else:
             sample_label = f"{eff_season} Full Season Sample (18 Weeks)"
 
-    return {
+    res_ctx = {
         'season': eff_season,
         'start_date': start_date,
         'end_date': end_date,
@@ -930,6 +981,8 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
         'sub_w': sub_w,
         'completed': completed
     }
+    _DYNAMIC_CTX_CACHE[cache_key] = res_ctx
+    return res_ctx
 
 def get_team_scheme_profile(team: str) -> Dict[str, Any]:
     _ensure_profiles_loaded()
@@ -1315,8 +1368,9 @@ def compute_scheme_insights(
                     mkt_line = 44.5
                     raw_lift = 0.05 + (z_delta * 0.012) + (z_cov * 0.015) + (z_yprr * 0.01) - (z_opp_pressure * 0.008)
                     scheme_lift = max(-0.06, min(0.10, raw_lift))
-                    fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
-                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'])
+                    model_fair = mkt_line * (1.0 + scheme_lift)
+                    fair_line = _blend_with_market(model_fair, mkt_line)
+                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['TE_seam'], stat_focus='Receiving Yards')
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.4, 2)}z"
 
                     cands.append({
@@ -1351,8 +1405,9 @@ def compute_scheme_insights(
                     mkt_line = 3.5
                     raw_lift = 0.05 + (z_delta * 0.015) + (z_cov * 0.015) + (z_opp_pressure * 0.008)
                     scheme_lift = max(-0.06, min(0.12, raw_lift))
-                    fair_val = round(mkt_line * (1.0 + scheme_lift), 1)
-                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0)
+                    model_fair = mkt_line * (1.0 + scheme_lift)
+                    fair_val = _blend_with_market(model_fair, mkt_line)
+                    p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
                     z_str = f"+{round(1.0 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                     cands.append({
@@ -1393,8 +1448,9 @@ def compute_scheme_insights(
                 mkt_line = 4.5
                 raw_lift = 0.06 + (z_delta * 0.015) + (z_tgt * 0.01) + (z_cov * 0.015) + (z_opp_pressure * 0.008)
                 scheme_lift = max(-0.06, min(0.12, raw_lift))
-                fair_val = round(mkt_line * (1.0 + scheme_lift), 1)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=10.0)
+                model_fair = mkt_line * (1.0 + scheme_lift)
+                fair_val = _blend_with_market(model_fair, mkt_line)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=10.0, stat_focus='Receptions')
                 z_str = f"+{round(1.1 + max(0.0, z_delta)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1436,8 +1492,9 @@ def compute_scheme_insights(
                 mkt_line = def_line
                 raw_lift = 0.05 + (z_delta * 0.012) + (z_yprr * 0.015) + (z_cov * 0.015) - (z_opp_pressure * 0.008)
                 scheme_lift = max(-0.06, min(0.10, raw_lift))
-                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'])
+                model_fair = mkt_line * (1.0 + scheme_lift)
+                fair_line = _blend_with_market(model_fair, mkt_line)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
                 z_str = f"+{round(1.2 + max(0.0, z_yprr)*0.4 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1476,8 +1533,9 @@ def compute_scheme_insights(
                 mkt_line = 54.5
                 raw_lift = 0.04 + (z_yprr * 0.015) + (z_tgt * 0.01) + (z_cov * 0.01) - (z_opp_pressure * 0.008)
                 scheme_lift = max(-0.05, min(0.09, raw_lift))
-                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_honey'])
+                model_fair = mkt_line * (1.0 + scheme_lift)
+                fair_line = _blend_with_market(model_fair, mkt_line)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_honey'], stat_focus='Receiving Yards')
                 z_str = f"+{round(1.0 + max(0.0, z_yprr)*0.4, 2)}z"
 
                 cands.append({
@@ -1516,8 +1574,9 @@ def compute_scheme_insights(
                 mkt_line = 3.5
                 raw_lift = 0.05 + (z_delta * 0.01) + (z_opp_pressure * 0.015) + (z_cov * 0.01)
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
-                fair_val = round(mkt_line * (1.0 + scheme_lift), 1)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0)
+                model_fair = mkt_line * (1.0 + scheme_lift)
+                fair_val = _blend_with_market(model_fair, mkt_line)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_val, is_count=True, sigma_or_r=12.0, stat_focus='Receptions')
                 z_str = f"+{round(0.9 + max(0.0, z_opp_pressure)*0.4, 2)}z"
 
                 cands.append({
@@ -1584,8 +1643,9 @@ def compute_scheme_insights(
             # Stout run defense - downgrade priority so it does not displace real passing edges
             priority = 74.0 + ((team_ypc - league_avg_ypc) * 4.0) - ((16 - opp_def_rank) * 1.2)
             mkt_line = 56.5
-            fair_line = round(mkt_line * 0.94, 1)
-            p_win, ev_pct, _ = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'])
+            model_fair = mkt_line * 0.94
+            fair_line = _blend_with_market(model_fair, mkt_line)
+            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards', is_under=True)
             tier = 'Grade C (Caution / Under)'
             z_str = f"-{round(abs((opp_def_ypc - league_avg_ypc) / 0.40), 2)}z"
 
@@ -1622,8 +1682,9 @@ def compute_scheme_insights(
             mkt_line = 62.5
             raw_lift = ((opp_def_ypc - league_avg_ypc) / league_avg_ypc) * 0.8 + ((team_ypc - league_avg_ypc) / league_avg_ypc) * 0.4 + (z_box * 0.01)
             scheme_lift = max(-0.05, min(0.10, raw_lift))
-            fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
-            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'])
+            model_fair = mkt_line * (1.0 + scheme_lift)
+            fair_line = _blend_with_market(model_fair, mkt_line)
+            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
             z_str = f"+{round(1.1 + max(0.0, opp_def_ypc - league_avg_ypc)*1.5, 2)}z"
 
             cands.append({
@@ -1656,8 +1717,9 @@ def compute_scheme_insights(
             delta = round(team_ypc - league_avg_ypc, 2)
             priority = 85.0 + ((team_ypc - league_avg_ypc) * 4.0)
             mkt_line = 58.5
-            fair_line = round(mkt_line * 1.02, 1)
-            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'])
+            model_fair = mkt_line * 1.02
+            fair_line = _blend_with_market(model_fair, mkt_line)
+            p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['RB_rush'], stat_focus='Rushing Yards')
             z_str = '+0.50z'
 
             cands.append({
@@ -1702,8 +1764,9 @@ def compute_scheme_insights(
                 mkt_line = 34.5
                 raw_lift = 0.06 + (z_cov * 0.015) + (z_opp_pressure * 0.015)
                 scheme_lift = max(-0.05, min(0.12, raw_lift))
-                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'])
+                model_fair = mkt_line * (1.0 + scheme_lift)
+                fair_line = _blend_with_market(model_fair, mkt_line)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
                 z_str = f"+{round(1.2 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1738,8 +1801,9 @@ def compute_scheme_insights(
                 mkt_line = 31.5
                 raw_lift = 0.05 + (z_cov * 0.012) + (z_opp_pressure * 0.01)
                 scheme_lift = max(-0.05, min(0.10, raw_lift))
-                fair_line = round(mkt_line * (1.0 + scheme_lift), 1)
-                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'])
+                model_fair = mkt_line * (1.0 + scheme_lift)
+                fair_line = _blend_with_market(model_fair, mkt_line)
+                p_win, ev_pct, tier = _evaluate_prob_and_tier(mkt_line, fair_line, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['QB_rush'], stat_focus='Rushing Yards')
                 z_str = f"+{round(1.0 + max(0.0, z_cov)*0.3, 2)}z"
 
                 cands.append({
@@ -1773,8 +1837,9 @@ def compute_scheme_insights(
         if not cands and team_prof.get('target_alignment', {}).get('key_targets'):
             top_p = team_prof['target_alignment']['key_targets'][0]
             fb_mkt = 54.5
-            fb_fair = round(fb_mkt * 1.04, 1)
-            p_win, ev_pct, tier = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'])
+            fb_model = fb_mkt * 1.04
+            fb_fair = _blend_with_market(fb_model, fb_mkt)
+            p_win, ev_pct, tier = _evaluate_prob_and_tier(fb_mkt, fb_fair, is_count=False, sigma_or_r=ROLE_SIGMA_MAP['WR_alpha'], stat_focus='Receiving Yards')
             cands.append({
                 'player': top_p['name'],
                 'team': team_code,
@@ -1847,12 +1912,12 @@ def compute_scheme_insights(
             'causal_mechanism': 'Goal line touch consolidation elevates player floor regardless of defensive fronts.',
             'market_line': '58.5 Rush Yds',
             'market_line_num': 58.5,
-            'fair_line': '66.2 Rush Yds',
-            'fair_line_num': 66.2,
-            'win_prob': 0.612,
-            'win_prob_fmt': '61.2%',
-            'ev_pct': '+16.8% EV',
-            'ev_pct_num': 16.8,
+            'fair_line': '60.3 Rush Yds',
+            'fair_line_num': 60.3,
+            'win_prob': 0.542,
+            'win_prob_fmt': '54.2%',
+            'ev_pct': '+3.5% EV',
+            'ev_pct_num': 3.5,
             'confidence_tier': 'Grade B (Solid Edge)',
             'z_score': '+0.95z',
             'trench_context': 'Neutral trench front'
