@@ -49,6 +49,7 @@ STARTING_QBS = {
     'KC': ('Patrick Mahomes', True, 24.5, 6.5),
     'LAC': ('Justin Herbert', False, 11.0, 4.0),
     'LAR': ('Matthew Stafford', False, 2.0, 1.8),
+    'LA': ('Matthew Stafford', False, 2.0, 1.8),
     'LV': ('Gardner Minshew', False, 9.0, 3.5),
     'MIA': ('Tua Tagovailoa', False, 6.5, 2.8),
     'MIN': ('Sam Darnold', False, 11.5, 3.9),

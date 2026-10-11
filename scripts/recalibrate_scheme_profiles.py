@@ -17,7 +17,7 @@ ROSTER_STARTERS = {
     'ARI': {'wr1': 'M.Harrison Jr.', 'wr2': 'M.Wilson', 'te': 'T.McBride', 'rb': 'J.Conner'},
     'ATL': {'wr1': 'D.London', 'wr2': 'D.Mooney', 'te': 'K.Pitts', 'rb': 'B.Robinson'},
     'BAL': {'wr1': 'Z.Flowers', 'wr2': 'R.Bateman', 'te': 'M.Andrews', 'rb': 'D.Henry'},
-    'BUF': {'wr1': 'K.Shakir', 'wr2': 'K.Coleman', 'te': 'D.Kincaid', 'rb': 'J.Cook'},
+    'BUF': {'wr1': 'K.Shakir', 'wr2': 'A.Cooper', 'te': 'D.Kincaid', 'rb': 'J.Cook'},
     'CAR': {'wr1': 'A.Thielen', 'wr2': 'X.Legette', 'te': 'J.Sanders', 'rb': 'C.Hubbard'},
     'CHI': {'wr1': 'DJ Moore', 'wr2': 'R.Odunze', 'te': 'C.Kmet', 'rb': 'D.Swift'},
     'CIN': {'wr1': "J.Chase", 'wr2': 'T.Higgins', 'te': 'M.Gesicki', 'rb': 'C.Brown'},
@@ -29,7 +29,7 @@ ROSTER_STARTERS = {
     'HOU': {'wr1': 'N.Collins', 'wr2': 'T.Dell', 'te': 'D.Schultz', 'rb': 'J.Mixon'},
     'IND': {'wr1': 'M.Pittman Jr.', 'wr2': 'J.Downs', 'te': 'K.Granson', 'rb': 'J.Taylor'},
     'JAX': {'wr1': 'B.Thomas Jr.', 'wr2': 'C.Kirk', 'te': 'E.Engram', 'rb': 'T.Etienne Jr.'},
-    'KC':  {'wr1': 'X.Worthy', 'wr2': 'R.Rice', 'te': 'T.Kelce', 'rb': 'I.Pacheco'},
+    'KC':  {'wr1': 'D.Hopkins', 'wr2': 'X.Worthy', 'te': 'T.Kelce', 'rb': 'I.Pacheco'},
     'LA':  {'wr1': 'P.Nacua', 'wr2': 'C.Kupp', 'te': 'C.Parkinson', 'rb': 'K.Williams'},
     'LAC': {'wr1': 'L.McConkey', 'wr2': 'Q.Johnston', 'te': 'W.Dissly', 'rb': 'J.Dobbins'},
     'LV':  {'wr1': 'J.Meyers', 'wr2': 'T.Tucker', 'te': 'B.Bowers', 'rb': 'A.Mattison'},
@@ -40,12 +40,12 @@ ROSTER_STARTERS = {
     'NYG': {'wr1': 'M.Nabers', 'wr2': 'W.Robinson', 'te': 'T.Johnson', 'rb': 'T.Tracy Jr.'},
     'NYJ': {'wr1': 'G.Wilson', 'wr2': 'D.Adams', 'te': 'T.Conklin', 'rb': 'B.Hall'},
     'PHI': {'wr1': 'D.Smith', 'wr2': 'J.Dotson', 'te': 'D.Goedert', 'rb': 'S.Barkley'},
-    'PIT': {'wr1': 'C.Austin III', 'wr2': 'V.Jefferson', 'te': 'P.Freiermuth', 'rb': 'N.Harris'},
+    'PIT': {'wr1': 'C.Austin III', 'wr2': 'M.Williams', 'te': 'P.Freiermuth', 'rb': 'N.Harris'},
     'SEA': {'wr1': 'D.Metcalf', 'wr2': 'J.Smith-Njigba', 'te': 'N.Fant', 'rb': 'K.Walker III'},
     'SF':  {'wr1': 'D.Samuel', 'wr2': 'J.Jennings', 'te': 'G.Kittle', 'rb': 'C.McCaffrey'},
     'TB':  {'wr1': 'M.Evans', 'wr2': 'C.Godwin', 'te': 'C.Otton', 'rb': 'B.Irving'},
     'TEN': {'wr1': 'C.Ridley', 'wr2': 'T.Boyd', 'te': 'C.Okonkwo', 'rb': 'T.Pollard'},
-    'WAS': {'wr1': 'T.McLaurin', 'wr2': 'L.McCaffrey', 'te': 'Z.Ertz', 'rb': 'B.Robinson Jr.'}
+    'WAS': {'wr1': 'T.McLaurin', 'wr2': 'N.Brown', 'te': 'Z.Ertz', 'rb': 'B.Robinson Jr.'}
 }
 
 # Empirical metrics by player from parquet
@@ -117,8 +117,8 @@ for team_code, prof in profiles.items():
     
     # 2. WR2 stats
     w2_dat = get_p_dat(wr2_name, {'target_share': 0.18, 'air_yards_share': 0.24, 'ypt': 8.0, 'adot': 12.5})
-    if wr2_name == 'G.Pickens' or w2_dat.get('air_yards_share', 0) >= 0.28:
-        # Co-alpha boundary deep threat (e.g. G.Pickens on Cowboys)
+    if wr2_name in ('G.Pickens', 'A.Cooper', 'X.Worthy', 'M.Williams') or w2_dat.get('air_yards_share', 0) >= 0.28:
+        # Co-alpha boundary deep threat (e.g. G.Pickens on Cowboys, A.Cooper on Bills)
         w2_base = max(21.0, min(26.5, w2_dat['target_share'] * 100))
         w2_slot = 20.0
         w2_out = 80.0

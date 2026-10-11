@@ -337,8 +337,8 @@
       "identity": "Downhill Gap / Power / Duo interior attack led by J.Cook."
     },
     "target_alignment": {
-      "slot_wr_pct": 23.4,
-      "wide_wr_pct": 41.6,
+      "slot_wr_pct": 24.1,
+      "wide_wr_pct": 41.0,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 9.0,
       "short_pct": 74.1,
@@ -357,15 +357,15 @@
           "yprr_zone": 2.17
         },
         {
-          "name": "K.Coleman",
+          "name": "A.Cooper",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 2.02,
-          "yprr_zone": 1.88
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.6,
+          "yprr_zone": 2.15
         },
         {
           "name": "D.Kincaid",
@@ -1549,8 +1549,8 @@
       "identity": "Downhill Gap / Power / Duo interior attack led by K.Hunt."
     },
     "target_alignment": {
-      "slot_wr_pct": 30.6,
-      "wide_wr_pct": 34.5,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 9.0,
       "short_pct": 77.6,
@@ -1558,26 +1558,26 @@
       "deep_pct": 14.5,
       "key_targets": [
         {
-          "name": "X.Worthy",
+          "name": "D.Hopkins",
           "pos": "WR",
           "slot_pct": 26.0,
           "outside_pct": 74.0,
           "inline_pct": 0.0,
-          "tgt_man": 27.8,
+          "tgt_man": 27.6,
           "tgt_zone": 22.6,
-          "yprr_man": 2.4,
-          "yprr_zone": 2.1
+          "yprr_man": 2.56,
+          "yprr_zone": 2.17
         },
         {
-          "name": "R.Rice",
+          "name": "X.Worthy",
           "pos": "WR",
-          "slot_pct": 68.0,
-          "outside_pct": 32.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 22.6,
-          "tgt_zone": 24.2,
-          "yprr_man": 2.05,
-          "yprr_zone": 1.91
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.6,
+          "yprr_zone": 2.15
         },
         {
           "name": "T.Kelce",
@@ -2660,8 +2660,8 @@
       "identity": "Balanced multi-concept run scheme featuring J.Warren."
     },
     "target_alignment": {
-      "slot_wr_pct": 14.3,
-      "wide_wr_pct": 50.7,
+      "slot_wr_pct": 15.0,
+      "wide_wr_pct": 50.1,
       "inline_te_pct": 17.5,
       "backfield_rb_pct": 9.0,
       "short_pct": 77.2,
@@ -2680,15 +2680,15 @@
           "yprr_zone": 2.24
         },
         {
-          "name": "V.Jefferson",
+          "name": "M.Williams",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
+          "slot_pct": 20.0,
+          "outside_pct": 80.0,
           "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.67,
-          "yprr_zone": 1.6
+          "tgt_man": 24.4,
+          "tgt_zone": 19.7,
+          "yprr_man": 2.8,
+          "yprr_zone": 2.39
         },
         {
           "name": "P.Freiermuth",
@@ -3185,15 +3185,15 @@
           "yprr_zone": 2.49
         },
         {
-          "name": "L.McCaffrey",
+          "name": "N.Brown",
           "pos": "WR",
           "slot_pct": 18.0,
           "outside_pct": 82.0,
           "inline_pct": 0.0,
           "tgt_man": 15.4,
           "tgt_zone": 16.5,
-          "yprr_man": 2.25,
-          "yprr_zone": 2.14
+          "yprr_man": 1.97,
+          "yprr_zone": 1.84
         },
         {
           "name": "Z.Ertz",
