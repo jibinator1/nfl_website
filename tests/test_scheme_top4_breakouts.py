@@ -20,28 +20,25 @@ def test_scheme_top4_breakouts():
         players = [b['player'] for b in breakouts]
         assert len(players) == len(set(players)), f"Duplicates in {a}@{h}: {players}"
         
-        # Verify clean structure & market-aware probabilistic metrics
+        # Verify clean structure & descriptive statistics metrics
         for b in breakouts:
             assert 'priority' not in b, f"Priority leaked in {b['player']}"
             assert b['player'] and b['team'] and b['pos'], f"Missing basic info in {b}"
             assert b['stat_focus'] in ('Receiving Yards', 'Receptions', 'Rushing Yards'), f"Invalid stat_focus in {b}"
             assert b.get('scheme_delta'), f"Missing scheme_delta in {b}"
             assert b.get('rationale'), f"Missing rationale in {b}"
-            assert 0.40 <= b.get('win_prob', 0) <= 0.68, f"Uncalibrated win_prob {b.get('win_prob')} in {b}"
-            assert '%' in b.get('win_prob_fmt', ''), f"Invalid win_prob_fmt in {b}"
             assert b.get('market_line'), f"Missing market_line in {b}"
             assert b.get('fair_line'), f"Missing fair_line in {b}"
-            assert 'EV' in b.get('ev_pct', ''), f"Missing EV in {b}"
-            assert b.get('ev_pct_num', 0) <= 14.0, f"Implausibly large EV {b.get('ev_pct_num')} in {b}"
-            assert 'Grade' in b.get('confidence_tier', ''), f"Missing confidence_tier in {b}"
-            assert 'Edge' not in b.get('confidence_tier', ''), f"'Edge' should not be in tier name without OOS proof: {b.get('confidence_tier')}"
-            assert b.get('side') in ('Over', 'Under'), f"Missing or invalid side in {b}"
-            assert 'is_calibrated' in b, f"Missing is_calibrated flag in {b}"
-            assert 'calibration_status' in b, f"Missing calibration_status in {b}"
-            if b.get('side') == 'Under':
-                assert not b.get('is_calibrated'), f"Under should not be marked calibrated until OOS fits exist: {b}"
-                assert '(Raw)' in b.get('win_prob_fmt', ''), f"Under win_prob_fmt should indicate (Raw): {b.get('win_prob_fmt')}"
+            assert b.get('confidence_tier'), f"Missing confidence_tier in {b}"
+            assert b.get('calibration_status'), f"Missing calibration_status in {b}"
             assert b.get('z_score', '').endswith('z'), f"Missing z_score in {b}"
+            
+            # Acceptance check: verify no prediction/model words
+            prohibited = ['exploit', 'advantage', 'edge', 'pick']
+            for field in ['verdict', 'rationale', 'scheme_delta']:
+                val = str(b.get(field, '')).lower()
+                for bad in prohibited:
+                    assert bad not in val, f"Found prohibited model word '{bad}' in {field}: '{val}'"
 
 def test_hou_ten_breakouts():
     res = compute_scheme_insights('HOU', 'TEN')
@@ -138,17 +135,15 @@ def test_dynamic_situational_pace_by_season():
     gb_tempo_24 = res24.get('game_flow_tempo', {}).get('away_tempo', {})
     assert gb_tempo_24.get('rz_pass_rate') == 46.8, f"Expected 46.8% RZ pass rate for GB in 2024, got {gb_tempo_24.get('rz_pass_rate')}"
 
-def test_under_recommendations():
-    # Verify Under picks are generated in defensive suppression matchups (e.g. KC@BAL, SF@LA, etc.)
-    matchups = [('KC', 'BAL'), ('SF', 'LA'), ('DAL', 'NYG'), ('JAX', 'GB'), ('DEN', 'PIT'), ('CLE', 'SF'), ('TEN', 'KC'), ('PHI', 'JAX')]
-    all_picks = []
+def test_defensive_suppression_context():
+    # Verify defensive suppression / resistance context is surfaced in tough matchups
+    matchups = [('KC', 'BAL'), ('SF', 'LA'), ('DAL', 'NYG')]
+    all_cards = []
     for a, h in matchups:
         res = compute_scheme_insights(a, h)
-        all_picks.extend(res.get('efficiency_breakouts', []))
-    
-    under_picks = [p for p in all_picks if p.get('side') == 'Under']
-    over_picks = [p for p in all_picks if p.get('side') == 'Over']
-    
-    assert len(under_picks) > 0, "No Under picks generated across 8 test matchups"
-    under_pct = len(under_picks) / len(all_picks)
-    assert 0.10 <= under_pct <= 0.40, f"Under percentage {under_pct:.1%} outside expected 10-40% range"
+        all_cards.extend(res.get('efficiency_breakouts', []))
+    assert len(all_cards) > 0
+    # Verify no betting picks or side predictions are emitted
+    for card in all_cards:
+        assert card.get('calibration_status') == 'Descriptive Stat'
+        assert card.get('side') == 'Neutral'

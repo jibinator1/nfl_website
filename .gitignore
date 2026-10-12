@@ -49,4 +49,8 @@ out.txt
 last_run.txt
 *.log
 
+# Local Cache Parquets & Dynamic Downloads
+data/pbp_cache/pbp_*.parquet
+data/injury_cache.json
+
 .agent/

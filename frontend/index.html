@@ -641,8 +641,8 @@
                     </div>
                 </div>
 
-                <!-- 6 Pillars & Summary Navigation Quick-Jumps -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 border-t border-[#21262d]">
+                <!-- 7 Sections Navigation Quick-Jumps -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-1 border-t border-[#21262d]">
                     <a href="#pillar-coverage" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">1. Coverage</span>
@@ -656,16 +656,20 @@
                         <span class="truncate">3. Targets</span>
                     </a>
                     <a href="#pillar-breakouts" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                        <span class="truncate">4. Breakouts</span>
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">4. Personnel</span>
                     </a>
                     <a href="#pillar-tempo" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                         <span class="truncate">5. Tempo</span>
                     </a>
+                    <a href="#pillar-matchup-sheet" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">6. Stat Sheet</span>
+                    </a>
                     <a href="#pillar-summary" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                        <span class="truncate">6. Wrap Up</span>
+                        <span class="truncate">7. Wrap Up</span>
                     </a>
                 </div>
             </div>
@@ -2842,7 +2846,7 @@
                 badge: 'Spatial Coverage',
                 desc: 'Defenders cover assigned field areas with eyes on QB.',
                 what: 'Defenders drop into designated spatial zones rather than shadowing receivers, keeping eyes on the quarterback to rally to the ball.',
-                why: 'Creates soft voids between zones. Patient passers exploit zones with high-percentage underneath throws; favors Reception volume props.',
+                why: 'Creates soft voids between zones. Patient passers target zone voids with high-percentage underneath throws; creates high reception volume.',
                 svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
                     <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
                     <text x="18" y="64" fill="#64748b" font-size="7" font-family="monospace">LOS</text>
@@ -3152,10 +3156,10 @@
                     <text x="115" y="18" fill="#facc15" font-size="7" font-weight="bold" text-anchor="middle">+33% Edge</text>
                 </svg>`
             },
-            'Causal Mechanism': {
-                title: 'Causal Mechanism',
+            'Matchup Mechanism': {
+                title: 'Matchup Mechanism',
                 badge: 'Tactical Rationale',
-                desc: 'The underlying schematic interaction causing the matchup advantage.',
+                desc: 'The underlying schematic interaction underlying the matchup dynamic.',
                 what: 'The tactical interaction between offensive route design and defensive shell mechanics creating the statistical edge.',
                 why: 'Explains why the matchup wins on tape (e.g. slot option routes against linebackers or light front-six boxes).',
                 svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
@@ -3188,11 +3192,11 @@
                 </svg>`
             },
             'Proj Plays': {
-                title: 'Projected Play Volume',
+                title: 'Pace & Play Volume',
                 badge: 'Play Volume',
-                desc: 'Estimated total offensive plays based on combined team tempo and pass/run splits.',
-                what: 'Forecasted offensive snaps based on combined team tempo, run/pass tendencies, and opponent pace.',
-                why: 'High projected plays (> 66 plays) expand total opportunity volume across all player prop markets.',
+                desc: 'Offensive plays based on combined team tempo and pass/run splits.',
+                what: 'Historical offensive snaps based on combined team tempo, run/pass tendencies, and opponent pace.',
+                why: 'High snap volume (> 66 plays) expands total opportunity volume across skill positions.',
                 svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
                     <rect x="25" y="24" width="75" height="42" rx="4" fill="#161b22" stroke="#30363d"/>
                     <text x="62" y="40" fill="#94a3b8" font-size="6" font-weight="bold" text-anchor="middle">Average NFL Game</text>
@@ -3291,7 +3295,7 @@
                         <span class="block">${info.what}</span>
                     </span>
                     <span class="block text-[10px] leading-relaxed text-emerald-300/95 bg-emerald-950/20 p-1.5 rounded border border-emerald-900/40 text-left">
-                        <span class="text-emerald-400 font-bold font-mono text-[9px] uppercase block tracking-wider mb-0.5">Offense Exploit</span>
+                        <span class="text-emerald-400 font-bold font-mono text-[9px] uppercase block tracking-wider mb-0.5">Offense Application</span>
                         <span class="block">${info.why}</span>
                     </span>
                 `;
@@ -3387,7 +3391,7 @@
             'crossing-routes': {
                 title: 'Mesh Crossing Routes',
                 what: 'Two receivers sprint horizontally across the field in opposite directions at shallow depth.',
-                why: 'The crossing paths create natural pick traffic that rubs off trailing man-to-man defenders.',
+                why: 'The crossing paths create natural rub traffic that frees trailing man-to-man defenders.',
                 svg: `<svg viewBox="0 0 250 90" class="w-full h-[90px] bg-[#0c1017] rounded">
                     <line x1="15" y1="68" x2="235" y2="68" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.5"/>
                     <circle cx="45" cy="68" r="5" fill="#eab308"/>
@@ -3399,7 +3403,7 @@
                     <path d="M 205 63 L 205 45 Q 200 45 55 45" stroke="#38bdf8" stroke-width="2" fill="none" stroke-linecap="round"/>
                     <polygon points="52,45 59,41 59,49" fill="#38bdf8"/>
                     <circle cx="125" cy="41" r="8" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-dasharray="2,2"/>
-                    <text x="125" y="30" fill="#f87171" font-size="6.5" font-weight="bold" text-anchor="middle">Pick / Traffic Mesh</text>
+                    <text x="125" y="30" fill="#f87171" font-size="6.5" font-weight="bold" text-anchor="middle">Rub / Traffic Mesh</text>
                 </svg>`
             },
             'boundary-go': {
@@ -3540,14 +3544,14 @@
 
             let passVerdict = '';
             if (hDefMfo >= 50 && aDefMfo >= 50) {
-                passVerdict = `Both defenses operate primarily out of Middle-Field Open (2-High) safety shells (${hDefMfo.toFixed(0)}% and ${aDefMfo.toFixed(0)}%). This caps perimeter deep explosive shots and funnels volume inside. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Receptions</b> over receiving yards for Slot Receivers and Tight End close catches settling into underneath voids, or <b>Receiving Yards</b> on vertical seam routes straight down the hashmarks.</span>`;
+                passVerdict = `Both defenses operate primarily out of Middle-Field Open (2-High) safety shells (${hDefMfo.toFixed(0)}% and ${aDefMfo.toFixed(0)}%). This caps perimeter deep shots and funnels volume inside. <span class="block mt-1 text-slate-200"><b>Situational Usage Tendency:</b> Higher reception shares for slot receivers and tight ends settling into underneath voids, or vertical seam routes between the safeties.</span>`;
             } else if (hDefZone >= 65 || aDefZone >= 65) {
-                passVerdict = `Heavy zone coverage structures dictate this passing matchup. Defenses prioritize keeping plays in front of them. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Receptions</b> on short throws, quick option routes, and backfield checkdowns rather than contested deep yardage totals.</span>`;
+                passVerdict = `Heavy zone coverage structures dictate this passing matchup. Defenses prioritize keeping plays in front of them. <span class="block mt-1 text-slate-200"><b>Situational Usage Tendency:</b> Receptions concentrate on short throws, quick option routes, and backfield checkdowns rather than contested perimeter downfield shots.</span>`;
             } else {
-                passVerdict = `Higher rates of single-high (Middle-Field Closed) and man coverage force 1-on-1 boundary isolations. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Receiving Yards</b> on boundary go routes and vertical shots. With single coverage outside, chunk explosive yardage outweighs raw reception volume.</span>`;
+                passVerdict = `Higher rates of single-high (Middle-Field Closed) and man coverage force 1-on-1 boundary isolations. <span class="block mt-1 text-slate-200"><b>Situational Usage Tendency:</b> Outside receivers on boundary go routes and vertical shots face 1-on-1 coverage where explosive yardage outweighs raw reception count.</span>`;
             }
 
-            // 2. Run Game & Trench Advantage Takeaways
+            // 2. Run Game & Trench Differential Takeaways
             const aZonePct = parseFloat(aRun.offense_zone_pct || 50);
             const aGapPct = parseFloat(aRun.offense_gap_pct || 50);
             const hZonePct = parseFloat(hRun.offense_zone_pct || 50);
@@ -3558,7 +3562,7 @@
             const aAllowsGap = parseFloat(hRun.opp_def_gap_ypc_allowed || 4.3);
             const aAllowsZone = parseFloat(hRun.opp_def_zone_ypc_allowed || 4.1);
 
-            let runVerdict = `${d.away_team} operates a ${(aGapPct > aZonePct ? 'Gap/Power' : 'Zone-stretch')} rushing identity (${(aGapPct > aZonePct ? aGapPct : aZonePct).toFixed(0)}%) against a ${d.home_team} defense allowing ${hAllowsGap.toFixed(2)} YPC on gap runs vs ${hAllowsZone.toFixed(2)} YPC on zone. On the other side, ${d.home_team} attacks with ${(hGapPct > hZonePct ? 'downhill gap schemes' : 'lateral zone runs')} against ${d.away_team}'s front conceding ${aAllowsGap.toFixed(2)} YPC on gap runs and ${aAllowsZone.toFixed(2)} YPC on zone. <span class="block mt-1 text-slate-200"><b>Tactical Prop Target:</b> Target <b>Rushing Yards</b> for primary running backs on their dominant rushing scheme, plus quarterback scramble rushing yards against man coverage looks where defenders' backs are turned.</span>`;
+            let runVerdict = `${d.away_team} operates a ${(aGapPct > aZonePct ? 'Gap/Power' : 'Zone-stretch')} rushing identity (${(aGapPct > aZonePct ? aGapPct : aZonePct).toFixed(0)}%) against a ${d.home_team} defense allowing ${hAllowsGap.toFixed(2)} YPC on gap runs vs ${hAllowsZone.toFixed(2)} YPC on zone. On the other side, ${d.home_team} attacks with ${(hGapPct > hZonePct ? 'downhill gap schemes' : 'lateral zone runs')} against ${d.away_team}'s front conceding ${aAllowsGap.toFixed(2)} YPC on gap runs and ${aAllowsZone.toFixed(2)} YPC on zone. <span class="block mt-1 text-slate-200"><b>Situational Usage Tendency:</b> Carry volume concentrates with primary backs running toward their dominant scheme, plus quarterback scramble yards against man coverage where second-level defenders turn their backs.</span>`;
 
             // 3. Pace, Game Flow & Touch Concentration Takeaways
             const totalPlays = Math.round((aTempo.proj_plays || 64) + (hTempo.proj_plays || 64));
@@ -3567,32 +3571,32 @@
 
             let paceVerdict = '';
             if (aPaceSec < 26.5 && hPaceSec < 26.5) {
-                paceVerdict = `Fast-paced matchup environment (~${totalPlays} projected plays). High play volume multiplies touch opportunities for skill players across all quarters.`;
+                paceVerdict = `Fast-paced matchup environment (~${totalPlays} total plays). High play volume multiplies touch opportunities for skill players across all quarters.`;
             } else if (aPaceSec > 29 || hPaceSec > 29) {
-                paceVerdict = `Deliberate, clock-chewing pacing (~${totalPlays} projected plays). In lower play-volume scripts, raw season yards regress and high-value touches matter most: ${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`} and ${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`} hold the primary touchdown equity.`;
+                paceVerdict = `Deliberate, clock-chewing pacing (~${totalPlays} total plays). In lower play-volume scripts, raw season yards regress and high-value touches matter most: ${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`} and ${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`} hold the primary touchdown share.`;
             } else {
-                paceVerdict = `Balanced tempo projecting ~${totalPlays} total plays. Scoring outcomes and fantasy production will hinge on red zone finish efficiency and checkdown dumping under pressure.`;
+                paceVerdict = `Balanced tempo projecting ~${totalPlays} total plays. Scoring outcomes hinge on red zone finish efficiency and checkdown dumping under pressure.`;
             }
 
-            // 4. Prime Edges / Key Player Insights
+            // 4. Key Matchup Splits / Personnel Insights
             const edges = (breakouts && breakouts.length > 0) ? breakouts : [
                 {
                     player: `${d.away_team} Primary Target`,
                     team: d.away_team,
                     pos: 'WR',
                     stat_focus: 'Receiving Yards',
-                    prop_angle: 'Prop Target: Receiving Yards (Deep Balls)',
+                    prop_angle: 'Matchup Focus: Receiving Yards (Boundary Routes)',
                     scheme_delta: '+2.8% Target Rate',
-                    rationale: `Target receiving yards over receptions. Schematic funnel points directly to boundary isolation against opposing single coverage.`
+                    rationale: `Usage split points to boundary isolation against opposing single coverage.`
                 },
                 {
                     player: `${d.home_team} Lead Back`,
                     team: d.home_team,
                     pos: 'RB',
                     stat_focus: 'Rushing Yards',
-                    prop_angle: 'Prop Target: Rushing Yards (Ground Attack)',
-                    scheme_delta: '+0.55 YPC Edge',
-                    rationale: `Target rushing yards / carries. Blocking scheme pairs favorably against defensive front line gap fits.`
+                    prop_angle: 'Matchup Focus: Rushing Yards (Ground Attack)',
+                    scheme_delta: '+0.55 YPC Split',
+                    rationale: `Primary rushing identity matches defensive front gap alignment.`
                 }
             ];
 
@@ -3600,11 +3604,566 @@
                 passVerdict,
                 runVerdict,
                 paceVerdict,
-                edges: edges.slice(0, 4)
+                edges: edges.slice(0, 4),
+                key_matchups: edges.slice(0, 4)
             };
         }
 
-        function renderSchemeInsights(d) {
+        
+        function renderStatCmp(stat, unit = '') {
+            if (!stat || stat.raw_value == null) return '<span class="text-slate-500">--</span>';
+            const raw = typeof stat.raw_value === 'number' ? stat.raw_value.toFixed(1) : stat.raw_value;
+            const med = typeof stat.league_median === 'number' ? stat.league_median.toFixed(1) : stat.league_median;
+            const diff = typeof stat.diff_from_median === 'number' ? (stat.diff_from_median > 0 ? `+${stat.diff_from_median.toFixed(1)}` : stat.diff_from_median.toFixed(1)) : '';
+            const diffPct = typeof stat.diff_pct === 'number' ? (stat.diff_pct > 0 ? `+${stat.diff_pct.toFixed(0)}%` : `${stat.diff_pct.toFixed(0)}%`) : '';
+            const rk = stat.rank ? `Rank #${stat.rank}/32` : '';
+            const smallBadge = stat.is_small_sample ? `<span class="text-amber-400 text-[9px] font-bold" title="Sample size n < 40 plays / 4 games">⚠️ n=${stat.sample_size}</span>` : `<span class="text-slate-400 text-[9px]">n=${stat.sample_size}</span>`;
+
+            return `
+                <div class="space-y-0.5 font-mono">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-100">${raw}${unit}</span>
+                        <span class="text-[10px] text-slate-400">Med: ${med}${unit}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[9.5px]">
+                        <span class="${stat.diff_from_median >= 0 ? 'text-emerald-400 font-semibold' : 'text-slate-400'}">${diff ? `${diff} (${diffPct})` : ''}</span>
+                        <div class="flex items-center space-x-1">
+                            <span class="px-1 py-0.2 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${rk}</span>
+                            ${smallBadge}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMatchupStatSheetHtml(sheet, awayTeam, homeTeam) {
+            if (!sheet || sheet.error) {
+                return '';
+            }
+
+            const sim5 = sheet.section_5_similar_opponents || {};
+            const homeDefSim = sim5.home_defense_vs_opponents_like_away || {};
+            const awayDefSim = sim5.away_defense_vs_opponents_like_home || {};
+            const homeDual = sim5.home_defense_dual_archetype_splits || {};
+            const awayDual = sim5.away_defense_dual_archetype_splits || {};
+            const h2h = sheet.section_6_head_to_head || {};
+            const personnel = sheet.section_7_key_personnel || {};
+
+            const awayTend = sheet.section_1_away_offense_tendencies || {};
+            const homeVuln = sheet.section_2_home_defense_vulnerabilities || {};
+            const homeTend = sheet.section_3_home_offense_tendencies || {};
+            const awayVuln = sheet.section_4_away_defense_vulnerabilities || {};
+
+            const renderSimTable = (simData, defTeam, oppTeam) => {
+                const games = simData.similar_games || [];
+                const allSum = simData.all_summary || simData.similar_games_summary || {};
+                const strongSum = simData.strong_summary || null;
+                const strongDedup = simData.strong_deduped_summary || null;
+                const overall = simData.overall_defense_baseline || {};
+                const sampleWarning = simData.sample_warning || '';
+                const h2hDisclaimer = simData.h2h_disclaimer || '';
+                const nStrongGames = simData.n_strong_analog_games != null ? simData.n_strong_analog_games : (simData.n_strong != null ? simData.n_strong : 0);
+                const nStrongOpps = simData.n_distinct_strong_analogs != null ? simData.n_distinct_strong_analogs : 0;
+                const nTotalGames = simData.n_total_games != null ? simData.n_total_games : games.length;
+                const nTotalOpps = simData.n_distinct_total_opponents != null ? simData.n_distinct_total_opponents : (new Set(games.map(g => g.opponent)).size);
+
+                return `
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-100 font-mono">${defTeam} Defense vs Opponents Similar to ${oppTeam}</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">Matched by rush rate, neutral rush %, carry concentration, designed QB rush % &amp; committee split</span>
+                            </div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">Top ${nTotalGames} Games (<span class="${nStrongGames < 3 || nStrongOpps < 2 ? 'text-amber-400 font-bold' : 'text-emerald-400 font-bold'}">${nStrongGames} Strong [${nStrongOpps} Opps]</span>)</span>
+                        </div>
+
+                        ${sampleWarning ? `
+                            <div class="bg-amber-950/25 border border-amber-900/40 rounded-lg p-2.5 text-[11px] text-amber-200/90 leading-relaxed font-sans">
+                                <span class="font-bold text-amber-300">Sample Notice:</span> ${sampleWarning}
+                                ${h2hDisclaimer ? `<span class="block mt-1 text-slate-300 text-[10.5px]">${h2hDisclaimer}</span>` : ''}
+                            </div>
+                        ` : ''}
+
+                        ${simData.descriptive_narrative ? `
+                            <p class="text-xs text-slate-300 bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] leading-relaxed">
+                                <b class="text-slate-200">Historical Comparison:</b> ${simData.descriptive_narrative}
+                            </p>
+                        ` : ''}
+
+                        <div class="overflow-x-auto rounded-lg border border-[#30363d]">
+                            <table class="w-full text-left text-xs border-collapse font-mono">
+                                <thead class="bg-[#21262d] text-slate-400 uppercase text-[10px] border-b border-[#30363d]">
+                                    <tr>
+                                        <th class="py-2.5 px-2.5">Game</th>
+                                        <th class="py-2.5 px-2 text-center">RMSD &amp; Tier</th>
+                                        <th class="py-2.5 px-2 text-right">RB Carries &amp; Yds</th>
+                                        <th class="py-2.5 px-2 text-right">RB YPC</th>
+                                        <th class="py-2.5 px-2 text-right">RB Rush EPA</th>
+                                        <th class="py-2.5 px-2 text-right">Stuff %</th>
+                                        <th class="py-2.5 px-2 text-right">Explosive %</th>
+                                        <th class="py-2.5 px-2 text-right">Pass Yds (YPA)</th>
+                                        <th class="py-2.5 px-2 text-center">Sacks</th>
+                                        <th class="py-2.5 px-2 text-right">EPA/Play</th>
+                                        <th class="py-2.5 px-2.5 text-right">Success%</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#21262d] text-[11px]">
+                                    ${games.map(g => {
+                                        const rmsdVal = g.rmsd != null ? g.rmsd : (g.distance || 0);
+                                        const isStrong = g.similarity_tier_key === 'strong' || rmsdVal <= 0.70;
+                                        const isMod = g.similarity_tier_key === 'moderate' || (rmsdVal > 0.70 && rmsdVal <= 1.10);
+                                        const tierBadge = isStrong
+                                            ? '<span class="px-1.5 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800/60 text-[9px] font-semibold">Strong (&le;0.70σ)</span>'
+                                            : (isMod
+                                                ? '<span class="px-1.5 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-800/60 text-[9px]">Mod (0.70-1.10σ)</span>'
+                                                : '<span class="px-1.5 py-0.5 rounded bg-slate-800/70 text-slate-400 border border-slate-700 text-[9px]">Loose (&gt;1.10σ)</span>');
+                                        const h2hTag = g.is_direct_h2h
+                                            ? '<span class="ml-1 px-1 py-0.2 rounded bg-purple-950/80 text-purple-300 border border-purple-800/80 text-[8.5px]">Direct H2H</span>'
+                                            : '<span class="ml-1 px-1 py-0.2 rounded bg-slate-800/50 text-slate-400 border border-slate-700/50 text-[8.5px]">Analog</span>';
+
+                                        return `
+                                            <tr class="hover:bg-[#21262d]/40 transition">
+                                                <td class="py-2 px-2.5 font-bold text-slate-200">vs ${g.opponent} <span class="text-[10px] text-slate-400">('${g.season % 100} W${g.week})</span>${h2hTag}</td>
+                                                <td class="py-2 px-2 text-center"><span class="text-slate-300">${rmsdVal.toFixed(3)}σ</span> ${tierBadge}</td>
+                                                <td class="py-2 px-2 text-right text-slate-100">${g.rb_carries_allowed || 0} car, ${g.rb_rush_yards_allowed != null ? g.rb_rush_yards_allowed.toFixed(0) : 0} yds</td>
+                                                <td class="py-2 px-2 text-right text-slate-100">${(g.rb_ypc_allowed || 0).toFixed(2)}</td>
+                                                <td class="py-2 px-2 text-right ${(g.rb_rush_epa_allowed || 0) > 0 ? 'text-emerald-400' : 'text-red-400'}">${(g.rb_rush_epa_allowed || 0) > 0 ? '+' : ''}${(g.rb_rush_epa_allowed || 0).toFixed(3)}</td>
+                                                <td class="py-2 px-2 text-right text-slate-300">${((g.rb_stuff_rate_allowed || 0) * 100).toFixed(0)}%</td>
+                                                <td class="py-2 px-2 text-right text-slate-300">${((g.rb_explosive_rate_allowed || 0) * 100).toFixed(0)}%</td>
+                                                <td class="py-2 px-2 text-right text-slate-100">${g.pass_yards_allowed != null ? g.pass_yards_allowed.toFixed(0) : 0} yds <span class="text-slate-400 text-[10px]">(${(g.pass_ypa_allowed || 0).toFixed(1)})</span></td>
+                                                <td class="py-2 px-2 text-center text-slate-300">${g.sacks != null ? g.sacks : 0}</td>
+                                                <td class="py-2 px-2 text-right ${g.epa_per_play_allowed > 0 ? 'text-emerald-400' : 'text-red-400'}">${g.epa_per_play_allowed > 0 ? '+' : ''}${g.epa_per_play_allowed.toFixed(3)}</td>
+                                                <td class="py-2 px-2.5 text-right text-slate-200">${(g.success_rate_allowed * 100).toFixed(1)}%</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+
+                                    <!-- Strong Matches Median Row -->
+                                    ${strongSum ? `
+                                        <tr class="bg-[#161f28] font-bold text-emerald-300 border-t-2 border-emerald-900/60">
+                                            <td class="py-2 px-2.5 uppercase text-[10px]">Strong Matches Median (n=${nStrongGames} games, ${nStrongOpps} opps)</td>
+                                            <td class="py-2 px-2 text-center text-emerald-400">&le; 0.70&sigma; RMSD</td>
+                                            <td class="py-2 px-2 text-right">${strongSum.rb_carries?.median != null ? strongSum.rb_carries.median.toFixed(0) + ' car, ' : ''}${strongSum.rb_rush_yards?.median != null ? strongSum.rb_rush_yards.median.toFixed(0) + ' yds' : '--'}</td>
+                                            <td class="py-2 px-2 text-right">${strongSum.rb_ypc?.median != null ? strongSum.rb_ypc.median.toFixed(2) : '--'}</td>
+                                            <td class="py-2 px-2 text-right">${strongSum.rb_rush_epa?.median != null ? (strongSum.rb_rush_epa.median > 0 ? '+' : '') + strongSum.rb_rush_epa.median.toFixed(3) : '--'}</td>
+                                            <td class="py-2 px-2 text-right">${strongSum.rb_stuff_rate?.median != null ? (strongSum.rb_stuff_rate.median * 100).toFixed(0) + '%' : '--'}</td>
+                                            <td class="py-2 px-2 text-right">${strongSum.rb_explosive_rate?.median != null ? (strongSum.rb_explosive_rate.median * 100).toFixed(0) + '%' : '--'}</td>
+                                            <td class="py-2 px-2 text-right">${strongSum.pass_yards?.median != null ? strongSum.pass_yards.median.toFixed(0) + ' yds' : '--'}</td>
+                                            <td class="py-2 px-2 text-center">${strongSum.sacks?.median != null ? strongSum.sacks.median.toFixed(1) : '--'}</td>
+                                            <td class="py-2 px-2 text-right">${strongSum.epa_per_play?.median != null ? (strongSum.epa_per_play.median > 0 ? '+' : '') + strongSum.epa_per_play.median.toFixed(3) : '--'}</td>
+                                            <td class="py-2 px-2.5 text-right">${strongSum.success_rate?.median != null ? (strongSum.success_rate.median * 100).toFixed(1) + '%' : '--'}</td>
+                                        </tr>
+                                    ` : ''}
+
+                                    <!-- All Matched Games Median Row -->
+                                    <tr class="bg-[#161b22] font-bold text-amber-200 border-t border-[#30363d]">
+                                        <td class="py-2 px-2.5 uppercase text-[10px]">All Matched Games Median (n=${nTotalGames} games, ${nTotalOpps} opps)</td>
+                                        <td class="py-2 px-2 text-center text-slate-400">Top ${nTotalGames}</td>
+                                        <td class="py-2 px-2 text-right">${allSum.rb_carries?.median != null ? allSum.rb_carries.median.toFixed(0) + ' car, ' : ''}${allSum.rb_rush_yards?.median != null ? allSum.rb_rush_yards.median.toFixed(0) + ' yds' : '--'}</td>
+                                        <td class="py-2 px-2 text-right">${allSum.rb_ypc?.median != null ? allSum.rb_ypc.median.toFixed(2) : '--'}</td>
+                                        <td class="py-2 px-2 text-right">${allSum.rb_rush_epa?.median != null ? (allSum.rb_rush_epa.median > 0 ? '+' : '') + allSum.rb_rush_epa.median.toFixed(3) : '--'}</td>
+                                        <td class="py-2 px-2 text-right">${allSum.rb_stuff_rate?.median != null ? (allSum.rb_stuff_rate.median * 100).toFixed(0) + '%' : '--'}</td>
+                                        <td class="py-2 px-2 text-right">${allSum.rb_explosive_rate?.median != null ? (allSum.rb_explosive_rate.median * 100).toFixed(0) + '%' : '--'}</td>
+                                        <td class="py-2 px-2 text-right">${allSum.pass_yards?.median != null ? allSum.pass_yards.median.toFixed(0) + ' yds' : '--'}</td>
+                                        <td class="py-2 px-2 text-center">${allSum.sacks?.median != null ? allSum.sacks.median.toFixed(1) : '--'}</td>
+                                        <td class="py-2 px-2 text-right">${allSum.epa_per_play?.median != null ? (allSum.epa_per_play.median > 0 ? '+' : '') + allSum.epa_per_play.median.toFixed(3) : '--'}</td>
+                                        <td class="py-2 px-2.5 text-right">${allSum.success_rate?.median != null ? (allSum.success_rate.median * 100).toFixed(1) + '%' : '--'}</td>
+                                    </tr>
+
+                                    <!-- Defense Overall Season Median Row -->
+                                    <tr class="bg-[#0d1117] text-slate-400 text-[10px]">
+                                        <td class="py-1.5 px-2.5 font-medium">Defense Overall Median (n=${overall.total_games_evaluated || 0} games, ${overall.distinct_opponents_evaluated || 0} opps)</td>
+                                        <td class="py-1.5 px-2 text-center">All Games</td>
+                                        <td class="py-1.5 px-2 text-right">${overall.rb_carries != null ? overall.rb_carries.toFixed(0) + ' car, ' : ''}${overall.rb_rush_yards != null ? overall.rb_rush_yards.toFixed(0) + ' yds' : '--'}</td>
+                                        <td class="py-1.5 px-2 text-right">${overall.rb_ypc != null ? overall.rb_ypc.toFixed(2) : '--'}</td>
+                                        <td class="py-1.5 px-2 text-right">${overall.rb_rush_epa != null ? (overall.rb_rush_epa > 0 ? '+' : '') + overall.rb_rush_epa.toFixed(3) : '--'}</td>
+                                        <td class="py-1.5 px-2 text-right">${overall.rb_stuff_rate != null ? (overall.rb_stuff_rate * 100).toFixed(0) + '%' : '--'}</td>
+                                        <td class="py-1.5 px-2 text-right">${overall.rb_explosive_rate != null ? (overall.rb_explosive_rate * 100).toFixed(0) + '%' : '--'}</td>
+                                        <td class="py-1.5 px-2 text-right">${overall.pass_yards != null ? overall.pass_yards.toFixed(0) + ' yds' : '--'}</td>
+                                        <td class="py-1.5 px-2 text-center">${overall.sacks != null ? overall.sacks.toFixed(1) : '--'}</td>
+                                        <td class="py-1.5 px-2 text-right">${overall.epa_per_play != null ? (overall.epa_per_play > 0 ? '+' : '') + overall.epa_per_play.toFixed(3) : '--'}</td>
+                                        <td class="py-1.5 px-2.5 text-right">${overall.success_rate != null ? (overall.success_rate * 100).toFixed(1) + '%' : '--'}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const renderDualContrastTable = (dualData, defTeam, oppTeam) => {
+                const contrastRows = dualData.contrast_table || [];
+                if (!contrastRows.length) return '';
+
+                const conclusionVerdict = dualData.conclusion_verdict || '';
+                const conclusionStatus = dualData.can_conclude_status || (dualData.can_conclude ? 'full' : 'none');
+
+                let verdictBanner = '';
+                if (conclusionStatus === 'full') {
+                    verdictBanner = `
+                        <div class="bg-emerald-950/30 border border-emerald-800/50 rounded-lg p-3 text-xs text-emerald-200 flex items-start gap-2.5">
+                            <span class="px-2 py-0.5 rounded bg-emerald-900/60 text-emerald-300 font-mono text-[10px] font-bold uppercase shrink-0 border border-emerald-700/60">Full Conclusion Supported</span>
+                            <span class="leading-relaxed">${conclusionVerdict}</span>
+                        </div>
+                    `;
+                } else if (conclusionStatus === 'partial_ground') {
+                    verdictBanner = `
+                        <div class="bg-sky-950/30 border border-sky-800/50 rounded-lg p-3 text-xs text-sky-200 flex items-start gap-2.5">
+                            <span class="px-2 py-0.5 rounded bg-sky-900/60 text-sky-300 font-mono text-[10px] font-bold uppercase shrink-0 border border-sky-700/60">Partial Conclusion (Ground Only)</span>
+                            <span class="leading-relaxed">${conclusionVerdict}</span>
+                        </div>
+                    `;
+                } else if (conclusionStatus === 'partial_aerial') {
+                    verdictBanner = `
+                        <div class="bg-sky-950/30 border border-sky-800/50 rounded-lg p-3 text-xs text-sky-200 flex items-start gap-2.5">
+                            <span class="px-2 py-0.5 rounded bg-sky-900/60 text-sky-300 font-mono text-[10px] font-bold uppercase shrink-0 border border-sky-700/60">Partial Conclusion (Aerial Only)</span>
+                            <span class="leading-relaxed">${conclusionVerdict}</span>
+                        </div>
+                    `;
+                } else {
+                    verdictBanner = `
+                        <div class="bg-amber-950/30 border border-amber-800/50 rounded-lg p-3 text-xs text-amber-200 flex items-start gap-2.5">
+                            <span class="px-2 py-0.5 rounded bg-amber-900/60 text-amber-300 font-mono text-[10px] font-bold uppercase shrink-0 border border-amber-700/60">Cannot Conclude</span>
+                            <span class="leading-relaxed">${conclusionVerdict}</span>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                        <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-100 font-mono">${defTeam} Defense: Dual Archetype Split Contrast</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">Comparing performance vs Ground-Heavy (${oppTeam}-like) vs. Pass-Heavy Opponents</span>
+                            </div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-cyan-300 border border-[#30363d]">Dual Archetype Comparison</span>
+                        </div>
+
+                        ${verdictBanner}
+
+                        <div class="overflow-x-auto rounded-lg border border-[#30363d]">
+                            <table class="w-full text-left text-xs border-collapse font-mono">
+                                <thead class="bg-[#21262d] text-slate-400 uppercase text-[10px] border-b border-[#30363d]">
+                                    <tr>
+                                        <th class="py-2.5 px-3">Offensive Archetype</th>
+                                        <th class="py-2.5 px-2 text-center">Sample (Games / Opps)</th>
+                                        <th class="py-2.5 px-2 text-right">RB Rush (Strong Games)</th>
+                                        <th class="py-2.5 px-2 text-right">RB Rush (Deduped Opps)</th>
+                                        <th class="py-2.5 px-2 text-right">RB YPC</th>
+                                        <th class="py-2.5 px-2 text-right">RB Rush EPA</th>
+                                        <th class="py-2.5 px-2 text-right">Stuff %</th>
+                                        <th class="py-2.5 px-2 text-right">Pass Yds</th>
+                                        <th class="py-2.5 px-3 text-right">Total EPA/Play</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#21262d] text-[11px]">
+                                    ${contrastRows.map(r => {
+                                        const isBaseline = r.archetype_key === 'baseline';
+                                        const rowBg = isBaseline ? 'bg-[#0d1117] text-slate-400' : 'hover:bg-[#21262d]/40 text-slate-200';
+                                        const titleColor = isBaseline ? 'text-slate-400 font-medium' : (r.archetype_key === 'ground' ? 'text-amber-300 font-bold' : 'text-sky-300 font-bold');
+
+                                        if (!isBaseline && !r.can_summarize) {
+                                            return `
+                                                <tr class="${rowBg} bg-amber-950/10">
+                                                    <td class="py-2.5 px-3 ${titleColor}">
+                                                        <div>${r.archetype}</div>
+                                                        <span class="text-[9.5px] text-amber-400 font-mono font-bold">INSUFFICIENT SAMPLE — NOT SUMMARIZED</span>
+                                                    </td>
+                                                    <td class="py-2.5 px-2 text-center text-slate-400">${r.n_strong_games || r.n_strong} str (${r.n_strong_opponents || 0} opps) / ${r.n_total_games || r.n_total} tot</td>
+                                                    <td colspan="7" class="py-2.5 px-3 text-center text-amber-300/80 italic font-mono text-[10.5px]">
+                                                        Sample too small (n &lt; 3 games or &lt; 2 distinct opponents) — Aggregation suppressed to prevent deceptive metrics
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }
+
+                                        const sampleLabel = isBaseline
+                                            ? `All (${r.n_total_games || r.n_total} games, ${r.n_total_opponents || 0} opps)`
+                                            : `<span class="text-emerald-400 font-semibold">${r.n_strong_games || r.n_strong} str (${r.n_strong_opponents || 0} opps)</span> / ${r.n_total_games || r.n_total} tot`;
+
+                                        const strongGamesVal = r.rb_rush_yards_strong != null ? r.rb_rush_yards_strong.toFixed(1) : '--';
+                                        const strongDedupVal = r.rb_rush_yards_strong_deduped != null ? r.rb_rush_yards_strong_deduped.toFixed(1) : strongGamesVal;
+
+                                        return `
+                                            <tr class="${rowBg}">
+                                                <td class="py-2 px-3 ${titleColor}">${r.archetype}</td>
+                                                <td class="py-2 px-2 text-center text-slate-300">${sampleLabel}</td>
+                                                <td class="py-2 px-2 text-right text-slate-100 font-semibold">${strongGamesVal}</td>
+                                                <td class="py-2 px-2 text-right text-slate-200">${strongDedupVal}</td>
+                                                <td class="py-2 px-2 text-right text-slate-200">${r.rb_ypc != null ? r.rb_ypc.toFixed(2) : '--'}</td>
+                                                <td class="py-2 px-2 text-right ${r.rb_rush_epa > 0 ? 'text-emerald-400' : 'text-red-400'}">${r.rb_rush_epa != null ? (r.rb_rush_epa > 0 ? '+' : '') + r.rb_rush_epa.toFixed(3) : '--'}</td>
+                                                <td class="py-2 px-2 text-right text-slate-200">${r.rb_stuff_rate != null ? (r.rb_stuff_rate * 100).toFixed(0) + '%' : '--'}</td>
+                                                <td class="py-2 px-2 text-right text-slate-100">${r.pass_yards != null ? r.pass_yards.toFixed(0) : '--'}</td>
+                                                <td class="py-2 px-3 text-right ${r.epa_per_play > 0 ? 'text-emerald-400' : 'text-red-400'}">${r.epa_per_play != null ? (r.epa_per_play > 0 ? '+' : '') + r.epa_per_play.toFixed(3) : '--'}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            };
+
+            return `
+                <!-- ============================================================== -->
+                <!-- MATCHUP SCOUTING STAT SHEET: SITUATIONAL TENDENCIES & SIMILAR OPPONENTS -->
+                <!-- ============================================================== -->
+                <div id="pillar-matchup-sheet" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-5">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">Matchup Scouting Stat Sheet</h3>
+                                <p class="text-[11px] text-slate-400">Descriptive situational splits, defensive production allowed, and similar-opponent historical game samples (n ≥ 40 plays / 4 games)</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">Descriptive Stat Sheet</span>
+                    </div>
+
+                    <!-- Pure Descriptive Disclaimer -->
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-lg p-2.5 flex items-start gap-2.5 text-[11px] text-slate-300 leading-relaxed font-sans">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <div>
+                            <span class="font-bold text-slate-200">Pure Descriptive Statistics:</span>
+                            ${sheet.disclaimer || 'This stat sheet presents purely descriptive and comparative historical statistics. It does not provide forecasts or wagering recommendations.'}
+                        </div>
+                    </div>
+
+                    <!-- 1. SIMILAR OPPONENT HISTORICAL GAME LOGS -->
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2 border-b border-[#21262d] pb-2">
+                            <i data-lucide="history" class="w-4 h-4 text-slate-400"></i>
+                            <h4 class="text-xs font-bold text-slate-200 uppercase font-mono">1. Similar-Opponent Historical Matchup Logs</h4>
+                        </div>
+                        <div class="space-y-4">
+                            ${renderSimTable(homeDefSim, homeTeam, awayTeam)}
+                            ${renderSimTable(awayDefSim, awayTeam, homeTeam)}
+                        </div>
+                    </div>
+
+                    <!-- 1B. DUAL ARCHETYPE SPLIT CONTRAST -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center space-x-2 border-b border-[#21262d] pb-2">
+                            <i data-lucide="split" class="w-4 h-4 text-slate-400"></i>
+                            <h4 class="text-xs font-bold text-slate-200 uppercase font-mono">1B. Dual Archetype Split Contrast: Ground-Heavy vs. Pass-Heavy</h4>
+                        </div>
+                        <div class="space-y-4">
+                            ${renderDualContrastTable(homeDual, homeTeam, awayTeam)}
+                            ${renderDualContrastTable(awayDual, awayTeam, homeTeam)}
+                        </div>
+                    </div>
+
+                    <!-- 2. SITUATIONAL TENDENCIES VS DEFENSIVE VULNERABILITIES -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center space-x-2 border-b border-[#21262d] pb-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-slate-400"></i>
+                            <h4 class="text-xs font-bold text-slate-200 uppercase font-mono">2. Situational Tendency Splits vs. Defensive Production Allowed</h4>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs">
+                            <!-- Away Offense vs Home Defense -->
+                            <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                                <div class="text-xs font-bold font-mono text-slate-200 border-b border-[#21262d] pb-1.5 flex justify-between">
+                                    <span>${awayTeam} Offense Tendencies</span>
+                                    <span class="text-slate-400 text-[11px] font-normal">vs ${homeTeam} Defense</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="text-[11px] font-bold text-slate-400 uppercase font-mono">Game State Splits</div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Leading (≥ +7)</span>
+                                            ${renderStatCmp(awayTend.game_state_splits?.leading?.pass_rate, '% Pass')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Neutral (-6 to +6)</span>
+                                            ${renderStatCmp(awayTend.game_state_splits?.neutral?.pass_rate, '% Pass')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Trailing (≤ -7)</span>
+                                            ${renderStatCmp(awayTend.game_state_splits?.trailing?.pass_rate, '% Pass')}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2 pt-1 border-t border-[#21262d]">
+                                    <div class="text-[11px] font-bold text-slate-400 uppercase font-mono">${homeTeam} Defense Production Allowed</div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">RB Rush (Inside Tackles)</span>
+                                            ${renderStatCmp(homeVuln.rb_rush_defense?.inside_tackles_ypc, ' YPC')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">RB Rush (Outside Tackles)</span>
+                                            ${renderStatCmp(homeVuln.rb_rush_defense?.outside_tackles_ypc, ' YPC')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Pass Defense (Short 1-10y)</span>
+                                            ${renderStatCmp(homeVuln.pass_defense?.short_ypp, ' YPA')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Pass Defense (Deep 20y+)</span>
+                                            ${renderStatCmp(homeVuln.pass_defense?.deep_ypp, ' YPA')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Home Offense vs Away Defense -->
+                            <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                                <div class="text-xs font-bold font-mono text-slate-200 border-b border-[#21262d] pb-1.5 flex justify-between">
+                                    <span>${homeTeam} Offense Tendencies</span>
+                                    <span class="text-slate-400 text-[11px] font-normal">vs ${awayTeam} Defense</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="text-[11px] font-bold text-slate-400 uppercase font-mono">Game State Splits</div>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Leading (≥ +7)</span>
+                                            ${renderStatCmp(homeTend.game_state_splits?.leading?.pass_rate, '% Pass')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Neutral (-6 to +6)</span>
+                                            ${renderStatCmp(homeTend.game_state_splits?.neutral?.pass_rate, '% Pass')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Trailing (≤ -7)</span>
+                                            ${renderStatCmp(homeTend.game_state_splits?.trailing?.pass_rate, '% Pass')}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2 pt-1 border-t border-[#21262d]">
+                                    <div class="text-[11px] font-bold text-slate-400 uppercase font-mono">${awayTeam} Defense Production Allowed</div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">RB Rush (Inside Tackles)</span>
+                                            ${renderStatCmp(awayVuln.rb_rush_defense?.inside_tackles_ypc, ' YPC')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">RB Rush (Outside Tackles)</span>
+                                            ${renderStatCmp(awayVuln.rb_rush_defense?.outside_tackles_ypc, ' YPC')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Pass Defense (Short 1-10y)</span>
+                                            ${renderStatCmp(awayVuln.pass_defense?.short_ypp, ' YPA')}
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px] mb-1 font-mono">Pass Defense (Deep 20y+)</span>
+                                            ${renderStatCmp(awayVuln.pass_defense?.deep_ypp, ' YPA')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. HEAD-TO-HEAD MOST RECENT MEETING -->
+                    ${h2h.played_recently ? `
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-center space-x-2 border-b border-[#21262d] pb-2">
+                                <i data-lucide="swords" class="w-4 h-4 text-slate-400"></i>
+                                <h4 class="text-xs font-bold text-slate-200 uppercase font-mono">3. Head-to-Head Most Recent Meeting (${h2h.season} Week ${h2h.week})</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                                <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                                    <div class="text-xs font-bold text-slate-100">${h2h.away_team?.team} Box Stats</div>
+                                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">Rush Yards:</span>
+                                            <b class="text-slate-200">${h2h.away_team?.rush_yards?.toFixed(0)} yds</b>
+                                            <span class="text-[9.5px] text-slate-400 block truncate">${h2h.away_team?.leading_rusher}</span>
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">Pass Yards:</span>
+                                            <b class="text-slate-200">${h2h.away_team?.pass_yards?.toFixed(0)} yds</b>
+                                            <span class="text-[9.5px] text-slate-400 block truncate">${h2h.away_team?.leading_receiver}</span>
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">Sacks / Turnovers:</span>
+                                            <b class="text-slate-200">${h2h.away_team?.sacks_taken} / ${h2h.away_team?.turnovers}</b>
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">EPA / Success:</span>
+                                            <b class="text-slate-200">${h2h.away_team?.epa_per_play} / ${(h2h.away_team?.success_rate * 100).toFixed(0)}%</b>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                                    <div class="text-xs font-bold text-slate-100">${h2h.home_team?.team} Box Stats</div>
+                                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">Rush Yards:</span>
+                                            <b class="text-slate-200">${h2h.home_team?.rush_yards?.toFixed(0)} yds</b>
+                                            <span class="text-[9.5px] text-slate-400 block truncate">${h2h.home_team?.leading_rusher}</span>
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">Pass Yards:</span>
+                                            <b class="text-slate-200">${h2h.home_team?.pass_yards?.toFixed(0)} yds</b>
+                                            <span class="text-[9.5px] text-slate-400 block truncate">${h2h.home_team?.leading_receiver}</span>
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">Sacks / Turnovers:</span>
+                                            <b class="text-slate-200">${h2h.home_team?.sacks_taken} / ${h2h.home_team?.turnovers}</b>
+                                        </div>
+                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                            <span class="text-slate-400 block text-[9.5px]">EPA / Success:</span>
+                                            <b class="text-slate-200">${h2h.home_team?.epa_per_play} / ${(h2h.home_team?.success_rate * 100).toFixed(0)}%</b>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- 4. KEY PERSONNEL AVAILABILITY (FACT-ONLY) -->
+                    ${((personnel.away_team_injuries && personnel.away_team_injuries.length > 0) || (personnel.home_team_injuries && personnel.home_team_injuries.length > 0)) ? `
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-center space-x-2 border-b border-[#21262d] pb-2">
+                                <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
+                                <h4 class="text-xs font-bold text-slate-200 uppercase font-mono">4. Key Personnel Availability (Reported Facts)</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                                <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                                    <span class="text-xs font-bold text-slate-200">${awayTeam} Reported Statuses</span>
+                                    <div class="space-y-1">
+                                        ${(personnel.away_team_injuries || []).slice(0, 6).map(inj => `
+                                            <div class="flex items-center justify-between bg-[#161b22] px-2.5 py-1.5 rounded border border-[#21262d] text-[11px]">
+                                                <span class="text-slate-200 font-bold font-sans">${inj.player} <span class="text-slate-400 font-mono text-[10px]">(${inj.pos})</span></span>
+                                                <div class="flex items-center space-x-1.5">
+                                                    <span class="px-1.5 py-0.2 rounded font-bold text-[9.5px] ${inj.status === 'Out' ? 'bg-rose-950/80 text-rose-300 border border-rose-700/60' : (inj.status === 'Questionable' ? 'bg-amber-950/80 text-amber-300 border border-amber-700/60' : 'bg-slate-800 text-slate-300')}">${inj.status || 'Active'}</span>
+                                                    ${inj.practice ? `<span class="text-[9.5px] text-slate-400">(${inj.practice})</span>` : ''}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                                    <span class="text-xs font-bold text-slate-200">${homeTeam} Reported Statuses</span>
+                                    <div class="space-y-1">
+                                        ${(personnel.home_team_injuries || []).slice(0, 6).map(inj => `
+                                            <div class="flex items-center justify-between bg-[#161b22] px-2.5 py-1.5 rounded border border-[#21262d] text-[11px]">
+                                                <span class="text-slate-200 font-bold font-sans">${inj.player} <span class="text-slate-400 font-mono text-[10px]">(${inj.pos})</span></span>
+                                                <div class="flex items-center space-x-1.5">
+                                                    <span class="px-1.5 py-0.2 rounded font-bold text-[9.5px] ${inj.status === 'Out' ? 'bg-rose-950/80 text-rose-300 border border-rose-700/60' : (inj.status === 'Questionable' ? 'bg-amber-950/80 text-amber-300 border border-amber-700/60' : 'bg-slate-800 text-slate-300')}">${inj.status || 'Active'}</span>
+                                                    ${inj.practice ? `<span class="text-[9.5px] text-slate-400">(${inj.practice})</span>` : ''}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-mono pt-1">
+                                ${personnel.note || 'Injuries displayed as reported facts (status, practice participation). No rating adjustments applied.'}
+                            </p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+function renderSchemeInsights(d) {
             const container = document.getElementById('insights-view-container');
             if (!container) return;
 
@@ -3755,7 +4314,7 @@
                                 </div>
                             </div>
 
-                            <!-- Exploit & Vulnerability Callout -->
+                            <!-- Vulnerability Callout -->
                             <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs space-y-2">
                                 <div>
                                     <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
@@ -3849,7 +4408,7 @@
                                 </div>
                             </div>
 
-                            <!-- Exploit & Vulnerability Callout -->
+                            <!-- Vulnerability Callout -->
                             <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs space-y-2">
                                 <div>
                                     <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
@@ -4075,28 +4634,28 @@
                 </div>
 
                 <!-- ============================================================== -->
-                <!-- PILLAR 4: EFFICIENCY BY CONTEXT & BREAKOUT SPOTTERS (12:05) -->
+                <!-- PILLAR 4: KEY PERSONNEL & SITUATIONAL SPLITS -->
                 <!-- ============================================================== -->
                 <div id="pillar-breakouts" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
                         <div class="flex items-center space-x-2.5">
                             <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
-                                <i data-lucide="zap" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-slate-100">4. Key Players to Watch: Scheme-Specific Breakout Spotters</h3>
-                                <p class="text-[11px] text-slate-400">Top 2–4 players with high statistical leverage against opposing coverage shells and run fronts</p>
+                                <h3 class="text-sm font-bold text-slate-100">4. Key Personnel: Situational Usage & Matchup Stat Splits</h3>
+                                <p class="text-[11px] text-slate-400">Key players with notable situational usage shares and historical split differences against opposing defensive structures</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${breakouts.length} Players Curated</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${breakouts.length} Players Analyzed</span>
                     </div>
 
-                    <!-- Market Line Provenance & Validation Notice -->
-                    <div class="bg-amber-950/20 border border-amber-500/30 rounded-lg p-2.5 flex items-start gap-2.5 text-[11px] text-amber-200/90 leading-relaxed font-sans">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <!-- Descriptive Statistics Notice -->
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-lg p-2.5 flex items-start gap-2.5 text-[11px] text-slate-300 leading-relaxed font-sans">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         <div>
-                            <span class="font-bold text-amber-300">Market Validation Notice:</span>
-                            Live 2026 prop picks are matched against real sportsbook lines via <b class="text-amber-200">The Odds API</b> (DraftKings/FanDuel). Multi-season historical walk-forward backtesting (2023–2025) is currently frozen pending acquisition of complete historical closing prop lines from an institutional provider. Model edges reflect scheme projections vs current market lines and should be traded responsibly.
+                            <span class="font-bold text-slate-200">Descriptive Statistics Notice:</span>
+                            All metrics display historical box stats, situational splits, and sample sizes (n). No projections, win probabilities, or betting picks are emitted.
                         </div>
                     </div>
 
@@ -4119,64 +4678,45 @@
                                         </span>
                                     </div>
 
-                                    ${(b.prop_angle || b.stat_focus) ? `
+                                    ${(b.stat_focus || b.prop_angle) ? `
                                         <div class="bg-[#161b22] px-2.5 py-1.5 rounded-lg border border-[#21262d] flex items-center justify-between text-[11px] font-mono">
                                             <span class="text-slate-400 flex items-center gap-1.5">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
-                                                <span class="text-slate-300 font-semibold">Prop Focus:</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                <span class="text-slate-300 font-semibold">Stat Focus:</span>
                                             </span>
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="font-extrabold px-1.5 py-0.2 rounded text-[9.5px] ${b.side === 'Under' ? 'text-amber-300 bg-amber-950/80 border border-amber-500/60' : 'text-emerald-300 bg-emerald-950/80 border border-emerald-500/60'}">
-                                                    ${(b.side || 'Over').toUpperCase()}
-                                                </span>
-                                                <span class="font-bold px-2 py-0.5 rounded text-[10px] ${b.stat_focus === 'Receiving Yards' ? 'text-amber-300 bg-amber-950/40 border border-amber-800/50' : (b.stat_focus === 'Receptions' ? 'text-emerald-300 bg-emerald-950/40 border border-emerald-800/50' : 'text-sky-300 bg-sky-950/40 border border-sky-800/50')}">
-                                                    ${(b.prop_angle || b.stat_focus).replace(/^Prop Target:\s*/, '')}
-                                                </span>
-                                            </div>
+                                            <span class="font-bold px-2 py-0.5 rounded text-[10px] text-sky-300 bg-sky-950/40 border border-sky-800/50">
+                                                ${b.stat_focus || (b.prop_angle || '').replace(/^.*Focus:\s*/, '')}
+                                            </span>
                                         </div>
                                     ` : ''}
 
-                                    ${b.win_prob ? `
-                                        <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1.5 text-xs font-mono">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-slate-400 text-[10.5px] flex items-center gap-1">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                                    <span class="text-slate-300 font-semibold">Model Probability:</span>
-                                                </span>
-                                                <div class="flex items-center space-x-1.5">
-                                                    <span class="font-bold text-emerald-400 text-xs">${b.win_prob_fmt || (b.win_prob * 100).toFixed(1) + '%'}</span>
-                                                    <span class="text-[9.5px] px-1.5 py-0.2 rounded font-bold ${b.confidence_tier && b.confidence_tier.includes('Model-Flagged') ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-700/60' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${b.confidence_tier ? b.confidence_tier.split('(')[0].trim() : 'Model-Flagged'}</span>
-                                                </div>
+                                    <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1.5 text-xs font-mono">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-slate-400 text-[10.5px] flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                                <span class="text-slate-300 font-semibold">Situational Split:</span>
+                                            </span>
+                                            <div class="flex items-center space-x-1.5">
+                                                <span class="font-bold text-slate-100 text-xs">${b.scheme_delta || '--'}</span>
+                                                <span class="text-[9.5px] px-1.5 py-0.5 rounded font-mono font-medium bg-[#21262d] text-slate-300 border border-[#30363d]" title="${b.z_score ? b.z_score.replace(/z$/, '') + ' standard deviations from league median' : 'Sample Stat'}">${b.z_score ? b.z_score.replace(/z$/, ' SD from league median') : 'Sample Stat'}</span>
                                             </div>
-                                            <div class="flex items-center justify-between text-[11px] text-slate-300 border-t border-[#21262d] pt-1">
-                                                <span class="text-slate-400 flex items-center gap-1.5">
-                                                    <span>Market vs Fair:</span>
-                                                    ${b.line_source ? `<span class="text-[8.5px] px-1 py-0.2 rounded font-mono ${b.line_source.includes('The Odds API') ? 'bg-amber-950/60 text-amber-300 border border-amber-600/50' : 'bg-slate-800 text-slate-400 border border-slate-700'}" title="${b.line_source}">${b.line_source.includes('The Odds API') ? 'ODDS API' : 'CONSENSUS'}</span>` : ''}
-                                                </span>
-                                                <span><b class="text-slate-300">${b.market_line || '--'}</b> <span class="text-slate-500">→</span> <b class="text-emerald-300">${b.fair_line || '--'}</b> <span class="text-emerald-400 font-bold ml-1">(${b.ev_pct || '+18% EV'})</span></span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-[11px] text-slate-300 border-t border-[#21262d] pt-1">
+                                            <span class="text-slate-400">Player Baseline:</span>
+                                            <span class="text-slate-200 font-semibold">${b.season_baseline || '--'}</span>
+                                        </div>
+                                        ${b.context_metric ? `
+                                            <div class="flex items-center justify-between text-[10.5px] text-slate-400 border-t border-[#21262d] pt-1">
+                                                <span>Context Metric:</span>
+                                                <span class="text-slate-300 truncate max-w-[160px]" title="${b.context_metric}">${b.context_metric}</span>
                                             </div>
-                                            ${b.trench_context ? `
-                                                <div class="flex items-center justify-between text-[10px] text-slate-400 border-t border-[#21262d] pt-1">
-                                                    <span>Trench Context:</span>
-                                                    <span class="text-slate-300 truncate max-w-[155px]" title="${b.trench_context}">${b.trench_context}</span>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    ` : ''}
-
-                                    <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1 text-xs font-mono">
-                                        <div class="flex justify-between text-slate-300">
-                                            <span>Scheme Metric:</span>
-                                            <b class="text-slate-100">${b.context_metric}</b>
-                                        </div>
-                                        <div class="flex justify-between text-slate-400 text-[11px]">
-                                            <span>Baseline Split:</span>
-                                            <span>${b.season_baseline}</span>
-                                        </div>
-                                        <div class="flex justify-between text-slate-200 text-[11px] font-semibold border-t border-[#21262d] pt-1">
-                                            <span>${renderSchemeTip('Scheme Edge', 'Scheme Edge', 'left')}:</span>
-                                            <span class="text-slate-100 font-bold">${b.scheme_delta}</span>
-                                        </div>
+                                        ` : ''}
+                                        ${b.trench_context ? `
+                                            <div class="flex items-center justify-between text-[10px] text-slate-400 border-t border-[#21262d] pt-1">
+                                                <span>Trench Context:</span>
+                                                <span class="text-slate-300 truncate max-w-[160px]" title="${b.trench_context}">${b.trench_context}</span>
+                                            </div>
+                                        ` : ''}
                                     </div>
 
                                     <p class="text-xs text-slate-300 leading-relaxed">
@@ -4184,14 +4724,14 @@
                                     </p>
                                 </div>
 
-                                ${b.causal_mechanism ? `
+                                ${b.matchup_mechanism ? `
                                     <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-[11px] space-y-1 mt-auto">
                                         <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5">
-                                            <i data-lucide="crosshair" class="w-3 h-3 text-slate-400"></i>
-                                            <span>${renderSchemeTip('Causal Mechanism', 'Causal Mechanism', 'left')}</span>
+                                            <i data-lucide="layers" class="w-3 h-3 text-slate-400"></i>
+                                            <span>Matchup Context</span>
                                         </div>
                                         <p class="text-slate-300 leading-relaxed font-sans text-[11px]">
-                                            ${formatInsightsText((b.causal_mechanism || '').replace(/^[A-Z0-9]+-[A-Z0-9]+:\s*/, ''))}
+                                            ${formatInsightsText((b.matchup_mechanism || '').replace(/^[A-Z0-9]+-[A-Z0-9]+:\s*/, ''))}
                                         </p>
                                     </div>
                                 ` : ''}
@@ -4299,6 +4839,8 @@
                     </div>
                 </div>
 
+                ${renderMatchupStatSheetHtml(d.matchup_stat_sheet, d.away_team, d.home_team)}
+
                 <!-- ============================================================== -->
                 <!-- MATCHUP FILM-ROOM WRAP UP & EXECUTIVE SUMMARY -->
                 <!-- ============================================================== -->
@@ -4309,7 +4851,7 @@
                                 <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-slate-100">6. Matchup Film-Room Wrap Up: What These Insights Mean</h3>
+                                <h3 class="text-sm font-bold text-slate-100">7. Matchup Film-Room Wrap Up: What These Insights Mean</h3>
                                 <p class="text-[11px] text-slate-400">Tactical summary translating coverage shells, run fits, and game flow into practical game conclusions</p>
                             </div>
                         </div>
@@ -4333,7 +4875,7 @@
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
                             <div class="flex items-center space-x-2 text-slate-200 font-bold">
                                 <i data-lucide="footprints" class="w-3.5 h-3.5 text-slate-400"></i>
-                                <span>2. Ground Attack & Trench Advantage</span>
+                                <span>2. Ground Attack & Trench Splits</span>
                             </div>
                             <p class="text-slate-300 leading-relaxed text-[11.5px]">
                                 ${formatInsightsText(wrapUp.runVerdict)}
@@ -4352,12 +4894,12 @@
                         </div>
                     </div>
 
-                    <!-- Bottom-Line Takeaways / Key Advantage Spotters -->
+                    <!-- Bottom-Line Takeaways / Key Matchup Spotters -->
                     <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                         <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
                             <div class="flex items-center space-x-2 text-xs font-bold text-slate-200">
                                 <i data-lucide="sparkles" class="w-3.5 h-3.5 text-slate-400"></i>
-                                <span>The Bottom Line: Where The Edges Lie</span>
+                                <span>Film-Room Summary: Key Matchup Splits</span>
                             </div>
                             <span class="text-[10px] font-mono text-slate-400">${d.away_team} @ ${d.home_team}</span>
                         </div>
@@ -4368,7 +4910,7 @@
                                     <div class="flex items-center justify-between">
                                         <b class="text-slate-100 font-sans text-xs">${b.player} <span class="text-slate-400 font-mono text-[11px]">(${b.team} ${b.pos})</span></b>
                                         <div class="flex items-center space-x-1.5 shrink-0">
-                                            ${b.win_prob_fmt ? `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/50 text-emerald-300 border border-emerald-800/60 font-bold">${b.win_prob_fmt} (${b.ev_pct})</span>` : ''}
+                                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]" title="${b.z_score ? b.z_score.replace(/z$/, '') + ' standard deviations from league median' : 'Sample Stat'}">${b.z_score ? b.z_score.replace(/z$/, ' SD from league median') : 'Sample Stat'}</span>
                                             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${b.scheme_delta}</span>
                                         </div>
                                     </div>
@@ -4600,7 +5142,7 @@
                         opp_def_zone_rank: hOppDefGapRank,
                         opp_def_gap_ypc_allowed: hOppDefGapYpc,
                         opp_def_gap_rank: hOppDefGapRank,
-                        scheme_advantage: hOppDefGapRank > 18 ? "Exploit Advantage" : (hOppDefGapRank < 8 ? "Tough Matchup" : "Neutral / Balanced"),
+                        scheme_advantage: hOppDefGapRank > 18 ? "Favorable Split" : (hOppDefGapRank < 8 ? "Tough Matchup" : "Neutral / Balanced"),
                         alignment_diagnostic: `${a} perimeter stretch zone run concepts attack ${h}'s defensive front (Rank #${hOppDefGapRank}).`
                     },
                     home_unit: {
@@ -4613,7 +5155,7 @@
                         opp_def_zone_rank: aOppDefGapRank,
                         opp_def_gap_ypc_allowed: aOppDefGapYpc,
                         opp_def_gap_rank: aOppDefGapRank,
-                        scheme_advantage: aOppDefGapRank > 18 ? "Exploit Advantage" : (aOppDefGapRank < 8 ? "Tough Matchup" : "Neutral / Balanced"),
+                        scheme_advantage: aOppDefGapRank > 18 ? "Favorable Split" : (aOppDefGapRank < 8 ? "Tough Matchup" : "Neutral / Balanced"),
                         alignment_diagnostic: `${h} downhill gap power concepts attack ${a}'s defensive front (Rank #${aOppDefGapRank}).`
                     }
                 },
@@ -4621,12 +5163,12 @@
                     away_distribution: { slot_wr_pct: 32, wide_wr_pct: 40, inline_te_pct: 18, backfield_rb_pct: 10 },
                     home_distribution: { slot_wr_pct: 34, wide_wr_pct: 38, inline_te_pct: 18, backfield_rb_pct: 10 },
                     away_player_targets: [
-                        { name: aRoster.wr1, pos: 'WR', slot_pct: 35, outside_pct: 65, inline_pct: 0, tgt_zone: 28.5, tgt_man: 32.0, yprr_zone: 2.6, boost_tier: 'High Boost', expected_boost: `+18% Target Boost: Boundary route-runner wins against soft perimeter cushions.` },
-                        { name: aRoster.te, pos: 'TE', slot_pct: 40, outside_pct: 10, inline_pct: 50, tgt_zone: 21.0, tgt_man: 16.5, yprr_zone: 2.1, boost_tier: 'High Boost', expected_boost: `+22% Target Boost: Seam routes exploit ${hMfo}% MFO safety split.` }
+                        { name: aRoster.wr1, pos: 'WR', slot_pct: 35, outside_pct: 65, inline_pct: 0, tgt_zone: 28.5, tgt_man: 32.0, yprr_zone: 2.6, split_tier: 'High Volume', split_note: `+18% Target Split: Boundary route-runner wins against soft perimeter cushions.` },
+                        { name: aRoster.te, pos: 'TE', slot_pct: 40, outside_pct: 10, inline_pct: 50, tgt_zone: 21.0, tgt_man: 16.5, yprr_zone: 2.1, split_tier: 'High Volume', split_note: `+22% Target Split: Seam routes target ${hMfo}% MFO safety split.` }
                     ],
                     home_player_targets: [
-                        { name: hRoster.wr1, pos: 'WR', slot_pct: 38, outside_pct: 62, inline_pct: 0, tgt_zone: 27.5, tgt_man: 29.5, yprr_zone: 2.4, boost_tier: 'High Boost', expected_boost: `+18% Target Boost: Boundary route-runner wins against soft perimeter cushions.` },
-                        { name: hRoster.te, pos: 'TE', slot_pct: 42, outside_pct: 8, inline_pct: 50, tgt_zone: 22.0, tgt_man: 17.0, yprr_zone: 2.0, boost_tier: 'High Boost', expected_boost: `+22% Target Boost: Seam routes exploit ${aMfo}% MFO safety split.` }
+                        { name: hRoster.wr1, pos: 'WR', slot_pct: 38, outside_pct: 62, inline_pct: 0, tgt_zone: 27.5, tgt_man: 29.5, yprr_zone: 2.4, split_tier: 'High Volume', split_note: `+18% Target Split: Boundary route-runner wins against soft perimeter cushions.` },
+                        { name: hRoster.te, pos: 'TE', slot_pct: 42, outside_pct: 8, inline_pct: 50, tgt_zone: 22.0, tgt_man: 17.0, yprr_zone: 2.0, split_tier: 'High Volume', split_note: `+22% Target Split: Seam routes target ${aMfo}% MFO safety split.` }
                     ]
                 },
                 efficiency_breakouts: [
@@ -4634,24 +5176,24 @@
                         player: hRoster.rb,
                         team: h,
                         pos: 'RB',
-                        scheme_type: 'Downhill Ground Edge',
+                        scheme_type: 'Downhill Ground Profile',
                         stat_focus: 'Rushing Yards',
-                        prop_angle: 'Prop Target: Rushing Yards (Ground Attack)',
+                        prop_angle: 'Player Focus: Rushing Yards (Ground Attack)',
                         context_metric: '4.70 YPC on Gap Concepts',
                         season_baseline: '4.10 Zone YPC',
-                        scheme_delta: '+0.60 YPC Gap Edge',
-                        verdict: 'HIGH EFFICIENCY GROUND EDGE',
-                        rationale: `Target rushing yards / carries. Downhill gap power concepts exploit ${a}'s interior defensive line gap fits (${aOppDefGapYpc} YPC allowed).`,
-                        causal_mechanism: 'Defenses with poor interior gap discipline yield elevated yards before contact to downhill primary ballcarriers.',
+                        scheme_delta: '+0.60 YPC Gap Split',
+                        verdict: 'HIGH EFFICIENCY GROUND SPLIT',
+                        rationale: `Downhill gap power concepts match against ${a}'s interior defensive line gap fits (${aOppDefGapYpc} YPC allowed).`,
+                        matchup_mechanism: 'Defenses with poor interior gap discipline yield elevated yards before contact to downhill primary ballcarriers.',
                         market_line: '62.5 Rush Yds',
                         market_line_num: 62.5,
-                        fair_line: '67.0 Rush Yds',
-                        fair_line_num: 67.0,
+                        split_line: '67.0 Rush Yds',
+                        split_line_num: 67.0,
                         win_prob: 0.556,
                         win_prob_fmt: '55.6%',
-                        ev_pct: '+6.1% EV',
+                        ev_pct: '+6.1% Split Diff',
                         ev_pct_num: 6.1,
-                        confidence_tier: 'Model-Flagged (Grade B)',
+                        confidence_tier: 'Primary Option',
                         z_score: '+1.10z',
                         trench_context: `Interior Front vs Rush Block`
                     },
@@ -4661,22 +5203,22 @@
                         pos: 'WR',
                         scheme_type: 'Boundary Deep Ball Threat',
                         stat_focus: 'Receiving Yards',
-                        prop_angle: 'Prop Target: Receiving Yards (Deep Balls)',
+                        prop_angle: 'Player Focus: Receiving Yards (Deep Balls)',
                         context_metric: `${(hMan >= 30 ? 32.5 : 28.5)}% Tgt Share vs Man`,
                         season_baseline: `${(hMan >= 30 ? 26.5 : 23.5)}% vs Zone`,
                         scheme_delta: `+${((hMan >= 30 ? 32.5 : 28.5) - (hMan >= 30 ? 26.5 : 23.5)).toFixed(1)}% vs Man Coverage`,
                         verdict: 'PRIME BREAKOUT SPOT',
-                        rationale: `Target receiving yards over receptions. 1-on-1 boundary go routes and vertical shots attack ${h}'s single-high/man looks (${hMan}%), yielding explosive chunk yardage rather than high volume catches.`,
-                        causal_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
+                        rationale: `1-on-1 boundary go routes and vertical shots attack ${h}'s single-high/man looks (${hMan}%), yielding explosive chunk yardage rather than high volume catches.`,
+                        matchup_mechanism: 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
                         market_line: '64.5 Rec Yds',
                         market_line_num: 64.5,
-                        fair_line: '70.0 Rec Yds',
-                        fair_line_num: 70.0,
+                        split_line: '70.0 Rec Yds',
+                        split_line_num: 70.0,
                         win_prob: 0.552,
                         win_prob_fmt: '55.2%',
-                        ev_pct: '+5.4% EV',
+                        ev_pct: '+5.4% Split Diff',
                         ev_pct_num: 5.4,
-                        confidence_tier: 'Model-Flagged (Grade B)',
+                        confidence_tier: 'Primary Option',
                         z_score: '+1.15z',
                         trench_context: `Clean Boundary Pocket`
                     },
@@ -4686,22 +5228,22 @@
                         pos: 'TE',
                         scheme_type: 'TE Close Catches / Middle Voids',
                         stat_focus: 'Receptions',
-                        prop_angle: 'Prop Target: Receptions (TE Close Catches)',
+                        prop_angle: 'Player Focus: Receptions (TE Close Catches)',
                         context_metric: `${(hZone >= 60 ? 22.5 : 19.5)}% Tgt Share vs Zone (2.10 YPRR)`,
                         season_baseline: `${(hZone >= 60 ? 16.5 : 15.0)}% vs Man`,
                         scheme_delta: `+${((hZone >= 60 ? 22.5 : 19.5) - (hZone >= 60 ? 16.5 : 15.0)).toFixed(1)}% Zone Target Funnel`,
                         verdict: 'HIGH RECEPTION FLOOR',
-                        rationale: `Target receptions on close catches over receiving yards. Short hook and drag routes settle into soft intermediate voids between linebackers in ${h}'s ${hZone}% zone shell for dependable, chain-moving close catches.`,
-                        causal_mechanism: 'Linebackers drop deep in zone coverage, leaving tight ends uncovered on short-to-intermediate crossing and sit routes.',
+                        rationale: `Short hook and drag routes settle into soft intermediate voids between linebackers in ${h}'s ${hZone}% zone shell for dependable, chain-moving close catches.`,
+                        matchup_mechanism: 'Linebackers drop deep in zone coverage, leaving tight ends uncovered on short-to-intermediate crossing and sit routes.',
                         market_line: '3.5 Receptions',
                         market_line_num: 3.5,
-                        fair_line: '3.9 Receptions',
-                        fair_line_num: 3.9,
+                        split_line: '3.9 Receptions',
+                        split_line_num: 3.9,
                         win_prob: 0.564,
                         win_prob_fmt: '56.4%',
-                        ev_pct: '+7.7% EV',
+                        ev_pct: '+7.7% Split Diff',
                         ev_pct_num: 7.7,
-                        confidence_tier: 'Model-Flagged (Grade A)',
+                        confidence_tier: 'Primary Option',
                         z_score: '+1.05z',
                         trench_context: `Underneath Soft Voids`
                     },
@@ -4709,24 +5251,24 @@
                         player: hRoster.qb_mobile ? hRoster.qb : aRoster.qb,
                         team: hRoster.qb_mobile ? h : a,
                         pos: 'QB',
-                        scheme_type: 'QB Scramble / Mobility Edge',
+                        scheme_type: 'QB Scramble / Mobility Profile',
                         stat_focus: 'Rushing Yards',
-                        prop_angle: 'Prop Target: Rushing Yards (QB Scramble vs Man)',
+                        prop_angle: 'Player Focus: Rushing Yards (QB Scramble vs Man)',
                         context_metric: '6.5 Scramble YPC vs Man Shell',
                         season_baseline: '3.8 YPC on Designed Runs',
-                        scheme_delta: '+14.5 Scramble Yds Edge',
+                        scheme_delta: '+14.5 Scramble Yds Split',
                         verdict: 'PRIME RUSHING CEILING',
-                        rationale: `Target rushing yards over passing props. Defensive backs turn their backs in man coverage to chase receivers downfield, opening wide scramble lanes for ${(hRoster.qb_mobile ? hRoster.qb : aRoster.qb)} to pick up chunk rushing yards.`,
-                        causal_mechanism: 'Man-to-man coverage forces defensive backs to turn away from the pocket, vacating intermediate lanes for mobile QBs to scramble for chunk rushing yards.',
+                        rationale: `Defensive backs turn their backs in man coverage to chase receivers downfield, opening wide scramble lanes for ${(hRoster.qb_mobile ? hRoster.qb : aRoster.qb)} to gain chunk rushing yards.`,
+                        matchup_mechanism: 'Man-to-man coverage forces defensive backs to turn away from the pocket, vacating intermediate lanes for mobile QBs to scramble for chunk rushing yards.',
                         market_line: '34.5 Rush Yds',
                         market_line_num: 34.5,
-                        fair_line: '37.5 Rush Yds',
-                        fair_line_num: 37.5,
+                        split_line: '37.5 Rush Yds',
+                        split_line_num: 37.5,
                         win_prob: 0.553,
                         win_prob_fmt: '55.3%',
-                        ev_pct: '+5.6% EV',
+                        ev_pct: '+5.6% Split Diff',
                         ev_pct_num: 5.6,
-                        confidence_tier: 'Model-Flagged (Grade B)',
+                        confidence_tier: 'Key Starter',
                         z_score: '+1.10z',
                         trench_context: `Flush Pocket Mobility`
                     } : {
@@ -4735,22 +5277,22 @@
                         pos: 'WR',
                         scheme_type: 'Slot Underneath Volume',
                         stat_focus: 'Receptions',
-                        prop_angle: 'Prop Target: Receptions (Short Throws)',
+                        prop_angle: 'Player Focus: Receptions (Short Throws)',
                         context_metric: '25.0% Slot Tgt Share vs Zone',
                         season_baseline: '19.5% vs Man',
                         scheme_delta: '+5.5% vs Zone Shell',
                         verdict: 'HIGH RECEPTION FLOOR',
-                        rationale: `Target receptions over receiving yards. Quick slot option routes and crossing routes find soft cushions against the zone shell, providing a high-volume reception floor.`,
-                        causal_mechanism: 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.',
+                        rationale: `Quick slot option routes and crossing routes find soft cushions against the zone shell, providing a high-volume reception floor.`,
+                        matchup_mechanism: 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.',
                         market_line: '4.5 Receptions',
                         market_line_num: 4.5,
-                        fair_line: '4.9 Receptions',
-                        fair_line_num: 4.9,
+                        split_line: '4.9 Receptions',
+                        split_line_num: 4.9,
                         win_prob: 0.548,
                         win_prob_fmt: '54.8%',
-                        ev_pct: '+4.6% EV',
+                        ev_pct: '+4.6% Split Diff',
                         ev_pct_num: 4.6,
-                        confidence_tier: 'Model-Flagged (Grade B)',
+                        confidence_tier: 'Key Starter',
                         z_score: '+0.95z',
                         trench_context: `Quick Slot Release`
                     }

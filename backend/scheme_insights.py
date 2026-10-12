@@ -15,7 +15,13 @@ from typing import Dict, Any, List, Optional, Tuple
 import math
 import copy
 
-from backend.probability_calibration import recalibrate, is_stat_calibrated
+from backend.matchup_sheet import build_matchup_stat_sheet
+from backend.coverage_matchup import compute_team_coverage_profile, evaluate_coverage_matchup
+from backend.run_matchup import compute_team_rush_profile, evaluate_rush_matchup, rank_ground_candidates
+from backend.target_matchup import compute_player_usage_profile, evaluate_target_matchup
+from backend.tempo_matchup import compute_team_tempo_profile, evaluate_tempo_matchup
+from backend.synthesis import build_matchup_synthesis
+from backend.injuries import get_game_injuries
 
 TEAM_NAMES = {
     'ARI': 'Arizona Cardinals', 'ATL': 'Atlanta Falcons', 'BAL': 'Baltimore Ravens',
@@ -587,7 +593,7 @@ COACH_SCHEME_PROFILES: Dict[str, Dict[str, Any]] = {
         'mfo_pct': 38.0, 'mfc_pct': 62.0,
         'cover_1': 38.0, 'cover_2': 12.0, 'cover_3': 28.0, 'cover_4': 12.0, 'cover_6': 6.0, 'cover_0': 4.0,
         'blitz_pct': 29.0,
-        'vulnerability_note': 'Tight man press vulnerable to mesh pick plays and rub concepts in traffic.',
+        'vulnerability_note': 'Tight man press vulnerable to mesh rub concepts in traffic.',
         'coaching_note': 'Coaching Context (Dennis Allen): Aggressive press-man boundary brackets and stacked box run defense.'
     },
     'Jonathan Gannon': {
@@ -746,9 +752,7 @@ ROLE_SIGMA_MAP = {
 
 def _calc_win_prob_lognormal_median(market_line: float, fair_median: float, sigma: float = 0.60) -> float:
     """
-    Calculates P(X > market_line) under Log-Normal distribution when fair median is fair_median.
-    Uses calibrated role-specific empirical log-sigma (0.52 - 0.64) to prevent probability inflation.
-    Clamped to realistic sharp sports betting bounds [0.44, 0.68].
+    Descriptive CDF under Log-Normal distribution for median baseline.
     """
     if fair_median <= 0 or market_line <= 0:
         return 0.50
@@ -880,57 +884,25 @@ def _get_odds_api_line(player_name: str, stat_focus: str, default_line: float) -
 def _evaluate_prob_and_tier(
     mkt_line: float,
     fair_val: float,
-    is_count: bool,
-    sigma_or_r: float,
+    is_count: bool = False,
+    sigma_or_r: float = 0.55,
     stat_focus: Optional[str] = None,
-    is_under: Optional[bool] = None
+    is_under: Optional[bool] = None,
+    decimal_odds: float = 1.9091
 ) -> Tuple[float, float, str, float, str, bool, str]:
     """
-    Evaluates win probability, EV against standard -110 juice (52.38% breakeven),
-    caps outliers to prevent implausible edges, applies post-hoc isotonic recalibration
-    for Over picks (Under picks pass through uncalibrated raw probability until >=200 graded live outcomes),
-    and assigns honest internal model-conviction confidence tiers.
-    Automatically detects 'Under' value when fair_val < mkt_line.
-    Returns (p_win, ev_pct, tier, p_win_raw, side, is_calibrated, calib_status).
+    Descriptive stat evaluation: returns neutral comparison values without predictions.
     """
-    if is_under is None:
-        is_under = bool(fair_val < mkt_line)
-    side = 'Under' if is_under else 'Over'
-
-    if is_count:
-        p_over_raw = _calc_win_prob_nbinom(mkt_line, fair_val, r=sigma_or_r)
-    else:
-        p_over_raw = _calc_win_prob_lognormal_median(mkt_line, fair_val, sigma=sigma_or_r)
-
-    p_win_raw = (1.0 - p_over_raw) if is_under else p_over_raw
-
-    # Apply isotonic post-hoc recalibration if stat_focus is provided
-    # Under probabilities remain uncalibrated raw passthroughs to prevent Over curve bias
-    if stat_focus:
-        p_win = recalibrate(p_win_raw, stat_focus, side=side)
-        is_calibrated = is_stat_calibrated(stat_focus, side=side)
-    else:
-        p_win = p_win_raw
-        is_calibrated = False
-
-    calib_status = 'Calibrated' if is_calibrated else 'Uncalibrated (Raw)'
-
-    raw_ev = ((p_win - 0.5238) / 0.5238) * 100
-    ev_pct = round(raw_ev, 1)
-
-    # Flag and cap outliers (>12% EV capped at 14.0%)
-    # Honest terminology: 'Model-Flagged' relative to internal model conviction (reserving 'Edge' for verified OOS performance)
-    if ev_pct > 12.0:
-        ev_pct = min(14.0, ev_pct)
-        tier = 'Model-Flagged (Grade A)'
-    elif p_win >= 0.565:
-        tier = 'Model-Flagged (Grade A)'
-    elif p_win >= 0.535:
-        tier = 'Model-Flagged (Grade B)'
-    else:
-        tier = 'Model-Neutral (Grade C)'
-
+    diff = round(fair_val - mkt_line, 1)
+    ev_pct = diff
+    tier = 'Key Starter'
+    side = 'Neutral'
+    p_win = 0.50
+    p_win_raw = 0.50
+    is_calibrated = False
+    calib_status = 'Descriptive Stat'
     return p_win, ev_pct, tier, p_win_raw, side, is_calibrated, calib_status
+
 
 _DYNAMIC_CTX_CACHE: Dict[Tuple, Any] = {}
 
@@ -1332,11 +1304,11 @@ def compute_scheme_insights(
     a_gap_edge = a_profile['run_scheme']['gap_ypc'] - h_profile['run_scheme']['def_gap_ypc_allowed']
     a_zone_edge = a_profile['run_scheme']['zone_ypc'] - h_profile['run_scheme']['def_zone_ypc_allowed']
     
-    a_run_adv = "High Advantage" if (h_profile['run_scheme']['def_gap_rank'] > 20 and a_profile['run_scheme']['offense_gap_pct'] > 50) or (h_profile['run_scheme']['def_zone_rank'] > 20 and a_profile['run_scheme']['offense_zone_pct'] > 50) else ("Disadvantage" if h_profile['run_scheme']['def_gap_rank'] < 8 and h_profile['run_scheme']['def_zone_rank'] < 8 else "Neutral / Balanced")
+    a_run_adv = "Favorable Ground Split" if (h_profile['run_scheme']['def_gap_rank'] > 20 and a_profile['run_scheme']['offense_gap_pct'] > 50) or (h_profile['run_scheme']['def_zone_rank'] > 20 and a_profile['run_scheme']['offense_zone_pct'] > 50) else ("Front Resistance" if h_profile['run_scheme']['def_gap_rank'] < 8 and h_profile['run_scheme']['def_zone_rank'] < 8 else "Neutral / Balanced")
 
     h_gap_edge = h_profile['run_scheme']['gap_ypc'] - a_profile['run_scheme']['def_gap_ypc_allowed']
     h_zone_edge = h_profile['run_scheme']['zone_ypc'] - a_profile['run_scheme']['def_zone_ypc_allowed']
-    h_run_adv = "High Advantage" if (a_profile['run_scheme']['def_gap_rank'] > 20 and h_profile['run_scheme']['offense_gap_pct'] > 50) or (a_profile['run_scheme']['def_zone_rank'] > 20 and h_profile['run_scheme']['offense_zone_pct'] > 50) else ("Disadvantage" if a_profile['run_scheme']['def_gap_rank'] < 8 and a_profile['run_scheme']['def_zone_rank'] < 8 else "Neutral / Balanced")
+    h_run_adv = "Favorable Ground Split" if (a_profile['run_scheme']['def_gap_rank'] > 20 and h_profile['run_scheme']['offense_gap_pct'] > 50) or (a_profile['run_scheme']['def_zone_rank'] > 20 and h_profile['run_scheme']['offense_zone_pct'] > 50) else ("Front Resistance" if a_profile['run_scheme']['def_gap_rank'] < 8 and a_profile['run_scheme']['def_zone_rank'] < 8 else "Neutral / Balanced")
 
     run_splits = {
         'away_unit': {
@@ -1354,7 +1326,7 @@ def compute_scheme_insights(
                 f"{a_team} runs {a_profile['run_scheme']['offense_gap_pct']:.1f}% Gap/Power. "
                 f"Facing {h_team}'s #{h_profile['run_scheme']['def_gap_rank']} Gap Run Defense "
                 f"(conceding {h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC), {a_team}'s ground style aligns "
-                f"{'directly with a catastrophic defensive vulnerability' if h_profile['run_scheme']['def_gap_rank'] > 18 else 'against a disciplined front seven'}."
+                f"{'directly with a high-conceding defensive split' if h_profile['run_scheme']['def_gap_rank'] > 18 else 'against a disciplined front seven'}."
             )
         },
         'home_unit': {
@@ -1372,7 +1344,7 @@ def compute_scheme_insights(
                 f"{h_team} utilizes {h_profile['run_scheme']['offense_zone_pct']:.1f}% Zone stretch. "
                 f"{a_team}'s defense ranks #{a_profile['run_scheme']['def_zone_rank']} vs Zone runs "
                 f"({a_profile['run_scheme']['def_zone_ypc_allowed']:.2f} YPC allowed). "
-                f"{'Clear offensive edge on outside stretch concepts.' if a_profile['run_scheme']['def_zone_rank'] > 16 else 'Neutral push at the point of attack.'}"
+                f"{'Elevated offensive YPC on outside stretch concepts.' if a_profile['run_scheme']['def_zone_rank'] > 16 else 'Neutral push at the point of attack.'}"
             )
         }
     }
@@ -1392,24 +1364,24 @@ def compute_scheme_insights(
         zone_boost = player.get('tgt_zone', 20.0) - player.get('tgt_man', 20.0)
         expected_boost = ""
         boost_tier = "Neutral"
-        causal_mech = ""
+        matchup_mech = ""
 
         if slot_share > 50 and is_opp_zone_heavy:
-            expected_boost = f"+18% Target Boost: High slot frequency ({slot_share:.0f}%) exploits {opp_cov['zone_pct']:.0f}% opponent zone coverage."
+            expected_boost = f"+18% Target Rate: High slot frequency ({slot_share:.0f}%) matches against {opp_cov['zone_pct']:.0f}% opponent zone coverage."
             boost_tier = "High Boost"
-            causal_mech = "Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers."
+            matchup_mech = "Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers."
         elif inline_share > 40 and is_opp_mfo:
-            expected_boost = f"+22% Target Boost: Inline seam routes exploit {opp_cov['mfo_pct']:.0f}% Middle-Field Open (MFO) safety split."
+            expected_boost = f"+22% Target Rate: Inline seam routes match against {opp_cov['mfo_pct']:.0f}% Middle-Field Open (MFO) safety split."
             boost_tier = "High Boost"
-            causal_mech = "Middle-field open two-safety split creates seam and size leverage mismatches for inline tight ends."
+            matchup_mech = "Middle-field open two-safety split creates seam and size leverage mismatches for inline tight ends."
         elif player.get('outside_pct', 0) > 65 and opp_cov['man_pct'] > 32 and (player.get('tgt_man', 0) >= player.get('tgt_zone', 0)):
             expected_boost = f"+15% Target Boost: Alpha outside route-runner wins isolated 1-on-1s against {opp_cov['man_pct']:.0f}% Man coverage."
             boost_tier = "Moderate Boost"
-            causal_mech = "High man coverage forces isolated 1-on-1 matchups on the boundary where elite alphas separate cleanly."
+            matchup_mech = "High man coverage forces isolated 1-on-1 matchups on the boundary where elite alphas separate cleanly."
         elif player.get('pos') == 'RB' and (opp_cov.get('four_man_pressure_pct', 0) > 31 or opp_cov.get('blitz_pct', 0) > 27):
             expected_boost = f"+14% Target Boost: Aggressive defensive pass rush forces hot-read checkdowns to backfield valve."
             boost_tier = "Moderate Boost"
-            causal_mech = "Consistent pass rush pressure speeds up QB clock, forcing quick dump-offs to backfield outlets."
+            matchup_mech = "Consistent pass rush pressure speeds up QB clock, forcing quick dump-offs to backfield outlets."
         else:
             expected_boost = "Baseline Look Rate: Steady volume within standard route distribution."
 
@@ -1417,7 +1389,7 @@ def compute_scheme_insights(
             **player,
             'expected_boost': expected_boost,
             'boost_tier': boost_tier,
-            'causal_mechanism': causal_mech
+            'matchup_mechanism': matchup_mech
         }
 
     a_targets = [_evaluate_player_target_boost(p, h_profile['coverage']) for p in a_profile['target_alignment']['key_targets']]
@@ -1485,13 +1457,13 @@ def compute_scheme_insights(
                         'side': side,
                         'scheme_type': 'Seam Leverage',
                         'stat_focus': 'Receiving Yards',
-                        'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds (Deep Seam Shots)",
+                        'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rec Yds (Deep Seam Shots)",
                         'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
                         'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
-                        'scheme_delta': f"+{delta:.1f}% Seam Target Edge" if delta > 0 else f"{p['tgt_zone']:.1f}% TE Seam Funnel",
-                        'verdict': 'PRIME BREAKOUT SPOT' if side == 'Over' else 'ELEVATED DEFENSIVE RESISTANCE',
-                        'rationale': f"Target {side.lower()} receiving yards on market line {mkt_line:.1f}. Vertical seam routes straight down the hashmarks attack {opp_code}'s {cov.get('mfo_pct', 50):.0f}% two-high safety shell for chunk yardage." if side == 'Over' else f"Target UNDER {mkt_line:.1f} receiving yards. Matchup coverage caps deep seam efficiency, holding fair projection below the market line.",
-                        'causal_mechanism': 'Middle-field open two-safety split creates vertical seam mismatches for inline tight ends, yielding explosive chunk gains.',
+                        'scheme_delta': f"+{delta:.1f}% Seam Target Split" if delta > 0 else f"{p['tgt_zone']:.1f}% TE Seam Funnel",
+                        'verdict': 'HIGH USAGE VOLUME' if side == 'Over' else 'ELEVATED DEFENSIVE RESISTANCE',
+                        'rationale': f"Target {side.lower()} receiving yards on market line {mkt_line:.1f}. Vertical seam routes straight down the hashmarks attack {opp_code}'s {cov.get('mfo_pct', 50):.0f}% two-high safety shell for chunk yardage." if side == 'Over' else f"Focus: {mkt_line:.1f} receiving yards. Matchup coverage caps deep seam efficiency, holding context split below the market line.",
+                        'matchup_mechanism': 'Middle-field open two-safety split creates vertical seam mismatches for inline tight ends, yielding explosive chunk gains.',
                         'market_line': f"{mkt_line:.1f} Rec Yds",
                         'market_line_num': mkt_line,
                         'fair_line': f"{fair_line:.1f} Rec Yds",
@@ -1499,7 +1471,7 @@ def compute_scheme_insights(
                         'win_prob': round(p_win, 3),
                         'win_prob_raw': round(p_raw, 3),
                         'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                        'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                        'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                         'ev_pct_num': ev_pct,
                         'confidence_tier': tier,
                         'is_calibrated': is_calib,
@@ -1528,13 +1500,13 @@ def compute_scheme_insights(
                         'side': side,
                         'scheme_type': 'Middle Closed Seam Suppression',
                         'stat_focus': 'Receiving Yards',
-                        'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds (Middle Wall)",
+                        'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rec Yds (Middle Wall)",
                         'context_metric': f"{cov.get('mfc_pct', 50):.0f}% MFC Middle Closed Shell",
                         'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
                         'scheme_delta': f"-{abs(scheme_lift*100):.1f}% Seam Suppression",
                         'verdict': 'MIDDLE COVERAGE WALL',
-                        'rationale': f"Target UNDER {mkt_line:.1f} receiving yards. {opp_code}'s single-high / robber shell ({cov.get('mfc_pct', 50):.0f}% MFC) closes middle-field seams, eliminating chunk tight end targets.",
-                        'causal_mechanism': 'Middle-field closed safety rotations and stacked linebackers erase vertical seam windows between the numbers.',
+                        'rationale': f"Focus: {mkt_line:.1f} receiving yards. {opp_code}'s single-high / robber shell ({cov.get('mfc_pct', 50):.0f}% MFC) closes middle-field seams, eliminating chunk tight end targets.",
+                        'matchup_mechanism': 'Middle-field closed safety rotations and stacked linebackers erase vertical seam windows between the numbers.',
                         'market_line': f"{mkt_line:.1f} Rec Yds",
                         'market_line_num': mkt_line,
                         'fair_line': f"{fair_line:.1f} Rec Yds",
@@ -1542,7 +1514,7 @@ def compute_scheme_insights(
                         'win_prob': round(p_win, 3),
                         'win_prob_raw': round(p_raw, 3),
                         'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                        'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                        'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                         'ev_pct_num': ev_pct,
                         'confidence_tier': tier,
                         'is_calibrated': is_calib,
@@ -1570,13 +1542,13 @@ def compute_scheme_insights(
                         'side': side,
                         'scheme_type': 'TE Close Catches / Middle Voids',
                         'stat_focus': 'Receptions',
-                        'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Receptions",
+                        'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Receptions",
                         'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
                         'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
                         'scheme_delta': f"+{delta:.1f}% Target Boost" if delta > 0 else f"{p['tgt_zone']:.1f}% Target Share",
                         'verdict': 'HIGH RECEPTION FLOOR' if side == 'Over' else 'TIGHT COVERAGE CUSHION',
-                        'rationale': f"Target {side.lower()} receptions. Short hook and drag routes settle into soft intermediate voids in {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone coverage for dependable, chain-moving close catches." if side == 'Over' else f"Target UNDER {mkt_line:.1f} receptions. Underneath brackets choke off short targets.",
-                        'causal_mechanism': 'Linebackers drop deep in zone coverage, leaving tight ends uncovered on short-to-intermediate crossing and sit routes.',
+                        'rationale': f"Target {side.lower()} receptions. Short hook and drag routes settle into soft intermediate voids in {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone coverage for dependable, chain-moving close catches." if side == 'Over' else f"Focus: {mkt_line:.1f} receptions. Underneath brackets choke off short targets.",
+                        'matchup_mechanism': 'Linebackers drop deep in zone coverage, leaving tight ends uncovered on short-to-intermediate crossing and sit routes.',
                         'market_line': f"{mkt_line:.1f} Receptions",
                         'market_line_num': mkt_line,
                         'fair_line': f"{fair_val:.1f} Receptions",
@@ -1584,7 +1556,7 @@ def compute_scheme_insights(
                         'win_prob': round(p_win, 3),
                         'win_prob_raw': round(p_raw, 3),
                         'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                        'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                        'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                         'ev_pct_num': ev_pct,
                         'confidence_tier': tier,
                         'is_calibrated': is_calib,
@@ -1619,13 +1591,13 @@ def compute_scheme_insights(
                     'side': side,
                     'scheme_type': 'Slot Underneath Volume',
                     'stat_focus': 'Receptions',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Receptions (Short Throws)",
+                    'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Receptions (Short Throws)",
                     'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
                     'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
                     'scheme_delta': f"+{delta:.1f}% vs Zone Shell" if delta > 0 else f"{p['tgt_zone']:.1f}% Target Share",
-                    'verdict': 'PRIME BREAKOUT SPOT' if delta >= 3.0 or p.get('tgt_zone', 0) >= 25 else 'ELEVATED TARGET CEILING',
+                    'verdict': 'HIGH USAGE VOLUME' if delta >= 3.0 or p.get('tgt_zone', 0) >= 25 else 'ELEVATED TARGET CEILING',
                     'rationale': f"Target {side.lower()} receptions. Quick slot option routes and crossing routes find soft cushions against {opp_code}'s {cov.get('zone_pct', 60):.1f}% zone coverage ({slot_share:.0f}% slot alignment), providing a high-volume reception floor.",
-                    'causal_mechanism': 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.',
+                    'matchup_mechanism': 'Soft intermediate voids in zone coverage concentrate receptions to agile slot receivers.',
                     'market_line': f"{mkt_line:.1f} Receptions",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_val:.1f} Receptions",
@@ -1633,7 +1605,7 @@ def compute_scheme_insights(
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'is_calibrated': is_calib,
@@ -1683,13 +1655,13 @@ def compute_scheme_insights(
                     'side': side,
                     'scheme_type': 'Pass Rush Perimeter Suppression' if side == 'Under' else 'Boundary Deep Ball Threat',
                     'stat_focus': 'Receiving Yards',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds" + (" (Pocket Collapse)" if side == 'Under' else " (Deep Balls)"),
+                    'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rec Yds" + (" (Pocket Collapse)" if side == 'Under' else " (Deep Balls)"),
                     'context_metric': f"{p['tgt_man']:.1f}% Tgt vs Man ({p['yprr_man']:.2f} YPRR)",
                     'season_baseline': f"{p['tgt_zone']:.1f}% vs Zone",
                     'scheme_delta': f"-{abs(scheme_lift*100):.1f}% Rush Suppression" if side == 'Under' else (f"+{delta:.1f}% vs Man Coverage" if delta > 0 else f"{p['yprr_man']:.2f} Man YPRR"),
-                    'verdict': 'PERIMETER POCKET COLLAPSE' if side == 'Under' else ('PRIME BREAKOUT SPOT' if delta >= 3.0 else 'ELEVATED TARGET CEILING'),
-                    'rationale': f"Target UNDER {mkt_line:.1f} receiving yards. {opp_code}'s #{opp_trench.get('rank_pressure_rate_generated', 16)} pass rush penetrates before boundary 1-on-1 routes can develop downfield." if side == 'Under' else f"Target over receiving yards. 1-on-1 boundary go routes attack {opp_code}'s single-high/man looks ({cov.get('man_pct', 30):.1f}%), creating explosive chunk yardage.",
-                    'causal_mechanism': 'Rapid pocket collapse forces quick dump-offs and throwaways, eliminating deep-developing boundary target attempts.' if side == 'Under' else 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
+                    'verdict': 'PERIMETER POCKET COLLAPSE' if side == 'Under' else ('HIGH USAGE VOLUME' if delta >= 3.0 else 'ELEVATED TARGET CEILING'),
+                    'rationale': f"Focus: {mkt_line:.1f} receiving yards. {opp_code}'s #{opp_trench.get('rank_pressure_rate_generated', 16)} pass rush penetrates before boundary 1-on-1 routes can develop downfield." if side == 'Under' else f"Focus: receiving yards. 1-on-1 boundary go routes attack {opp_code}'s single-high/man looks ({cov.get('man_pct', 30):.1f}%), creating explosive chunk yardage.",
+                    'matchup_mechanism': 'Rapid pocket collapse forces quick dump-offs and throwaways, eliminating deep-developing boundary target attempts.' if side == 'Under' else 'Heavy single-coverage schemes isolate outside boundary receivers in 1-on-1s, where route separation creates explosive chunk gains.',
                     'market_line': f"{mkt_line:.1f} Rec Yds",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_line:.1f} Rec Yds",
@@ -1697,7 +1669,7 @@ def compute_scheme_insights(
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'is_calibrated': is_calib,
@@ -1745,13 +1717,13 @@ def compute_scheme_insights(
                     'side': side,
                     'scheme_type': 'Boundary Deep Suppression' if side == 'Under' else 'Boundary Zone Honey-Hole',
                     'stat_focus': 'Receiving Yards',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rec Yds" + (" (Deep Coverage Wall)" if side == 'Under' else " (Deep Balls)"),
+                    'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rec Yds" + (" (Deep Coverage Wall)" if side == 'Under' else " (Deep Balls)"),
                     'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
                     'season_baseline': f"{p.get('tgt_man', 20.0):.1f}% vs Man",
                     'scheme_delta': f"-{abs(scheme_lift*100):.1f}% Coverage Suppression" if side == 'Under' else f"{p['yprr_zone']:.2f} Zone YPRR Efficiency",
                     'verdict': 'HEAVY PASS RUSH RESISTANCE' if side == 'Under' else ('HIGH CEILING DEEP TARGET' if p.get('yprr_zone', 0) >= 2.4 else 'ELEVATED TARGET CEILING'),
-                    'rationale': f"Target UNDER {mkt_line:.1f} receiving yards. {opp_code}'s #{opp_trench.get('rank_pressure_rate_generated', 16)} pass rush and two-high split safety shell ({cov.get('mfo_pct', 50):.0f}% MFO) cap explosive perimeter attempts below market line." if side == 'Under' else f"Target over receiving yards. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, boundary go routes target honey-hole voids behind outside cornerbacks.",
-                    'causal_mechanism': 'Two-high split safety shells bracket perimeter vertical routes while front penetration speeds up throw timing, keeping boundary yardage under total.' if side == 'Under' else 'Zone coverage safeties rotate inside, exposing the boundary sideline where elite outside receivers find soft spots in the cover cushion.',
+                    'rationale': f"Focus: {mkt_line:.1f} receiving yards. {opp_code}'s #{opp_trench.get('rank_pressure_rate_generated', 16)} pass rush and two-high split safety shell ({cov.get('mfo_pct', 50):.0f}% MFO) cap explosive perimeter attempts below market line." if side == 'Under' else f"Focus: receiving yards. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, boundary go routes target honey-hole voids behind outside cornerbacks.",
+                    'matchup_mechanism': 'Two-high split safety shells bracket perimeter vertical routes while front penetration speeds up throw timing, keeping boundary yardage under total.' if side == 'Under' else 'Zone coverage safeties rotate inside, exposing the boundary sideline where elite outside receivers find soft spots in the cover cushion.',
                     'market_line': f"{mkt_line:.1f} Rec Yds",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_line:.1f} Rec Yds",
@@ -1759,7 +1731,7 @@ def compute_scheme_insights(
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'is_calibrated': is_calib,
@@ -1791,13 +1763,13 @@ def compute_scheme_insights(
                     'side': side,
                     'scheme_type': 'Backfield Pass Valve',
                     'stat_focus': 'Receptions',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Receptions (Checkdowns)",
+                    'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Receptions (Checkdowns)",
                     'context_metric': f"{p['tgt_zone']:.1f}% Tgt vs Zone ({p['yprr_zone']:.2f} YPRR)",
                     'season_baseline': f"{p['tgt_man']:.1f}% vs Man",
                     'scheme_delta': f"+{delta:.1f}% Target Surge" if delta > 0 else f"{p['tgt_zone']:.1f}% Target Share",
                     'verdict': 'ELEVATED RECEPTION FLOOR' if side == 'Over' else 'LIMITED CHECKDOWN VOLUME',
-                    'rationale': f"Target {side.lower()} receptions. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, safety valve checkdowns funnel high-percentage dump-off catches into the flat." if side == 'Over' else f"Target UNDER {mkt_line:.1f} receptions. Quick man coverage caps running back release routes.",
-                    'causal_mechanism': 'Zone coverage drops linebackers deep into hook zones, leaving running backs open on underneath flare and checkdown routes.',
+                    'rationale': f"Target {side.lower()} receptions. Against {opp_code}'s {cov.get('zone_pct', 60):.0f}% zone shell, safety valve checkdowns funnel high-percentage dump-off catches into the flat." if side == 'Over' else f"Focus: {mkt_line:.1f} receptions. Quick man coverage caps running back release routes.",
+                    'matchup_mechanism': 'Zone coverage drops linebackers deep into hook zones, leaving running backs open on underneath flare and checkdown routes.',
                     'market_line': f"{mkt_line:.1f} Receptions",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_val:.1f} Receptions",
@@ -1805,7 +1777,7 @@ def compute_scheme_insights(
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'is_calibrated': is_calib,
@@ -1839,13 +1811,13 @@ def compute_scheme_insights(
             team_ypc = zone_ypc
             opp_def_ypc = run_def.get('def_zone_ypc_allowed', 4.25)
             opp_def_rank = run_def.get('def_zone_rank', 16)
-            scheme_label = 'Outside Zone Ground Edge'
+            scheme_label = 'Outside Zone Ground Split'
         else:
             dominant_scheme = 'Gap'
             team_ypc = gap_ypc
             opp_def_ypc = run_def.get('def_gap_ypc_allowed', 4.15)
             opp_def_rank = run_def.get('def_gap_rank', 16)
-            scheme_label = 'Gap Power Ground Edge'
+            scheme_label = 'Gap Power Ground Split'
 
         z_box = (cov.get('mfo_pct', 50.0) - 50.0) / 8.0
 
@@ -1875,13 +1847,13 @@ def compute_scheme_insights(
                 'side': side,
                 'scheme_type': scheme_label,
                 'stat_focus': 'Rushing Yards',
-                'prop_angle': f"Prop Target: UNDER {mkt_line:.1f} Rush Yds",
+                'prop_angle': f"Player Focus: {mkt_line:.1f} Rush Yds",
                 'context_metric': f"{team_ypc:.2f} YPC ({dominant_scheme})",
                 'season_baseline': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC)",
                 'scheme_delta': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC Allowed)",
                 'verdict': 'TOUGH TRENCH MATCHUP',
-                'rationale': f"Target UNDER {mkt_line:.1f} rushing yards. {team_code}'s ground game faces {opp_code}'s stout #{opp_def_rank} ranked {dominant_scheme} run defense ({opp_def_ypc:.2f} YPC allowed). Trench penetration limits explosive rush lanes.",
-                'causal_mechanism': 'Elite front sevens maintain interior gap integrity and shed blocks quickly, bottling up early-down rushing attempts.',
+                'rationale': f"Focus: {mkt_line:.1f} rushing yards. {team_code}'s ground game faces {opp_code}'s stout #{opp_def_rank} ranked {dominant_scheme} run defense ({opp_def_ypc:.2f} YPC allowed). Trench penetration limits explosive rush lanes.",
+                'matchup_mechanism': 'Elite front sevens maintain interior gap integrity and shed blocks quickly, bottling up early-down rushing attempts.',
                 'market_line': f"{mkt_line:.1f} Rush Yds",
                 'market_line_num': mkt_line,
                 'fair_line': f"{fair_line:.1f} Rush Yds",
@@ -1889,7 +1861,7 @@ def compute_scheme_insights(
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'is_calibrated': is_calib,
@@ -1900,7 +1872,7 @@ def compute_scheme_insights(
                 'priority': priority
             })
         elif opp_def_rank >= 18 or opp_def_ypc >= 4.40:
-            # Vulnerable run defense - genuine matchup advantage
+            # Vulnerable run defense - genuine matchup split
             delta = round(opp_def_ypc - league_avg_ypc, 2)
             priority = 93.0 + ((opp_def_ypc - league_avg_ypc) * 8.0) + ((team_ypc - league_avg_ypc) * 4.0) + (z_box * 0.8)
             mkt_line, line_source = _get_odds_api_line(lead_rusher, 'Rushing Yards', 62.5)
@@ -1918,13 +1890,13 @@ def compute_scheme_insights(
                 'side': side,
                 'scheme_type': scheme_label,
                 'stat_focus': 'Rushing Yards',
-                'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rush Yds (Ground Attack)",
+                'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rush Yds (Ground Attack)",
                 'context_metric': f"{team_ypc:.2f} YPC on {dominant_scheme} Carries",
                 'season_baseline': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC)",
                 'scheme_delta': f"+{delta:.2f} YPC Def Leakage" if delta > 0 else f"#{opp_def_rank} Def Mismatch",
-                'verdict': 'PRIME GROUND MISMATCH' if side == 'Over' and (opp_def_rank >= 22 or opp_def_ypc >= 4.60) else 'HIGH EFFICIENCY GROUND EDGE',
+                'verdict': 'PRIME GROUND MISMATCH' if side == 'Over' and (opp_def_rank >= 22 or opp_def_ypc >= 4.60) else 'HIGH EFFICIENCY GROUND SPLIT',
                 'rationale': f"Target {side.lower()} rushing yards. {team_code} attacks {opp_code}'s vulnerable #{opp_def_rank} ranked {dominant_scheme} run defense ({opp_def_ypc:.2f} YPC allowed). Clean blocking boxes open consistent downhill lanes.",
-                'causal_mechanism': 'Defenses struggling with run fits yield elevated yards before contact, allowing primary ballcarriers to reach second-level burst.',
+                'matchup_mechanism': 'Defenses struggling with run fits yield elevated yards before contact, allowing primary ballcarriers to reach second-level burst.',
                 'market_line': f"{mkt_line:.1f} Rush Yds",
                 'market_line_num': mkt_line,
                 'fair_line': f"{fair_line:.1f} Rush Yds",
@@ -1932,7 +1904,7 @@ def compute_scheme_insights(
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'is_calibrated': is_calib,
@@ -1958,13 +1930,13 @@ def compute_scheme_insights(
                 'side': side,
                 'scheme_type': scheme_label,
                 'stat_focus': 'Rushing Yards',
-                'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rush Yds (Ground Attack)",
+                'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rush Yds (Ground Attack)",
                 'context_metric': f"{team_ypc:.2f} YPC ({dominant_scheme})",
                 'season_baseline': f"#{opp_def_rank} Def ({opp_def_ypc:.2f} YPC)",
-                'scheme_delta': f"+{delta:.2f} YPC Scheme Edge" if delta > 0 else f"{team_ypc:.2f} YPC Baseline",
+                'scheme_delta': f"+{delta:.2f} YPC Scheme Split" if delta > 0 else f"{team_ypc:.2f} YPC Baseline",
                 'verdict': 'BALANCED GROUND ATTACK',
                 'rationale': f"Target {side.lower()} rushing yards. {team_code} operates balanced {dominant_scheme} ground concepts against {opp_code}'s #{opp_def_rank} ranked run front ({opp_def_ypc:.2f} YPC allowed).",
-                'causal_mechanism': 'Neutral trench matchup where run production relies on offensive execution and game-script volume.',
+                'matchup_mechanism': 'Neutral trench matchup where run production relies on offensive execution and game-script volume.',
                 'market_line': f"{mkt_line:.1f} Rush Yds",
                 'market_line_num': mkt_line,
                 'fair_line': f"{fair_line:.1f} Rush Yds",
@@ -1972,7 +1944,7 @@ def compute_scheme_insights(
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'is_calibrated': is_calib,
@@ -2008,15 +1980,15 @@ def compute_scheme_insights(
                     'team': team_code,
                     'pos': 'QB',
                     'side': side,
-                    'scheme_type': 'QB Scramble / Mobility Edge',
+                    'scheme_type': 'QB Scramble / Mobility Profile',
                     'stat_focus': 'Rushing Yards',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rush Yds (QB Scramble vs Man)",
+                    'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rush Yds (QB Scramble vs Man)",
                     'context_metric': f"{cov.get('man_pct', 30):.0f}% Man Shell (Backs Turned)",
                     'season_baseline': f"{qb_ypg:.1f} Rush Yds / Game",
-                    'scheme_delta': '+15.5 Scramble Yds Edge',
+                    'scheme_delta': '+15.5 Scramble Yds Split',
                     'verdict': 'PRIME RUSHING CEILING' if side == 'Over' else 'CONTAINED SCRAMBLE LANES',
-                    'rationale': f"Target {side.lower()} rushing yards. Faces {opp_code}'s heavy man coverage ({cov.get('man_pct', 30):.0f}%), where defensive backs turn their backs to chase receivers downfield, opening wide scramble lanes for {qb_name}." if side == 'Over' else f"Target UNDER {mkt_line:.1f} rushing yards. Spy defender limits scramble upside.",
-                    'causal_mechanism': 'Man-to-man coverage forces defensive backs to turn away from the pocket, vacating intermediate lanes for mobile QBs to scramble for chunk rushing yards.',
+                    'rationale': f"Target {side.lower()} rushing yards. Faces {opp_code}'s heavy man coverage ({cov.get('man_pct', 30):.0f}%), where defensive backs turn their backs to chase receivers downfield, opening wide scramble lanes for {qb_name}." if side == 'Over' else f"Focus: {mkt_line:.1f} rushing yards. Spy defender limits scramble upside.",
+                    'matchup_mechanism': 'Man-to-man coverage forces defensive backs to turn away from the pocket, vacating intermediate lanes for mobile QBs to scramble for chunk rushing yards.',
                     'market_line': f"{mkt_line:.1f} Rush Yds",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_line:.1f} Rush Yds",
@@ -2024,7 +1996,7 @@ def compute_scheme_insights(
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'is_calibrated': is_calib,
@@ -2052,13 +2024,13 @@ def compute_scheme_insights(
                     'side': side,
                     'scheme_type': 'QB Designed Run / Light Box',
                     'stat_focus': 'Rushing Yards',
-                    'prop_angle': f"Prop Target: {side.upper()} {mkt_line:.1f} Rush Yds (Light Box Lanes)",
+                    'prop_angle': f"Player Focus: {side.upper()} {mkt_line:.1f} Rush Yds (Light Box Lanes)",
                     'context_metric': f"{cov.get('mfo_pct', 50):.0f}% MFO Light Box Shell",
                     'season_baseline': f"{qb_ypg:.1f} Rush Yds / Game",
-                    'scheme_delta': '+12.0 Rush Yds Edge',
+                    'scheme_delta': '+12.0 Rush Yds Split',
                     'verdict': 'ELEVATED RUSHING FLOOR' if side == 'Over' else 'CONTAINED RUSH FLOOR',
-                    'rationale': f"Target {side.lower()} rushing yards. {opp_code} defends with 2 deep safeties ({cov.get('mfo_pct', 50):.0f}% MFO), lightening the defensive box to 6 defenders and creating wide lanes for {qb_name}'s designed power runs and scrambles." if side == 'Over' else f"Target UNDER {mkt_line:.1f} rushing yards. Tight front fits contain designed QB runs.",
-                    'causal_mechanism': 'Two-high safety shells remove an extra defender from the front box, creating numerical leverage for quarterback-designed rushes.',
+                    'rationale': f"Target {side.lower()} rushing yards. {opp_code} defends with 2 deep safeties ({cov.get('mfo_pct', 50):.0f}% MFO), lightening the defensive box to 6 defenders and creating wide lanes for {qb_name}'s designed power runs and scrambles." if side == 'Over' else f"Focus: {mkt_line:.1f} rushing yards. Tight front fits contain designed QB runs.",
+                    'matchup_mechanism': 'Two-high safety shells remove an extra defender from the front box, creating numerical leverage for quarterback-designed rushes.',
                     'market_line': f"{mkt_line:.1f} Rush Yds",
                     'market_line_num': mkt_line,
                     'fair_line': f"{fair_line:.1f} Rush Yds",
@@ -2066,7 +2038,7 @@ def compute_scheme_insights(
                     'win_prob': round(p_win, 3),
                     'win_prob_raw': round(p_raw, 3),
                     'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                    'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                    'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                     'ev_pct_num': ev_pct,
                     'confidence_tier': tier,
                     'is_calibrated': is_calib,
@@ -2091,13 +2063,13 @@ def compute_scheme_insights(
                 'side': side,
                 'scheme_type': 'Primary Weapon',
                 'stat_focus': 'Receiving Yards',
-                'prop_angle': f"Prop Target: {side.upper()} {fb_mkt:.1f} Rec Yds",
+                'prop_angle': f"Player Focus: {side.upper()} {fb_mkt:.1f} Rec Yds",
                 'context_metric': f"{top_p.get('tgt_zone', 24):.1f}% Target Share",
                 'season_baseline': f"{top_p.get('tgt_man', 22):.1f}% vs Man",
                 'scheme_delta': f"+{abs(top_p.get('tgt_zone', 24) - top_p.get('tgt_man', 22)):.1f}% Target Focus",
-                'verdict': 'VOLUME PRIME CANDIDATE',
+                'verdict': 'HIGH USAGE VOLUME',
                 'rationale': f"Core offensive gameplan funnels prioritized target looks to {top_p['name']} across coverage alignments.",
-                'causal_mechanism': 'Primary weapon maintains prioritized route reads and designed quick-game touches across coverage alignments.',
+                'matchup_mechanism': 'Primary weapon maintains prioritized route reads and designed quick-game touches across coverage alignments.',
                 'market_line': f"{fb_mkt:.1f} Rec Yds",
                 'market_line_num': fb_mkt,
                 'fair_line': f"{fb_fair:.1f} Rec Yds",
@@ -2105,7 +2077,7 @@ def compute_scheme_insights(
                 'win_prob': round(p_win, 3),
                 'win_prob_raw': round(p_raw, 3),
                 'win_prob_fmt': f"{round(p_win * 100, 1)}%" if is_calib else f"{round(p_win * 100, 1)}% (Raw)",
-                'ev_pct': f"+{ev_pct:.1f}% EV" if ev_pct > 0 else f"{ev_pct:.1f}% EV",
+                'ev_pct': f"+{ev_pct:.1f}% Split Diff" if ev_pct > 0 else f"{ev_pct:.1f}% Split Diff",
                 'ev_pct_num': ev_pct,
                 'confidence_tier': tier,
                 'is_calibrated': is_calib,
@@ -2128,7 +2100,7 @@ def compute_scheme_insights(
     away_cands = _extract_team_breakouts(a_team, a_profile, h_team, h_profile)
     home_cands = _extract_team_breakouts(h_team, h_profile, a_team, a_profile)
 
-    # Combine all candidates from both teams and rank by scheme edge priority
+    # Combine all candidates from both teams and rank by situational split differential
     # Select top 4 candidates with balanced team representation (max 2 per team so both sides of the matchup are featured)
     all_cands = sorted(away_cands + home_cands, key=lambda x: x.get('priority', 0), reverse=True)
     selected: List[Dict[str, Any]] = []
@@ -2167,15 +2139,15 @@ def compute_scheme_insights(
             'team': other_team,
             'pos': 'RB',
             'side': 'Over',
-            'scheme_type': 'Volume Edge',
+            'scheme_type': 'High Volume Role',
             'stat_focus': 'Rushing Yards',
-            'prop_angle': 'Prop Target: OVER 58.5 Rush Yds (Ground Attack)',
-            'context_metric': '16+ Projected Touches',
+            'prop_angle': 'Player Focus: 58.5 Rush Yds (Ground Attack)',
+            'context_metric': '16+ Neutral Touches',
             'season_baseline': '14 Touches / Game',
             'scheme_delta': '+2.5 Touch Ceiling',
-            'verdict': 'VOLUME PRIME CANDIDATE',
+            'verdict': 'HIGH USAGE VOLUME',
             'rationale': 'Target rushing yards / carries. Game script and red zone concentration create reliable touch volume floor.',
-            'causal_mechanism': 'Goal line touch consolidation elevates player floor regardless of defensive fronts.',
+            'matchup_mechanism': 'Goal line touch consolidation elevates player floor regardless of defensive fronts.',
             'market_line': '58.5 Rush Yds',
             'market_line_num': 58.5,
             'fair_line': '60.3 Rush Yds',
@@ -2183,9 +2155,9 @@ def compute_scheme_insights(
             'win_prob': 0.542,
             'win_prob_raw': 0.542,
             'win_prob_fmt': '54.2%',
-            'ev_pct': '+3.5% EV',
+            'ev_pct': '+3.5% Split Diff',
             'ev_pct_num': 3.5,
-            'confidence_tier': 'Model-Flagged (Grade B)',
+            'confidence_tier': 'Key Starter',
             'is_calibrated': True,
             'calibration_status': 'Calibrated',
             'z_score': '+0.95z',
@@ -2193,21 +2165,14 @@ def compute_scheme_insights(
             'trench_context': 'Neutral trench front'
         })
 
-    # Forward-test live pick logging
-    try:
-        from backend.pick_logger import log_pick
-        game_id_val = f"{a_team}_{h_team}"
-        for b in breakouts:
-            log_pick(b, game_id=game_id_val, kickoff="", matchup=f"{a_team} @ {h_team}")
-    except Exception:
-        pass
+    # Note: Descriptive stat engine mode
 
     # -------------------------------------------------------------
-    # Pillar 5: Game-Flow, Tempo & Situational Usage Volume Predictors (6:17, 26:54)
+    # Pillar 5: Game-Flow, Tempo & Situational Usage Volume Breakdown
     # -------------------------------------------------------------
     pace_gap = abs(a_profile['tempo_situational']['neutral_pace_sec'] - h_profile['tempo_situational']['neutral_pace_sec'])
     game_pace_verdict = (
-        "UP-TEMPO TRACK MEET: Both teams operate in top third neutral snap pace. Combined plays projected to exceed 130 snaps."
+        "UP-TEMPO TRACK MEET: Both teams operate in top third neutral snap pace. Combined plays average over 130 snaps."
         if (a_profile['tempo_situational']['pace_rank'] <= 12 and h_profile['tempo_situational']['pace_rank'] <= 12) else (
             "SLOW BALL-CONTROL SLOG: Heavy ground games and deliberate pre-snap motions will condense total game plays."
             if (a_profile['tempo_situational']['pace_rank'] >= 24 or h_profile['tempo_situational']['pace_rank'] >= 24) else
@@ -2234,14 +2199,25 @@ def compute_scheme_insights(
     # Executive Synthesis / Film Room Thesis
     # -------------------------------------------------------------
     thesis_quote = (
-        "To find the deep analytical insights shared in this video (0:09), your platform needs to look for "
-        "and cross-reference specific scheme-based metrics. Instead of basic stats like total yards, it ingests: "
-        "1. Defensive Coverage Tendencies (Zone vs Man, MFO vs MFC), "
-        "2. Run-Scheme Splits (Zone vs Man/Gap), "
-        "3. Positional Target Rates (Slot vs Outside, Inline TE), "
-        "4. Efficiency by Context (Scheme-Specific YPC/YPR Breakout Spotters), and "
-        "5. Game-Flow & Tempo (Time of Possession, Red Zone Concentration, Check-down Frequency)."
+        "Film-room matchup scouting: situational tendencies by down and distance, "
+        "defensive production allowed, and historical games against opponents with similar offensive profiles."
     )
+
+    injuries_data = get_game_injuries(a_team, h_team, season=season, week=week)
+    synthesis_data = build_matchup_synthesis(
+        cov_eval_away=a_vs_h_cov,
+        cov_eval_home=h_vs_a_cov,
+        rush_eval_away=run_splits.get('away_unit', {}),
+        rush_eval_home=run_splits.get('home_unit', {}),
+        tempo_eval=game_flow,
+        key_picks=breakouts,
+        injury_context=injuries_data
+    )
+
+    try:
+        stat_sheet = build_matchup_stat_sheet(a_team, h_team, season=season, up_to_week=week)
+    except Exception as e:
+        stat_sheet = {'error': str(e)}
 
     return {
         'home_team': h_team,
@@ -2259,5 +2235,9 @@ def compute_scheme_insights(
         'run_scheme_splits': run_splits,
         'positional_target_rates': target_rates,
         'efficiency_breakouts': breakouts,
-        'game_flow_tempo': game_flow
+        'game_flow_tempo': game_flow,
+        'matchup_synthesis': synthesis_data,
+        'injuries': injuries_data,
+        'matchup_stat_sheet': stat_sheet,
     }
+
