@@ -83,15 +83,15 @@ def build_matchup_synthesis(
         "size_vs_league": f"MFO Split: {mfo_away:.0%} & {mfo_home:.0%}",
         "confidence": "Low Sample" if cov_eval_away.get("is_low_sample") else "Robust Sample",
         "detail": (
-            "Two-high split safeties cap perimeter deep explosives and funnel targets inside to slot/tight end options."
+            "Two-high split safeties cap perimeter deep passes and direct targets inside to slot/tight end options."
             if mfo_away >= 0.50 and mfo_home >= 0.50 else
-            "Single-high closed shells open isolated 1-on-1 boundary match-ups for perimeter wide receivers."
+            "Single-high closed shells feature 1-on-1 boundary coverage for perimeter wide receivers."
         ),
         "importance": cov_importance,
     })
 
     # 3. Tempo / Environment Stat
-    combined_plays = tempo_eval.get("combined_proj_plays", 128.0)
+    combined_plays = tempo_eval.get("combined_avg_plays", tempo_eval.get("combined_proj_plays", 128.0))
     pace_importance = abs(combined_plays - 128.0) / 4.0
     stats.append({
         "pillar": "Pace & Environment",
@@ -119,7 +119,7 @@ def build_matchup_synthesis(
         "ranked_drivers": stats,
         "contingencies": contingencies,
         "key_players_summary": [
-            f"{p.get('player')} ({p.get('team')} {p.get('pos')}): {p.get('stat_focus', '')} - {p.get('season_stat', p.get('market_line', ''))}"
+            f"{p.get('player')} ({p.get('team')} {p.get('pos')}): {p.get('stat_focus', '')} - {p.get('last_10_stats', {}).get('summary_str', p.get('season_stat', ''))}"
             for p in players_list
         ],
     }

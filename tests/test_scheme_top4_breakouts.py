@@ -25,20 +25,19 @@ def test_scheme_top4_breakouts():
             assert 'priority' not in b, f"Priority leaked in {b['player']}"
             assert b['player'] and b['team'] and b['pos'], f"Missing basic info in {b}"
             assert b['stat_focus'] in ('Receiving Yards', 'Receptions', 'Rushing Yards'), f"Invalid stat_focus in {b}"
-            assert b.get('scheme_delta'), f"Missing scheme_delta in {b}"
-            assert b.get('rationale'), f"Missing rationale in {b}"
-            assert b.get('market_line'), f"Missing market_line in {b}"
-            assert b.get('fair_line'), f"Missing fair_line in {b}"
-            assert b.get('confidence_tier'), f"Missing confidence_tier in {b}"
-            assert b.get('calibration_status'), f"Missing calibration_status in {b}"
-            assert b.get('z_score', '').endswith('z'), f"Missing z_score in {b}"
-            
-            # Acceptance check: verify no prediction/model words
-            prohibited = ['exploit', 'advantage', 'edge', 'pick']
-            for field in ['verdict', 'rationale', 'scheme_delta']:
-                val = str(b.get(field, '')).lower()
-                for bad in prohibited:
-                    assert bad not in val, f"Found prohibited model word '{bad}' in {field}: '{val}'"
+            assert 'last_10_stats' in b, f"Missing last_10_stats in {b}"
+            assert 'median' in b['last_10_stats'], f"Missing median in {b['last_10_stats']}"
+            assert 'p25' in b['last_10_stats'], f"Missing p25 in {b['last_10_stats']}"
+            assert 'p75' in b['last_10_stats'], f"Missing p75 in {b['last_10_stats']}"
+            assert 'n_games' in b['last_10_stats'], f"Missing n_games in {b['last_10_stats']}"
+            assert 'splits' in b, f"Missing splits in {b}"
+            assert 'red_zone' in b, f"Missing red_zone in {b}"
+            assert 'defense_context' in b, f"Missing defense_context in {b}"
+
+            # Strict check: verify no betting model words or residue
+            prohibited = ['market_line', 'fair_line', 'confidence_tier', 'win_prob', 'ev_pct', 'verdict', 'matchup_mechanism']
+            for field in prohibited:
+                assert field not in b, f"Found prohibited model field '{field}' in breakout card {b['player']}"
 
 def test_hou_ten_breakouts():
     res = compute_scheme_insights('HOU', 'TEN')
@@ -106,22 +105,24 @@ def test_den_engram():
     assert 'P.Washington' in jax_targets
 
 def test_calibrated_edges_and_tiers():
-    # Pickens, Nacua, Adams must have calibrated, realistic EVs (2% to 12%), not +40%
+    # Pickens and Nacua must have descriptive box stats (median, p25, p75, n_games), no betting predictions
     res_dal = compute_scheme_insights('DAL', 'NYG')
     pickens = [b for b in res_dal.get('efficiency_breakouts', []) if b['player'] == 'G.Pickens']
     if pickens:
         p = pickens[0]
-        assert p['win_prob'] <= 0.65, f"Pickens win_prob too high: {p['win_prob']}"
-        assert p['ev_pct_num'] <= 12.0, f"Pickens EV too high: {p['ev_pct_num']}"
-        assert p['fair_line_num'] <= 75.0, f"Pickens fair line too high: {p['fair_line_num']}"
+        assert p['last_10_stats']['median'] > 0
+        assert p['last_10_stats']['n_games'] > 0
+        assert 'market_line' not in p
+        assert 'win_prob' not in p
 
     res_la = compute_scheme_insights('SF', 'LA')
     nacua = [b for b in res_la.get('efficiency_breakouts', []) if b['player'] == 'P.Nacua']
     if nacua:
         n = nacua[0]
-        assert n['win_prob'] <= 0.65, f"Nacua win_prob too high: {n['win_prob']}"
-        assert n['ev_pct_num'] <= 12.0, f"Nacua EV too high: {n['ev_pct_num']}"
-        assert n['fair_line_num'] <= 75.0, f"Nacua fair line too high: {n['fair_line_num']}"
+        assert n['last_10_stats']['median'] > 0
+        assert n['last_10_stats']['n_games'] > 0
+        assert 'market_line' not in n
+        assert 'win_prob' not in n
 
 def test_dynamic_situational_pace_by_season():
     # 2026 (this year) for GB should be ~56.8% RZ pass rate, not static 45.7%
@@ -136,14 +137,16 @@ def test_dynamic_situational_pace_by_season():
     assert gb_tempo_24.get('rz_pass_rate') == 46.8, f"Expected 46.8% RZ pass rate for GB in 2024, got {gb_tempo_24.get('rz_pass_rate')}"
 
 def test_defensive_suppression_context():
-    # Verify defensive suppression / resistance context is surfaced in tough matchups
+    # Verify defense context is surfaced in matchups
     matchups = [('KC', 'BAL'), ('SF', 'LA'), ('DAL', 'NYG')]
     all_cards = []
     for a, h in matchups:
         res = compute_scheme_insights(a, h)
         all_cards.extend(res.get('efficiency_breakouts', []))
     assert len(all_cards) > 0
-    # Verify no betting picks or side predictions are emitted
+    # Verify no betting lines or verdicts exist
     for card in all_cards:
-        assert card.get('calibration_status') == 'Descriptive Stat'
-        assert card.get('side') == 'Neutral'
+        assert 'defense_context' in card
+        assert 'market_line' not in card
+        assert 'verdict' not in card
+

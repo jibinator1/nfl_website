@@ -107,9 +107,11 @@ def format_stat_comparison(
     higher_is_better: bool = True,
     unit: str = "",
     min_sample: int = 40,
+    n_games: Optional[int] = None,
 ) -> Dict[str, Any]:
     """
     Computes league median, percentiles, rank, differences, and sample size flag.
+    If n_games < 6, rank is suppressed to prevent misleading small-sample claims.
     """
     if isinstance(league_series, dict):
         vals = pd.Series(list(league_series.values())).dropna()
@@ -136,12 +138,28 @@ def format_stat_comparison(
     diff_pct = (diff_raw / abs(median) * 100.0) if abs(median) > 1e-5 else 0.0
     is_small = sample_size < min_sample
 
+    rank_suppressed = False
+    if n_games is not None:
+        if n_games < 6:
+            rank_suppressed = True
+            rank_out = None
+            rank_display = f"{team_val:.2f} {unit} (league median {median:.2f}, n={n_games} games -- rank suppressed, small sample)"
+        else:
+            rank_out = rank
+            rank_display = f"Rank #{rank} (n={n_games} games)"
+    else:
+        rank_out = rank
+        rank_display = f"Rank #{rank} (n={sample_size} plays)"
+
     return {
         "raw_value": round(float(team_val), 3),
         "league_median": round(float(median), 3),
         "league_p25": round(float(p25), 3),
         "league_p75": round(float(p75), 3),
-        "rank": rank,
+        "rank": rank_out,
+        "rank_display": rank_display,
+        "rank_suppressed": rank_suppressed,
+        "n_games": n_games,
         "total_teams": len(vals) if not vals.empty else 32,
         "rank_direction": "higher is better" if higher_is_better else "lower is better",
         "diff_from_median": round(float(diff_raw), 3),
@@ -183,6 +201,8 @@ def compute_team_tendency_profile(
     df["_rec_pos"] = df["receiver_player_id"].map(pos_map).fillna("Unknown")
     df["_rush_pos"] = df["rusher_player_id"].map(pos_map).fillna("Unknown")
 
+    n_games = int(df[df["posteam"] == team]["game_id"].nunique()) if "game_id" in df.columns else None
+
     # Helper: team vs league series
     def _agg_metric(
         filter_fn,
@@ -204,7 +224,7 @@ def compute_team_tendency_profile(
                 target_val = val
                 target_n = n_sub
         return format_stat_comparison(
-            target_val, league_vals, target_n, higher_is_better, unit=unit, min_sample=min_sample
+            target_val, league_vals, target_n, higher_is_better, unit=unit, min_sample=min_sample, n_games=n_games
         )
 
     # 1. Game State Splits
@@ -407,6 +427,8 @@ def compute_opponent_vulnerability_profile(
         adj_per_team = merged.groupby("defteam")["diff"].mean().to_dict()
         return {tm: float(adj_per_team.get(tm, 0.0)) for tm in all_teams}
 
+    n_games = int(df[df["defteam"] == defense_team]["game_id"].nunique()) if "game_id" in df.columns else None
+
     def _agg_def_metric(
         filter_fn,
         val_fn,
@@ -427,7 +449,7 @@ def compute_opponent_vulnerability_profile(
                 target_val = val
                 target_n = n_sub
         return format_stat_comparison(
-            target_val, league_vals, target_n, higher_is_better=higher_is_better, unit=unit, min_sample=min_sample
+            target_val, league_vals, target_n, higher_is_better=higher_is_better, unit=unit, min_sample=min_sample, n_games=n_games
         )
 
     # A. Rush Defense (RB Carries Only)

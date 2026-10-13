@@ -212,12 +212,16 @@ def test_similar_opponent_historical_lookup():
 # 5. Dual-Split Lookup (Run-Heavy vs Pass-Heavy side-by-side)
 # ==============================================================================
 def test_dual_archetype_lookup():
-    """run_dual_archetype_lookup presents run-heavy and pass-heavy historical samples side-by-side."""
+    """run_dual_archetype_lookup presents run-heavy and pass-heavy historical samples side-by-side with distance ceiling <= 1.50sigma."""
     dual = run_dual_archetype_lookup("BAL", "KC", season=2026, n_similar=5)
     assert "ground_match" in dual
     assert "aerial_match" in dual
-    assert len(dual["ground_match"]["similar_games"]) == 5
-    assert len(dual["aerial_match"]["similar_games"]) == 5
+    # Distance ceiling drops any match > 1.50 sigma
+    ground_games = dual["ground_match"]["similar_games"]
+    assert len(ground_games) <= 5
+    for g in ground_games:
+        assert g["rmsd"] <= 1.50, f"Game RMSD exceeded 1.50 ceiling: {g}"
+
 
 
 # ==============================================================================

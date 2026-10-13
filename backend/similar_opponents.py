@@ -374,24 +374,37 @@ def find_similar_opponent_games(
         "distinct_opponents_evaluated": int(all_games_df["opponent"].nunique()),
     }
 
-    # Top N most similar games sorted by distance
-    sorted_df = all_games_df.sort_values("distance").head(n_similar).copy()
-    sorted_df["similarity_rank"] = range(1, len(sorted_df) + 1)
+    # 1.50σ RMSD hard ceiling: Drop any game above 1.50σ from match candidate pool
+    third_party_all = all_games_df[~all_games_df["is_direct_h2h"]]
+    closest_distance = float(third_party_all["distance"].min()) if not third_party_all.empty else float(all_games_df["distance"].min())
+
+    ceiling_df = all_games_df[all_games_df["rmsd"] <= 1.50].sort_values("distance").copy()
+
+    # If fewer than 3 games remain under the ceiling, do not render a match table at all
+    if len(ceiling_df) < 3:
+        render_match_table = False
+        no_analogs_message = f"No suitable analogs found in the available history. Closest match distance: {closest_distance:.2f}σ, above the 1.50σ ceiling."
+        sorted_df = pd.DataFrame(columns=all_games_df.columns)
+    else:
+        render_match_table = True
+        no_analogs_message = ""
+        sorted_df = ceiling_df.head(n_similar).copy()
+        sorted_df["similarity_rank"] = range(1, len(sorted_df) + 1)
 
     # Separate Strong Analogs vs. Direct H2H
-    strong_df = sorted_df[sorted_df["rmsd"] <= 0.70].copy()
-    strong_analog_df = strong_df[~strong_df["is_direct_h2h"]].copy()
+    strong_df = sorted_df[sorted_df["rmsd"] <= 0.70].copy() if not sorted_df.empty else pd.DataFrame(columns=all_games_df.columns)
+    strong_analog_df = strong_df[~strong_df["is_direct_h2h"]].copy() if not strong_df.empty else pd.DataFrame(columns=all_games_df.columns)
 
     n_strong = len(strong_df)
     n_strong_analog = len(strong_analog_df)
     n_strong_analog_games = len(strong_analog_df)
-    n_distinct_strong_analogs = int(strong_analog_df["opponent"].nunique())
+    n_distinct_strong_analogs = int(strong_analog_df["opponent"].nunique()) if not strong_analog_df.empty else 0
 
     n_total = len(sorted_df)
     n_total_games = len(sorted_df)
-    n_distinct_total_opponents = int(sorted_df["opponent"].nunique())
+    n_distinct_total_opponents = int(sorted_df["opponent"].nunique()) if not sorted_df.empty else 0
 
-    direct_h2h_games = [g for g in sorted_df.to_dict(orient="records") if g["is_direct_h2h"]]
+    direct_h2h_games = [g for g in all_games_df.to_dict(orient="records") if g["is_direct_h2h"]]
     has_direct_h2h = len(direct_h2h_games) > 0
 
     def _calc_summary(df: pd.DataFrame) -> Dict[str, Any]:
@@ -623,12 +636,18 @@ def find_similar_opponent_games(
             f"{overall_medians['rb_rush_yards']:.1f} rushing yards and {overall_medians['pass_yards']:.1f} passing yards."
         )
 
+    if not render_match_table:
+        sample_warning = no_analogs_message
+        descriptive_narrative = no_analogs_message
+
     return {
         "label": label,
         "offense_team": offense_team,
         "defense_team": defense_team,
         "target_offensive_profile": target_prof,
         "features_matched": features,
+        "render_match_table": render_match_table,
+        "no_analogs_message": no_analogs_message,
         "n_strong": n_strong,
         "n_strong_analog": n_strong_analog,
         "n_strong_analog_games": n_strong_analog_games,
@@ -640,10 +659,10 @@ def find_similar_opponent_games(
         "can_summarize_strong": can_summarize_strong,
         "sample_warning": sample_warning,
         "h2h_disclaimer": h2h_disclaimer,
-        "similar_games": sorted_df.to_dict(orient="records"),
-        "similar_games_summary": all_summary,
-        "all_summary": all_summary,
-        "all_deduped_summary": all_deduped_summary,
+        "similar_games": sorted_df.to_dict(orient="records") if render_match_table else [],
+        "similar_games_summary": all_summary if render_match_table else {},
+        "all_summary": all_summary if render_match_table else {},
+        "all_deduped_summary": all_deduped_summary if render_match_table else {},
         "strong_summary": strong_summary,
         "strong_deduped_summary": strong_deduped_summary,
         "overall_defense_baseline": overall_medians,

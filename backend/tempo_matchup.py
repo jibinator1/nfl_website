@@ -126,7 +126,8 @@ def compute_team_tempo_profile(
         "go_for_it_4th_rate": round(go_4th, 3),
         "rz_10_touch_leader": lead_10,
         "rz_5_touch_leader": lead_5,
-        "proj_plays": round(1530.0 / neutral_pace, 1),  # ~1530 seconds of game clock in pass/run sequences
+        "recent_avg_plays": round(1530.0 / neutral_pace, 1),
+        "proj_plays": round(1530.0 / neutral_pace, 1),  # backward compatibility alias
         "is_low_sample": low_sample(n_plays=n_plays),
     }
 
@@ -138,7 +139,7 @@ def evaluate_tempo_matchup(
     total_line: float = 45.0,
 ) -> Dict[str, Any]:
     """
-    Evaluates symmetric pace environment and game-script projections.
+    Evaluates symmetric pace environment and historical situational tendencies.
     """
     a_pace = away_tempo["neutral_pace_sec"]
     h_pace = home_tempo["neutral_pace_sec"]
@@ -146,39 +147,55 @@ def evaluate_tempo_matchup(
     z_a = (PRIOR_NEUTRAL_PACE_SEC - a_pace) / SIGMA_NEUTRAL_PACE
     z_h = (PRIOR_NEUTRAL_PACE_SEC - h_pace) / SIGMA_NEUTRAL_PACE
 
-    # Symmetric pace verdict
+    # Symmetric pace environment
     if z_a >= 1.0 and z_h >= 1.0:
-        verdict = "UP-TEMPO ENVIRONMENT (Both teams >= 1.0 SD fast)"
+        pace_env = "UP-TEMPO ENVIRONMENT (Both teams >= 1.0 SD fast)"
         pace_tag = "Track Meet Potential"
     elif z_a <= -1.0 and z_h <= -1.0:
-        verdict = "SLOW DELIBERATE ENVIRONMENT (Both teams >= 1.0 SD slow)"
+        pace_env = "SLOW DELIBERATE ENVIRONMENT (Both teams >= 1.0 SD slow)"
         pace_tag = "Clock-Control Slog"
     else:
-        verdict = "BALANCED NFL TEMPO ENVIRONMENT"
+        pace_env = "BALANCED NFL TEMPO ENVIRONMENT"
         pace_tag = "Standard Pace"
 
-    combined_proj_plays = round(away_tempo["proj_plays"] + home_tempo["proj_plays"], 1)
+    combined_avg_plays = round(
+        away_tempo.get("recent_avg_plays", away_tempo.get("proj_plays", 63.5)) +
+        home_tempo.get("recent_avg_plays", home_tempo.get("proj_plays", 63.5)),
+        1
+    )
 
-    # Spread script projection:
-    # Negative spread means home team favored (e.g. -3.5 means Home is favorite)
+    # Historical tendencies when leading / trailing
+    h_leading_pass = home_tempo.get("pass_rate_leading", 0.44) * 100
+    a_trailing_pass = away_tempo.get("pass_rate_trailing", 0.68) * 100
+    a_leading_pass = away_tempo.get("pass_rate_leading", 0.44) * 100
+    h_trailing_pass = home_tempo.get("pass_rate_trailing", 0.68) * 100
+
     if spread_line <= -4.5:
         script_note = (
-            f"{home_tempo['team']} favored by {abs(spread_line):.1f}: game script projects "
-            f"elevated late rushing volume for {home_tempo['team']} and negative-script pass funnel for {away_tempo['team']}."
+            f"Historical tendencies when leading/trailing (Spread: {home_tempo['team']} {spread_line:+.1f}): "
+            f"in games with a 4+ point lead, {home_tempo['team']} runs {100 - h_leading_pass:.1f}% of the time "
+            f"(league median 56.0%); when trailing by 7+, {away_tempo['team']} passes {a_trailing_pass:.1f}% of the time."
         )
     elif spread_line >= 4.5:
         script_note = (
-            f"{away_tempo['team']} favored by {spread_line:.1f}: projects elevated ground script "
-            f"for {away_tempo['team']} and trailing pass volume acceleration for {home_tempo['team']}."
+            f"Historical tendencies when leading/trailing (Spread: {away_tempo['team']} favored by {spread_line:.1f}): "
+            f"in games with a 4+ point lead, {away_tempo['team']} runs {100 - a_leading_pass:.1f}% of the time "
+            f"(league median 56.0%); when trailing by 7+, {home_tempo['team']} passes {h_trailing_pass:.1f}% of the time."
         )
     else:
-        script_note = f"Competitive one-score spread ({spread_line:+.1f}): projects sustained neutral pace throughout."
+        script_note = (
+            f"Competitive one-score spread ({spread_line:+.1f}): historical neutral pass rate is "
+            f"{home_tempo.get('pass_rate_neutral', 0.58)*100:.1f}% for {home_tempo['team']} and "
+            f"{away_tempo.get('pass_rate_neutral', 0.58)*100:.1f}% for {away_tempo['team']}."
+        )
 
     return {
         "away_team": away_tempo["team"],
         "home_team": home_tempo["team"],
-        "combined_proj_plays": combined_proj_plays,
-        "pace_verdict": verdict,
+        "combined_avg_plays": combined_avg_plays,
+        "combined_proj_plays": combined_avg_plays,  # backward compatibility alias
+        "pace_and_tempo": pace_env,
+        "pace_verdict": pace_env,  # backward compatibility alias
         "pace_tag": pace_tag,
         "script_note": script_note,
         "away_tempo": away_tempo,
