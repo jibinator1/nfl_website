@@ -615,12 +615,18 @@ def find_similar_opponent_games(
 
     # Descriptive narrative reporting
     if not can_summarize_strong:
+        if all_summary and "rb_rush_yards" in all_summary:
+            all_rush_med = f"{all_summary['rb_rush_yards']['median']:.1f}"
+            all_pass_med = f"{all_summary['pass_yards']['median']:.1f}"
+        else:
+            all_rush_med = "N/A"
+            all_pass_med = "N/A"
         descriptive_narrative = (
             f"{defense_team} faced {len(sorted_df)} opponents evaluated against {offense_team}'s profile, "
             f"but only {n_strong_analog_games} third-party games across {n_distinct_strong_analogs} distinct opponents qualify as strong analogs (RMSD <= 0.70σ, excluding direct H2H). "
             f"There is not enough independent data (need >= 3 games and >= 2 distinct opponents) to draw reliable conclusions about {defense_team}'s tendencies against {offense_team}-like offenses. "
             f"Across all {len(sorted_df)} evaluated matches ({n_distinct_total_opponents} distinct opponents, including loose matches), {defense_team} allowed a game median of "
-            f"{all_summary['rb_rush_yards']['median']:.1f} rushing yards to RBs and {all_summary['pass_yards']['median']:.1f} passing yards. "
+            f"{all_rush_med} rushing yards to RBs and {all_pass_med} passing yards. "
             f"Refer to the individual game logs below rather than aggregated summaries."
         )
     else:
@@ -764,6 +770,14 @@ def run_dual_archetype_lookup(
             f"There is not enough independent data to draw reliable conclusions about {defense_team}'s performance against ground-heavy vs. pass-heavy offenses."
         )
 
+    def _safe_med(summ: Optional[Dict[str, Any]], key: str) -> Optional[float]:
+        if not summ or not isinstance(summ, dict):
+            return None
+        val = summ.get(key)
+        if isinstance(val, dict):
+            return val.get("median")
+        return val
+
     # Build Side-by-Side Comparative Contrast Table
     contrast_table = [
         {
@@ -784,20 +798,20 @@ def run_dual_archetype_lookup(
                 if run_split.get("can_summarize_strong", False)
                 else f"INSUFFICIENT SAMPLE — NOT SUMMARIZED ({run_split.get('n_strong_analog_games', 0)} games, {run_split.get('n_distinct_strong_analogs', 0)} opps)"
             ),
-            "rb_rush_yards_strong": run_split.get("strong_summary", {}).get("rb_rush_yards", {}).get("median") if run_split.get("strong_summary") else None,
-            "rb_rush_yards_strong_deduped": run_split.get("strong_deduped_summary", {}).get("rb_rush_yards", {}).get("median") if run_split.get("strong_deduped_summary") else None,
-            "rb_rush_yards_all": run_split["all_summary"]["rb_rush_yards"]["median"],
-            "rb_rush_yards_all_deduped": run_split["all_deduped_summary"]["rb_rush_yards"]["median"],
-            "rb_carries": run_split["all_summary"]["rb_carries"]["median"],
-            "rb_ypc": run_split["all_summary"]["rb_ypc"]["median"],
-            "rb_rush_epa": run_split["all_summary"]["rb_rush_epa"]["median"],
-            "rb_success_rate": run_split["all_summary"]["rb_success_rate"]["median"],
-            "rb_stuff_rate": run_split["all_summary"]["rb_stuff_rate"]["median"],
-            "rb_explosive_rate": run_split["all_summary"]["rb_explosive_rate"]["median"],
-            "pass_yards": run_split["all_summary"]["pass_yards"]["median"],
-            "sacks": run_split["all_summary"]["sacks"]["median"],
-            "epa_per_play": run_split["all_summary"]["epa_per_play"]["median"],
-            "success_rate": run_split["all_summary"]["success_rate"]["median"],
+            "rb_rush_yards_strong": _safe_med(run_split.get("strong_summary"), "rb_rush_yards"),
+            "rb_rush_yards_strong_deduped": _safe_med(run_split.get("strong_deduped_summary"), "rb_rush_yards"),
+            "rb_rush_yards_all": _safe_med(run_split.get("all_summary"), "rb_rush_yards"),
+            "rb_rush_yards_all_deduped": _safe_med(run_split.get("all_deduped_summary"), "rb_rush_yards"),
+            "rb_carries": _safe_med(run_split.get("all_summary"), "rb_carries"),
+            "rb_ypc": _safe_med(run_split.get("all_summary"), "rb_ypc"),
+            "rb_rush_epa": _safe_med(run_split.get("all_summary"), "rb_rush_epa"),
+            "rb_success_rate": _safe_med(run_split.get("all_summary"), "rb_success_rate"),
+            "rb_stuff_rate": _safe_med(run_split.get("all_summary"), "rb_stuff_rate"),
+            "rb_explosive_rate": _safe_med(run_split.get("all_summary"), "rb_explosive_rate"),
+            "pass_yards": _safe_med(run_split.get("all_summary"), "pass_yards"),
+            "sacks": _safe_med(run_split.get("all_summary"), "sacks"),
+            "epa_per_play": _safe_med(run_split.get("all_summary"), "epa_per_play"),
+            "success_rate": _safe_med(run_split.get("all_summary"), "success_rate"),
         },
         {
             "archetype": "Pass-Heavy (Aerial & Spread Target Distribution)",
@@ -817,20 +831,20 @@ def run_dual_archetype_lookup(
                 if pass_split.get("can_summarize_strong", False)
                 else f"INSUFFICIENT SAMPLE — NOT SUMMARIZED ({pass_split.get('n_strong_analog_games', 0)} games, {pass_split.get('n_distinct_strong_analogs', 0)} opps)"
             ),
-            "rb_rush_yards_strong": pass_split.get("strong_summary", {}).get("rb_rush_yards", {}).get("median") if pass_split.get("strong_summary") else None,
-            "rb_rush_yards_strong_deduped": pass_split.get("strong_deduped_summary", {}).get("rb_rush_yards", {}).get("median") if pass_split.get("strong_deduped_summary") else None,
-            "rb_rush_yards_all": pass_split["all_summary"]["rb_rush_yards"]["median"],
-            "rb_rush_yards_all_deduped": pass_split["all_deduped_summary"]["rb_rush_yards"]["median"],
-            "rb_carries": pass_split["all_summary"]["rb_carries"]["median"],
-            "rb_ypc": pass_split["all_summary"]["rb_ypc"]["median"],
-            "rb_rush_epa": pass_split["all_summary"]["rb_rush_epa"]["median"],
-            "rb_success_rate": pass_split["all_summary"]["rb_success_rate"]["median"],
-            "rb_stuff_rate": pass_split["all_summary"]["rb_stuff_rate"]["median"],
-            "rb_explosive_rate": pass_split["all_summary"]["rb_explosive_rate"]["median"],
-            "pass_yards": pass_split["all_summary"]["pass_yards"]["median"],
-            "sacks": pass_split["all_summary"]["sacks"]["median"],
-            "epa_per_play": pass_split["all_summary"]["epa_per_play"]["median"],
-            "success_rate": pass_split["all_summary"]["success_rate"]["median"],
+            "rb_rush_yards_strong": _safe_med(pass_split.get("strong_summary"), "rb_rush_yards"),
+            "rb_rush_yards_strong_deduped": _safe_med(pass_split.get("strong_deduped_summary"), "rb_rush_yards"),
+            "rb_rush_yards_all": _safe_med(pass_split.get("all_summary"), "rb_rush_yards"),
+            "rb_rush_yards_all_deduped": _safe_med(pass_split.get("all_deduped_summary"), "rb_rush_yards"),
+            "rb_carries": _safe_med(pass_split.get("all_summary"), "rb_carries"),
+            "rb_ypc": _safe_med(pass_split.get("all_summary"), "rb_ypc"),
+            "rb_rush_epa": _safe_med(pass_split.get("all_summary"), "rb_rush_epa"),
+            "rb_success_rate": _safe_med(pass_split.get("all_summary"), "rb_success_rate"),
+            "rb_stuff_rate": _safe_med(pass_split.get("all_summary"), "rb_stuff_rate"),
+            "rb_explosive_rate": _safe_med(pass_split.get("all_summary"), "rb_explosive_rate"),
+            "pass_yards": _safe_med(pass_split.get("all_summary"), "pass_yards"),
+            "sacks": _safe_med(pass_split.get("all_summary"), "sacks"),
+            "epa_per_play": _safe_med(pass_split.get("all_summary"), "epa_per_play"),
+            "success_rate": _safe_med(pass_split.get("all_summary"), "success_rate"),
         },
         {
             "archetype": f"{defense_team} Season Baseline (All Opponents)",

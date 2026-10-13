@@ -75,7 +75,7 @@ for key, g in games_data.items():
 
     def _render_sim(sim_obj, def_tm, tgt_tm):
         print(f"**{def_tm} Defense vs. Opponents Similar to {tgt_tm}:**")
-        if sim_obj.get("table_suppressed"):
+        if not sim_obj.get("render_match_table", True):
             print(f"  * {sim_obj.get('no_analogs_message')}")
         else:
             games_list = sim_obj.get("similar_games", [])
