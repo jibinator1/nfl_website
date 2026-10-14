@@ -14,7 +14,7 @@ games = [
 results = {}
 for away, home, wk in games:
     print(f"Computing insights for {away} @ {home} Week {wk}...", file=sys.stderr)
-    res = compute_scheme_insights(home_team=home, away_team=away, season=2026, week=wk)
+    res = compute_scheme_insights(home_team=home, away_team=away, season=2026, week=wk, up_to_week=wk)
     results[f"{away}_at_{home}_w{wk}"] = res
 
 with open("scratch_insights_output.json", "w", encoding="utf-8") as f:

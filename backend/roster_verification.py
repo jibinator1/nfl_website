@@ -261,42 +261,44 @@ def compute_player_historical_box_stats(
 
 def format_injury_line(player_row: dict) -> str | None:
     """
-    Formats a clean non-null injury string for display.
+    Formats a clean non-null injury string for display with team tags.
     Ensures 'Status = None' and 'Injury = None' never render.
+    Suppresses redundant practice status when game status is Out, Doubtful, or IR.
     Excludes fully cleared players who have no game status designation and full practice participation.
     """
-    status = player_row.get("report_status") or player_row.get("status")
-    clean_status = str(status).strip() if status and str(status).strip() not in ("None", "nan", "") else None
+    status = str(player_row.get("report_status") or player_row.get("status") or "").strip()
+    practice = str(player_row.get("practice_status") or player_row.get("practice") or "").strip()
+    injury = str(player_row.get("report_primary_injury") or player_row.get("primary_injury") or player_row.get("injury") or "").strip()
 
-    practice = player_row.get("practice_status") or player_row.get("practice")
-    clean_practice = str(practice).strip() if practice and str(practice).strip() not in ("None", "nan", "") else None
+    status = "" if status in ("None", "null", "nan") else status
+    practice = "" if practice in ("None", "null", "nan") else practice
+    injury = "" if injury in ("None", "null", "nan", "Undisclosed") else injury
 
-    injury = player_row.get("report_primary_injury") or player_row.get("primary_injury")
-    clean_injury = str(injury).strip() if injury and str(injury).strip() not in ("None", "nan", "", "Undisclosed") else None
+    # Exclude healthy full-practice players
+    if not status and (practice in ("Full Participation in Practice", "Full", "") or "full participation" in practice.lower()):
+        return None
 
-    # Exclude players who have no game status designation and full practice participation
-    if not clean_status:
-        if not clean_practice:
-            return None
-        prac_lower = clean_practice.lower()
-        if "full participation" in prac_lower or prac_lower == "full":
-            return None
+    # Only show practice status if game status is Questionable or unassigned
+    details = []
+    if status:
+        details.append(status)
+    if practice and status not in ("Out", "Doubtful", "IR"):
+        # Shorten verbose NFL strings
+        short_prac = practice.replace(" Participation in Practice", "").replace(" In Practice", "").replace("in Practice", "").strip()
+        details.append(short_prac)
 
-    parts = []
-    if clean_status:
-        parts.append(clean_status)
-    if clean_practice:
-        parts.append(clean_practice)
-    if clean_injury:
-        parts.append(f"({clean_injury})")
+    detail_str = ", ".join(details)
+    if injury:
+        detail_str = f"{detail_str} ({injury})" if detail_str else f"({injury})"
 
-    if not parts:
+    if not detail_str:
         return None
 
     name = player_row.get("player_name") or player_row.get("player") or "Unknown Player"
     pos = player_row.get("position") or player_row.get("pos") or ""
-    pos_str = f" ({pos})" if pos else ""
-    return f"{name}{pos_str}: {', '.join(parts)}"
+    team = player_row.get("team") or player_row.get("team_abbr") or ""
+    team_prefix = f"{team} - " if team else ""
+    return f"{name} ({team_prefix}{pos}): {detail_str}"
 
 
 def get_roster_profiles(

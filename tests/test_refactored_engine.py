@@ -461,13 +461,16 @@ def test_run_scheme_clash_positive_only():
             assert "top-20%" not in b.get("headline", "")
 
 
-def test_small_sample_gate_suppresses_outliers():
-    """Assert SCHEME_CLASH and UNIT_EXTREME are suppressed when n_games < 4."""
+def test_empirical_bayes_prior_shrinkage_early_season():
+    """Assert early-season games (n < 4) blend with prior season and include blend tag,
+    while un-stabilized dummy teams without priors are suppressed."""
     from backend.outlier_filter import extract_top_outliers
 
-    mock_matchup = {
+    # Real team early-season matchup (Week 3, n=2)
+    matchup = {
         "away_team": "BAL",
         "home_team": "DAL",
+        "season": 2026,
         "sample_window": {
             "home_games_in_sample": 2,
             "away_games_in_sample": 2,
@@ -476,23 +479,49 @@ def test_small_sample_gate_suppresses_outliers():
         "run_scheme_splits": {
             "home_unit": {
                 "team": "DAL",
-                "offense_gap_pct": 65.0,  # extreme +2.35σ
-                "opp_def_gap_ypc_allowed": 5.20,  # extreme +2.22σ
+                "offense_gap_pct": 58.3,
+                "opp_def_gap_ypc_allowed": 3.48,
+            },
+            "away_unit": {
+                "team": "BAL",
+                "offense_gap_pct": 43.5,
+                "opp_def_zone_ypc_allowed": 5.13,
             }
         }
     }
-    bullets = extract_top_outliers(mock_matchup)
-    # Both teams only have 2 games; outliers must be suppressed
-    assert len(bullets) == 0
+    bullets = extract_top_outliers(matchup)
+    headlines = [b["headline"] for b in bullets]
+    # DAL zone defense (5.13 shrunk with 5.30 prior = 5.215) triggers UNIT_EXTREME with blend tag
+    assert any("DAL allowing 5.21 YPC on ZONE runs" in h and "[Blended w/ 2025 Prior, n=2]" in h for h in headlines)
+    # DAL gap offense (58.3%) vs BAL gap defense (3.48 shrunk with 3.25 prior = 3.37) triggers SCHEME_CLASH with blend tag
+    assert any("DAL runs GAP at top-20% rate" in h and "BAL defense allowing 3.37 YPC" in h and "[Blended w/ 2025 Prior, n=2]" in h for h in headlines)
+
+    # Dummy team without priors must be suppressed when n < 4
+    dummy_matchup = {
+        "away_team": "DUMMY_A",
+        "home_team": "DUMMY_H",
+        "sample_window": {"n_games": 2},
+        "run_scheme_splits": {
+            "home_unit": {
+                "team": "DUMMY_H",
+                "offense_gap_pct": 65.0,
+                "opp_def_gap_ypc_allowed": 5.20,
+            }
+        }
+    }
+    dummy_bullets = extract_top_outliers(dummy_matchup)
+    assert len(dummy_bullets) == 0
 
 
 def test_format_injury_line_excludes_healthy_full_practice():
-    """Assert healthy players with full practice and no status designation return None."""
+    """Assert healthy players with full practice and no status designation return None,
+    and injured players format as Player (TEAM - POS): Status (Injury) with practice suppressed when Out/Doubtful."""
     from backend.roster_verification import format_injury_line
 
     healthy_player = {
         "player_name": "Zay Flowers",
         "position": "WR",
+        "team": "BAL",
         "report_status": None,
         "practice_status": "Full Participation in Practice",
     }
@@ -501,39 +530,41 @@ def test_format_injury_line_excludes_healthy_full_practice():
     injured_player = {
         "player_name": "Nnamdi Madubuike",
         "position": "DT",
+        "team": "BAL",
         "report_status": "Out",
         "practice_status": "Limited Participation in Practice",
         "report_primary_injury": "Neck",
     }
     line = format_injury_line(injured_player)
     assert line is not None
-    assert "Nnamdi Madubuike (DT): Out" in line
-    assert "(Neck)" in line
+    assert line == "Nnamdi Madubuike (BAL - DT): Out (Neck)"
+    assert "Limited" not in line  # Mid-week practice status suppressed when officially Out
 
-    limited_only_player = {
+    questionable_player = {
         "player_name": "Maliek Collins",
         "position": "DT",
-        "report_status": None,
+        "team": "DAL",
+        "report_status": "Questionable",
         "practice_status": "Limited Participation in Practice",
+        "report_primary_injury": "Knee",
     }
-    assert format_injury_line(limited_only_player) is not None
+    q_line = format_injury_line(questionable_player)
+    assert q_line is not None
+    assert q_line == "Maliek Collins (DAL - DT): Questionable, Limited (Knee)"
 
 
 def test_strong_analog_filter_excludes_moderate_analogs():
-    """Assert games with RMSD > 0.70 are excluded from strong_third_party."""
+    """Assert games with RMSD <= 0.85 qualify for strong_third_party, capped at top 8."""
+    # 10 candidate games: 9 with rmsd <= 0.85, 1 with rmsd > 0.85
     third_party_analogs = [
-        {"opponent": "PIT", "rmsd": 0.641, "similarity_tier_key": "strong", "yds": 80.0},
-        {"opponent": "GB", "rmsd": 0.675, "similarity_tier_key": "strong", "yds": 85.0},
-        {"opponent": "NYG", "rmsd": 0.782, "similarity_tier_key": "moderate", "yds": 90.0},
-        {"opponent": "DAL", "rmsd": 0.793, "similarity_tier_key": "moderate", "yds": 95.0},
+        {"opponent": f"OPP_{i}", "rmsd": 0.50 + (i * 0.04), "yds": 80.0 + i}
+        for i in range(10)
     ]
-    strong_third_party = [
-        g for g in third_party_analogs
-        if g.get("similarity_tier_key") == "strong" or g.get("rmsd", 99.0) <= 0.70
-    ]
-    distinct_opps = {g["opponent"] for g in strong_third_party}
-    # Only PIT and GB qualify (2 games, 2 opps < 3)
-    assert len(strong_third_party) == 2
-    assert len(distinct_opps) == 2
+    # rmsd values: 0.50, 0.54, 0.58, 0.62, 0.66, 0.70, 0.74, 0.78, 0.82, 0.86
+    strong_candidates = [g for g in third_party_analogs if g.get("rmsd", 99.0) <= 0.85]
+    assert len(strong_candidates) == 9  # 0.86 is excluded
+    strong_candidates.sort(key=lambda g: g["rmsd"])
+    strong_third_party = strong_candidates[:8]
+    assert len(strong_third_party) == 8  # Top 8 cap applied
 
 

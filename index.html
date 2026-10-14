@@ -4180,35 +4180,45 @@
 
         function formatInjuryLine(playerRow) {
             if (!playerRow) return null;
-            const parts = [];
-            const repStatus = playerRow.report_status || playerRow.status;
-            let hasStatus = false;
-            if (repStatus && String(repStatus) !== "None" && String(repStatus) !== "null" && String(repStatus).trim() !== "") {
-                hasStatus = true;
-                parts.push(String(repStatus).trim());
-            }
-            const pracStatus = playerRow.practice_status || playerRow.practice;
-            let cleanPrac = "";
-            if (pracStatus && String(pracStatus) !== "None" && String(pracStatus) !== "null" && String(pracStatus).trim() !== "") {
-                cleanPrac = String(pracStatus).trim();
-            }
-            // Filter out players with no game status and full practice participation
-            if (!hasStatus && (cleanPrac.toLowerCase().includes("full participation") || cleanPrac.toLowerCase() === "full")) {
+            let status = String(playerRow.report_status || playerRow.status || "").trim();
+            let practice = String(playerRow.practice_status || playerRow.practice || "").trim();
+            let injury = String(playerRow.report_primary_injury || playerRow.primary_injury || playerRow.injury || "").trim();
+
+            status = (status === "None" || status === "null" || status === "nan") ? "" : status;
+            practice = (practice === "None" || practice === "null" || practice === "nan") ? "" : practice;
+            injury = (injury === "None" || injury === "null" || injury === "nan" || injury === "Undisclosed") ? "" : injury;
+
+            // Exclude healthy full-practice players
+            if (!status && (practice === "Full Participation in Practice" || practice === "Full" || practice === "" || practice.toLowerCase().includes("full participation"))) {
                 return null;
             }
-            if (cleanPrac) {
-                parts.push(cleanPrac);
+
+            const details = [];
+            if (status) {
+                details.push(status);
             }
-            const primInj = playerRow.report_primary_injury || playerRow.primary_injury || playerRow.injury;
-            if (primInj && String(primInj) !== "None" && String(primInj) !== "null" && String(primInj).trim() !== "" && String(primInj).trim() !== "Undisclosed") {
-                parts.push(`(${String(primInj).trim()})`);
+            if (practice && status !== "Out" && status !== "Doubtful" && status !== "IR") {
+                let shortPrac = practice.replace(/ Participation in Practice/gi, "")
+                                        .replace(/ In Practice/gi, "")
+                                        .replace(/ in Practice/gi, "")
+                                        .trim();
+                details.push(shortPrac);
             }
-            if (parts.length === 0) {
+
+            let detailStr = details.join(", ");
+            if (injury) {
+                detailStr = detailStr ? `${detailStr} (${injury})` : `(${injury})`;
+            }
+
+            if (!detailStr) {
                 return null;
             }
-            const name = playerRow.player_name || playerRow.player || playerRow.name || "Unknown";
+
+            const name = playerRow.player_name || playerRow.player || playerRow.name || "Unknown Player";
             const pos = playerRow.position || playerRow.pos || "N/A";
-            return `${name} (${pos}): ${parts.join(', ')}`;
+            const team = playerRow.team || playerRow.team_abbr || "";
+            const teamPrefix = team ? `${team} - ` : "";
+            return `${name} (${teamPrefix}${pos}): ${detailStr}`;
         }
 
         function renderSchemeInsights(d) {
