@@ -20,6 +20,9 @@ import numpy as np
 
 from backend.team_tendencies import load_weekly_stats
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RZ_CACHE_PATH = os.path.join(ROOT_DIR, "data", "player_red_zone_cache.parquet")
+_CACHED_RZ_DF: Optional[pd.DataFrame] = None
 _ROSTER_CACHE: Dict[Tuple[int, str, Optional[int]], pd.DataFrame] = {}
 
 
@@ -191,24 +194,18 @@ def compute_player_historical_box_stats(
         min_val = round(float(series.min()), 1)
         max_val = round(float(series.max()), 1)
 
-    # 1. Real Red Zone touches from play-by-play (yardline_100 <= 20 and <= 10)
+    # 1. Real Red Zone touches from precomputed cache or play-by-play (yardline_100 <= 20 and <= 10)
     rz20_sum = 0
     rz10_sum = 0
     try:
-        from backend.team_tendencies import load_clean_pbp
-        pbp_dfs = []
-        for s in matches["season"].unique():
-            try:
-                pbp_dfs.append(load_clean_pbp(season=int(s)))
-            except Exception:
-                pass
-        if pbp_dfs:
-            pbp_comb = pd.concat(pbp_dfs, ignore_index=True)
-            game_keys = set(zip(matches["season"].astype(int), matches["week"].astype(int)))
-            pbp_sub = pbp_comb[pbp_comb.apply(lambda r: (int(r["season"]), int(r["week"])) in game_keys, axis=1)]
+        global _CACHED_RZ_DF
+        if _CACHED_RZ_DF is None and os.path.exists(RZ_CACHE_PATH):
+            _CACHED_RZ_DF = pd.read_parquet(RZ_CACHE_PATH)
 
+        if _CACHED_RZ_DF is not None and not _CACHED_RZ_DF.empty:
+            game_keys = set(zip(matches["season"].astype(int), matches["week"].astype(int)))
+            sub_rz = _CACHED_RZ_DF[_CACHED_RZ_DF.apply(lambda r: (int(r["season"]), int(r["week"])) in game_keys, axis=1)]
             player_ids = set(matches["player_id"].dropna().astype(str).unique().tolist()) if "player_id" in matches.columns else set()
-            player_names = set(matches["player_name"].dropna().astype(str).unique().tolist()) if "player_name" in matches.columns else set()
             disp_names = set(matches["player_display_name"].dropna().astype(str).unique().tolist()) if "player_display_name" in matches.columns else set()
             disp_names.add(disp_name)
 
@@ -217,26 +214,62 @@ def compute_player_historical_box_stats(
             first_init = parts[0][0].upper() if parts else ""
             last_name = parts[-1].lower() if parts else ""
 
-            # Rush plays: must be run play, matching either player_id, full/abbrev name, or first_init + clean last name
-            rush_mask = (pbp_sub["play_type"] == "run")
-            rush_id_mask = pbp_sub["rusher_player_id"].astype(str).isin(player_ids) if (player_ids and "rusher_player_id" in pbp_sub.columns) else pd.Series(False, index=pbp_sub.index)
-            rush_name_col = pbp_sub["rusher_player_name"].fillna("")
-            rush_name_mask = rush_name_col.isin(player_names | disp_names)
-            rush_part_mask = (rush_name_col.str.lower().str.endswith(last_name)) & (rush_name_col.str.startswith(first_init)) if (last_name and first_init) else pd.Series(False, index=pbp_sub.index)
+            p_mask = (
+                sub_rz["player_id"].astype(str).isin(player_ids) |
+                sub_rz["player_display_name"].isin(disp_names) |
+                sub_rz["player_name"].isin(disp_names)
+            )
+            if not p_mask.any() and last_name and first_init:
+                name_col = sub_rz["player_name"].fillna("").astype(str)
+                p_mask = (name_col.str.lower().str.endswith(last_name)) & (name_col.str.startswith(first_init))
 
-            rush_plays = pbp_sub[rush_mask & (rush_id_mask | rush_name_mask | rush_part_mask)]
+            matched_rz = sub_rz[p_mask]
+            if not matched_rz.empty:
+                rz20_sum = int(matched_rz["rz20"].sum())
+                rz10_sum = int(matched_rz["rz10"].sum())
+        else:
+            from backend.team_tendencies import load_clean_pbp
+            pbp_dfs = []
+            for s in matches["season"].unique():
+                try:
+                    pbp_dfs.append(load_clean_pbp(season=int(s)))
+                except Exception:
+                    pass
+            if pbp_dfs:
+                pbp_comb = pd.concat(pbp_dfs, ignore_index=True)
+                game_keys = set(zip(matches["season"].astype(int), matches["week"].astype(int)))
+                pbp_sub = pbp_comb[pbp_comb.apply(lambda r: (int(r["season"]), int(r["week"])) in game_keys, axis=1)]
 
-            # Rec plays: completed pass, matching player_id, full/abbrev name, or first_init + clean last name
-            rec_mask = (pbp_sub["complete_pass"] == 1)
-            rec_id_mask = pbp_sub["receiver_player_id"].astype(str).isin(player_ids) if (player_ids and "receiver_player_id" in pbp_sub.columns) else pd.Series(False, index=pbp_sub.index)
-            rec_name_col = pbp_sub["receiver_player_name"].fillna("")
-            rec_name_mask = rec_name_col.isin(player_names | disp_names)
-            rec_part_mask = (rec_name_col.str.lower().str.endswith(last_name)) & (rec_name_col.str.startswith(first_init)) if (last_name and first_init) else pd.Series(False, index=pbp_sub.index)
+                player_ids = set(matches["player_id"].dropna().astype(str).unique().tolist()) if "player_id" in matches.columns else set()
+                player_names = set(matches["player_name"].dropna().astype(str).unique().tolist()) if "player_name" in matches.columns else set()
+                disp_names = set(matches["player_display_name"].dropna().astype(str).unique().tolist()) if "player_display_name" in matches.columns else set()
+                disp_names.add(disp_name)
 
-            rec_plays = pbp_sub[rec_mask & (rec_id_mask | rec_name_mask | rec_part_mask)]
+                clean_name = re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", disp_name, flags=re.IGNORECASE).strip()
+                parts = clean_name.replace(".", " ").split()
+                first_init = parts[0][0].upper() if parts else ""
+                last_name = parts[-1].lower() if parts else ""
 
-            rz20_sum = int((rush_plays["yardline_100"] <= 20).sum() + (rec_plays["yardline_100"] <= 20).sum())
-            rz10_sum = int((rush_plays["yardline_100"] <= 10).sum() + (rec_plays["yardline_100"] <= 10).sum())
+                # Rush plays: must be run play, matching either player_id, full/abbrev name, or first_init + clean last name
+                rush_mask = (pbp_sub["play_type"] == "run")
+                rush_id_mask = pbp_sub["rusher_player_id"].astype(str).isin(player_ids) if (player_ids and "rusher_player_id" in pbp_sub.columns) else pd.Series(False, index=pbp_sub.index)
+                rush_name_col = pbp_sub["rusher_player_name"].fillna("")
+                rush_name_mask = rush_name_col.isin(player_names | disp_names)
+                rush_part_mask = (rush_name_col.str.lower().str.endswith(last_name)) & (rush_name_col.str.startswith(first_init)) if (last_name and first_init) else pd.Series(False, index=pbp_sub.index)
+
+                rush_plays = pbp_sub[rush_mask & (rush_id_mask | rush_name_mask | rush_part_mask)]
+
+                # Rec plays: completed pass, matching player_id, full/abbrev name, or first_init + clean last name
+                rec_mask = (pbp_sub["complete_pass"] == 1)
+                rec_id_mask = pbp_sub["receiver_player_id"].astype(str).isin(player_ids) if (player_ids and "receiver_player_id" in pbp_sub.columns) else pd.Series(False, index=pbp_sub.index)
+                rec_name_col = pbp_sub["receiver_player_name"].fillna("")
+                rec_name_mask = rec_name_col.isin(player_names | disp_names)
+                rec_part_mask = (rec_name_col.str.lower().str.endswith(last_name)) & (rec_name_col.str.startswith(first_init)) if (last_name and first_init) else pd.Series(False, index=pbp_sub.index)
+
+                rec_plays = pbp_sub[rec_mask & (rec_id_mask | rec_name_mask | rec_part_mask)]
+
+                rz20_sum = int((rush_plays["yardline_100"] <= 20).sum() + (rec_plays["yardline_100"] <= 20).sum())
+                rz10_sum = int((rush_plays["yardline_100"] <= 10).sum() + (rec_plays["yardline_100"] <= 10).sum())
     except Exception:
         rz20_sum = 0
         rz10_sum = 0
