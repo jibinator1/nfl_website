@@ -134,19 +134,12 @@ def compute_player_historical_box_stats(
     if not is_ok or not disp_name:
         return None
 
-    # Load player's games across current and prior season
-    frames = []
+    # Load player's games: evaluate current season first so n matches the current season window
     df_curr = load_weekly_stats(season=season, up_to_week=up_to_week)
-    if not df_curr.empty:
-        frames.append(df_curr)
-    df_prev = load_weekly_stats(season=season - 1)
-    if not df_prev.empty:
-        frames.append(df_prev)
-
-    if not frames:
+    all_w = df_curr if not df_curr.empty else load_weekly_stats(season=season - 1)
+    if all_w.empty:
         return None
 
-    all_w = pd.concat(frames, ignore_index=True)
     team_norm = "LA" if team == "LAR" else team
     sub = all_w[all_w["team"].replace({"LAR": "LA"}) == team_norm].copy()
     if sub.empty:
@@ -160,6 +153,19 @@ def compute_player_historical_box_stats(
         matches = sub[
             sub["player_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
         ]
+
+    # If no games found in current season, check prior season as fallback
+    if matches.empty and not df_curr.empty:
+        df_prev = load_weekly_stats(season=season - 1)
+        if not df_prev.empty:
+            sub_prev = df_prev[df_prev["team"].replace({"LAR": "LA"}) == team_norm].copy()
+            matches = sub_prev[
+                sub_prev["player_display_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
+            ]
+            if matches.empty:
+                matches = sub_prev[
+                    sub_prev["player_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
+                ]
 
     if matches.empty:
         return None
