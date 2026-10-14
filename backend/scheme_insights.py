@@ -27,7 +27,10 @@ from backend.roster_verification import (
     clean_or_drop_player,
     compute_player_historical_box_stats,
     get_active_team_roster,
+    get_roster_profiles,
+    format_injury_line,
 )
+from backend.outlier_filter import extract_top_outliers
 
 TEAM_NAMES = {
     'ARI': 'Arizona Cardinals', 'ATL': 'Atlanta Falcons', 'BAL': 'Baltimore Ravens',
@@ -708,7 +711,14 @@ def _evaluate_prob_and_tier(
 
 _DYNAMIC_CTX_CACHE: Dict[Tuple, Any] = {}
 
-def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = None, end_date: Optional[str] = None, schedules_df=None, weekly_df=None):
+def _get_dynamic_sample_context(
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    schedules_df=None,
+    weekly_df=None,
+):
     _ensure_parquet_loaded()
     s = schedules_df if schedules_df is not None else _SCHEDULES_DF
     w = weekly_df if weekly_df is not None else _WEEKLY_DF
@@ -725,14 +735,16 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
     else:
         eff_season = int(season if season else 2026)
         sub_s = sub_s[sub_s['season'] == eff_season]
+        if up_to_week is not None and 'week' in sub_s.columns:
+            sub_s = sub_s[sub_s['week'] < up_to_week]
 
-    cache_key = (eff_season, start_date, end_date)
+    cache_key = (eff_season, up_to_week, start_date, end_date)
     if cache_key in _DYNAMIC_CTX_CACHE:
         return _DYNAMIC_CTX_CACHE[cache_key]
 
     completed = sub_s[sub_s['home_score'].notna()]
     if completed.empty:
-        eff_season = int(season if season else 2026)
+        eff_season = int(season if season else 2026) - 1
         completed = s[(s['season'] == eff_season) & (s['home_score'].notna())]
 
     game_ids = set(completed['game_id'].unique())
@@ -835,10 +847,12 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
         else:
             sample_label = f"Date Range: {start_date} to {end_date}"
     else:
-        if eff_season == 2026:
-            sample_label = "2026 Season Only (Weeks 1-5 Current Games)"
+        max_week_included = int(completed['week'].max()) if not completed.empty and 'week' in completed.columns else 0
+        n_gm = max(team_games_count.values()) if team_games_count else 0
+        if max_week_included > 0:
+            sample_label = f"Sample Window: {eff_season} Weeks 1–{max_week_included} (n={n_gm} games)"
         else:
-            sample_label = f"{eff_season} Full Season Sample (18 Weeks)"
+            sample_label = f"Sample Window: {eff_season} (n=0 games)"
 
     res_ctx = {
         'season': eff_season,
@@ -889,7 +903,8 @@ def compute_scheme_insights(
     home_team: str,
     away_team: str,
     season: int = 2026,
-    week: Optional[int] = 1,
+    week: Optional[int] = None,
+    up_to_week: Optional[int] = None,
     weekly_df=None,
     schedules_df=None,
     start_date: Optional[str] = None,
@@ -898,6 +913,7 @@ def compute_scheme_insights(
     """
     Computes a comprehensive 5-pillar scheme analytics report for the selected matchup.
     """
+    eff_week = up_to_week if up_to_week is not None else week
     h_team = home_team.upper()
     a_team = away_team.upper()
 
@@ -908,7 +924,14 @@ def compute_scheme_insights(
     a_name = TEAM_NAMES.get(a_team, a_team)
 
     # Dynamic Sample Context Overlay
-    ctx = _get_dynamic_sample_context(season=season, start_date=start_date, end_date=end_date, schedules_df=schedules_df, weekly_df=weekly_df)
+    ctx = _get_dynamic_sample_context(
+        season=season,
+        up_to_week=eff_week,
+        start_date=start_date,
+        end_date=end_date,
+        schedules_df=schedules_df,
+        weekly_df=weekly_df,
+    )
 
     h_games = 0
     a_games = 0
@@ -1151,7 +1174,7 @@ def compute_scheme_insights(
             t_norm = 'LA' if team_code == 'LAR' else team_code
             if latest_norm and latest_norm != t_norm:
                 continue
-            is_ok, disp = verify_player_on_roster(t_name, team_code, season=season, up_to_week=week)
+            is_ok, disp = verify_player_on_roster(t_name, team_code, season=season, up_to_week=eff_week)
             if is_ok and disp and disp not in seen_players:
                 seen_players.add(disp)
                 pos = tg.get('pos', 'WR')
@@ -1160,12 +1183,12 @@ def compute_scheme_insights(
 
         # 2. Key rusher / receiver from active roster if needed
         if len(cands) < 2:
-            roster = get_active_team_roster(team_code, season=season, up_to_week=week)
+            roster = get_active_team_roster(team_code, season=season, up_to_week=eff_week)
             if not roster.empty:
                 rushers = roster.groupby('player_display_name')['carries'].sum().sort_values(ascending=False)
                 for r_name, c_cnt in rushers.items():
                     if c_cnt > 0 and r_name not in seen_players:
-                        is_ok, disp = verify_player_on_roster(r_name, team_code, season=season, up_to_week=week)
+                        is_ok, disp = verify_player_on_roster(r_name, team_code, season=season, up_to_week=eff_week)
                         if is_ok and disp:
                             seen_players.add(disp)
                             cands.append((r_name, disp, 'RB', 'Rushing Yards'))
@@ -1173,7 +1196,7 @@ def compute_scheme_insights(
                 targets = roster.groupby('player_display_name')['targets'].sum().sort_values(ascending=False)
                 for t_name, t_cnt in targets.items():
                     if t_cnt > 0 and t_name not in seen_players and len(cands) < 2:
-                        is_ok, disp = verify_player_on_roster(t_name, team_code, season=season, up_to_week=week)
+                        is_ok, disp = verify_player_on_roster(t_name, team_code, season=season, up_to_week=eff_week)
                         if is_ok and disp:
                             seen_players.add(disp)
                             cands.append((t_name, disp, 'WR', 'Receiving Yards'))
@@ -1181,7 +1204,7 @@ def compute_scheme_insights(
 
         profiles = []
         for raw_name, disp_name, pos, focus in cands[:2]:
-            st = compute_player_historical_box_stats(disp_name, team_code, stat_focus=focus, season=season, up_to_week=week)
+            st = compute_player_historical_box_stats(disp_name, team_code, stat_focus=focus, season=season, up_to_week=eff_week)
             if not st:
                 continue
 
@@ -1294,7 +1317,7 @@ def compute_scheme_insights(
         f"{h_team} run defense: {h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC allowed on Gap, {h_profile['run_scheme']['def_zone_ypc_allowed']:.2f} on Zone (n={h_games} games)."
     )
 
-    injuries_data = get_game_injuries(a_team, h_team, season=season, week=week)
+    injuries_data = get_game_injuries(a_team, h_team, season=season, week=eff_week)
     synthesis_data = build_matchup_synthesis(
         cov_eval_away=a_vs_h_cov,
         cov_eval_home=h_vs_a_cov,
@@ -1306,17 +1329,22 @@ def compute_scheme_insights(
     )
 
     try:
-        stat_sheet = build_matchup_stat_sheet(a_team, h_team, season=season, up_to_week=week)
+        stat_sheet = build_matchup_stat_sheet(a_team, h_team, season=season, up_to_week=eff_week)
     except Exception as e:
         stat_sheet = {'error': str(e)}
 
-    return {
+    # Concentrated Player Usage (Alpha thresholds: Target Share >= 22%, Rush Share >= 45%, RZ Touch Share >= 35%)
+    away_roster = get_roster_profiles(a_team, season=season, up_to_week=eff_week)
+    home_roster = get_roster_profiles(h_team, season=season, up_to_week=eff_week)
+    alpha_usage = [p for p in (away_roster + home_roster) if p.get("is_alpha")]
+
+    res = {
         'home_team': h_team,
         'home_team_name': h_name,
         'away_team': a_team,
         'away_team_name': a_name,
         'season': season,
-        'week': week,
+        'week': eff_week,
         'sample_window': sample_window,
         'matchup_summary': matchup_summary,
         'thesis_quote': matchup_summary,  # backward compatibility alias
@@ -1328,9 +1356,19 @@ def compute_scheme_insights(
         'positional_target_rates': target_rates,
         'player_usage_profiles': breakouts,
         'efficiency_breakouts': breakouts,  # backward compatibility alias
+        'concentrated_player_usage': alpha_usage,
         'game_flow_tempo': game_flow,
         'matchup_synthesis': synthesis_data,
         'injuries': injuries_data,
         'matchup_stat_sheet': stat_sheet,
     }
+
+    # Extract Top Outliers (Max 5 Bullets) via Outlier & Mismatch Engine
+    top_outliers = extract_top_outliers(res, max_bullets=5)
+    res['top_outliers'] = top_outliers
+    if isinstance(stat_sheet, dict):
+        stat_sheet['top_outliers'] = top_outliers
+        stat_sheet['concentrated_player_usage'] = alpha_usage
+
+    return res
 

@@ -199,7 +199,7 @@ def compute_player_historical_box_stats(
         pbp_dfs = []
         for s in matches["season"].unique():
             try:
-                pbp_dfs.append(load_clean_pbp(season=int(s)))
+                pbp_dfs.append(load_clean_pbp(season=int(s), up_to_week=up_to_week if int(s) == season else None))
             except Exception:
                 pass
         if pbp_dfs:
@@ -257,3 +257,121 @@ def compute_player_historical_box_stats(
         "exp_summary": exp_summary_str,
         "splits_note": None,  # Omit filler when sub-split is not available
     }
+
+
+def format_injury_line(player_row: dict) -> str | None:
+    """
+    Formats a clean non-null injury string for display.
+    Ensures 'Status = None' and 'Injury = None' never render.
+    Excludes fully cleared players who have no game status designation and full practice participation.
+    """
+    status = player_row.get("report_status") or player_row.get("status")
+    clean_status = str(status).strip() if status and str(status).strip() not in ("None", "nan", "") else None
+
+    practice = player_row.get("practice_status") or player_row.get("practice")
+    clean_practice = str(practice).strip() if practice and str(practice).strip() not in ("None", "nan", "") else None
+
+    injury = player_row.get("report_primary_injury") or player_row.get("primary_injury")
+    clean_injury = str(injury).strip() if injury and str(injury).strip() not in ("None", "nan", "", "Undisclosed") else None
+
+    # Exclude players who have no game status designation and full practice participation
+    if not clean_status:
+        if not clean_practice:
+            return None
+        prac_lower = clean_practice.lower()
+        if "full participation" in prac_lower or prac_lower == "full":
+            return None
+
+    parts = []
+    if clean_status:
+        parts.append(clean_status)
+    if clean_practice:
+        parts.append(clean_practice)
+    if clean_injury:
+        parts.append(f"({clean_injury})")
+
+    if not parts:
+        return None
+
+    name = player_row.get("player_name") or player_row.get("player") or "Unknown Player"
+    pos = player_row.get("position") or player_row.get("pos") or ""
+    pos_str = f" ({pos})" if pos else ""
+    return f"{name}{pos_str}: {', '.join(parts)}"
+
+
+def get_roster_profiles(
+    team: str,
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Returns player usage profiles for team up to up_to_week,
+    calculating target share, rush share, and red zone touch share.
+    Alpha threshold: target_share >= 22%, rush_share >= 45%, or rz_touch_share >= 35%.
+    """
+    roster_df = get_active_team_roster(team=team, season=season, up_to_week=up_to_week)
+    if roster_df.empty:
+        return []
+
+    tot_carries = float(roster_df["carries"].sum()) if "carries" in roster_df.columns else 0.0
+    tot_targets = float(roster_df["targets"].sum()) if "targets" in roster_df.columns else 0.0
+
+    # Red zone totals from PBP
+    rz_touches_by_player: Dict[str, int] = {}
+    rz_tot = 0
+    try:
+        from backend.team_tendencies import load_clean_pbp
+        pbp = load_clean_pbp(season=season, up_to_week=up_to_week)
+        if not pbp.empty:
+            tm_rz = pbp[(pbp["posteam"] == team) & (pbp["yardline_100"] <= 20)]
+            rz_tot = len(tm_rz)
+            for _, r_play in tm_rz.iterrows():
+                if r_play["play_type"] == "run" and pd.notna(r_play.get("rusher_player_name")):
+                    p_n = str(r_play["rusher_player_name"])
+                    rz_touches_by_player[p_n] = rz_touches_by_player.get(p_n, 0) + 1
+                elif r_play["play_type"] == "pass" and r_play.get("complete_pass") == 1 and pd.notna(r_play.get("receiver_player_name")):
+                    p_n = str(r_play["receiver_player_name"])
+                    rz_touches_by_player[p_n] = rz_touches_by_player.get(p_n, 0) + 1
+    except Exception:
+        pass
+
+    profiles = []
+    name_col = "player_display_name" if "player_display_name" in roster_df.columns else "player_name"
+    for p_name, p_group in roster_df.groupby(name_col):
+        carries = float(p_group["carries"].sum()) if "carries" in p_group.columns else 0.0
+        targets = float(p_group["targets"].sum()) if "targets" in p_group.columns else 0.0
+        pos = p_group["position"].iloc[-1] if "position" in p_group.columns else "Unknown"
+
+        rush_share = carries / tot_carries if tot_carries > 0 else 0.0
+        target_share = targets / tot_targets if tot_targets > 0 else 0.0
+
+        # Match RZ touches by name
+        rz_touches = 0
+        p_name_str = str(p_name)
+        parts = p_name_str.split()
+        last_name = parts[-1].lower() if parts else ""
+        first_init = parts[0][0].upper() if parts else ""
+        for rz_k, rz_v in rz_touches_by_player.items():
+            if rz_k.lower().endswith(last_name) and rz_k.startswith(first_init):
+                rz_touches += rz_v
+
+        rz_touch_share = rz_touches / rz_tot if rz_tot > 0 else 0.0
+        is_alpha = bool(target_share >= 0.22 or rush_share >= 0.45 or rz_touch_share >= 0.35)
+
+        profiles.append({
+            "player": p_name_str,
+            "player_display_name": p_name_str,
+            "team": team,
+            "pos": pos,
+            "carries": carries,
+            "targets": targets,
+            "rush_share": round(rush_share, 3),
+            "target_share": round(target_share, 3),
+            "rz_touches": rz_touches,
+            "rz_touch_share": round(rz_touch_share, 3),
+            "is_alpha": is_alpha,
+        })
+
+    profiles.sort(key=lambda x: (x["is_alpha"], x["target_share"] + x["rush_share"]), reverse=True)
+    return profiles
+

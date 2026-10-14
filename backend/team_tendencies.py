@@ -39,7 +39,11 @@ _CACHED_POS_MAP: Optional[Dict[str, str]] = None
 # -----------------------------------------------------------------------------
 # Data Loader Helpers
 # -----------------------------------------------------------------------------
-def load_clean_pbp(season: int = 2026, up_to_week: Optional[int] = None) -> pd.DataFrame:
+def load_clean_pbp(
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+    strict_less: bool = True,
+) -> pd.DataFrame:
     """Loads and caches clean regular season pass/run plays from local parquet or nflreadpy."""
     global _CACHED_PBP
     if season not in _CACHED_PBP:
@@ -64,11 +68,18 @@ def load_clean_pbp(season: int = 2026, up_to_week: Optional[int] = None) -> pd.D
 
     df = _CACHED_PBP[season]
     if up_to_week is not None and "week" in df.columns:
-        df = df[df["week"] <= up_to_week].copy()
+        if strict_less:
+            df = df[df["week"] < up_to_week].copy()
+        else:
+            df = df[df["week"] <= up_to_week].copy()
     return df
 
 
-def load_weekly_stats(season: Optional[int] = None, up_to_week: Optional[int] = None) -> pd.DataFrame:
+def load_weekly_stats(
+    season: Optional[int] = None,
+    up_to_week: Optional[int] = None,
+    strict_less: bool = True,
+) -> pd.DataFrame:
     """Loads player weekly box stats for archetype analysis."""
     global _CACHED_WEEKLY
     if _CACHED_WEEKLY is None:
@@ -81,7 +92,10 @@ def load_weekly_stats(season: Optional[int] = None, up_to_week: Optional[int] = 
     if season is not None and "season" in df.columns:
         df = df[df["season"] == season]
     if up_to_week is not None and "week" in df.columns:
-        df = df[df["week"] <= up_to_week]
+        if strict_less:
+            df = df[df["week"] < up_to_week]
+        else:
+            df = df[df["week"] <= up_to_week]
     return df
 
 
@@ -649,3 +663,20 @@ def compute_opponent_vulnerability_profile(
         "positions_allowed": pos_allowed,
         "player_archetypes_allowed": archetype_stats,
     }
+
+
+def get_team_tendencies(
+    team: str,
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+    pbp_df: Optional[pd.DataFrame] = None,
+) -> Dict[str, Any]:
+    """
+    Descriptive team tendency profile lookup enforcing point-in-time up_to_week cutoff.
+    """
+    return compute_team_tendency_profile(
+        team=team,
+        season=season,
+        up_to_week=up_to_week,
+        pbp_df=pbp_df,
+    )

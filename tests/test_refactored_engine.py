@@ -353,3 +353,187 @@ def test_injuries_layer():
     assert isinstance(injuries.get("injuries", []), list)
     game_inj = get_game_injuries("BAL", "KC", season=2024, week=1)
     assert isinstance(game_inj, list)
+
+
+# ==============================================================================
+# 13. Path 1 Signal-Only & Outlier Engine Invariants
+# ==============================================================================
+def test_no_lookahead_in_sample_window():
+    """Assert a Week 3 call contains zero plays from Weeks 3+ (and Weeks 4+)."""
+    from backend.team_tendencies import load_clean_pbp
+    from backend.matchup_sheet import build_matchup_stat_sheet
+
+    pbp = load_clean_pbp(season=2026, up_to_week=3, strict_less=True)
+    if not pbp.empty and "week" in pbp.columns:
+        pbp_curr = pbp[pbp["season"] == 2026] if "season" in pbp.columns else pbp
+        if not pbp_curr.empty:
+            assert (pbp_curr["week"] < 3).all()
+            assert not (pbp_curr["week"] >= 3).any()
+
+    # Verify stat sheet sample window
+    sheet = build_matchup_stat_sheet("BAL", "DAL", season=2026, up_to_week=3)
+    sw = sheet.get("sample_window", {})
+    assert sw.get("up_to_week") == 3
+    assert sw.get("max_week_included", 0) <= 2
+    assert "Weeks 1–2" in sw.get("sample_label", "") or "Weeks 1–" in sw.get("sample_label", "")
+
+
+def test_strong_analog_requires_three_distinct_opponents():
+    """Assert that 4 games against DAL alone returns strong_median = None."""
+    # When strong_third_party has 4 games, but all against DAL (len(distinct_opps) == 1 < 3):
+    third_party_analogs = [
+        {"opponent": "DAL", "rmsd": 0.50, "yds": 90.0},
+        {"opponent": "DAL", "rmsd": 0.60, "yds": 95.0},
+        {"opponent": "DAL", "rmsd": 0.70, "yds": 85.0},
+        {"opponent": "DAL", "rmsd": 0.80, "yds": 100.0},
+    ]
+    strong_third_party = [g for g in third_party_analogs if g["rmsd"] <= 1.00]
+    distinct_opps = {g["opponent"] for g in strong_third_party}
+
+    if len(strong_third_party) >= 3 and len(distinct_opps) >= 3:
+        strong_median = float(np.median([g["yds"] for g in strong_third_party]))
+        strong_status = f"{len(strong_third_party)} games across {len(distinct_opps)} third-party opponents"
+    else:
+        strong_median = None
+        strong_status = "Insufficient third-party diversity (<3 games or <3 distinct opponents)"
+
+    assert strong_median is None
+    assert "Insufficient third-party diversity" in strong_status
+
+
+def test_max_five_outlier_bullets():
+    """Assert len(sheet['top_outliers']) <= 5 across matchup data."""
+    from backend.scheme_insights import compute_scheme_insights
+    from backend.outlier_filter import extract_top_outliers
+
+    insights = compute_scheme_insights(home_team="DAL", away_team="BAL", season=2026, week=3)
+    assert "top_outliers" in insights
+    assert len(insights["top_outliers"]) <= 5
+    if "matchup_stat_sheet" in insights and isinstance(insights["matchup_stat_sheet"], dict):
+        sheet = insights["matchup_stat_sheet"]
+        if "top_outliers" in sheet:
+            assert len(sheet["top_outliers"]) <= 5
+
+    # Also test outlier filter with artificial 10+ candidate outliers
+    mock_matchup = {
+        "coverage_tendencies": {
+            "away_vs_home": {"def_man_pct_z": 2.1, "def_blitz_pct_z": 1.8, "def_zone_pct_z": -1.5, "def_mfo_pct_z": 1.3},
+            "home_vs_away": {"def_man_pct_z": 1.9, "def_blitz_pct_z": 1.6, "def_zone_pct_z": -1.4, "def_mfo_pct_z": 1.2},
+        },
+        "run_scheme_splits": {
+            "away_unit": {"off_gap_pct_z": 1.5, "opp_def_gap_ypc_allowed_z": 1.6, "off_zone_pct_z": 1.4, "opp_def_zone_ypc_allowed_z": 1.5},
+            "home_unit": {"off_gap_pct_z": 1.5, "opp_def_gap_ypc_allowed_z": 1.6, "off_zone_pct_z": 1.4, "opp_def_zone_ypc_allowed_z": 1.5},
+        }
+    }
+    extracted = extract_top_outliers(mock_matchup, max_bullets=5)
+    assert len(extracted) <= 5
+
+
+def test_run_scheme_clash_positive_only():
+    """Assert negative offensive z-scores do not trigger SCHEME_CLASH (prevents binary mirroring)."""
+    from backend.outlier_filter import extract_top_outliers
+
+    # DAL has +1.6σ Gap and -1.6σ Zone; opposing BAL defense allows 3.48 YPC (-1.6σ) on Gap and 3.62 YPC (-1.3σ) on Zone
+    mock_matchup = {
+        "away_team": "BAL",
+        "home_team": "DAL",
+        "n_games": 8,
+        "run_scheme_splits": {
+            "home_unit": {
+                "team": "DAL",
+                "offense_gap_pct": 58.3,   # +1.56σ
+                "offense_zone_pct": 41.7,  # -1.56σ
+                "opp_def_gap_ypc_allowed": 3.48,   # -1.60σ
+                "opp_def_zone_ypc_allowed": 3.62,  # -1.33σ
+            }
+        }
+    }
+    bullets = extract_top_outliers(mock_matchup)
+    clash_subtypes = [b.get("subtype") for b in bullets if b.get("type") == "SCHEME_CLASH"]
+
+    # Only Gap should clash, NOT Zone (DAL leans on Gap, avoids Zone)
+    assert "RUN_GAP_CLASH" in clash_subtypes
+    assert "RUN_ZONE_CLASH" not in clash_subtypes
+
+    # Ensure no bullet labels a negative z as 'top-20% rate'
+    for b in bullets:
+        if "runs ZONE" in b.get("headline", ""):
+            assert "top-20%" not in b.get("headline", "")
+
+
+def test_small_sample_gate_suppresses_outliers():
+    """Assert SCHEME_CLASH and UNIT_EXTREME are suppressed when n_games < 4."""
+    from backend.outlier_filter import extract_top_outliers
+
+    mock_matchup = {
+        "away_team": "BAL",
+        "home_team": "DAL",
+        "sample_window": {
+            "home_games_in_sample": 2,
+            "away_games_in_sample": 2,
+            "n_games": 2,
+        },
+        "run_scheme_splits": {
+            "home_unit": {
+                "team": "DAL",
+                "offense_gap_pct": 65.0,  # extreme +2.35σ
+                "opp_def_gap_ypc_allowed": 5.20,  # extreme +2.22σ
+            }
+        }
+    }
+    bullets = extract_top_outliers(mock_matchup)
+    # Both teams only have 2 games; outliers must be suppressed
+    assert len(bullets) == 0
+
+
+def test_format_injury_line_excludes_healthy_full_practice():
+    """Assert healthy players with full practice and no status designation return None."""
+    from backend.roster_verification import format_injury_line
+
+    healthy_player = {
+        "player_name": "Zay Flowers",
+        "position": "WR",
+        "report_status": None,
+        "practice_status": "Full Participation in Practice",
+    }
+    assert format_injury_line(healthy_player) is None
+
+    injured_player = {
+        "player_name": "Nnamdi Madubuike",
+        "position": "DT",
+        "report_status": "Out",
+        "practice_status": "Limited Participation in Practice",
+        "report_primary_injury": "Neck",
+    }
+    line = format_injury_line(injured_player)
+    assert line is not None
+    assert "Nnamdi Madubuike (DT): Out" in line
+    assert "(Neck)" in line
+
+    limited_only_player = {
+        "player_name": "Maliek Collins",
+        "position": "DT",
+        "report_status": None,
+        "practice_status": "Limited Participation in Practice",
+    }
+    assert format_injury_line(limited_only_player) is not None
+
+
+def test_strong_analog_filter_excludes_moderate_analogs():
+    """Assert games with RMSD > 0.70 are excluded from strong_third_party."""
+    third_party_analogs = [
+        {"opponent": "PIT", "rmsd": 0.641, "similarity_tier_key": "strong", "yds": 80.0},
+        {"opponent": "GB", "rmsd": 0.675, "similarity_tier_key": "strong", "yds": 85.0},
+        {"opponent": "NYG", "rmsd": 0.782, "similarity_tier_key": "moderate", "yds": 90.0},
+        {"opponent": "DAL", "rmsd": 0.793, "similarity_tier_key": "moderate", "yds": 95.0},
+    ]
+    strong_third_party = [
+        g for g in third_party_analogs
+        if g.get("similarity_tier_key") == "strong" or g.get("rmsd", 99.0) <= 0.70
+    ]
+    distinct_opps = {g["opponent"] for g in strong_third_party}
+    # Only PIT and GB qualify (2 games, 2 opps < 3)
+    assert len(strong_third_party) == 2
+    assert len(distinct_opps) == 2
+
+

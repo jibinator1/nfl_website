@@ -177,10 +177,30 @@ def build_matchup_stat_sheet(
         "note": "Injuries displayed as reported facts (status, practice participation). No rating adjustments applied.",
     }
 
+    pbp_cur = load_clean_pbp(season=season, up_to_week=up_to_week)
+    if not pbp_cur.empty and "week" in pbp_cur.columns and pbp_cur["week"].notna().any():
+        max_wk = int(pbp_cur["week"].max())
+        n_gm = int(pbp_cur[pbp_cur["posteam"].isin([away_team, home_team])]["game_id"].nunique()) // 2
+        sample_label = f"Sample Window: {season} Weeks 1–{max_wk} (n={n_gm} games)"
+    else:
+        max_wk = 0
+        n_gm = 0
+        sample_label = f"Sample Window: {season} (n=0 games)"
+
+    sample_window_data = {
+        "sample_label": sample_label,
+        "up_to_week": up_to_week,
+        "max_week_included": max_wk,
+        "n_games": n_gm,
+        "label": sample_label,
+    }
+
     return {
         "matchup": f"{away_team} @ {home_team}",
         "season": season,
         "up_to_week": up_to_week,
+        "sample_window": sample_window_data,
+        "sample_label": sample_label,
         "report_type": "Descriptive Team Tendency & Vulnerability Stat Sheet",
         "section_1_away_offense_tendencies": away_off_tendencies,
         "section_2_home_defense_vulnerabilities": home_def_vulnerabilities,
@@ -196,3 +216,19 @@ def build_matchup_stat_sheet(
         "section_7_key_personnel": personnel_facts,
         "disclaimer": "This stat sheet presents purely descriptive and comparative historical statistics. It does not provide forecasts or wagering recommendations.",
     }
+
+
+def build_matchup_sheet(
+    away_team: str,
+    home_team: str,
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+) -> Dict[str, Any]:
+    """Alias for build_matchup_stat_sheet."""
+    return build_matchup_stat_sheet(
+        away_team=away_team,
+        home_team=home_team,
+        season=season,
+        up_to_week=up_to_week,
+    )
+
