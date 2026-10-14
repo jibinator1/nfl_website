@@ -12,11 +12,11 @@ Includes:
   - Game-level vs. Distinct-Opponent Deduplication:
       * Reports both game count (n_games) and distinct opponent franchise count (n_distinct_opponents)
       * Calculates both game-level medians and deduped opponent-level medians
-      * Requires n >= 3 games AND n >= 3 distinct opponents before summarizing strong analogs
+      * Requires n >= 3 games AND n >= 2 distinct opponents before summarizing strong analogs
   - RMSD-calibrated similarity tiers (dimension-invariant):
-      * Strong (RMSD <= 0.85σ)
-      * Moderate (0.85–1.15σ)
-      * Loose (> 1.15σ)
+      * Strong (RMSD <= 0.70σ)
+      * Moderate (0.70–1.10σ)
+      * Loose (> 1.10σ)
   - Exclusion of direct head-to-head meetings from third-party analog sample size
   - Side-by-side Dual Archetype Split:
       * Ground-heavy vs. pass-heavy performance vs. season baseline
@@ -304,20 +304,15 @@ def find_similar_opponent_games(
         epa_per_play = float(g["epa"].mean())
         success_rate = float(g["success"].mean())
 
-        # QB rushing and scramble yards conceded
-        qb_runs = g[(g["play_type"] == "run") & ((g["_rush_pos"] == "QB") | (g.get("qb_scramble", 0) == 1))]
-        qb_rush_yds = float(qb_runs["yards_gained"].sum()) if not qb_runs.empty else 0.0
-        qb_carries = int(len(qb_runs))
-
         # RMSD-calibrated similarity tier classification
-        if rmsd <= 0.85:
-            sim_tier = "Strong (<= 0.85σ)"
+        if rmsd <= 1.00:
+            sim_tier = "Strong (<= 1.00σ)"
             sim_tier_key = "strong"
-        elif rmsd <= 1.15:
-            sim_tier = "Moderate (0.85–1.15σ)"
+        elif rmsd <= 1.30:
+            sim_tier = "Moderate (1.00–1.30σ)"
             sim_tier_key = "moderate"
         else:
-            sim_tier = "Loose (1.15–1.50σ)"
+            sim_tier = "Loose (1.30–1.50σ)"
             sim_tier_key = "loose"
 
         is_direct_h2h = bool(opp == offense_team)
@@ -336,14 +331,11 @@ def find_similar_opponent_games(
             "match_note": match_note,
             "rb_carries_allowed": rb_carries,
             "rb_rush_yards_allowed": round(rb_rush_yds, 1),
-            "yds": round(rb_rush_yds, 1),
             "rb_ypc_allowed": rb_ypc,
             "rb_rush_epa_allowed": rb_rush_epa,
             "rb_rush_success_rate_allowed": rb_success_rate,
             "rb_stuff_rate_allowed": rb_stuff_rate,
             "rb_explosive_rate_allowed": rb_explosive_rate,
-            "qb_carries_allowed": qb_carries,
-            "qb_rush_yards_allowed": round(qb_rush_yds, 1),
             "pass_attempts_allowed": pass_att,
             "pass_yards_allowed": round(tot_pass_yds, 1),
             "pass_ypa_allowed": pass_ypa,
@@ -389,38 +381,6 @@ def find_similar_opponent_games(
     closest_distance = float(third_party_all["distance"].min()) if not third_party_all.empty else float(all_games_df["distance"].min())
 
     ceiling_df = all_games_df[all_games_df["rmsd"] <= 1.50].sort_values("distance").copy()
-    qualifying_records = ceiling_df.to_dict(orient="records")
-    for r in qualifying_records:
-        r["yds"] = r.get("rb_rush_yards_allowed", 0.0)
-
-    # 1. Split the payload lists: third_party_analogs and direct_h2h_games
-    third_party_analogs = [g for g in qualifying_records if g["opponent"] != offense_team]
-    direct_h2h_games = [g for g in qualifying_records if g["opponent"] == offense_team]
-    all_h2h = [g for g in all_games_df.to_dict(orient="records") if g.get("is_direct_h2h")]
-    for r in all_h2h:
-        r["yds"] = r.get("rb_rush_yards_allowed", 0.0)
-    if not direct_h2h_games and all_h2h:
-        direct_h2h_games = all_h2h
-
-    has_direct_h2h = len(direct_h2h_games) > 0
-
-    # 2. Raise Distinct Opponent Floor to 3 for strong analogs (RMSD <= 0.85σ / Strong tier, Top 8 slice)
-    strong_candidates = [
-        g for g in third_party_analogs
-        if g.get("similarity_tier_key") == "strong" or g.get("similarity_tier", "").startswith("Strong") or g.get("rmsd", 99.0) <= 0.85
-    ]
-    strong_candidates.sort(key=lambda g: g.get("rmsd", 99.0))
-    strong_third_party = strong_candidates[:8]  # Never average across 21 games; take top 8 closest clones
-    distinct_opps = {g["opponent"] for g in strong_third_party}
-
-    if len(strong_third_party) >= 3 and len(distinct_opps) >= 3:
-        strong_median = round(float(np.median([g["yds"] for g in strong_third_party])), 1)
-        strong_status = f"{len(strong_third_party)} games across {len(distinct_opps)} third-party opponents"
-        can_summarize_strong = True
-    else:
-        strong_median = None
-        strong_status = "Insufficient third-party diversity (<3 games or <3 distinct opponents)"
-        can_summarize_strong = False
 
     # If fewer than 3 games remain under the ceiling, do not render a match table at all
     if len(ceiling_df) < 3:
@@ -433,17 +393,21 @@ def find_similar_opponent_games(
         sorted_df = ceiling_df.head(n_similar).copy()
         sorted_df["similarity_rank"] = range(1, len(sorted_df) + 1)
 
-    strong_df = sorted_df[sorted_df["rmsd"] <= 0.85].copy() if not sorted_df.empty else pd.DataFrame(columns=all_games_df.columns)
-    strong_analog_df = pd.DataFrame(strong_third_party) if can_summarize_strong else pd.DataFrame(columns=all_games_df.columns)
+    # Separate Strong Analogs vs. Direct H2H
+    strong_df = sorted_df[sorted_df["rmsd"] <= 1.00].copy() if not sorted_df.empty else pd.DataFrame(columns=all_games_df.columns)
+    strong_analog_df = strong_df[~strong_df["is_direct_h2h"]].copy() if not strong_df.empty else pd.DataFrame(columns=all_games_df.columns)
 
-    n_strong = len(strong_third_party)
-    n_strong_analog = len(strong_third_party)
-    n_strong_analog_games = len(strong_third_party)
-    n_distinct_strong_analogs = len(distinct_opps)
+    n_strong = len(strong_df)
+    n_strong_analog = len(strong_analog_df)
+    n_strong_analog_games = len(strong_analog_df)
+    n_distinct_strong_analogs = int(strong_analog_df["opponent"].nunique()) if not strong_analog_df.empty else 0
 
     n_total = len(sorted_df)
     n_total_games = len(sorted_df)
     n_distinct_total_opponents = int(sorted_df["opponent"].nunique()) if not sorted_df.empty else 0
+
+    direct_h2h_games = [g for g in all_games_df.to_dict(orient="records") if g["is_direct_h2h"]]
+    has_direct_h2h = len(direct_h2h_games) > 0
 
     def _calc_summary(df: pd.DataFrame) -> Dict[str, Any]:
         if df.empty:
@@ -515,11 +479,6 @@ def find_similar_opponent_games(
                 "median": round(float(df["te_rec_yards_allowed"].median()), 1),
                 "min": round(float(df["te_rec_yards_allowed"].min()), 1),
                 "max": round(float(df["te_rec_yards_allowed"].max()), 1),
-            },
-            "qb_rush_yards": {
-                "median": round(float(df["qb_rush_yards_allowed"].median()), 1) if "qb_rush_yards_allowed" in df else 0.0,
-                "min": round(float(df["qb_rush_yards_allowed"].min()), 1) if "qb_rush_yards_allowed" in df else 0.0,
-                "max": round(float(df["qb_rush_yards_allowed"].max()), 1) if "qb_rush_yards_allowed" in df else 0.0,
             },
             "sacks": {
                 "median": round(float(df["sacks"].median()), 1),
@@ -616,8 +575,8 @@ def find_similar_opponent_games(
     all_summary = _calc_summary(sorted_df)
     all_deduped_summary = _calc_deduped_summary(sorted_df)
 
-    # Require BOTH n_strong_analog_games >= 3 AND n_distinct_strong_analogs >= 3 to summarize strong
-    can_summarize_strong = bool(n_strong_analog_games >= 3 and n_distinct_strong_analogs >= 3)
+    # Require BOTH n_strong_analog_games >= 3 AND n_distinct_strong_analogs >= 2 to summarize strong
+    can_summarize_strong = bool(n_strong_analog_games >= 3 and n_distinct_strong_analogs >= 2)
     strong_summary = _calc_summary(strong_analog_df) if can_summarize_strong else None
     strong_deduped_summary = _calc_deduped_summary(strong_analog_df) if can_summarize_strong else None
 
@@ -625,30 +584,29 @@ def find_similar_opponent_games(
     if n_strong_analog_games == 0:
         if has_direct_h2h:
             sample_warning = (
-                f"No third-party opponent in {defense_team}'s history matched {offense_team}'s profile as a strong analog (RMSD <= 0.85σ). "
+                f"No third-party opponent in {defense_team}'s history matched {offense_team}'s profile as a strong analog (RMSD <= 1.00σ). "
                 f"The only close match is the actual H2H meeting ({direct_h2h_games[0]['season']} Wk {direct_h2h_games[0]['week']} vs {offense_team}). "
                 f"The similarity comparison for this matchup is therefore circular and should not be used to draw general conclusions about {defense_team}'s tendencies against {offense_team}-like offenses."
             )
         else:
             sample_warning = (
-                f"No opponent in {defense_team}'s history matched {offense_team}'s profile as a strong analog (RMSD <= 0.85σ). "
+                f"No opponent in {defense_team}'s history matched {offense_team}'s profile as a strong analog (RMSD <= 1.00σ). "
                 f"All {n_total_games} games evaluated are moderate or loose matches under the 1.50σ ceiling."
             )
     elif n_strong_analog_games < 3:
         sample_warning = (
-            f"Only {n_strong_analog_games} third-party games in {defense_team}'s history matched {offense_team}'s profile as a strong analog "
-            f"({n_distinct_strong_analogs} distinct opponents, RMSD <= 0.85σ, excluding direct H2H meetings). Sample is too small (need >= 3 games) for strong-only isolate. Showing median across all qualifying matches under 1.50σ ceiling."
+            f"Only {n_strong_analog_games} third-party game in {defense_team}'s history matched {offense_team}'s profile as a strong analog "
+            f"({n_distinct_strong_analogs} distinct opponent, RMSD <= 1.00σ, excluding direct H2H meetings). Sample is too small (need >= 3 games) for strong-only isolate. Showing median across all qualifying matches under 1.50σ ceiling."
         )
-    elif n_distinct_strong_analogs < 3:
-        opp_str = ", ".join(sorted(distinct_opps)) if distinct_opps else "none"
+    elif n_distinct_strong_analogs < 2:
         sample_warning = (
-            f"While {n_strong_analog_games} games matched as strong analogs, they were across only {n_distinct_strong_analogs} opponent(s) ({opp_str}). "
-            f"There are not enough distinct opponent franchises (need >= 3) to summarize as a general stylistic analog."
+            f"While {n_strong_analog_games} games matched as strong analogs, all were against a single opponent ({strong_analog_df['opponent'].iloc[0]}). "
+            f"There are not enough distinct opponent franchises (need >= 2) to summarize as a general stylistic analog."
         )
     else:
         sample_warning = (
             f"{n_strong_analog_games} third-party games across {n_distinct_strong_analogs} distinct opponents matched {offense_team}'s profile as strong analogs "
-            f"(RMSD <= 0.85σ, excluding direct H2H meetings)."
+            f"(RMSD <= 1.00σ, excluding direct H2H meetings)."
         )
 
     h2h_disclaimer = (
@@ -658,7 +616,7 @@ def find_similar_opponent_games(
     )
 
     # Descriptive narrative reporting
-    if not can_summarize_strong or not strong_summary or "rb_rush_yards" not in strong_summary:
+    if not can_summarize_strong:
         if all_summary and "rb_rush_yards" in all_summary:
             all_rush_med = f"{all_summary['rb_rush_yards']['median']:.1f}"
             all_pass_med = f"{all_summary['pass_yards']['median']:.1f}"
@@ -667,24 +625,19 @@ def find_similar_opponent_games(
             all_pass_med = "N/A"
         descriptive_narrative = (
             f"{defense_team} faced {len(sorted_df)} opponents evaluated against {offense_team}'s profile under the 1.50σ ceiling, "
-            f"with {n_strong_analog_games} third-party games across {n_distinct_strong_analogs} distinct opponents qualifying as strong analogs (RMSD <= 0.85σ, excluding direct H2H). "
+            f"with {n_strong_analog_games} third-party games across {n_distinct_strong_analogs} distinct opponents qualifying as strong analogs (RMSD <= 1.00σ, excluding direct H2H). "
             f"Across all {len(sorted_df)} evaluated matches ({n_distinct_total_opponents} distinct opponents), {defense_team} allowed a game median of "
             f"{all_rush_med} rushing yards to RBs and {all_pass_med} passing yards."
         )
     else:
-        rush_med = strong_summary['rb_rush_yards']['median']
-        ypc_med = strong_summary.get('rb_ypc', {}).get('median', 0.0)
-        pass_med = strong_summary.get('pass_yards', {}).get('median', 0.0)
-        dedup_rush = strong_deduped_summary.get('rb_rush_yards', {}).get('median', rush_med) if strong_deduped_summary else rush_med
-
         if n_strong_analog_games == n_distinct_strong_analogs:
-            opp_note = f"In those {n_strong_analog_games} games ({n_distinct_strong_analogs} distinct opponents), {defense_team} allowed a median of {rush_med:.1f} rushing yards to RBs ({ypc_med:.2f} YPC)"
+            opp_note = f"In those {n_strong_analog_games} games ({n_distinct_strong_analogs} distinct opponents), {defense_team} allowed a median of {strong_summary['rb_rush_yards']['median']:.1f} rushing yards to RBs ({strong_summary['rb_ypc']['median']:.2f} YPC)"
         else:
-            opp_note = f"In those {n_strong_analog_games} games across {n_distinct_strong_analogs} distinct opponents, {defense_team} allowed a game-level median of {rush_med:.1f} rushing yards to RBs (deduped opponent median: {dedup_rush:.1f}, {ypc_med:.2f} YPC)"
+            opp_note = f"In those {n_strong_analog_games} games across {n_distinct_strong_analogs} distinct opponents, {defense_team} allowed a game-level median of {strong_summary['rb_rush_yards']['median']:.1f} rushing yards to RBs (deduped opponent median: {strong_deduped_summary['rb_rush_yards']['median']:.1f}, {strong_summary['rb_ypc']['median']:.2f} YPC)"
 
         descriptive_narrative = (
             f"{defense_team} faced {len(sorted_df)} opponents with {n_strong_analog_games} strong third-party games across {n_distinct_strong_analogs} distinct opponents matching {offense_team}'s profile "
-            f"(RMSD <= 0.85σ, excluding direct H2H). {opp_note} and {pass_med:.1f} passing yards. "
+            f"(RMSD <= 1.00σ, excluding direct H2H). {opp_note} and {strong_summary['pass_yards']['median']:.1f} passing yards. "
             f"{defense_team}'s median across all {overall_medians['total_games_evaluated']} games evaluated is "
             f"{overall_medians['rb_rush_yards']:.1f} rushing yards and {overall_medians['pass_yards']:.1f} passing yards."
         )
@@ -701,10 +654,6 @@ def find_similar_opponent_games(
         "features_matched": features,
         "render_match_table": render_match_table,
         "no_analogs_message": no_analogs_message,
-        "third_party_analogs": third_party_analogs,
-        "direct_h2h_games": direct_h2h_games,
-        "strong_analogs_median": strong_median,
-        "strong_status": strong_status,
         "n_strong": n_strong,
         "n_strong_analog": n_strong_analog,
         "n_strong_analog_games": n_strong_analog_games,
@@ -712,7 +661,7 @@ def find_similar_opponent_games(
         "n_total": n_total,
         "n_total_games": n_total_games,
         "n_distinct_total_opponents": n_distinct_total_opponents,
-        "is_full_sample": bool(n_strong_analog_games == n_total_games and n_strong_analog_games > 0),
+        "is_full_sample": bool(n_strong_analog_games == n_total_games),
         "can_summarize_strong": can_summarize_strong,
         "sample_warning": sample_warning,
         "h2h_disclaimer": h2h_disclaimer,
@@ -723,19 +672,9 @@ def find_similar_opponent_games(
         "strong_summary": strong_summary,
         "strong_deduped_summary": strong_deduped_summary,
         "median_rb_rush_yards_all": all_summary.get("rb_rush_yards", {}).get("median") if all_summary else None,
-        "median_rb_rush_yards_strong": strong_median,
+        "median_rb_rush_yards_strong": strong_summary.get("rb_rush_yards", {}).get("median") if strong_summary else None,
         "median_pass_yards_all": all_summary.get("pass_yards", {}).get("median") if all_summary else None,
         "median_pass_yards_strong": strong_summary.get("pass_yards", {}).get("median") if strong_summary else None,
-        "median_wr_rec_yards_strong": strong_summary.get("wr_rec_yards", {}).get("median") if strong_summary else None,
-        "median_te_rec_yards_strong": strong_summary.get("te_rec_yards", {}).get("median") if strong_summary else None,
-        "median_qb_rush_yards_strong": strong_summary.get("qb_rush_yards", {}).get("median") if strong_summary else None,
-        "strong_production_allowed": {
-            "rb_rush_yards": strong_median,
-            "pass_yards": strong_summary.get("pass_yards", {}).get("median") if strong_summary else None,
-            "wr_rec_yards": strong_summary.get("wr_rec_yards", {}).get("median") if strong_summary else None,
-            "te_rec_yards": strong_summary.get("te_rec_yards", {}).get("median") if strong_summary else None,
-            "qb_rush_yards": strong_summary.get("qb_rush_yards", {}).get("median") if strong_summary else None,
-        } if can_summarize_strong else None,
         "overall_defense_baseline": overall_medians,
         "descriptive_narrative": descriptive_narrative,
         "disclaimer": "Historical comparison based on past game logs. Shows past defensive results against similar offensive profiles.",
@@ -794,44 +733,44 @@ def run_dual_archetype_lookup(
         label="Aerial & Target-Distribution Match (Pass-Funnel)",
     )
 
-    ground_ok = bool(run_split.get("can_summarize_strong", False) and run_split.get("strong_analogs_median") is not None)
-    aerial_ok = bool(pass_split.get("can_summarize_strong", False) and pass_split.get("strong_analogs_median") is not None)
+    ground_ok = run_split.get("can_summarize_strong", False)
+    aerial_ok = pass_split.get("can_summarize_strong", False)
 
     if ground_ok and aerial_ok:
         can_conclude = True
-        can_conclude_status = "FULL"
+        can_conclude_status = "full"
         conclusion_verdict = (
             f"Full conclusion supported: {defense_team} has sufficient third-party history against both "
-            f"ground-heavy offenses ({run_split.get('strong_status')}) "
-            f"and pass-heavy offenses ({pass_split.get('strong_status')})."
+            f"ground-heavy offenses ({run_split['n_strong_analog_games']} games across {run_split['n_distinct_strong_analogs']} distinct opponents) "
+            f"and pass-heavy offenses ({pass_split['n_strong_analog_games']} games across {pass_split['n_distinct_strong_analogs']} distinct opponents)."
         )
     elif ground_ok and not aerial_ok:
         can_conclude = False
-        can_conclude_status = "PARTIAL_GROUND"
+        can_conclude_status = "partial_ground"
         conclusion_verdict = (
             f"Partial conclusion supported: {defense_team} has sufficient third-party history against ground-heavy offenses "
-            f"({run_split.get('strong_status')}; "
-            f"median {run_split['strong_analogs_median']:.1f} RB rush yds vs baseline {run_split['overall_defense_baseline']['rb_rush_yards']:.1f}), "
-            f"but insufficient pass-heavy analogs ({pass_split.get('strong_status', 'insufficient sample')}). "
+            f"({run_split['n_strong_analog_games']} games across {run_split['n_distinct_strong_analogs']} distinct opponents; "
+            f"median {run_split['strong_summary']['rb_rush_yards']['median']:.1f} RB rush yds vs baseline {run_split['overall_defense_baseline']['rb_rush_yards']:.1f}), "
+            f"but insufficient pass-heavy analogs ({pass_split.get('n_strong_analog_games', 0)} games, {pass_split.get('n_distinct_strong_analogs', 0)} opponents). "
             f"Ground tendency can be summarized, but aerial contrast cannot be concluded."
         )
     elif aerial_ok and not ground_ok:
         can_conclude = False
-        can_conclude_status = "PARTIAL_AERIAL"
+        can_conclude_status = "partial_aerial"
         conclusion_verdict = (
             f"Partial conclusion supported: {defense_team} has sufficient third-party history against pass-heavy offenses "
-            f"({pass_split.get('strong_status')}; "
-            f"median {pass_split.get('median_pass_yards_strong', 0.0):.1f} pass yds vs baseline {pass_split['overall_defense_baseline']['pass_yards']:.1f}), "
-            f"but insufficient ground-heavy analogs ({run_split.get('strong_status', 'insufficient sample')}). "
+            f"({pass_split['n_strong_analog_games']} games across {pass_split['n_distinct_strong_analogs']} distinct opponents; "
+            f"median {pass_split['strong_summary']['pass_yards']['median']:.1f} pass yds vs baseline {pass_split['overall_defense_baseline']['pass_yards']:.1f}), "
+            f"but insufficient ground-heavy analogs ({run_split.get('n_strong_analog_games', 0)} games, {run_split.get('n_distinct_strong_analogs', 0)} opponents). "
             f"Aerial tendency can be summarized, but ground contrast cannot be concluded."
         )
     else:
         can_conclude = False
-        can_conclude_status = "CANNOT_CONCLUDE"
+        can_conclude_status = "none"
         conclusion_verdict = (
-            f"Cannot conclude: {defense_team} has insufficient third-party diversity matching {offense_team}'s profile "
-            f"(Ground: {run_split.get('strong_status', 'N/A')}; "
-            f"Aerial: {pass_split.get('strong_status', 'N/A')}). "
+            f"Cannot conclude: {defense_team} has faced fewer than 3 third-party opponents matching {offense_team}'s profile "
+            f"(Ground: {run_split.get('n_strong_analog_games', 0)} games across {run_split.get('n_distinct_strong_analogs', 0)} opponents; "
+            f"Aerial: {pass_split.get('n_strong_analog_games', 0)} games across {pass_split.get('n_distinct_strong_analogs', 0)} opponents). "
             f"There is not enough independent data to draw reliable conclusions about {defense_team}'s performance against ground-heavy vs. pass-heavy offenses."
         )
 

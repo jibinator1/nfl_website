@@ -641,19 +641,35 @@
                     </div>
                 </div>
 
-                <!-- 3 Sections Navigation Quick-Jumps -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-[#21262d]">
-                    <a href="#block-playstyle" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="shield" class="w-3.5 h-3.5 text-sky-400 shrink-0"></i>
-                        <span class="truncate">1. Playstyle Matchup</span>
+                <!-- 7 Sections Navigation Quick-Jumps -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 pt-1 border-t border-[#21262d]">
+                    <a href="#pillar-coverage" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">1. Coverage</span>
                     </a>
-                    <a href="#block-archetypes" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
-                        <span class="truncate">2. Target Archetypes</span>
+                    <a href="#pillar-run" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="footprints" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">2. Run Splits</span>
                     </a>
-                    <a href="#block-analogs" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="git-compare" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
-                        <span class="truncate">3. Stylistic Analogs</span>
+                    <a href="#pillar-alignment" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="target" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">3. Targets</span>
+                    </a>
+                    <a href="#pillar-breakouts" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">4. Personnel</span>
+                    </a>
+                    <a href="#pillar-tempo" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">5. Tempo</span>
+                    </a>
+                    <a href="#pillar-matchup-sheet" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="clipboard-list" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">6. Stat Sheet</span>
+                    </a>
+                    <a href="#pillar-summary" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                        <span class="truncate">7. Wrap Up</span>
                     </a>
                 </div>
             </div>
@@ -4174,467 +4190,720 @@
             `;
         }
 
-        function formatInjuryLine(playerRow) {
-            if (!playerRow) return null;
-            let status = String(playerRow.report_status || playerRow.status || "").trim();
-            let practice = String(playerRow.practice_status || playerRow.practice || "").trim();
-            let injury = String(playerRow.report_primary_injury || playerRow.primary_injury || playerRow.injury || "").trim();
-
-            status = (status === "None" || status === "null" || status === "nan") ? "" : status;
-            practice = (practice === "None" || practice === "null" || practice === "nan") ? "" : practice;
-            injury = (injury === "None" || injury === "null" || injury === "nan" || injury === "Undisclosed") ? "" : injury;
-
-            // Exclude healthy full-practice players
-            if (!status && (practice === "Full Participation in Practice" || practice === "Full" || practice === "" || practice.toLowerCase().includes("full participation"))) {
-                return null;
-            }
-
-            const details = [];
-            if (status) {
-                details.push(status);
-            }
-            if (practice && status !== "Out" && status !== "Doubtful" && status !== "IR") {
-                let shortPrac = practice.replace(/ Participation in Practice/gi, "")
-                                        .replace(/ In Practice/gi, "")
-                                        .replace(/ in Practice/gi, "")
-                                        .trim();
-                details.push(shortPrac);
-            }
-
-            let detailStr = details.join(", ");
-            if (injury) {
-                detailStr = detailStr ? `${detailStr} (${injury})` : `(${injury})`;
-            }
-
-            if (!detailStr) {
-                return null;
-            }
-
-            const name = playerRow.player_name || playerRow.player || playerRow.name || "Unknown Player";
-            const pos = playerRow.position || playerRow.pos || "N/A";
-            const team = playerRow.team || playerRow.team_abbr || "";
-            const teamPrefix = team ? `${team} - ` : "";
-            return `${name} (${teamPrefix}${pos}): ${detailStr}`;
-        }
-
-        function renderSchemeInsights(d) {
+function renderSchemeInsights(d) {
             const container = document.getElementById('insights-view-container');
             if (!container) return;
 
-            const sw = d.sample_window || {};
-            let sampleWindowLabel = '';
-            if (typeof sw === 'object' && sw !== null) {
-                sampleWindowLabel = sw.sample_label || sw.label || `Sample Window: ${d.season || 2026} Weeks 1–${Math.max(1, (d.week || 1) - 1)}`;
-            } else if (typeof sw === 'string') {
-                sampleWindowLabel = sw;
-            } else {
-                sampleWindowLabel = `Sample Window: ${d.season || 2026} Weeks 1–${Math.max(1, (d.week || 1) - 1)}`;
-            }
+            const wrapUp = buildSchemeWrapUp(d);
+            const sampleWindow = d.sample_window || {};
 
-            const sheet = d.matchup_stat_sheet || {};
-            const pf = d.playstyle_funnel || sheet.playstyle_funnel || {};
-            const s1 = d.section_1_playstyle_matchup || pf.section_1_playstyle_matchup || sheet.section_1_playstyle_matchup || {};
-            const s2 = d.section_2_archetypes_to_target || pf.section_2_archetypes_to_target || sheet.section_2_archetypes_to_target || {};
-            const s3 = d.section_3_historical_analogs || pf.section_3_historical_analogs || sheet.section_3_historical_analogs || sheet.section_5_similar_opponents || {};
+            const aCov = d.coverage_tendencies?.away_vs_home || {};
+            const hCov = d.coverage_tendencies?.home_vs_away || {};
+            const runSplits = d.run_scheme_splits || {};
+            const aRun = runSplits.away_unit || {};
+            const hRun = runSplits.home_unit || {};
+            const tgts = d.positional_target_rates || {};
+            const aDist = tgts.away_distribution || {};
+            const hDist = tgts.home_distribution || {};
+            const aPlayerTgts = tgts.away_player_targets || [];
+            const hPlayerTgts = tgts.home_player_targets || [];
+            const breakouts = d.efficiency_breakouts || [];
+            const flow = d.game_flow_tempo || {};
+            const aTempo = flow.away_tempo || {};
+            const hTempo = flow.home_tempo || {};
 
-            const awayOffVsHomeDef = s1.away_off_vs_home_def || {};
-            const homeOffVsAwayDef = s1.home_off_vs_away_def || {};
-
-            const beneficiaries = s2.beneficiary_players || [];
-            let alphaPlayers = s2.concentrated_alpha_usage || d.concentrated_player_usage || sheet.concentrated_player_usage || [];
-            if (!alphaPlayers || alphaPlayers.length === 0) {
-                const profiles = d.player_usage_profiles || [];
-                alphaPlayers = profiles.filter(p => {
-                    const tShare = (p.target_share || 0);
-                    const rShare = (p.rush_share || 0);
-                    const rzShare = (p.rz_touch_share || 0);
-                    return tShare >= 0.22 || rShare >= 0.45 || rzShare >= 0.35 || p.is_alpha;
-                });
-            }
-
-            const hSim = s3.home_defense_vs_similar_away || s3.home_defense_vs_opponents_like_away || {};
-            const aSim = s3.away_defense_vs_similar_home || s3.away_defense_vs_opponents_like_home || {};
-
-            const analogUnits = [
-                { defTeam: d.home_team, oppTeam: d.away_team, sim: hSim },
-                { defTeam: d.away_team, oppTeam: d.home_team, sim: aSim }
-            ];
-
-            const renderPlaystyleCard = (matchData, offTeam, defTeam) => {
-                const defFunnel = matchData.defense_funnel || {};
-                const offPlaystyle = matchData.offense_playstyle || {};
-                const funnels = matchData.funnel_insights || [];
-                const cov = defFunnel.coverage_shell || {};
-                const bleed = defFunnel.funnel_bleed || {};
-                const drop = offPlaystyle.dropback_profile || {};
-                const runId = offPlaystyle.run_identity || {};
-                const qb = offPlaystyle.qb_threat || {};
-
-                return `
-                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-4">
-                        <div class="flex items-center justify-between border-b border-[#21262d] pb-2.5">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-xs font-bold text-slate-100 font-mono tracking-tight">${offTeam} Offense vs. ${defTeam} Defense</span>
-                            </div>
-                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#161b22] text-sky-300 border border-[#21262d]">Schematic Matchup</span>
-                        </div>
-
-                        <!-- Defensive Shell & Funnel Profile -->
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-bold text-slate-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
-                                    <i data-lucide="shield" class="w-3.5 h-3.5 text-rose-400"></i>
-                                    <span>${defTeam} Defensive Shell &amp; Funnel Bleed</span>
-                                </span>
-                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950/40 text-rose-300 border border-rose-800/40">
-                                    ${cov.shell_archetype || (cov.mfo_pct >= 50 ? 'Two-High MFO' : 'Single-High MFC')}
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">Coverage Shell:</span>
-                                    <b class="text-slate-200">${cov.mfo_pct != null ? cov.mfo_pct.toFixed(0) : 50}% MFO • ${cov.zone_pct != null ? cov.zone_pct.toFixed(0) : 65}% Zone</b>
-                                </div>
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">Blitz / Pressure:</span>
-                                    <b class="text-slate-200">${cov.blitz_pct != null ? cov.blitz_pct.toFixed(0) : 25}% Blitz</b>
-                                </div>
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">Short &lt;10y Comp %:</span>
-                                    <b class="text-slate-200">${bleed.short_comp_pct != null ? bleed.short_comp_pct.toFixed(1) : 75}% (${bleed.short_target_share != null ? bleed.short_target_share.toFixed(0) : 60}% vol)</b>
-                                </div>
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">QB Rush Conceded:</span>
-                                    <b class="text-slate-200">${bleed.qb_rush_ypg_allowed != null ? bleed.qb_rush_ypg_allowed.toFixed(1) : 20} yds/g</b>
-                                </div>
-                            </div>
-                            <p class="text-[11px] text-slate-300 font-sans leading-relaxed bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                ${defFunnel.summary || `${defTeam} Defense operates primarily in zone coverage shells.`}
-                            </p>
-                        </div>
-
-                        <!-- Offensive Playstyle Profile -->
-                        <div class="space-y-2 pt-1 border-t border-[#21262d]">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-bold text-slate-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
-                                    <i data-lucide="zap" class="w-3.5 h-3.5 text-sky-400"></i>
-                                    <span>${offTeam} Offensive Playstyle Profile</span>
-                                </span>
-                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/40 text-sky-300 border border-sky-800/40">
-                                    ${runId.primary_run || 'Balanced'}
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">Run Split:</span>
-                                    <b class="text-slate-200">${runId.gap_pct != null ? runId.gap_pct.toFixed(1) : 45}% Gap / ${runId.zone_pct != null ? runId.zone_pct.toFixed(1) : 55}% Zone</b>
-                                </div>
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">Target Depths:</span>
-                                    <b class="text-slate-200">${drop.pass_short_under_10_pct != null ? drop.pass_short_under_10_pct.toFixed(0) : 60}% &lt;10y • ${drop.deep_shot_rate != null ? drop.deep_shot_rate.toFixed(0) : 15}% Deep</b>
-                                </div>
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">Formations &amp; Pace:</span>
-                                    <b class="text-slate-200">${drop.shotgun_pct != null ? drop.shotgun_pct.toFixed(0) : 70}% Gun • ${drop.neutral_pass_pct != null ? drop.neutral_pass_pct.toFixed(0) : 57}% Pass</b>
-                                </div>
-                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
-                                    <span class="text-slate-400 block text-[9.5px]">QB Rush Threat:</span>
-                                    <b class="text-slate-200">${qb.qb_name || 'QB'}: ${qb.rush_yds_per_game != null ? qb.rush_yds_per_game.toFixed(1) : 10} yds/g</b>
-                                </div>
-                            </div>
-                            <p class="text-[11px] text-slate-300 font-sans leading-relaxed bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                ${offPlaystyle.summary || `${offTeam} offense balances short passing with situational checks.`}
-                            </p>
-                        </div>
-
-                        <!-- What This Opens Up (Schematic Funnels) -->
-                        <div class="space-y-2 pt-1 border-t border-[#21262d]">
-                            <span class="text-[11px] font-bold text-amber-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
-                                <i data-lucide="compass" class="w-3.5 h-3.5 text-amber-400"></i>
-                                <span>What This Opens Up (Schematic Funnels)</span>
-                            </span>
-                            ${funnels.length > 0 ? `
-                                <div class="space-y-2">
-                                    ${funnels.map(fn => `
-                                        <div class="bg-[#161b22] rounded-lg border border-[#21262d] p-3 space-y-1">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-xs font-bold text-amber-300 font-sans">${fn.name}</span>
-                                                <span class="text-[9.5px] font-mono px-2 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-800/40">${fn.archetype_title || 'Target Role'}</span>
-                                            </div>
-                                            <p class="text-xs text-slate-200 font-sans leading-relaxed">
-                                                ${fn.takeaway}
-                                            </p>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : `
-                                <div class="bg-[#161b22] rounded-lg border border-[#21262d] p-3 text-xs text-slate-400 italic">
-                                    Standard neutral schematic balance with no extreme coverage funnel points identified.
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                `;
+            const fmtPct = (v) => (v != null && !isNaN(v)) ? `${parseFloat(v).toFixed(1)}%` : '--';
+            const fmtDec = (v) => (v != null && !isNaN(v)) ? parseFloat(v).toFixed(2) : '--';
+            const fmtSigned = (v) => {
+                if (v == null || isNaN(v)) return '--';
+                const n = parseFloat(v);
+                return n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
             };
 
             const html = `
                 <!-- ============================================================== -->
-                <!-- HEADER: Matchup Title & Point-in-Time Sample Window -->
+                <!-- ACTIVE SAMPLE WINDOW & MATCHUP HEADER -->
                 <!-- ============================================================== -->
-                <div class="glass-panel rounded-xl p-5 border border-[#30363d] bg-[#161b22] flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex items-center space-x-3.5">
-                        <div class="w-10 h-10 rounded-xl bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-200 shrink-0 shadow-sm">
-                            <i data-lucide="crosshair" class="w-5 h-5 text-slate-300"></i>
+                <div class="glass-panel rounded-xl p-4 border border-[#30363d] bg-[#161b22] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-300 shrink-0">
+                            <i data-lucide="calendar" class="w-4 h-4 text-slate-300"></i>
                         </div>
                         <div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h3 class="text-base font-bold text-slate-100 font-mono tracking-tight">${d.away_team_name || d.away_team} (${d.away_team}) @ ${d.home_team_name || d.home_team} (${d.home_team})</h3>
-                                <span class="text-[11px] px-2.5 py-0.5 rounded-full font-mono bg-[#21262d] text-cyan-400 border border-cyan-800/40">Season ${d.season || 2026} Week ${d.week || 1}</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-bold text-slate-200">${d.away_team} @ ${d.home_team} • Season ${d.season || 2026} Week ${d.week || 1}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${sampleWindow.is_custom_date ? 'Custom Date Range' : 'Season Window'}</span>
                             </div>
-                            <p class="text-xs text-slate-400 mt-1 font-mono flex items-center gap-1.5">
-                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-500"></i>
-                                <span class="text-slate-300 font-semibold">${sampleWindowLabel}</span>
+                            <p class="text-[11px] text-slate-400">
+                                Descriptive situational tendency profiles and historical box stats.
+                                ${sampleWindow.home_games_in_sample > 0 ? `(${sampleWindow.home_games_in_sample} games evaluated for ${d.home_team}, ${sampleWindow.away_games_in_sample} for ${d.away_team})` : ''}
                             </p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 self-start md:self-auto">
-                        <span class="text-[11px] px-2.5 py-1 rounded-md bg-[#12161c] text-sky-400 border border-sky-800/40 font-mono">
-                            Playstyle &amp; Player Archetype Funnel Engine
-                        </span>
-                    </div>
                 </div>
 
                 <!-- ============================================================== -->
-                <!-- SECTION 1: OFFENSIVE VS. DEFENSIVE PLAYSTYLE MATCHUP -->
+                <!-- PILLAR 1: DEFENSIVE COVERAGE TENDENCIES (0:49, 17:53) -->
                 <!-- ============================================================== -->
-                <div id="block-playstyle" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                <div id="pillar-coverage" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
                         <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-sky-950/40 border border-sky-800/50 flex items-center justify-center text-sky-400 shrink-0">
-                                <i data-lucide="shield" class="w-4 h-4 text-sky-400"></i>
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400"></i>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-slate-100">Section 1 — Offensive vs. Defensive Playstyle Matchup</h3>
-                                <p class="text-[11px] text-slate-400">Coverage shell tendencies, funnel bleed points, offensive run/pass identities, and schematic cause-and-effect</p>
+                                <h3 class="text-sm font-bold text-slate-100">1. Defensive Coverage Tendencies</h3>
+                                <p class="text-[11px] text-slate-400">Zone vs Man rates, Middle-Field Open (MFO) vs Closed (MFC) safety shells, and blitz tendencies</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-sky-300 border border-[#30363d]">Two-Way Breakdown</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 0:49, 17:53</span>
                     </div>
 
-                    <div class="space-y-4">
-                        ${renderPlaystyleCard(awayOffVsHomeDef, d.away_team, d.home_team)}
-                        ${renderPlaystyleCard(homeOffVsAwayDef, d.home_team, d.away_team)}
-                    </div>
-                </div>
-
-                <!-- ============================================================== -->
-                <!-- SECTION 2: PLAYER ARCHETYPES TO TARGET -->
-                <!-- ============================================================== -->
-                <div id="block-archetypes" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-5">
-                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-emerald-950/40 border border-emerald-800/50 flex items-center justify-center text-emerald-400 shrink-0">
-                                <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-100">Section 2 — Player Archetypes to Target</h3>
-                                <p class="text-[11px] text-slate-400">Matchup beneficiaries directly exploiting defensive coverage funnels and concentrated alpha usage roles</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-emerald-300 border border-[#30363d]">${beneficiaries.length} Matchup Beneficiaries</span>
-                    </div>
-
-                    <!-- Matchup Beneficiaries (Who Feasts & Why) -->
-                    <div class="space-y-3">
-                        <span class="text-xs font-bold text-slate-200 font-mono uppercase tracking-wider block">
-                            [Matchup Beneficiaries — Who Benefits &amp; Why]
-                        </span>
-                        ${beneficiaries.length > 0 ? `
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                ${beneficiaries.map(b => `
-                                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2 hover:border-slate-500 transition">
-                                        <div class="flex items-start justify-between gap-2">
-                                            <div>
-                                                <div class="flex items-center space-x-1.5">
-                                                    <span class="text-xs font-bold text-slate-100 font-sans">${b.player}</span>
-                                                    <span class="text-[10px] font-mono text-slate-400">(${b.pos} - ${b.team})</span>
-                                                </div>
-                                                <span class="text-[10.5px] font-semibold text-emerald-400 font-sans block mt-0.5">${b.archetype}</span>
-                                            </div>
-                                            <span class="text-[9.5px] font-mono px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#21262d] shrink-0">
-                                                ${b.role_context}
-                                            </span>
-                                        </div>
-                                        <p class="text-xs text-slate-300 font-sans leading-relaxed bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                            ${b.matchup_rationale}
-                                        </p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : `
-                            <div class="bg-[#12161c] border border-[#30363d] rounded-xl p-4 text-xs text-slate-400 italic">
-                                No specific schematic archetype beneficiaries identified for this matchup.
-                            </div>
-                        `}
-                    </div>
-
-                    <!-- Concentrated Alpha Usage Table -->
-                    <div class="space-y-3 pt-2 border-t border-[#21262d]">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-200 font-mono uppercase tracking-wider block">
-                                [Concentrated Alpha Usage (Target Share &ge; 22%, Rush Share &ge; 45%, RZ Share &ge; 35%)]
-                            </span>
-                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-cyan-300 border border-[#30363d]">${alphaPlayers.length} Qualifiers</span>
-                        </div>
-
-                        ${alphaPlayers.length > 0 ? `
-                            <div class="overflow-x-auto rounded-xl border border-[#30363d]">
-                                <table class="w-full text-xs text-left text-slate-300">
-                                    <thead class="text-[10px] uppercase font-mono bg-[#161b22] text-slate-400 border-b border-[#30363d]">
-                                        <tr>
-                                            <th class="py-2.5 px-3">Player</th>
-                                            <th class="py-2.5 px-2">Pos</th>
-                                            <th class="py-2.5 px-2">Team</th>
-                                            <th class="py-2.5 px-3 text-right">Target Share</th>
-                                            <th class="py-2.5 px-3 text-right">Rush Share</th>
-                                            <th class="py-2.5 px-3 text-right">RZ Touch Share</th>
-                                            <th class="py-2.5 px-3">Alpha Triggers</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-[#21262d] bg-[#12161c] font-mono">
-                                        ${alphaPlayers.map(p => {
-                                            const pName = p.player || p.player_display_name || p.player_name || 'Unknown';
-                                            const pos = p.pos || p.position || 'N/A';
-                                            const tm = p.team || '';
-                                            const tShare = (p.target_share || 0) * 100;
-                                            const rShare = (p.rush_share || 0) * 100;
-                                            const rzShare = (p.rz_touch_share || 0) * 100;
-
-                                            const badges = [];
-                                            if (tShare >= 22.0) badges.push({ text: `Target ${tShare.toFixed(1)}%`, cls: 'bg-emerald-950/40 text-emerald-300 border-emerald-800/40' });
-                                            if (rShare >= 45.0) badges.push({ text: `Rush ${rShare.toFixed(1)}%`, cls: 'bg-amber-950/40 text-amber-300 border-amber-800/40' });
-                                            if (rzShare >= 35.0) badges.push({ text: `RZ Touch ${rzShare.toFixed(1)}%`, cls: 'bg-rose-950/40 text-rose-300 border-rose-800/40' });
-                                            if (badges.length === 0 && p.alpha_triggers) {
-                                                p.alpha_triggers.forEach(tr => badges.push({ text: tr, cls: 'bg-slate-800 text-slate-300 border-slate-700' }));
-                                            }
-
-                                            return `
-                                                <tr class="hover:bg-[#161b22] transition">
-                                                    <td class="py-2.5 px-3 font-sans font-semibold text-slate-100">${pName}</td>
-                                                    <td class="py-2.5 px-2 text-slate-400">${pos}</td>
-                                                    <td class="py-2.5 px-2 text-slate-400">${tm}</td>
-                                                    <td class="py-2.5 px-3 text-right ${tShare >= 22.0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${tShare > 0 ? `${tShare.toFixed(1)}%` : '--'}</td>
-                                                    <td class="py-2.5 px-3 text-right ${rShare >= 45.0 ? 'text-amber-400 font-bold' : 'text-slate-400'}">${rShare > 0 ? `${rShare.toFixed(1)}%` : '--'}</td>
-                                                    <td class="py-2.5 px-3 text-right ${rzShare >= 35.0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${rzShare > 0 ? `${rzShare.toFixed(1)}%` : '--'}</td>
-                                                    <td class="py-2.5 px-3 font-sans">
-                                                        <div class="flex flex-wrap gap-1">
-                                                            ${badges.map(b => `<span class="text-[10px] px-2 py-0.5 rounded border font-mono ${b.cls}">${b.text}</span>`).join('')}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            `;
-                                        }).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ` : `
-                            <div class="bg-[#12161c] border border-[#30363d] rounded-xl p-4 text-xs text-slate-400 italic">
-                                No skill players cleared alpha concentration thresholds (&ge;22% target share, &ge;45% rush share, &ge;35% RZ touch share).
-                            </div>
-                        `}
-                    </div>
-                </div>
-
-                <!-- ============================================================== -->
-                <!-- SECTION 3: HISTORICAL STYLISTIC ANALOGS & H2H PERFORMANCE -->
-                <!-- ============================================================== -->
-                <div id="block-analogs" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
-                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-purple-950/40 border border-purple-800/50 flex items-center justify-center text-purple-400 shrink-0">
-                                <i data-lucide="git-compare" class="w-4 h-4 text-purple-400"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-100">Section 3 — Historical Stylistic Analogs &amp; H2H Performance</h3>
-                                <p class="text-[11px] text-slate-400">Multivariate production allowed to qualified stylistic clones (RMSD &le; 0.85&sigma;, &ge;3 distinct opponents) and direct head-to-head history</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-purple-300 border border-[#30363d]">Stylistic Clones</span>
-                    </div>
-
-                    <div class="space-y-4">
-                        ${analogUnits.map(u => {
-                            const simObj = u.sim || {};
-                            const sMed = simObj.strong_analogs_median != null ? simObj.strong_analogs_median : (simObj.median_rb_rush_yards_strong != null ? simObj.median_rb_rush_yards_strong : null);
-                            const prod = simObj.strong_production_allowed || (sMed != null ? { rb_rush_yards: sMed } : null);
-                            const h2hGames = simObj.direct_h2h_games || [];
-                            const status = simObj.strong_status || (sMed != null ? 'Qualified sample' : 'Insufficient sample (<3 games or <3 distinct opponents)');
-
-                            return `
-                                <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#21262d] pb-2">
-                                        <span class="text-xs font-bold text-slate-100 font-mono">
-                                            ${u.defTeam} Defense vs. ${u.oppTeam}-like Stylistic Analogs
-                                        </span>
-                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded ${sMed != null ? 'bg-purple-950/40 text-purple-300 border border-purple-800/40' : 'bg-[#161b22] text-slate-400 border border-[#21262d]'}">
-                                            ${status}
-                                        </span>
-                                    </div>
-
-                                    ${sMed != null && prod ? `
-                                        <div class="space-y-1.5">
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider block">
-                                                [Qualified Analog Production Allowed — Medians]
-                                            </span>
-                                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
-                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                                    <span class="text-slate-400 block text-[9.5px]">RB Rush Yards:</span>
-                                                    <b class="text-purple-300 font-bold">${prod.rb_rush_yards != null ? prod.rb_rush_yards.toFixed(1) : '--'} yds</b>
-                                                </div>
-                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                                    <span class="text-slate-400 block text-[9.5px]">Pass Yards:</span>
-                                                    <b class="text-slate-200">${prod.pass_yards != null ? prod.pass_yards.toFixed(1) : '--'} yds</b>
-                                                </div>
-                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                                    <span class="text-slate-400 block text-[9.5px]">WR Rec Yards:</span>
-                                                    <b class="text-slate-200">${prod.wr_rec_yards != null ? prod.wr_rec_yards.toFixed(1) : '--'} yds</b>
-                                                </div>
-                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                                    <span class="text-slate-400 block text-[9.5px]">TE Rec Yards:</span>
-                                                    <b class="text-slate-200">${prod.te_rec_yards != null ? prod.te_rec_yards.toFixed(1) : '--'} yds</b>
-                                                </div>
-                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
-                                                    <span class="text-slate-400 block text-[9.5px]">QB Rush Yards:</span>
-                                                    <b class="text-slate-200">${prod.qb_rush_yards != null ? prod.qb_rush_yards.toFixed(1) : '--'} yds</b>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ` : `
-                                        <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs text-slate-400 italic">
-                                            No qualified third-party stylistic analogs meeting the &le; 0.85&sigma; RMSD threshold and minimum 3-opponent diversity floor.
-                                        </div>
-                                    `}
-
-                                    ${h2hGames.length > 0 ? `
-                                        <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] space-y-2 mt-2">
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider block">
-                                                [Direct H2H Games (${u.defTeam} vs. ${u.oppTeam})]
-                                            </span>
-                                            <div class="space-y-1.5 font-mono text-[11px]">
-                                                ${h2hGames.map(gm => `
-                                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between text-slate-300 py-1 border-b border-[#21262d] last:border-0 gap-1">
-                                                        <span class="text-slate-200 font-semibold">${gm.season} Wk ${gm.week} vs ${gm.opponent}</span>
-                                                        <span class="text-slate-400 text-xs">
-                                                            Allowed <b class="text-slate-200">${gm.rb_rush_yards_allowed != null ? gm.rb_rush_yards_allowed : (gm.yds != null ? gm.yds : '--')}</b> RB rush yds, <b class="text-slate-200">${gm.pass_yards_allowed != null ? gm.pass_yards_allowed : '--'}</b> pass yds, <b class="text-slate-200">${gm.wr_rec_yards_allowed != null ? gm.wr_rec_yards_allowed : '--'}</b> WR yds, <b class="text-slate-200">${gm.te_rec_yards_allowed != null ? gm.te_rec_yards_allowed : '--'}</b> TE yds, <b class="text-slate-200">${gm.qb_rush_yards_allowed != null ? gm.qb_rush_yards_allowed : '--'}</b> QB rush yds
-                                                        </span>
-                                                    </div>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                    ` : ''}
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Away Offense vs Home Defense -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Offense vs ${d.home_team} Defense</span>
                                 </div>
-                            `;
-                        }).join('')}
+                            </div>
+
+                            <!-- Zone vs Man Bar -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-[11px] font-mono text-slate-300">
+                                    <span>${renderSchemeTip('Zone Coverage', 'Zone Coverage', 'left')}: <b>${fmtPct(aCov.def_zone_pct)}</b></span>
+                                    <span>${renderSchemeTip('Man Coverage', 'Man Coverage', 'right')}: <b>${fmtPct(aCov.def_man_pct)}</b></span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
+                                    <div class="bg-slate-300 h-full" style="width: ${aCov.def_zone_pct || 65}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${aCov.def_man_pct || 35}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- MFO vs MFC Bar -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-[11px] font-mono text-slate-300">
+                                    <span>${renderSchemeTip('Middle-Field Open', 'MFO (2-High)', 'left')}: <b>${fmtPct(aCov.def_mfo_pct)}</b></span>
+                                    <span>${renderSchemeTip('Middle-Field Closed', 'MFC (1-High)', 'right')}: <b>${fmtPct(aCov.def_mfc_pct)}</b></span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
+                                    <div class="bg-slate-300 h-full" style="width: ${aCov.def_mfo_pct || 55}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${aCov.def_mfc_pct || 45}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Coverage Shells Pill Grid -->
+                            <div class="space-y-1 pt-1">
+                                <div class="text-[10px] font-bold text-slate-500 uppercase">Coverage Shell Distribution</div>
+                                <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono">
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 1', 'Cover 1', 'left')}</span>
+                                        <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 1 (Man)'] || aCov.shells?.cover_1 || 22)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 2', 'Cover 2', 'center')}</span>
+                                        <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 2 (MFO)'] || aCov.shells?.cover_2 || 18)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 3', 'Cover 3', 'right')}</span>
+                                        <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 3 (MFC)'] || aCov.shells?.cover_3 || 26)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 4', 'Cover 4', 'left')}</span>
+                                        <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 4 Quarters (MFO)'] || aCov.shells?.cover_4 || 22)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 6', 'Cover 6', 'center')}</span>
+                                        <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 6 Split (MFO)'] || aCov.shells?.cover_6 || 12)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'right')}</span>
+                                        <b class="text-slate-200">${fmtPct(aCov.blitz_pct || 28)}</b>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vulnerability Callout -->
+                            <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs space-y-2">
+                                <div>
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>Defensive Profile:</span>
+                                    </span>
+                                    <p class="text-slate-300 leading-relaxed text-[11.5px] mt-0.5 font-sans">
+                                        ${formatInsightsText(aCov.vulnerability_note || `${d.home_team}'s defense deploys a 2-high safety shell structure with intermediate coverage focus.`)}
+                                    </p>
+                                </div>
+                                <div class="border-t border-[#21262d] pt-1.5">
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>Target Tendency:</span>
+                                    </span>
+                                    <p class="text-slate-200 leading-relaxed text-[11.5px] mt-0.5 font-sans font-medium">
+                                        ${formatInsightsText(aCov.offense_exploit || `${d.away_team} targets short/intermediate inside passes and seam concepts.`)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Home Offense vs Away Defense -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Offense vs ${d.away_team} Defense</span>
+                                </div>
+                            </div>
+
+                            <!-- Zone vs Man Bar -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-[11px] font-mono text-slate-300">
+                                    <span>${renderSchemeTip('Zone Coverage', 'Zone Coverage', 'left')}: <b>${fmtPct(hCov.def_zone_pct)}</b></span>
+                                    <span>${renderSchemeTip('Man Coverage', 'Man Coverage', 'right')}: <b>${fmtPct(hCov.def_man_pct)}</b></span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
+                                    <div class="bg-slate-300 h-full" style="width: ${hCov.def_zone_pct || 65}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${hCov.def_man_pct || 35}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- MFO vs MFC Bar -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-[11px] font-mono text-slate-300">
+                                    <span>${renderSchemeTip('Middle-Field Open', 'MFO (2-High)', 'left')}: <b>${fmtPct(hCov.def_mfo_pct)}</b></span>
+                                    <span>${renderSchemeTip('Middle-Field Closed', 'MFC (1-High)', 'right')}: <b>${fmtPct(hCov.def_mfc_pct)}</b></span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
+                                    <div class="bg-slate-300 h-full" style="width: ${hCov.def_mfo_pct || 55}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${hCov.def_mfc_pct || 45}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Coverage Shells Pill Grid -->
+                            <div class="space-y-1 pt-1">
+                                <div class="text-[10px] font-bold text-slate-500 uppercase">Coverage Shell Distribution</div>
+                                <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono">
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 1', 'Cover 1', 'left')}</span>
+                                        <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 1 (Man)'] || hCov.shells?.cover_1 || 22)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 2', 'Cover 2', 'center')}</span>
+                                        <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 2 (MFO)'] || hCov.shells?.cover_2 || 18)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 3', 'Cover 3', 'right')}</span>
+                                        <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 3 (MFC)'] || hCov.shells?.cover_3 || 26)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 4', 'Cover 4', 'left')}</span>
+                                        <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 4 Quarters (MFO)'] || hCov.shells?.cover_4 || 22)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 6', 'Cover 6', 'center')}</span>
+                                        <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 6 Split (MFO)'] || hCov.shells?.cover_6 || 12)}</b>
+                                    </div>
+                                    <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'right')}</span>
+                                        <b class="text-slate-200">${fmtPct(hCov.blitz_pct || 28)}</b>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vulnerability Callout -->
+                            <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs space-y-2">
+                                <div>
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>Defensive Profile:</span>
+                                    </span>
+                                    <p class="text-slate-300 leading-relaxed text-[11.5px] mt-0.5 font-sans">
+                                        ${formatInsightsText(hCov.vulnerability_note || `${d.away_team}'s defense deploys a 2-high safety shell structure with intermediate coverage focus.`)}
+                                    </p>
+                                </div>
+                                <div class="border-t border-[#21262d] pt-1.5">
+                                    <span class="text-slate-400 text-[10px] font-mono uppercase font-bold flex items-center gap-1">
+                                        <i data-lucide="crosshair" class="w-3.5 h-3.5 text-slate-400"></i>
+                                        <span>Target Tendency:</span>
+                                    </span>
+                                    <p class="text-slate-200 leading-relaxed text-[11.5px] mt-0.5 font-sans font-medium">
+                                        ${formatInsightsText(hCov.offense_exploit || `${d.home_team} targets short/intermediate inside passes and seam concepts.`)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- PILLAR 2: RUN-SCHEME SPLITS (4:58, 12:00) -->
+                <!-- ============================================================== -->
+                <div id="pillar-run" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="footprints" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">2. Run-Scheme Splits & Defensive Front Tendencies</h3>
+                                <p class="text-[11px] text-slate-400">Zone vs Gap rushing frequency and yards per carry allowed by concept</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 4:58, 12:00</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Away Rushing Attack -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Ground Attack</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${fmtDec(aRun.gap_ypc)} YPC Gap | ${fmtDec(aRun.zone_ypc)} YPC Zone</span>
+                            </div>
+
+                            <!-- Zone vs Gap Run Ratio -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-[11px] font-mono text-slate-300">
+                                    <span>${renderSchemeTip('Zone Runs', 'Zone Runs', 'left')}: <b>${fmtPct(aRun.offense_zone_pct)}</b> (${fmtDec(aRun.zone_ypc)} YPC)</span>
+                                    <span>${renderSchemeTip('Gap/Man Runs', 'Gap/Man Runs', 'right')}: <b>${fmtPct(aRun.offense_gap_pct)}</b> (${fmtDec(aRun.gap_ypc)} YPC)</span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
+                                    <div class="bg-slate-300 h-full" style="width: ${aRun.offense_zone_pct || 50}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${aRun.offense_gap_pct || 50}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Opponent Defense Vulnerability Breakdown -->
+                            <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1">
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Zone Runs', `${d.home_team} vs Zone Runs`, 'left')}</span>
+                                    <div class="text-slate-200 font-bold">${fmtDec(aRun.opp_def_zone_ypc_allowed)} YPC Allowed</div>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(aRun.opp_def_zone_rank)}">${aRun.opp_def_zone_rank_display || (aRun.opp_def_zone_rank ? `Rank #${aRun.opp_def_zone_rank} (n=${sampleWindow.home_games_in_sample || 5} games)` : `n=${sampleWindow.home_games_in_sample || 5}g (rank suppressed)`)}</span>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Gap Runs', `${d.home_team} vs Gap Runs`, 'right')}</span>
+                                    <div class="text-slate-200 font-bold">${fmtDec(aRun.opp_def_gap_ypc_allowed)} YPC Allowed</div>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(aRun.opp_def_gap_rank)}">${aRun.opp_def_gap_rank_display || (aRun.opp_def_gap_rank ? `Rank #${aRun.opp_def_gap_rank} (n=${sampleWindow.home_games_in_sample || 5} games)` : `n=${sampleWindow.home_games_in_sample || 5}g (rank suppressed)`)}</span>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-slate-300 bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] leading-relaxed font-mono">
+                                ${formatInsightsText(aRun.comparison_summary || aRun.alignment_diagnostic || `${d.away_team} Gap: ${fmtDec(aRun.gap_ypc)} YPC vs ${d.home_team} Allowed: ${fmtDec(aRun.opp_def_gap_ypc_allowed)} YPC.`)}
+                            </p>
+                        </div>
+
+                        <!-- Home Rushing Attack -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Ground Attack</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${fmtDec(hRun.gap_ypc)} YPC Gap | ${fmtDec(hRun.zone_ypc)} YPC Zone</span>
+                            </div>
+
+                            <!-- Zone vs Gap Run Ratio -->
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-[11px] font-mono text-slate-300">
+                                    <span>${renderSchemeTip('Zone Runs', 'Zone Runs', 'left')}: <b>${fmtPct(hRun.offense_zone_pct)}</b> (${fmtDec(hRun.zone_ypc)} YPC)</span>
+                                    <span>${renderSchemeTip('Gap/Man Runs', 'Gap/Man Runs', 'right')}: <b>${fmtPct(hRun.offense_gap_pct)}</b> (${fmtDec(hRun.gap_ypc)} YPC)</span>
+                                </div>
+                                <div class="w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex">
+                                    <div class="bg-slate-300 h-full" style="width: ${hRun.offense_zone_pct || 50}%"></div>
+                                    <div class="bg-slate-600 h-full" style="width: ${hRun.offense_gap_pct || 50}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Opponent Defense Vulnerability Breakdown -->
+                            <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1">
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Zone Runs', `${d.away_team} vs Zone Runs`, 'left')}</span>
+                                    <div class="text-slate-200 font-bold">${fmtDec(hRun.opp_def_zone_ypc_allowed)} YPC Allowed</div>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(hRun.opp_def_zone_rank)}">${hRun.opp_def_zone_rank_display || (hRun.opp_def_zone_rank ? `Rank #${hRun.opp_def_zone_rank} (n=${sampleWindow.away_games_in_sample || 5} games)` : `n=${sampleWindow.away_games_in_sample || 5}g (rank suppressed)`)}</span>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d] space-y-0.5">
+                                    <span class="text-slate-400 block text-[10px]">${renderSchemeTip('vs Gap Runs', `${d.away_team} vs Gap Runs`, 'right')}</span>
+                                    <div class="text-slate-200 font-bold">${fmtDec(hRun.opp_def_gap_ypc_allowed)} YPC Allowed</div>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded ${getRankBadge(hRun.opp_def_gap_rank)}">${hRun.opp_def_gap_rank_display || (hRun.opp_def_gap_rank ? `Rank #${hRun.opp_def_gap_rank} (n=${sampleWindow.away_games_in_sample || 5} games)` : `n=${sampleWindow.away_games_in_sample || 5}g (rank suppressed)`)}</span>
+                                </div>
+                            </div>
+
+                            <p class="text-xs text-slate-300 bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] leading-relaxed font-mono">
+                                ${formatInsightsText(hRun.comparison_summary || hRun.alignment_diagnostic || `${d.home_team} Zone: ${fmtDec(hRun.zone_ypc)} YPC vs ${d.away_team} Allowed: ${fmtDec(hRun.opp_def_zone_ypc_allowed)} YPC.`)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- PILLAR 3: POSITIONAL TARGET RATES & ALIGNMENT (2:40, 10:47, 14:12) -->
+                <!-- ============================================================== -->
+                <div id="pillar-alignment" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="target" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">3. Positional Target Rates & Alignment Matchups</h3>
+                                <p class="text-[11px] text-slate-400">Target frequency by alignment (Slot vs Outside WR, Inline TE, Backfield RB) against coverage shell</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 2:40, 10:47, 14:12</span>
+                    </div>
+
+                    <!-- Alignment Shares Overview Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="text-xs font-bold font-mono text-slate-200">${d.away_team} Alignment Target Shares</div>
+                            <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Slot WR', 'Slot WR', 'left')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.slot_wr_pct || 30)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Outside WR', 'Outside WR', 'center')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.wide_wr_pct || 42)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Inline TE', 'Inline TE', 'center')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.inline_te_pct || 18)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Backfield RB', 'Backfield RB', 'right')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(aDist.backfield_rb_pct || 10)}</b>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="text-xs font-bold font-mono text-slate-200">${d.home_team} Alignment Target Shares</div>
+                            <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Slot WR', 'Slot WR', 'left')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.slot_wr_pct || 32)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Outside WR', 'Outside WR', 'center')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.wide_wr_pct || 40)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Inline TE', 'Inline TE', 'center')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.inline_te_pct || 18)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Backfield RB', 'Backfield RB', 'right')}</span>
+                                    <b class="text-slate-100 font-bold">${fmtPct(hDist.backfield_rb_pct || 10)}</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Receivers Target Boost Table -->
+                    <div class="overflow-x-auto rounded-xl border border-[#30363d]">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-[#21262d] text-slate-400 uppercase text-[10px] font-mono border-b border-[#30363d]">
+                                <tr>
+                                    <th class="py-2 px-3">Player</th>
+                                    <th class="py-2 px-2 text-center">Team</th>
+                                    <th class="py-2 px-2 text-center">Pos</th>
+                                    <th class="py-2 px-3">Primary Alignment</th>
+                                    <th class="py-2 px-2 text-right">${renderSchemeTip('Tgt% vs Zone', 'Tgt% Zone', 'center')}</th>
+                                    <th class="py-2 px-2 text-right">${renderSchemeTip('Tgt% vs Man', 'Tgt% Man', 'center')}</th>
+                                    <th class="py-2 px-2 text-right">${renderSchemeTip('YPRR', 'YPRR', 'right')}</th>
+                                    <th class="py-2 px-3">Coverage Matchup Diagnostic</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#21262d] font-mono text-[11px]">
+                                ${[...aPlayerTgts.map(p => ({...p, team: d.away_team})), ...hPlayerTgts.map(p => ({...p, team: d.home_team}))].map(p => `
+                                    <tr class="hover:bg-[#21262d]/50 transition">
+                                        <td class="py-2 px-3 font-bold text-slate-100 font-sans">${p.name || p.player || 'Player'}</td>
+                                        <td class="py-2 px-2 text-center text-slate-300 font-bold">${p.team}</td>
+                                        <td class="py-2 px-2 text-center text-slate-400">${p.pos}</td>
+                                        <td class="py-2 px-3 text-slate-300">
+                                            ${p.slot_pct > 40 ? `<span>Slot (${p.slot_pct}%)</span>` : (p.inline_pct > 30 ? `<span>Inline TE (${p.inline_pct}%)</span>` : `<span>Outside (${p.outside_pct}%)</span>`)}
+                                        </td>
+                                        <td class="py-2 px-2 text-right font-bold text-slate-200">${fmtPct(p.tgt_zone)}</td>
+                                        <td class="py-2 px-2 text-right text-slate-400">${fmtPct(p.tgt_man)}</td>
+                                        <td class="py-2 px-2 text-right text-slate-100 font-bold">${fmtDec(p.yprr_zone || p.yprr_man || 1.8)}</td>
+                                        <td class="py-2 px-3 font-sans text-slate-300 text-[11px]">
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-300 border border-[#30363d] mr-1">
+                                                ${p.boost_tier || 'Neutral'}
+                                            </span>
+                                            ${formatInsightsText(p.expected_boost || 'Standard target look rate within progression.')}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- PILLAR 4: PLAYER USAGE PROFILES -->
+                <!-- ============================================================== -->
+                <div id="pillar-breakouts" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">4. Player Usage Profiles</h3>
+                                <p class="text-[11px] text-slate-400">Historical box stats from recent games, coverage shell splits, and red zone touch concentration (no betting lines or projections)</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${breakouts.length} Players Evaluated</span>
+                    </div>
+
+                    <!-- Descriptive Statistics Notice -->
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-lg p-2.5 flex items-start gap-2.5 text-[11px] text-slate-300 leading-relaxed font-sans">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <div>
+                            <span class="font-bold text-slate-200">Descriptive Statistics Notice:</span>
+                            All metrics display historical box stats, situational splits, and sample sizes (n). No projections, win probabilities, or betting picks are emitted.
+                        </div>
+                    </div>
+
+                    <div class="grid ${breakouts.length === 4 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : (breakouts.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2')} gap-3.5">
+                        ${breakouts.map(b => `
+                            <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 flex flex-col justify-between space-y-3 hover:border-slate-500 transition">
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center space-x-2 min-w-0">
+                                            <span class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center font-bold font-mono text-xs text-slate-200 shrink-0">
+                                                ${b.team}
+                                            </span>
+                                            <div class="min-w-0">
+                                                <h4 class="font-bold text-slate-100 text-sm truncate">${b.player_display_name || b.player}</h4>
+                                                <span class="text-[10px] text-slate-400 font-mono truncate block">${b.pos} • ${b.role_description || b.stat_focus || 'Usage Profile'}</span>
+                                            </div>
+                                        </div>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[#21262d] text-slate-300 border border-[#30363d] whitespace-nowrap shrink-0">
+                                            ${b.stat_focus || 'Historical Box Stats'}
+                                        </span>
+                                    </div>
+
+                                    <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1.5 text-xs font-mono">
+                                        <div class="text-slate-400 text-[10.5px]">
+                                            <span class="text-slate-300 font-semibold block mb-0.5">Historical Box Stats:</span>
+                                            <span class="text-slate-200 text-[11px] font-sans leading-tight block">${b.last_10_stats?.summary_str || b.season_baseline || '--'}</span>
+                                        </div>
+                                        ${b.splits?.coverage_shell ? `
+                                            <div class="text-[10.5px] text-slate-400 border-t border-[#21262d] pt-1.5">
+                                                <span class="text-slate-300 font-semibold block mb-0.5">Coverage Shell Split:</span>
+                                                <span class="text-slate-200 text-[11px] font-sans leading-tight block">${b.splits.coverage_shell}</span>
+                                            </div>
+                                        ` : ''}
+                                        ${b.red_zone?.summary_str ? `
+                                            <div class="text-[10.5px] text-slate-400 border-t border-[#21262d] pt-1.5">
+                                                <span class="text-slate-300 font-semibold block mb-0.5">Red Zone Touches:</span>
+                                                <span class="text-slate-200 text-[11px] font-sans leading-tight block">${b.red_zone.summary_str}</span>
+                                            </div>
+                                        ` : ''}
+                                        ${b.explosive_plays?.summary_str ? `
+                                            <div class="text-[10.5px] text-slate-400 border-t border-[#21262d] pt-1.5">
+                                                <span class="text-slate-300 font-semibold block mb-0.5">Explosive Plays:</span>
+                                                <span class="text-slate-200 text-[11px] font-sans leading-tight block">${b.explosive_plays.summary_str}</span>
+                                            </div>
+                                        ` : ''}
+                                        ${b.defense_context ? `
+                                            <div class="text-[10.5px] text-slate-400 border-t border-[#21262d] pt-1.5">
+                                                <span class="text-slate-300 font-semibold block mb-0.5">Defense Context:</span>
+                                                <span class="text-slate-300 text-[11px] font-sans leading-tight block">${b.defense_context}</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <p class="text-xs text-slate-300 leading-relaxed font-sans">
+                                        ${formatInsightsText(b.rationale || '')}
+                                    </p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- PILLAR 5: PACE AND TEMPO (6:17, 26:54) -->
+                <!-- ============================================================== -->
+                <div id="pillar-tempo" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">5. Pace and Tempo</h3>
+                                <p class="text-[11px] text-slate-400">Seconds per play, recent game play volume, red zone touch concentration, and historical tendencies when leading or trailing</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Video Ref: 6:17, 26:54</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Away Tempo Profile -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Situational Pace</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${(sampleWindow.away_games_in_sample != null && sampleWindow.away_games_in_sample < 6) ? `n=${sampleWindow.away_games_in_sample} games (rank suppressed)` : `Pace Rank #${aTempo.pace_rank || 16} (n=${sampleWindow.away_games_in_sample || 17} games)`}</span>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Neutral Pace', 'Neutral Pace', 'left')}</span>
+                                    <b class="text-slate-200">${aTempo.neutral_pace_sec || 27.5}s/snap</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Recent Avg Plays', 'Recent Avg Plays', 'center')}</span>
+                                    <b class="text-slate-200">${aTempo.recent_avg_plays || aTempo.proj_plays || 64}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Checkdown Rate', 'Checkdown Rate', 'right')}</span>
+                                    <b class="text-slate-200 font-bold">${fmtPct(aTempo.checkdown_pct || 14)}</b>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-xs space-y-1">
+                                <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
+                                    <span>${renderSchemeTip('RZ Touch Leader', 'RZ Touch Leader', 'left')}:</span>
+                                    <b class="text-slate-200">${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`}</b>
+                                </div>
+                                <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
+                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b class="cursor-help" title="${aTempo.rz_pass_context || ''}">${fmtPct(aTempo.rz_pass_rate_shrunk || aTempo.rz_pass_rate || 52)}${aTempo.rz_pass_rate_shrunk && aTempo.rz_pass_rate_shrunk !== aTempo.rz_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${aTempo.rz_pass_rate}% raw)</span>` : ''}</b></span>
+                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b class="cursor-help" title="${aTempo.third_down_context || ''}">${fmtPct(aTempo.third_down_pass_rate_shrunk || aTempo.third_down_pass_rate || 70)}${aTempo.third_down_pass_rate_shrunk && aTempo.third_down_pass_rate_shrunk !== aTempo.third_down_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${aTempo.third_down_pass_rate}% raw)</span>` : ''}</b></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Home Tempo Profile -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Situational Pace</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${(sampleWindow.home_games_in_sample != null && sampleWindow.home_games_in_sample < 6) ? `n=${sampleWindow.home_games_in_sample} games (rank suppressed)` : `Pace Rank #${hTempo.pace_rank || 16} (n=${sampleWindow.home_games_in_sample || 17} games)`}</span>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Neutral Pace', 'Neutral Pace', 'left')}</span>
+                                    <b class="text-slate-200">${hTempo.neutral_pace_sec || 27.5}s/snap</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Recent Avg Plays', 'Recent Avg Plays', 'center')}</span>
+                                    <b class="text-slate-200">${hTempo.recent_avg_plays || hTempo.proj_plays || 64}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Checkdown Rate', 'Checkdown Rate', 'right')}</span>
+                                    <b class="text-slate-200 font-bold">${fmtPct(hTempo.checkdown_pct || 14)}</b>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-xs space-y-1">
+                                <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
+                                    <span>${renderSchemeTip('RZ Touch Leader', 'RZ Touch Leader', 'left')}:</span>
+                                    <b class="text-slate-200">${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`}</b>
+                                </div>
+                                <div class="text-slate-400 flex items-center justify-between font-mono text-[11px]">
+                                    <span>${renderSchemeTip('RZ Pass Rate', 'RZ Pass Rate', 'left')}: <b class="cursor-help" title="${hTempo.rz_pass_context || ''}">${fmtPct(hTempo.rz_pass_rate_shrunk || hTempo.rz_pass_rate || 52)}${hTempo.rz_pass_rate_shrunk && hTempo.rz_pass_rate_shrunk !== hTempo.rz_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${hTempo.rz_pass_rate}% raw)</span>` : ''}</b></span>
+                                    <span>${renderSchemeTip('3rd Down Pass Rate', '3rd Down Pass Rate', 'right')}: <b class="cursor-help" title="${hTempo.third_down_context || ''}">${fmtPct(hTempo.third_down_pass_rate_shrunk || hTempo.third_down_pass_rate || 70)}${hTempo.third_down_pass_rate_shrunk && hTempo.third_down_pass_rate_shrunk !== hTempo.third_down_pass_rate ? ` <span class="text-[9px] text-slate-500 font-normal">(${hTempo.third_down_pass_rate}% raw)</span>` : ''}</b></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pace and Tempo Summary -->
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-1.5">
+                        <div class="flex items-center space-x-2 text-xs font-bold text-slate-200">
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span>Pace and Tempo Summary</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed font-mono">
+                            ${formatInsightsText(flow.pace_and_tempo || flow.pace_synthesis || 'Neutral pace and situational tendencies from completed games.')}
+                        </p>
+                    </div>
+                </div>
+
+                ${renderMatchupStatSheetHtml(d.matchup_stat_sheet, d.away_team, d.home_team)}
+
+                <!-- ============================================================== -->
+                <!-- MATCHUP SUMMARY -->
+                <!-- ============================================================== -->
+                <div id="pillar-summary" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-[#21262d] border border-[#30363d] flex items-center justify-center text-slate-400 shrink-0">
+                                <i data-lucide="clipboard-check" class="w-3.5 h-3.5 text-slate-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">7. Matchup Summary</h3>
+                                <p class="text-[11px] text-slate-400">Empirical summary translating coverage shells, run fits, and game flow into practical game observations</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">Descriptive Summary</span>
+                    </div>
+
+                    <!-- 3 Tactical Pillars Synthesis -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+                        <!-- 1. Pass Game Takeaway -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="flex items-center space-x-2 text-slate-200 font-bold">
+                                <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>1. Passing Tendencies</span>
+                            </div>
+                            <p class="text-slate-300 leading-relaxed text-[11.5px]">
+                                ${formatInsightsText(wrapUp.passVerdict)}
+                            </p>
+                        </div>
+
+                        <!-- 2. Run Game Takeaway -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="flex items-center space-x-2 text-slate-200 font-bold">
+                                <i data-lucide="footprints" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>2. Ground Tendencies</span>
+                            </div>
+                            <p class="text-slate-300 leading-relaxed text-[11.5px]">
+                                ${formatInsightsText(wrapUp.runVerdict)}
+                            </p>
+                        </div>
+
+                        <!-- 3. Tempo & Opportunity Takeaway -->
+                        <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
+                            <div class="flex items-center space-x-2 text-slate-200 font-bold">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>3. Pace and Tempo</span>
+                            </div>
+                            <p class="text-slate-300 leading-relaxed text-[11.5px]">
+                                ${formatInsightsText(wrapUp.paceVerdict)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bottom-Line Takeaways / Key Matchup Spotters -->
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
+                        <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
+                            <div class="flex items-center space-x-2 text-xs font-bold text-slate-200">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-slate-400"></i>
+                                <span>Matchup Summary: Key Player Usage Splits</span>
+                            </div>
+                            <span class="text-[10px] font-mono text-slate-400">${d.away_team} @ ${d.home_team}</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            ${wrapUp.edges.map(b => `
+                                <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <b class="text-slate-100 font-sans text-xs">${b.player_display_name || b.player} <span class="text-slate-400 font-mono text-[11px]">(${b.team} ${b.pos})</span></b>
+                                        <div class="flex items-center space-x-1.5 shrink-0">
+                                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${b.stat_focus || 'Split'}</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
+                                        ${formatInsightsText(b.last_10_stats?.summary_str || b.rationale || '')}
+                                    </p>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed pt-1 border-t border-[#21262d] font-mono">
+                            <b class="text-slate-200">Matchup Summary:</b> ${formatInsightsText(d.matchup_summary || `${d.away_team} vs ${d.home_team} empirical tendency and split comparison based on completed games.`)}
+                        </p>
                     </div>
                 </div>
             `;

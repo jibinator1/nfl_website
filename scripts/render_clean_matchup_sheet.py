@@ -1,9 +1,5 @@
 import json
 import sys
-import os
-
-# Add repo root to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -22,123 +18,177 @@ for key, g in games_data.items():
         sample_window = sw.get("sample_label", f"{season} Weeks 1-{week}")
     else:
         sample_window = str(sw or f"{season} Weeks 1-{week}")
+    
+    sheet = g.get("matchup_stat_sheet", {})
 
     print("=" * 80)
     print(f"MATCHUP: {away_name} ({away}) @ {home_name} ({home})")
-    print(f"Season: {season} | Week: {week} | {sample_window}")
+    print(f"Season: {season} | Week: {week} | Sample Window: {sample_window}")
     print("=" * 80)
     print()
 
-    # SECTION 1 — TEAM PLAYSTYLE IDENTITY & SCHEMATIC FUNNEL (BOTH SIDES)
-    print("### Section 1 — Team Playstyle Identity & Schematic Funnel")
-    s1 = g.get("section_1_playstyle_matchup") or g.get("playstyle_funnel", {}).get("section_1_playstyle_matchup", {})
-    
-    for matchup_key, label in [
-        ("away_off_vs_home_def", f"{away} Offense vs {home} Defense"),
-        ("home_off_vs_away_def", f"{home} Offense vs {away} Defense"),
-    ]:
-        m_data = s1.get(matchup_key, {})
-        if not m_data:
-            continue
-        print(f"[{label}]")
-        def_funnel = m_data.get("defense_funnel", {})
-        off_playstyle = m_data.get("offense_playstyle", {})
-        funnels = m_data.get("funnel_insights", [])
-        
-        print(f"  * [DEFENSIVE SHELL & FUNNEL] {def_funnel.get('summary', 'N/A')}")
-        print(f"  * [OFFENSIVE PLAYSTYLE] {off_playstyle.get('summary', 'N/A')}")
-        
-        if funnels:
-            print("  * What This Opens Up (Schematic Funnels):")
-            for fn in funnels:
-                print(f"    - [{fn.get('name')}]: {fn.get('takeaway')}")
-        print()
-
-    # SECTION 2 — PLAYER ARCHETYPES TO TARGET
-    print("### Section 2 — Player Archetypes to Target (Matchup Beneficiaries & Usage Concentration)")
-    s2 = g.get("section_2_archetypes_to_target") or g.get("playstyle_funnel", {}).get("section_2_archetypes_to_target", {})
-    beneficiaries = s2.get("beneficiary_players", [])
-    
-    if beneficiaries:
-        print("  [Matchup Beneficiaries — Who Benefits & Why]:")
-        for b in beneficiaries:
-            p_name = b.get("player")
-            pos = b.get("pos")
-            tm = b.get("team")
-            arch = b.get("archetype")
-            ctx = b.get("role_context")
-            rat = b.get("matchup_rationale")
-            print(f"  * {p_name} ({pos} - {tm}) — {arch} [{ctx}]:")
-            print(f"    Rationale: {rat}")
-    else:
-        print("  * No specific schematic archetype beneficiaries identified.")
+    # (1) Matchup Summary
+    print("### (1) Matchup Summary")
+    summary = g.get("matchup_summary", "")
+    print(f"{summary}")
     print()
 
-    print("  [Concentrated Alpha Usage (Target Share >= 22%, Rush Share >= 45%, RZ Share >= 35%)]:")
-    alphas = s2.get("concentrated_alpha_usage") or g.get("concentrated_player_usage", [])
-    if alphas:
-        for p in alphas:
-            p_name = p.get("player") or p.get("player_display_name")
-            pos = p.get("pos", "")
-            tm = p.get("team", "")
-            t_share = (p.get("target_share") or 0.0) * 100.0
-            r_share = (p.get("rush_share") or 0.0) * 100.0
-            rz_share = (p.get("rz_touch_share") or 0.0) * 100.0
-            badges = []
-            if t_share >= 22.0:
-                badges.append(f"Target Share {t_share:.1f}%")
-            if r_share >= 45.0:
-                badges.append(f"Rush Share {r_share:.1f}%")
-            if rz_share >= 35.0:
-                badges.append(f"RZ Touch Share {rz_share:.1f}%")
-            badge_str = ", ".join(badges) if badges else f"Target {t_share:.1f}%, Rush {r_share:.1f}%"
-            print(f"  * {p_name} ({pos} - {tm}): {badge_str}")
-    else:
-        print("  * No skill players cleared alpha concentration thresholds.")
+    # (2) Situational Tendencies
+    print("### (2) Situational Tendencies")
+    cov = g.get("coverage_tendencies", {})
+    a_vs_h = cov.get("away_vs_home", {})
+    h_vs_a = cov.get("home_vs_away", {})
+    print(f"**{away} Defensive Tendencies:**")
+    print(f"  * Middle-Field Open (MFO): {h_vs_a.get('def_mfo_pct', 0.0):.1f}% | Middle-Field Closed (MFC): {h_vs_a.get('def_mfc_pct', 0.0):.1f}%")
+    print(f"  * Zone Coverage: {h_vs_a.get('def_zone_pct', 0.0):.1f}% | Man Coverage: {h_vs_a.get('def_man_pct', 0.0):.1f}%")
+    print(f"  * Summary: {h_vs_a.get('coverage_summary', '')}")
+    print()
+    print(f"**{home} Defensive Tendencies:**")
+    print(f"  * Middle-Field Open (MFO): {a_vs_h.get('def_mfo_pct', 0.0):.1f}% | Middle-Field Closed (MFC): {a_vs_h.get('def_mfc_pct', 0.0):.1f}%")
+    print(f"  * Zone Coverage: {a_vs_h.get('def_zone_pct', 0.0):.1f}% | Man Coverage: {a_vs_h.get('def_man_pct', 0.0):.1f}%")
+    print(f"  * Summary: {a_vs_h.get('coverage_summary', '')}")
     print()
 
-    # SECTION 3 — HISTORICAL STYLISTIC ANALOGS & H2H PERFORMANCE
-    print("### Section 3 — Historical Stylistic Analogs & H2H Performance")
-    s3 = g.get("section_3_historical_analogs") or g.get("playstyle_funnel", {}).get("section_3_historical_analogs", {})
-    h_sim = s3.get("home_defense_vs_similar_away", {})
-    a_sim = s3.get("away_defense_vs_similar_home", {})
+    # (3) Opponent Vulnerabilities
+    print("### (3) Opponent Vulnerabilities")
+    run_splits = g.get("run_scheme_splits", {})
+    a_run = run_splits.get("away_unit", {})
+    h_run = run_splits.get("home_unit", {})
+    print(f"**{away} Ground Attack vs. {home} Defense:**")
+    print(f"  * {away} Offense: Zone {a_run.get('offense_zone_pct', 0):.1f}% ({a_run.get('zone_ypc', 0.0):.2f} YPC) | Gap {a_run.get('offense_gap_pct', 0):.1f}% ({a_run.get('gap_ypc', 0.0):.2f} YPC)")
+    print(f"  * {home} Defense Allowed: Zone {a_run.get('opp_def_zone_ypc_allowed', 0.0):.2f} YPC [{a_run.get('opp_def_zone_rank_display', '')}] | Gap {a_run.get('opp_def_gap_ypc_allowed', 0.0):.2f} YPC [{a_run.get('opp_def_gap_rank_display', '')}]")
+    print(f"  * Diagnostic: {a_run.get('comparison_summary', '')}")
+    print()
+    print(f"**{home} Ground Attack vs. {away} Defense:**")
+    print(f"  * {home} Offense: Zone {h_run.get('offense_zone_pct', 0):.1f}% ({h_run.get('zone_ypc', 0.0):.2f} YPC) | Gap {h_run.get('offense_gap_pct', 0):.1f}% ({h_run.get('gap_ypc', 0.0):.2f} YPC)")
+    print(f"  * {away} Defense Allowed: Zone {h_run.get('opp_def_zone_ypc_allowed', 0.0):.2f} YPC [{h_run.get('opp_def_zone_rank_display', '')}] | Gap {h_run.get('opp_def_gap_ypc_allowed', 0.0):.2f} YPC [{h_run.get('opp_def_gap_rank_display', '')}]")
+    print(f"  * Diagnostic: {h_run.get('comparison_summary', '')}")
+    print()
 
-    units = [
-        (h_sim, home, away),
-        (a_sim, away, home)
-    ]
-    rendered_any_analog = False
-    for sim_obj, def_tm, opp_tm in units:
-        s_med = sim_obj.get("strong_analogs_median") or sim_obj.get("median_rb_rush_yards_strong")
-        prod = sim_obj.get("strong_production_allowed")
-        h2h_games = sim_obj.get("direct_h2h_games", [])
-        
-        if s_med is not None or h2h_games:
-            rendered_any_analog = True
-            status = sim_obj.get("strong_status", "qualified games")
-            if s_med is not None:
-                print(f"  * {def_tm} Defense vs {opp_tm}-like Strong Analogs ({status}):")
-                if prod:
-                    print(f"    - Medians Allowed: {prod.get('rb_rush_yards', 'N/A')} RB rush yds | {prod.get('pass_yards', 'N/A')} pass yds | {prod.get('wr_rec_yards', 'N/A')} WR rec yds | {prod.get('te_rec_yards', 'N/A')} TE rec yds | {prod.get('qb_rush_yards', 'N/A')} QB rush yds")
-                else:
-                    print(f"    - Median RB Rush Yards Allowed: {s_med:.1f}")
+    # (4) Similar-Opponent Historical Lookup
+    print("### (4) Similar-Opponent Historical Lookup")
+    sim = sheet.get("section_5_similar_opponents", {})
+    h_sim = sim.get("home_defense_vs_opponents_like_away", {})
+    a_sim = sim.get("away_defense_vs_opponents_like_home", {})
+
+    def _render_sim(sim_obj, def_tm, tgt_tm):
+        print(f"**{def_tm} Defense vs. Opponents Similar to {tgt_tm}:**")
+        if not sim_obj.get("render_match_table", True):
+            print(f"  * {sim_obj.get('no_analogs_message')}")
+        else:
+            games_list = sim_obj.get("similar_games", [])
+            print(f"  * Analog Games Evaluated ({len(games_list)} games under 1.50σ ceiling):")
+            for gm in games_list:
+                h2h_flag = " [Direct H2H]" if gm.get("is_direct_h2h") else " [Analog]"
+                rush_val = gm.get('rb_rush_yards_allowed', 'N/A')
+                pass_val = gm.get('pass_yards_allowed', 'N/A')
+                print(f"    - {gm.get('season')} Wk {gm.get('week')} vs {gm.get('opponent')}{h2h_flag}: RMSD = {gm.get('rmsd', 0.0):.3f}σ ({gm.get('similarity_tier')}) | Allowed: {rush_val} RB rush yds, {pass_val} pass yds")
+            str_med = sim_obj.get('median_rb_rush_yards_strong')
+            all_med = sim_obj.get('median_rb_rush_yards_all')
+            if str_med is not None:
+                print(f"  * Strong Analogs Median (<= 1.00σ): {str_med} yds")
             else:
-                print(f"  * {def_tm} Defense vs {opp_tm}-like Analogs: {status}")
-            
-            if h2h_games:
-                print("    [Direct H2H Games]:")
-                for gm in h2h_games:
-                    rush_val = gm.get('rb_rush_yards_allowed', gm.get('yds', 'N/A'))
-                    pass_val = gm.get('pass_yards_allowed', 'N/A')
-                    wr_val = gm.get('wr_rec_yards_allowed', 'N/A')
-                    te_val = gm.get('te_rec_yards_allowed', 'N/A')
-                    qb_val = gm.get('qb_rush_yards_allowed', 'N/A')
-                    print(f"      - {gm.get('season')} Wk {gm.get('week')} vs {gm.get('opponent')}: Allowed {rush_val} RB rush yds, {pass_val} pass yds, {wr_val} WR yds, {te_val} TE yds, {qb_val} QB rush yds")
-            print()
-
-    if not rendered_any_analog:
-        print("  * No qualified stylistic analogs meeting the <= 0.85σ RMSD threshold and minimum 3-opponent floor.")
+                print(f"  * Strong Analogs: Sample insufficient (need >= 3 games <= 1.00σ) for style-only isolate")
+            print(f"  * All Qualifying Analogs Median (n={len(games_list)} games <= 1.50σ): {all_med if all_med is not None else 'N/A'} yds")
         print()
 
+    _render_sim(h_sim, home, away)
+    _render_sim(a_sim, away, home)
+
+    # (5) Dual Archetype Comparison
+    print("### (5) Dual Archetype Comparison")
+    h_dual = sim.get("home_defense_dual_archetype_splits", {})
+    a_dual = sim.get("away_defense_dual_archetype_splits", {})
+
+    def _render_dual(dual_obj, def_tm, opp_tm):
+        print(f"**{def_tm} Defense vs. {opp_tm}-Profile Offenses (Ground vs. Aerial):**")
+        status = dual_obj.get("can_conclude_status", "cannot_conclude")
+        print(f"  * Conclusion Status: {status.upper()}")
+        print(f"  * Sample Analysis: {dual_obj.get('conclusion_verdict', '')}")
+        ct = dual_obj.get("contrast_table", [])
+        if ct:
+            for row in ct:
+                arch = row.get("archetype", "")
+                stat = row.get("status", "")
+                str_yd = row.get("rb_rush_yards_strong")
+                all_yd = row.get("rb_rush_yards_all")
+                ypc = row.get("rb_ypc")
+                pass_yd = row.get("pass_yards")
+                print(f"    - {arch}: {stat}")
+                print(f"      RB Rush Yds Allowed: Strong Med = {str_yd} yds | All Med = {all_yd} yds | YPC = {ypc} | Pass Yds = {pass_yd}")
+        print()
+
+    _render_dual(h_dual, home, away)
+    _render_dual(a_dual, away, home)
+
+    # (6) Player Usage Profiles
+    print("### (6) Player Usage Profiles")
+    profiles = g.get("player_usage_profiles", [])
+    for p in profiles:
+        p_name = p.get('player_display_name') or p.get('player')
+        print(f"**{p_name} ({p.get('pos')} - {p.get('team')}) | Focus: {p.get('stat_focus')}**")
+        l10 = p.get("last_10_stats", {})
+        print(f"  * Last {l10.get('n_games', 0)} Games Box Stats: Median {l10.get('median')} {l10.get('unit')} (p25–p75: {l10.get('p25')}–{l10.get('p75')}, Range: {l10.get('min')}–{l10.get('max')})")
+        if p.get("splits", {}).get("coverage_shell"):
+            print(f"  * Coverage Splits: {p['splits']['coverage_shell']}")
+        if p.get("red_zone", {}).get("summary_str"):
+            print(f"  * Red Zone Opportunities: {p['red_zone']['summary_str']}")
+        if p.get("explosive_plays", {}).get("summary_str"):
+            print(f"  * Explosive Gains: {p['explosive_plays']['summary_str']}")
+        print(f"  * Opponent Defense Context: {p.get('defense_context')}")
+        print()
+
+    # (7) Pace and Tempo
+    print("### (7) Pace and Tempo")
+    gf = g.get("game_flow_tempo", {})
+    print(f"  * {gf.get('pace_and_tempo', '')}")
+    print(f"  * Situational Tendencies: {gf.get('situational_tendencies', '')}")
+    print()
+
+    # (8) Head-to-Head History
+    print("### (8) Head-to-Head History")
+    h2h = sheet.get("section_6_head_to_head", {})
+    if h2h.get("played_recently"):
+        print(f"  * {h2h.get('descriptive_note')}")
+        ab = h2h.get("away_team", {})
+        hb = h2h.get("home_team", {})
+        print(f"  * {ab.get('team')}: {ab.get('total_plays')} plays, {ab.get('rush_yards')} rush yds, {ab.get('pass_yards')} pass yds, Turnovers: {ab.get('turnovers')}, EPA/play: {ab.get('epa_per_play')}")
+        print(f"    - Leaders: Rusher {ab.get('leading_rusher')} | Receiver {ab.get('leading_receiver')}")
+        print(f"  * {hb.get('team')}: {hb.get('total_plays')} plays, {hb.get('rush_yards')} rush yds, {hb.get('pass_yards')} pass yds, Turnovers: {hb.get('turnovers')}, EPA/play: {hb.get('epa_per_play')}")
+        print(f"    - Leaders: Rusher {hb.get('leading_rusher')} | Receiver {hb.get('leading_receiver')}")
+    else:
+        print(f"  * {h2h.get('note')}")
+    print()
+
+    # (9) Reported Personnel Status
+    print("### (9) Reported Personnel Status")
+    pers = sheet.get("section_7_key_personnel", {})
+    print(f"  * Protocol: {pers.get('note', '')}")
+    a_injs = pers.get("away_team_injuries", [])
+    h_injs = pers.get("home_team_injuries", [])
+    if a_injs:
+        print(f"  * {away} Reported Status:")
+        for inj in a_injs[:5]:
+            p_n = inj.get('player') or inj.get('player_name') or 'Player'
+            pos = inj.get('position', '')
+            st = inj.get('status', 'Active')
+            pr = inj.get('practice_status', 'Full')
+            inj_type = inj.get('primary_injury', '')
+            print(f"    - {p_n} ({pos}): Status = {st}, Practice = {pr}" + (f", Injury = {inj_type}" if inj_type else ""))
+    else:
+        print(f"  * {away}: No reported injury status entries on file.")
+
+    if h_injs:
+        print(f"  * {home} Reported Status:")
+        for inj in h_injs[:5]:
+            p_n = inj.get('player') or inj.get('player_name') or 'Player'
+            pos = inj.get('position', '')
+            st = inj.get('status', 'Active')
+            pr = inj.get('practice_status', 'Full')
+            inj_type = inj.get('primary_injury', '')
+            print(f"    - {p_n} ({pos}): Status = {st}, Practice = {pr}" + (f", Injury = {inj_type}" if inj_type else ""))
+    else:
+        print(f"  * {home}: No reported injury status entries on file.")
+    print()
     print("=" * 80)
     print()
