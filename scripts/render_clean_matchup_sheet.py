@@ -40,9 +40,25 @@ STAT_NAME_MAP = {
     'fourth_quarter_margin.one_score_game.pass_rate': 'One-Score 4th Qtr Pass Rate',
     'positions_allowed.wr.yards_per_game': 'WR Yards/Game Allowed',
     'positions_allowed.wr.epa_per_target': 'WR EPA/Target Allowed',
+    'positions_allowed.wr.yards_per_target': 'WR Yards/Target Allowed',
+    'positions_allowed.wr.success_rate': 'WR Success Rate Allowed',
     'positions_allowed.rb.yards_per_target': 'RB Yards/Target Allowed',
+    'positions_allowed.rb.success_rate': 'RB Success Rate Allowed',
     'positions_allowed.te.yards_per_target': 'TE Yards/Target Allowed',
+    'positions_allowed.te.success_rate': 'TE Success Rate Allowed',
     'field_position_splits.red_zone_20_to_1.pass_rate': 'Red Zone (20–1) Pass Rate',
+    'field_position_splits.red_zone_20_to_1.rush_rate': 'Red Zone (20–1) Rush Rate',
+    'field_position_splits.red_zone_20_to_1.td_rate': 'Red Zone (20–1) TD Rate',
+    'field_position_splits.red_zone_20_to_1.epa_per_play': 'Red Zone (20–1) EPA/play',
+    'red_zone_shares.inside_20.rb_target_share': 'RZ Inside 20 RB Target Share',
+    'red_zone_shares.inside_20.te_target_share': 'RZ Inside 20 TE Target Share',
+    'red_zone_shares.inside_20.rb_carry_share': 'RZ Inside 20 RB Carry Share',
+    'red_zone_shares.inside_20.qb_carry_share': 'RZ Inside 20 QB Carry Share',
+    'pass_defense.overall_dropbacks.yards_per_attempt': 'Pass Defense Yards/Attempt Allowed',
+    'pass_defense.overall_dropbacks.success_rate': 'Pass Defense Success Rate Allowed',
+    'rush_defense.overall_rb.explosive_rate_10_plus': 'Rush Defense Explosive Rate (10+ yds)',
+    'rush_defense.overall_rb.success_rate': 'Rush Defense Success Rate Allowed',
+    'rush_defense.overall_rb.yards_per_carry': 'Rush Defense Yards/Carry Allowed',
     'game_state_splits.neutral.epa_per_play': 'Neutral EPA/play',
     'pass_defense.target_depth_allowed.short_0_to_9.epa_per_attempt': 'Short (0–9 yds) Pass EPA Allowed',
 }
@@ -83,21 +99,25 @@ def extract_qualifying_outliers(g, min_sample_required=1):
     }
     
     sections = [
-        ("section_1_away_offense_tendencies", away),
-        ("section_2_home_defense_vulnerabilities", home),
-        ("section_3_home_offense_tendencies", home),
-        ("section_4_away_defense_vulnerabilities", away),
+        ("section_1_away_offense_tendencies", away, "off"),
+        ("section_2_home_defense_vulnerabilities", home, "def"),
+        ("section_3_home_offense_tendencies", home, "off"),
+        ("section_4_away_defense_vulnerabilities", away, "def"),
     ]
     
     qualifying = []
     
-    for sec_key, team_code in sections:
+    for sec_key, team_code, side in sections:
         sec_dict = sheet.get(sec_key, {})
         if not isinstance(sec_dict, dict):
             continue
             
         def walk(d, path=""):
             if isinstance(d, dict):
+                # Skip obscure non-red-zone field position splits (own 1-20, own 21-50, opp 49-21)
+                if any(x in path for x in ("opp_49_to_21", "own_1_to_20", "own_21_to_50")):
+                    return
+
                 r = d.get("rank")
                 n_games = d.get("n_games")
                 if n_games is None:
@@ -120,6 +140,7 @@ def extract_qualifying_outliers(g, min_sample_required=1):
                         extremity = abs(r - 16.5)
                         qualifying.append({
                             "team": team_code,
+                            "side": side,
                             "stat_name": sn,
                             "raw_value": d.get("raw_value"),
                             "league_median": d.get("league_median"),
@@ -136,20 +157,29 @@ def extract_qualifying_outliers(g, min_sample_required=1):
         
     qualifying.sort(key=lambda x: x["extremity"], reverse=True)
     
-    # Deduplicate binary pairs (e.g. 2nd Down Pass Rate vs 2nd Down Rush Rate)
+    # Deduplicate binary pairs and duplicate stat names per team/side
     filtered = []
+    seen_stat = set()
     seen_binary = set()
     for c in qualifying:
-        sn = c["stat_name"]
         tm = c["team"]
+        side = c["side"]
+        sn = c["stat_name"]
+        
+        stat_key = (tm, side, sn)
+        if stat_key in seen_stat:
+            continue
+        seen_stat.add(stat_key)
+        
         binary_key = None
         if "Pass Rate" in sn or "Rush Rate" in sn:
             group = sn.replace("Pass Rate", "").replace("Rush Rate", "").strip()
-            binary_key = (tm, group)
+            binary_key = (tm, side, group)
         if binary_key and binary_key in seen_binary:
             continue
         if binary_key:
             seen_binary.add(binary_key)
+            
         filtered.append(c)
         
     return filtered
@@ -190,13 +220,14 @@ def main():
             # Show at most 5 stats per matchup
             for stat in qualifying[:5]:
                 t = stat["team"]
+                side = stat.get("side", "off")
                 sn = stat["stat_name"]
                 u = stat["unit"]
                 rv = format_val(stat["raw_value"], u)
                 med = format_val(stat["league_median"], u)
                 rk = stat["rank"]
                 ng_val = stat["n_games"]
-                print(f"{t} {sn}: {rv} (league median {med}, rank #{rk} of 32, n={ng_val})")
+                print(f"{t} {side}: {sn}: {rv} (league median {med}, rank #{rk} of 32, n={ng_val})")
                 
         print()
 
