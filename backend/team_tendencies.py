@@ -471,6 +471,7 @@ def compute_opponent_vulnerability_profile(
         sample_size=rb_epa["sample_size"],
         higher_is_better=False,
         unit="epa_diff",
+        n_games=n_games,
     )
 
     # Inside vs Outside
@@ -519,6 +520,7 @@ def compute_opponent_vulnerability_profile(
         sample_size=pass_epa["sample_size"],
         higher_is_better=False,
         unit="epa_diff",
+        n_games=n_games,
     )
 
     # Pass Depth Bins
@@ -588,7 +590,7 @@ def compute_opponent_vulnerability_profile(
         med_wh_ypc = float((def_wh["rushing_yards"] / def_wh["carries"].replace(0, 1)).median()) if n_wh_games > 0 else 0.0
 
         wh_all_meds = workhorses.groupby("opponent_team")["rushing_yards"].median().to_dict()
-        wh_yds_comp = format_stat_comparison(med_wh_yds, wh_all_meds, n_wh_games, higher_is_better=False, unit="yards", min_sample=3)
+        wh_yds_comp = format_stat_comparison(med_wh_yds, wh_all_meds, n_wh_games, higher_is_better=False, unit="yards", min_sample=3, n_games=n_games)
 
         # 2. Committee RBs (< 10 carries)
         committee = w_df[(w_df["position"] == "RB") & (w_df["carries"] < 10) & (w_df["carries"] > 0)]
@@ -596,7 +598,7 @@ def compute_opponent_vulnerability_profile(
         n_comm_games = len(def_comm)
         med_comm_yds = float(def_comm["rushing_yards"].median()) if n_comm_games > 0 else 0.0
         comm_all_meds = committee.groupby("opponent_team")["rushing_yards"].median().to_dict()
-        comm_yds_comp = format_stat_comparison(med_comm_yds, comm_all_meds, n_comm_games, higher_is_better=False, unit="yards", min_sample=4)
+        comm_yds_comp = format_stat_comparison(med_comm_yds, comm_all_meds, n_comm_games, higher_is_better=False, unit="yards", min_sample=4, n_games=n_games)
 
         # 3. WR1s (highest targets on their team for the game)
         wr_only = w_df[w_df["position"] == "WR"].copy()
@@ -607,9 +609,9 @@ def compute_opponent_vulnerability_profile(
             n_wr1 = len(def_wr1)
             med_wr1_yds = float(def_wr1["receiving_yards"].median()) if n_wr1 > 0 else 0.0
             wr1_all_meds = wr1s.groupby("opponent_team")["receiving_yards"].median().to_dict()
-            wr1_comp = format_stat_comparison(med_wr1_yds, wr1_all_meds, n_wr1, higher_is_better=False, unit="yards", min_sample=3)
+            wr1_comp = format_stat_comparison(med_wr1_yds, wr1_all_meds, n_wr1, higher_is_better=False, unit="yards", min_sample=3, n_games=n_games)
         else:
-            wr1_comp = format_stat_comparison(0.0, {}, 0)
+            wr1_comp = format_stat_comparison(0.0, {}, 0, n_games=n_games)
 
         # 4. High-Volume TEs (>= 15% target share or >= 5 targets)
         tes = w_df[(w_df["position"] == "TE") & (w_df["targets"] >= 5)]
@@ -617,7 +619,7 @@ def compute_opponent_vulnerability_profile(
         n_te = len(def_te)
         med_te_yds = float(def_te["receiving_yards"].median()) if n_te > 0 else 0.0
         te_all_meds = tes.groupby("opponent_team")["receiving_yards"].median().to_dict()
-        te_comp = format_stat_comparison(med_te_yds, te_all_meds, n_te, higher_is_better=False, unit="yards", min_sample=3)
+        te_comp = format_stat_comparison(med_te_yds, te_all_meds, n_te, higher_is_better=False, unit="yards", min_sample=3, n_games=n_games)
 
         archetype_stats = {
             "vs_workhorse_rbs_15_plus_carries": {
