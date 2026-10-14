@@ -641,23 +641,19 @@
                     </div>
                 </div>
 
-                <!-- 4 Blocks Navigation Quick-Jumps -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 border-t border-[#21262d]">
-                    <a href="#block-outliers" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
-                        <span class="truncate">1. Outliers & Clashes</span>
+                <!-- 3 Sections Navigation Quick-Jumps -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-[#21262d]">
+                    <a href="#block-playstyle" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="shield" class="w-3.5 h-3.5 text-sky-400 shrink-0"></i>
+                        <span class="truncate">1. Playstyle Matchup</span>
                     </a>
-                    <a href="#block-usage" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="crosshair" class="w-3.5 h-3.5 text-cyan-400 shrink-0"></i>
-                        <span class="truncate">2. Concentrated Usage</span>
+                    <a href="#block-archetypes" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
+                        <i data-lucide="target" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+                        <span class="truncate">2. Target Archetypes</span>
                     </a>
                     <a href="#block-analogs" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
                         <i data-lucide="git-compare" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
-                        <span class="truncate">3. Qualified Analogs</span>
-                    </a>
-                    <a href="#block-injuries" class="px-2.5 py-1.5 rounded-lg bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[11px] text-slate-300 hover:text-slate-100 flex items-center justify-center space-x-1.5 text-center transition">
-                        <i data-lucide="activity" class="w-3.5 h-3.5 text-rose-400 shrink-0"></i>
-                        <span class="truncate">4. Active Injuries</span>
+                        <span class="truncate">3. Stylistic Analogs</span>
                     </a>
                 </div>
             </div>
@@ -4236,12 +4232,16 @@
             }
 
             const sheet = d.matchup_stat_sheet || {};
+            const pf = d.playstyle_funnel || sheet.playstyle_funnel || {};
+            const s1 = d.section_1_playstyle_matchup || pf.section_1_playstyle_matchup || sheet.section_1_playstyle_matchup || {};
+            const s2 = d.section_2_archetypes_to_target || pf.section_2_archetypes_to_target || sheet.section_2_archetypes_to_target || {};
+            const s3 = d.section_3_historical_analogs || pf.section_3_historical_analogs || sheet.section_3_historical_analogs || sheet.section_5_similar_opponents || {};
 
-            // Block 1 — Key Statistical Outliers & Scheme Clashes (Max 5 Bullets)
-            const topOutliers = (d.top_outliers || sheet.top_outliers || []).slice(0, 5);
+            const awayOffVsHomeDef = s1.away_off_vs_home_def || {};
+            const homeOffVsAwayDef = s1.home_off_vs_away_def || {};
 
-            // Block 2 — Concentrated Player Usage (Filtered Table)
-            let alphaPlayers = d.concentrated_player_usage || sheet.concentrated_player_usage || [];
+            const beneficiaries = s2.beneficiary_players || [];
+            let alphaPlayers = s2.concentrated_alpha_usage || d.concentrated_player_usage || sheet.concentrated_player_usage || [];
             if (!alphaPlayers || alphaPlayers.length === 0) {
                 const profiles = d.player_usage_profiles || [];
                 alphaPlayers = profiles.filter(p => {
@@ -4252,53 +4252,130 @@
                 });
             }
 
-            // Block 3 — Qualified Analog & H2H Lookup (Auto-Collapsed if Empty)
-            const sim = sheet.section_5_similar_opponents || {};
-            const hSim = sim.home_defense_vs_opponents_like_away || {};
-            const aSim = sim.away_defense_vs_opponents_like_home || {};
+            const hSim = s3.home_defense_vs_similar_away || s3.home_defense_vs_opponents_like_away || {};
+            const aSim = s3.away_defense_vs_similar_home || s3.away_defense_vs_opponents_like_home || {};
 
-            const hStrong = (hSim.strong_analogs_median != null) ? hSim.strong_analogs_median : (hSim.median_rb_rush_yards_strong != null ? hSim.median_rb_rush_yards_strong : null);
-            const aStrong = (aSim.strong_analogs_median != null) ? aSim.strong_analogs_median : (aSim.median_rb_rush_yards_strong != null ? aSim.median_rb_rush_yards_strong : null);
-
-            const qualifiedUnits = [];
-            if (hStrong != null) {
-                qualifiedUnits.push({
-                    defTeam: d.home_team,
-                    oppTeam: d.away_team,
-                    strongMedian: hStrong,
-                    status: hSim.strong_status || 'qualified games',
-                    directH2H: hSim.direct_h2h_games || []
-                });
-            }
-            if (aStrong != null) {
-                qualifiedUnits.push({
-                    defTeam: d.away_team,
-                    oppTeam: d.home_team,
-                    strongMedian: aStrong,
-                    status: aSim.strong_status || 'qualified games',
-                    directH2H: aSim.direct_h2h_games || []
-                });
-            }
-            const hasStrongAnalogs = qualifiedUnits.length > 0;
-
-            // Block 4 — Active Injury Exceptions
-            const pers = sheet.section_7_key_personnel || {};
-            const rawInjuries = [
-                ...(pers.away_team_injuries || []),
-                ...(pers.home_team_injuries || []),
-                ...(d.injuries?.injuries || []),
-                ...(d.injuries?.away_injuries || []),
-                ...(d.injuries?.home_injuries || [])
+            const analogUnits = [
+                { defTeam: d.home_team, oppTeam: d.away_team, sim: hSim },
+                { defTeam: d.away_team, oppTeam: d.home_team, sim: aSim }
             ];
-            const activeInjuries = [];
-            const seenInj = new Set();
-            for (const inj of rawInjuries) {
-                const line = formatInjuryLine(inj);
-                if (line && !seenInj.has(line)) {
-                    seenInj.add(line);
-                    activeInjuries.push(line);
-                }
-            }
+
+            const renderPlaystyleCard = (matchData, offTeam, defTeam) => {
+                const defFunnel = matchData.defense_funnel || {};
+                const offPlaystyle = matchData.offense_playstyle || {};
+                const funnels = matchData.funnel_insights || [];
+                const cov = defFunnel.coverage_shell || {};
+                const bleed = defFunnel.funnel_bleed || {};
+                const drop = offPlaystyle.dropback_profile || {};
+                const runId = offPlaystyle.run_identity || {};
+                const qb = offPlaystyle.qb_threat || {};
+
+                return `
+                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-4">
+                        <div class="flex items-center justify-between border-b border-[#21262d] pb-2.5">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-bold text-slate-100 font-mono tracking-tight">${offTeam} Offense vs. ${defTeam} Defense</span>
+                            </div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#161b22] text-sky-300 border border-[#21262d]">Schematic Matchup</span>
+                        </div>
+
+                        <!-- Defensive Shell & Funnel Profile -->
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                                    <i data-lucide="shield" class="w-3.5 h-3.5 text-rose-400"></i>
+                                    <span>${defTeam} Defensive Shell &amp; Funnel Bleed</span>
+                                </span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950/40 text-rose-300 border border-rose-800/40">
+                                    ${cov.shell_archetype || (cov.mfo_pct >= 50 ? 'Two-High MFO' : 'Single-High MFC')}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">Coverage Shell:</span>
+                                    <b class="text-slate-200">${cov.mfo_pct != null ? cov.mfo_pct.toFixed(0) : 50}% MFO • ${cov.zone_pct != null ? cov.zone_pct.toFixed(0) : 65}% Zone</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">Blitz / Pressure:</span>
+                                    <b class="text-slate-200">${cov.blitz_pct != null ? cov.blitz_pct.toFixed(0) : 25}% Blitz</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">Short &lt;10y Comp %:</span>
+                                    <b class="text-slate-200">${bleed.short_comp_pct != null ? bleed.short_comp_pct.toFixed(1) : 75}% (${bleed.short_target_share != null ? bleed.short_target_share.toFixed(0) : 60}% vol)</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">QB Rush Conceded:</span>
+                                    <b class="text-slate-200">${bleed.qb_rush_ypg_allowed != null ? bleed.qb_rush_ypg_allowed.toFixed(1) : 20} yds/g</b>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-300 font-sans leading-relaxed bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                ${defFunnel.summary || `${defTeam} Defense operates primarily in zone coverage shells.`}
+                            </p>
+                        </div>
+
+                        <!-- Offensive Playstyle Profile -->
+                        <div class="space-y-2 pt-1 border-t border-[#21262d]">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                                    <i data-lucide="zap" class="w-3.5 h-3.5 text-sky-400"></i>
+                                    <span>${offTeam} Offensive Playstyle Profile</span>
+                                </span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/40 text-sky-300 border border-sky-800/40">
+                                    ${runId.primary_run || 'Balanced'}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">Run Split:</span>
+                                    <b class="text-slate-200">${runId.gap_pct != null ? runId.gap_pct.toFixed(1) : 45}% Gap / ${runId.zone_pct != null ? runId.zone_pct.toFixed(1) : 55}% Zone</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">Target Depths:</span>
+                                    <b class="text-slate-200">${drop.pass_short_under_10_pct != null ? drop.pass_short_under_10_pct.toFixed(0) : 60}% &lt;10y • ${drop.deep_shot_rate != null ? drop.deep_shot_rate.toFixed(0) : 15}% Deep</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">Formations &amp; Pace:</span>
+                                    <b class="text-slate-200">${drop.shotgun_pct != null ? drop.shotgun_pct.toFixed(0) : 70}% Gun • ${drop.neutral_pass_pct != null ? drop.neutral_pass_pct.toFixed(0) : 57}% Pass</b>
+                                </div>
+                                <div class="bg-[#161b22] p-2 rounded-lg border border-[#21262d]">
+                                    <span class="text-slate-400 block text-[9.5px]">QB Rush Threat:</span>
+                                    <b class="text-slate-200">${qb.qb_name || 'QB'}: ${qb.rush_yds_per_game != null ? qb.rush_yds_per_game.toFixed(1) : 10} yds/g</b>
+                                </div>
+                            </div>
+                            <p class="text-[11px] text-slate-300 font-sans leading-relaxed bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                ${offPlaystyle.summary || `${offTeam} offense balances short passing with situational checks.`}
+                            </p>
+                        </div>
+
+                        <!-- What This Opens Up (Schematic Funnels) -->
+                        <div class="space-y-2 pt-1 border-t border-[#21262d]">
+                            <span class="text-[11px] font-bold text-amber-300 uppercase font-mono tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="compass" class="w-3.5 h-3.5 text-amber-400"></i>
+                                <span>What This Opens Up (Schematic Funnels)</span>
+                            </span>
+                            ${funnels.length > 0 ? `
+                                <div class="space-y-2">
+                                    ${funnels.map(fn => `
+                                        <div class="bg-[#161b22] rounded-lg border border-[#21262d] p-3 space-y-1">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-xs font-bold text-amber-300 font-sans">${fn.name}</span>
+                                                <span class="text-[9.5px] font-mono px-2 py-0.5 rounded bg-amber-950/40 text-amber-300 border border-amber-800/40">${fn.archetype_title || 'Target Role'}</span>
+                                            </div>
+                                            <p class="text-xs text-slate-200 font-sans leading-relaxed">
+                                                ${fn.takeaway}
+                                            </p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : `
+                                <div class="bg-[#161b22] rounded-lg border border-[#21262d] p-3 text-xs text-slate-400 italic">
+                                    Standard neutral schematic balance with no extreme coverage funnel points identified.
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            };
 
             const html = `
                 <!-- ============================================================== -->
@@ -4321,187 +4398,234 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 self-start md:self-auto">
-                        <span class="text-[11px] px-2.5 py-1 rounded-md bg-[#12161c] text-slate-400 border border-[#30363d] font-mono">
-                            Outlier &amp; Mismatch Engine • Signal-Only
+                        <span class="text-[11px] px-2.5 py-1 rounded-md bg-[#12161c] text-sky-400 border border-sky-800/40 font-mono">
+                            Playstyle &amp; Player Archetype Funnel Engine
                         </span>
                     </div>
                 </div>
 
                 <!-- ============================================================== -->
-                <!-- BLOCK 1: KEY STATISTICAL OUTLIERS & SCHEME CLASHES (MAX 5) -->
+                <!-- SECTION 1: OFFENSIVE VS. DEFENSIVE PLAYSTYLE MATCHUP -->
                 <!-- ============================================================== -->
-                <div id="block-outliers" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                <div id="block-playstyle" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
                     <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
                         <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-amber-950/40 border border-amber-800/50 flex items-center justify-center text-amber-400 shrink-0">
-                                <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+                            <div class="w-7 h-7 rounded-lg bg-sky-950/40 border border-sky-800/50 flex items-center justify-center text-sky-400 shrink-0">
+                                <i data-lucide="shield" class="w-4 h-4 text-sky-400"></i>
                             </div>
                             <div>
-                                <h3 class="text-sm font-bold text-slate-100">Block 1 — Key Statistical Outliers & Scheme Clashes</h3>
-                                <p class="text-[11px] text-slate-400">Strictly gated at top/bottom 20% (|z| &ge; 1.0&sigma;), capped at top 5 leverage mismatches</p>
+                                <h3 class="text-sm font-bold text-slate-100">Section 1 — Offensive vs. Defensive Playstyle Matchup</h3>
+                                <p class="text-[11px] text-slate-400">Coverage shell tendencies, funnel bleed points, offensive run/pass identities, and schematic cause-and-effect</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-amber-300 border border-[#30363d]">${topOutliers.length} Outliers</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-sky-300 border border-[#30363d]">Two-Way Breakdown</span>
                     </div>
 
-                    ${topOutliers.length > 0 ? `
-                        <div class="space-y-2.5">
-                            ${topOutliers.map((o) => {
-                                const oType = o.type || 'OUTLIER';
-                                const badgeColor = oType === 'SCHEME_CLASH' 
-                                    ? 'bg-rose-950/40 text-rose-300 border-rose-800/50' 
-                                    : oType === 'UNIT_EXTREME' 
-                                    ? 'bg-amber-950/40 text-amber-300 border-amber-800/50' 
-                                    : 'bg-purple-950/40 text-purple-300 border-purple-800/50';
-                                return `
-                                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 flex items-start space-x-3 transition hover:border-slate-500">
-                                        <span class="text-[10px] font-mono font-bold px-2 py-1 rounded shrink-0 border ${badgeColor}">
-                                            ${oType}
-                                        </span>
-                                        <div class="flex-1 space-y-1">
-                                            <p class="text-xs text-slate-200 font-sans leading-relaxed">
-                                                ${formatInsightsText(o.headline || '')}
-                                            </p>
-                                            ${o.detail ? `<p class="text-[11px] text-slate-400 font-mono">${formatInsightsText(o.detail)}</p>` : ''}
-                                        </div>
-                                        ${o.score != null ? `
-                                            <span class="text-[10px] font-mono text-slate-400 shrink-0 bg-[#161b22] px-2 py-0.5 rounded border border-[#21262d]">
-                                                score: ${o.score.toFixed(2)}
+                    <div class="space-y-4">
+                        ${renderPlaystyleCard(awayOffVsHomeDef, d.away_team, d.home_team)}
+                        ${renderPlaystyleCard(homeOffVsAwayDef, d.home_team, d.away_team)}
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- SECTION 2: PLAYER ARCHETYPES TO TARGET -->
+                <!-- ============================================================== -->
+                <div id="block-archetypes" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-5">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-950/40 border border-emerald-800/50 flex items-center justify-center text-emerald-400 shrink-0">
+                                <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">Section 2 — Player Archetypes to Target</h3>
+                                <p class="text-[11px] text-slate-400">Matchup beneficiaries directly exploiting defensive coverage funnels and concentrated alpha usage roles</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-emerald-300 border border-[#30363d]">${beneficiaries.length} Matchup Beneficiaries</span>
+                    </div>
+
+                    <!-- Matchup Beneficiaries (Who Feasts & Why) -->
+                    <div class="space-y-3">
+                        <span class="text-xs font-bold text-slate-200 font-mono uppercase tracking-wider block">
+                            [Matchup Beneficiaries — Who Benefits &amp; Why]
+                        </span>
+                        ${beneficiaries.length > 0 ? `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                ${beneficiaries.map(b => `
+                                    <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2 hover:border-slate-500 transition">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div>
+                                                <div class="flex items-center space-x-1.5">
+                                                    <span class="text-xs font-bold text-slate-100 font-sans">${b.player}</span>
+                                                    <span class="text-[10px] font-mono text-slate-400">(${b.pos} - ${b.team})</span>
+                                                </div>
+                                                <span class="text-[10.5px] font-semibold text-emerald-400 font-sans block mt-0.5">${b.archetype}</span>
+                                            </div>
+                                            <span class="text-[9.5px] font-mono px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#21262d] shrink-0">
+                                                ${b.role_context}
                                             </span>
-                                        ` : ''}
+                                        </div>
+                                        <p class="text-xs text-slate-300 font-sans leading-relaxed bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                            ${b.matchup_rationale}
+                                        </p>
                                     </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    ` : `
-                        <div class="bg-[#12161c] border border-[#30363d] rounded-xl p-4 text-xs text-slate-400 italic flex items-center space-x-2.5">
-                            <i data-lucide="info" class="w-4 h-4 text-slate-400 shrink-0"></i>
-                            <span>No significant statistical outliers or scheme mismatches exceeding 1.0&sigma; this week.</span>
-                        </div>
-                    `}
-                </div>
-
-                <!-- ============================================================== -->
-                <!-- BLOCK 2: CONCENTRATED PLAYER USAGE (FILTERED TABLE) -->
-                <!-- ============================================================== -->
-                <div id="block-usage" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
-                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-cyan-950/40 border border-cyan-800/50 flex items-center justify-center text-cyan-400 shrink-0">
-                                <i data-lucide="crosshair" class="w-4 h-4 text-cyan-400"></i>
+                                `).join('')}
                             </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-100">Block 2 — Concentrated Player Usage</h3>
-                                <p class="text-[11px] text-slate-400">Alpha role filter: Target Share &ge; 22%, Rush Share &ge; 45%, or Red Zone Touch Share &ge; 35%</p>
+                        ` : `
+                            <div class="bg-[#12161c] border border-[#30363d] rounded-xl p-4 text-xs text-slate-400 italic">
+                                No specific schematic archetype beneficiaries identified for this matchup.
                             </div>
-                        </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-cyan-300 border border-[#30363d]">${alphaPlayers.length} Qualifiers</span>
+                        `}
                     </div>
 
-                    ${alphaPlayers.length > 0 ? `
-                        <div class="overflow-x-auto rounded-xl border border-[#30363d]">
-                            <table class="w-full text-xs text-left text-slate-300">
-                                <thead class="text-[10px] uppercase font-mono bg-[#161b22] text-slate-400 border-b border-[#30363d]">
-                                    <tr>
-                                        <th class="py-2.5 px-3">Player</th>
-                                        <th class="py-2.5 px-2">Pos</th>
-                                        <th class="py-2.5 px-2">Team</th>
-                                        <th class="py-2.5 px-3 text-right">Target Share</th>
-                                        <th class="py-2.5 px-3 text-right">Rush Share</th>
-                                        <th class="py-2.5 px-3 text-right">RZ Touch Share</th>
-                                        <th class="py-2.5 px-3">Alpha Triggers</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-[#21262d] bg-[#12161c] font-mono">
-                                    ${alphaPlayers.map(p => {
-                                        const pName = p.player || p.player_display_name || p.player_name || 'Unknown';
-                                        const pos = p.pos || p.position || 'N/A';
-                                        const tm = p.team || '';
-                                        const tShare = (p.target_share || 0) * 100;
-                                        const rShare = (p.rush_share || 0) * 100;
-                                        const rzShare = (p.rz_touch_share || 0) * 100;
-
-                                        const badges = [];
-                                        if (tShare >= 22.0) badges.push({ text: `Target ${tShare.toFixed(1)}%`, cls: 'bg-emerald-950/40 text-emerald-300 border-emerald-800/40' });
-                                        if (rShare >= 45.0) badges.push({ text: `Rush ${rShare.toFixed(1)}%`, cls: 'bg-amber-950/40 text-amber-300 border-amber-800/40' });
-                                        if (rzShare >= 35.0) badges.push({ text: `RZ Touch ${rzShare.toFixed(1)}%`, cls: 'bg-rose-950/40 text-rose-300 border-rose-800/40' });
-                                        if (badges.length === 0 && p.alpha_triggers) {
-                                            p.alpha_triggers.forEach(tr => badges.push({ text: tr, cls: 'bg-slate-800 text-slate-300 border-slate-700' }));
-                                        }
-
-                                        return `
-                                            <tr class="hover:bg-[#161b22] transition">
-                                                <td class="py-2.5 px-3 font-sans font-semibold text-slate-100">${pName}</td>
-                                                <td class="py-2.5 px-2 text-slate-400">${pos}</td>
-                                                <td class="py-2.5 px-2 text-slate-400">${tm}</td>
-                                                <td class="py-2.5 px-3 text-right ${tShare >= 22.0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${tShare > 0 ? `${tShare.toFixed(1)}%` : '--'}</td>
-                                                <td class="py-2.5 px-3 text-right ${rShare >= 45.0 ? 'text-amber-400 font-bold' : 'text-slate-400'}">${rShare > 0 ? `${rShare.toFixed(1)}%` : '--'}</td>
-                                                <td class="py-2.5 px-3 text-right ${rzShare >= 35.0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${rzShare > 0 ? `${rzShare.toFixed(1)}%` : '--'}</td>
-                                                <td class="py-2.5 px-3 font-sans">
-                                                    <div class="flex flex-wrap gap-1">
-                                                        ${badges.map(b => `<span class="text-[10px] px-2 py-0.5 rounded border font-mono ${b.cls}">${b.text}</span>`).join('')}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
+                    <!-- Concentrated Alpha Usage Table -->
+                    <div class="space-y-3 pt-2 border-t border-[#21262d]">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-200 font-mono uppercase tracking-wider block">
+                                [Concentrated Alpha Usage (Target Share &ge; 22%, Rush Share &ge; 45%, RZ Share &ge; 35%)]
+                            </span>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-cyan-300 border border-[#30363d]">${alphaPlayers.length} Qualifiers</span>
                         </div>
-                    ` : `
-                        <div class="bg-[#12161c] border border-[#30363d] rounded-xl p-4 text-xs text-slate-400 italic flex items-center space-x-2.5">
-                            <i data-lucide="info" class="w-4 h-4 text-slate-400 shrink-0"></i>
-                            <span>No skill players cleared alpha concentration thresholds (&ge;22% target share, &ge;45% rush share, &ge;35% RZ touch share).</span>
-                        </div>
-                    `}
+
+                        ${alphaPlayers.length > 0 ? `
+                            <div class="overflow-x-auto rounded-xl border border-[#30363d]">
+                                <table class="w-full text-xs text-left text-slate-300">
+                                    <thead class="text-[10px] uppercase font-mono bg-[#161b22] text-slate-400 border-b border-[#30363d]">
+                                        <tr>
+                                            <th class="py-2.5 px-3">Player</th>
+                                            <th class="py-2.5 px-2">Pos</th>
+                                            <th class="py-2.5 px-2">Team</th>
+                                            <th class="py-2.5 px-3 text-right">Target Share</th>
+                                            <th class="py-2.5 px-3 text-right">Rush Share</th>
+                                            <th class="py-2.5 px-3 text-right">RZ Touch Share</th>
+                                            <th class="py-2.5 px-3">Alpha Triggers</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-[#21262d] bg-[#12161c] font-mono">
+                                        ${alphaPlayers.map(p => {
+                                            const pName = p.player || p.player_display_name || p.player_name || 'Unknown';
+                                            const pos = p.pos || p.position || 'N/A';
+                                            const tm = p.team || '';
+                                            const tShare = (p.target_share || 0) * 100;
+                                            const rShare = (p.rush_share || 0) * 100;
+                                            const rzShare = (p.rz_touch_share || 0) * 100;
+
+                                            const badges = [];
+                                            if (tShare >= 22.0) badges.push({ text: `Target ${tShare.toFixed(1)}%`, cls: 'bg-emerald-950/40 text-emerald-300 border-emerald-800/40' });
+                                            if (rShare >= 45.0) badges.push({ text: `Rush ${rShare.toFixed(1)}%`, cls: 'bg-amber-950/40 text-amber-300 border-amber-800/40' });
+                                            if (rzShare >= 35.0) badges.push({ text: `RZ Touch ${rzShare.toFixed(1)}%`, cls: 'bg-rose-950/40 text-rose-300 border-rose-800/40' });
+                                            if (badges.length === 0 && p.alpha_triggers) {
+                                                p.alpha_triggers.forEach(tr => badges.push({ text: tr, cls: 'bg-slate-800 text-slate-300 border-slate-700' }));
+                                            }
+
+                                            return `
+                                                <tr class="hover:bg-[#161b22] transition">
+                                                    <td class="py-2.5 px-3 font-sans font-semibold text-slate-100">${pName}</td>
+                                                    <td class="py-2.5 px-2 text-slate-400">${pos}</td>
+                                                    <td class="py-2.5 px-2 text-slate-400">${tm}</td>
+                                                    <td class="py-2.5 px-3 text-right ${tShare >= 22.0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${tShare > 0 ? `${tShare.toFixed(1)}%` : '--'}</td>
+                                                    <td class="py-2.5 px-3 text-right ${rShare >= 45.0 ? 'text-amber-400 font-bold' : 'text-slate-400'}">${rShare > 0 ? `${rShare.toFixed(1)}%` : '--'}</td>
+                                                    <td class="py-2.5 px-3 text-right ${rzShare >= 35.0 ? 'text-rose-400 font-bold' : 'text-slate-400'}">${rzShare > 0 ? `${rzShare.toFixed(1)}%` : '--'}</td>
+                                                    <td class="py-2.5 px-3 font-sans">
+                                                        <div class="flex flex-wrap gap-1">
+                                                            ${badges.map(b => `<span class="text-[10px] px-2 py-0.5 rounded border font-mono ${b.cls}">${b.text}</span>`).join('')}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ` : `
+                            <div class="bg-[#12161c] border border-[#30363d] rounded-xl p-4 text-xs text-slate-400 italic">
+                                No skill players cleared alpha concentration thresholds (&ge;22% target share, &ge;45% rush share, &ge;35% RZ touch share).
+                            </div>
+                        `}
+                    </div>
                 </div>
 
                 <!-- ============================================================== -->
-                <!-- BLOCK 3: QUALIFIED ANALOG & H2H LOOKUP (AUTO-COLLAPSED IF EMPTY) -->
+                <!-- SECTION 3: HISTORICAL STYLISTIC ANALOGS & H2H PERFORMANCE -->
                 <!-- ============================================================== -->
-                ${hasStrongAnalogs ? `
-                    <div id="block-analogs" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
-                        <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                            <div class="flex items-center space-x-2.5">
-                                <div class="w-7 h-7 rounded-lg bg-purple-950/40 border border-purple-800/50 flex items-center justify-center text-purple-400 shrink-0">
-                                    <i data-lucide="git-compare" class="w-4 h-4 text-purple-400"></i>
-                                </div>
-                                <div>
-                                    <h3 class="text-sm font-bold text-slate-100">Block 3 — Qualified Analog & H2H Lookup</h3>
-                                    <p class="text-[11px] text-slate-400">Qualified sample (&ge;3 games across &ge;3 distinct third-party opponents within 1.00&sigma;), with isolated H2H history</p>
-                                </div>
+                <div id="block-analogs" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
+                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-purple-950/40 border border-purple-800/50 flex items-center justify-center text-purple-400 shrink-0">
+                                <i data-lucide="git-compare" class="w-4 h-4 text-purple-400"></i>
                             </div>
-                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-purple-300 border border-[#30363d]">Strong Analogs</span>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100">Section 3 — Historical Stylistic Analogs &amp; H2H Performance</h3>
+                                <p class="text-[11px] text-slate-400">Multivariate production allowed to qualified stylistic clones (RMSD &le; 0.85&sigma;, &ge;3 distinct opponents) and direct head-to-head history</p>
+                            </div>
                         </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-purple-300 border border-[#30363d]">Stylistic Clones</span>
+                    </div>
 
-                        <div class="space-y-3">
-                            ${qualifiedUnits.map(unit => `
+                    <div class="space-y-4">
+                        ${analogUnits.map(u => {
+                            const simObj = u.sim || {};
+                            const sMed = simObj.strong_analogs_median != null ? simObj.strong_analogs_median : (simObj.median_rb_rush_yards_strong != null ? simObj.median_rb_rush_yards_strong : null);
+                            const prod = simObj.strong_production_allowed || (sMed != null ? { rb_rush_yards: sMed } : null);
+                            const h2hGames = simObj.direct_h2h_games || [];
+                            const status = simObj.strong_status || (sMed != null ? 'Qualified sample' : 'Insufficient sample (<3 games or <3 distinct opponents)');
+
+                            return `
                                 <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#21262d] pb-2">
                                         <span class="text-xs font-bold text-slate-100 font-mono">
-                                            ${unit.defTeam} Defense vs ${unit.oppTeam}-like Strong Analogs
+                                            ${u.defTeam} Defense vs. ${u.oppTeam}-like Stylistic Analogs
                                         </span>
-                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#161b22] text-slate-400 border border-[#21262d]">
-                                            ${unit.status}
+                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded ${sMed != null ? 'bg-purple-950/40 text-purple-300 border border-purple-800/40' : 'bg-[#161b22] text-slate-400 border border-[#21262d]'}">
+                                            ${status}
                                         </span>
                                     </div>
 
-                                    <div class="text-xs text-slate-200 font-mono bg-[#161b22] p-3 rounded-lg border border-[#21262d] flex items-center justify-between">
-                                        <span>Third-Party Strong Analogs Median:</span>
-                                        <b class="text-purple-300 font-bold">${unit.strongMedian.toFixed(1)} RB rush yds</b>
-                                    </div>
-
-                                    ${unit.directH2H.length > 0 ? `
-                                        <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] space-y-2">
+                                    ${sMed != null && prod ? `
+                                        <div class="space-y-1.5">
                                             <span class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider block">
-                                                [Direct H2H Games]
+                                                [Qualified Analog Production Allowed — Medians]
+                                            </span>
+                                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
+                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                                    <span class="text-slate-400 block text-[9.5px]">RB Rush Yards:</span>
+                                                    <b class="text-purple-300 font-bold">${prod.rb_rush_yards != null ? prod.rb_rush_yards.toFixed(1) : '--'} yds</b>
+                                                </div>
+                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                                    <span class="text-slate-400 block text-[9.5px]">Pass Yards:</span>
+                                                    <b class="text-slate-200">${prod.pass_yards != null ? prod.pass_yards.toFixed(1) : '--'} yds</b>
+                                                </div>
+                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                                    <span class="text-slate-400 block text-[9.5px]">WR Rec Yards:</span>
+                                                    <b class="text-slate-200">${prod.wr_rec_yards != null ? prod.wr_rec_yards.toFixed(1) : '--'} yds</b>
+                                                </div>
+                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                                    <span class="text-slate-400 block text-[9.5px]">TE Rec Yards:</span>
+                                                    <b class="text-slate-200">${prod.te_rec_yards != null ? prod.te_rec_yards.toFixed(1) : '--'} yds</b>
+                                                </div>
+                                                <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d]">
+                                                    <span class="text-slate-400 block text-[9.5px]">QB Rush Yards:</span>
+                                                    <b class="text-slate-200">${prod.qb_rush_yards != null ? prod.qb_rush_yards.toFixed(1) : '--'} yds</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ` : `
+                                        <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] text-xs text-slate-400 italic">
+                                            No qualified third-party stylistic analogs meeting the &le; 0.85&sigma; RMSD threshold and minimum 3-opponent diversity floor.
+                                        </div>
+                                    `}
+
+                                    ${h2hGames.length > 0 ? `
+                                        <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] space-y-2 mt-2">
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider block">
+                                                [Direct H2H Games (${u.defTeam} vs. ${u.oppTeam})]
                                             </span>
                                             <div class="space-y-1.5 font-mono text-[11px]">
-                                                ${unit.directH2H.map(gm => `
-                                                    <div class="flex items-center justify-between text-slate-300 py-0.5 border-b border-[#21262d] last:border-0">
-                                                        <span>${gm.season} Week ${gm.week} vs ${gm.opponent}</span>
-                                                        <span class="text-slate-400">
-                                                            Allowed <b class="text-slate-200">${gm.rb_rush_yards_allowed != null ? gm.rb_rush_yards_allowed : (gm.yds != null ? gm.yds : 'N/A')}</b> RB rush yds, <b class="text-slate-200">${gm.pass_yards_allowed != null ? gm.pass_yards_allowed : 'N/A'}</b> pass yds
+                                                ${h2hGames.map(gm => `
+                                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between text-slate-300 py-1 border-b border-[#21262d] last:border-0 gap-1">
+                                                        <span class="text-slate-200 font-semibold">${gm.season} Wk ${gm.week} vs ${gm.opponent}</span>
+                                                        <span class="text-slate-400 text-xs">
+                                                            Allowed <b class="text-slate-200">${gm.rb_rush_yards_allowed != null ? gm.rb_rush_yards_allowed : (gm.yds != null ? gm.yds : '--')}</b> RB rush yds, <b class="text-slate-200">${gm.pass_yards_allowed != null ? gm.pass_yards_allowed : '--'}</b> pass yds, <b class="text-slate-200">${gm.wr_rec_yards_allowed != null ? gm.wr_rec_yards_allowed : '--'}</b> WR yds, <b class="text-slate-200">${gm.te_rec_yards_allowed != null ? gm.te_rec_yards_allowed : '--'}</b> TE yds, <b class="text-slate-200">${gm.qb_rush_yards_allowed != null ? gm.qb_rush_yards_allowed : '--'}</b> QB rush yds
                                                         </span>
                                                     </div>
                                                 `).join('')}
@@ -4509,43 +4633,9 @@
                                         </div>
                                     ` : ''}
                                 </div>
-                            `).join('')}
-                        </div>
+                            `;
+                        }).join('')}
                     </div>
-                ` : ''}
-
-                <!-- ============================================================== -->
-                <!-- BLOCK 4: ACTIVE INJURY EXCEPTIONS -->
-                <!-- ============================================================== -->
-                <div id="block-injuries" class="glass-panel rounded-xl p-5 border border-[#30363d] space-y-4">
-                    <div class="flex items-center justify-between border-b border-[#30363d] pb-3">
-                        <div class="flex items-center space-x-2.5">
-                            <div class="w-7 h-7 rounded-lg bg-rose-950/40 border border-rose-800/50 flex items-center justify-center text-rose-400 shrink-0">
-                                <i data-lucide="activity" class="w-4 h-4 text-rose-400"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold text-slate-100">Block 4 — Active Injury Exceptions</h3>
-                                <p class="text-[11px] text-slate-400">Sanitized practice and game status; null values strictly excluded</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-rose-300 border border-[#30363d]">${activeInjuries.length} Reported</span>
-                    </div>
-
-                    ${activeInjuries.length > 0 ? `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                            ${activeInjuries.map(line => `
-                                <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3 text-xs text-slate-200 font-sans flex items-center space-x-2">
-                                    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-400 shrink-0"></i>
-                                    <span class="leading-relaxed">${line}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : `
-                        <div class="bg-[#12161c] border border-[#30363d] rounded-xl p-4 text-xs text-slate-400 italic flex items-center space-x-2.5">
-                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
-                            <span>No active injury status entries reported.</span>
-                        </div>
-                    `}
                 </div>
             `;
 

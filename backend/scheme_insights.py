@@ -1338,6 +1338,13 @@ def compute_scheme_insights(
     home_roster = get_roster_profiles(h_team, season=season, up_to_week=eff_week)
     alpha_usage = [p for p in (away_roster + home_roster) if p.get("is_alpha")]
 
+    # Compute Playstyle & Player Archetype Funnel Engine
+    try:
+        from backend.playstyle_funnel import build_playstyle_funnel_matchup
+        funnel_data = build_playstyle_funnel_matchup(a_team, h_team, season=season, up_to_week=eff_week)
+    except Exception as e:
+        funnel_data = {"error": str(e)}
+
     res = {
         'home_team': h_team,
         'home_team_name': h_name,
@@ -1361,6 +1368,10 @@ def compute_scheme_insights(
         'matchup_synthesis': synthesis_data,
         'injuries': injuries_data,
         'matchup_stat_sheet': stat_sheet,
+        'playstyle_funnel': funnel_data,
+        'section_1_playstyle_matchup': funnel_data.get('section_1_playstyle_matchup', {}),
+        'section_2_archetypes_to_target': funnel_data.get('section_2_archetypes_to_target', {}),
+        'section_3_historical_analogs': funnel_data.get('section_3_historical_analogs', {}),
     }
 
     # Extract Top Outliers (Max 5 Bullets) via Outlier & Mismatch Engine
@@ -1369,6 +1380,10 @@ def compute_scheme_insights(
     if isinstance(stat_sheet, dict):
         stat_sheet['top_outliers'] = top_outliers
         stat_sheet['concentrated_player_usage'] = alpha_usage
+        stat_sheet['playstyle_funnel'] = funnel_data
+        stat_sheet['section_1_playstyle_matchup'] = funnel_data.get('section_1_playstyle_matchup', {})
+        stat_sheet['section_2_archetypes_to_target'] = funnel_data.get('section_2_archetypes_to_target', {})
+        stat_sheet['section_3_historical_analogs'] = funnel_data.get('section_3_historical_analogs', {})
 
     return res
 

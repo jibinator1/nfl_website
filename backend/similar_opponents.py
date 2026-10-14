@@ -304,6 +304,11 @@ def find_similar_opponent_games(
         epa_per_play = float(g["epa"].mean())
         success_rate = float(g["success"].mean())
 
+        # QB rushing and scramble yards conceded
+        qb_runs = g[(g["play_type"] == "run") & ((g["_rush_pos"] == "QB") | (g.get("qb_scramble", 0) == 1))]
+        qb_rush_yds = float(qb_runs["yards_gained"].sum()) if not qb_runs.empty else 0.0
+        qb_carries = int(len(qb_runs))
+
         # RMSD-calibrated similarity tier classification
         if rmsd <= 0.85:
             sim_tier = "Strong (<= 0.85σ)"
@@ -337,6 +342,8 @@ def find_similar_opponent_games(
             "rb_rush_success_rate_allowed": rb_success_rate,
             "rb_stuff_rate_allowed": rb_stuff_rate,
             "rb_explosive_rate_allowed": rb_explosive_rate,
+            "qb_carries_allowed": qb_carries,
+            "qb_rush_yards_allowed": round(qb_rush_yds, 1),
             "pass_attempts_allowed": pass_att,
             "pass_yards_allowed": round(tot_pass_yds, 1),
             "pass_ypa_allowed": pass_ypa,
@@ -508,6 +515,11 @@ def find_similar_opponent_games(
                 "median": round(float(df["te_rec_yards_allowed"].median()), 1),
                 "min": round(float(df["te_rec_yards_allowed"].min()), 1),
                 "max": round(float(df["te_rec_yards_allowed"].max()), 1),
+            },
+            "qb_rush_yards": {
+                "median": round(float(df["qb_rush_yards_allowed"].median()), 1) if "qb_rush_yards_allowed" in df else 0.0,
+                "min": round(float(df["qb_rush_yards_allowed"].min()), 1) if "qb_rush_yards_allowed" in df else 0.0,
+                "max": round(float(df["qb_rush_yards_allowed"].max()), 1) if "qb_rush_yards_allowed" in df else 0.0,
             },
             "sacks": {
                 "median": round(float(df["sacks"].median()), 1),
@@ -714,6 +726,16 @@ def find_similar_opponent_games(
         "median_rb_rush_yards_strong": strong_median,
         "median_pass_yards_all": all_summary.get("pass_yards", {}).get("median") if all_summary else None,
         "median_pass_yards_strong": strong_summary.get("pass_yards", {}).get("median") if strong_summary else None,
+        "median_wr_rec_yards_strong": strong_summary.get("wr_rec_yards", {}).get("median") if strong_summary else None,
+        "median_te_rec_yards_strong": strong_summary.get("te_rec_yards", {}).get("median") if strong_summary else None,
+        "median_qb_rush_yards_strong": strong_summary.get("qb_rush_yards", {}).get("median") if strong_summary else None,
+        "strong_production_allowed": {
+            "rb_rush_yards": strong_median,
+            "pass_yards": strong_summary.get("pass_yards", {}).get("median") if strong_summary else None,
+            "wr_rec_yards": strong_summary.get("wr_rec_yards", {}).get("median") if strong_summary else None,
+            "te_rec_yards": strong_summary.get("te_rec_yards", {}).get("median") if strong_summary else None,
+            "qb_rush_yards": strong_summary.get("qb_rush_yards", {}).get("median") if strong_summary else None,
+        } if can_summarize_strong else None,
         "overall_defense_baseline": overall_medians,
         "descriptive_narrative": descriptive_narrative,
         "disclaimer": "Historical comparison based on past game logs. Shows past defensive results against similar offensive profiles.",

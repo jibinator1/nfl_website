@@ -568,3 +568,130 @@ def test_strong_analog_filter_excludes_moderate_analogs():
     assert len(strong_third_party) == 8  # Top 8 cap applied
 
 
+# ==============================================================================
+# Playstyle & Player Archetype Funnel Engine Tests
+# ==============================================================================
+def test_compute_defensive_funnel():
+    """Verify compute_defensive_funnel returns shell tendencies and bleed points."""
+    from backend.playstyle_funnel import compute_defensive_funnel
+
+    funnel = compute_defensive_funnel("DAL", season=2026, up_to_week=3)
+    assert funnel["team"] == "DAL"
+    assert "coverage_shell" in funnel
+    assert "funnel_bleed" in funnel
+    assert "summary" in funnel
+
+    cov = funnel["coverage_shell"]
+    assert "mfo_pct" in cov
+    assert "zone_pct" in cov
+    assert "blitz_pct" in cov
+
+    bleed = funnel["funnel_bleed"]
+    assert "short_comp_pct" in bleed
+    assert "qb_rush_ypg_allowed" in bleed
+    assert "gap_ypc_allowed" in bleed
+
+
+def test_compute_offensive_playstyle():
+    """Verify compute_offensive_playstyle returns run identity, dropback profile, and QB threat."""
+    from backend.playstyle_funnel import compute_offensive_playstyle
+
+    playstyle = compute_offensive_playstyle("BAL", season=2026, up_to_week=3)
+    assert playstyle["team"] == "BAL"
+    assert "dropback_profile" in playstyle
+    assert "run_identity" in playstyle
+    assert "qb_threat" in playstyle
+    assert "summary" in playstyle
+
+    qb = playstyle["qb_threat"]
+    assert qb["qb_name"] == "Lamar Jackson"
+    assert qb["is_mobile"] is True
+
+
+def test_evaluate_schematic_funnels_football_rules():
+    """Verify football cause-and-effect rules trigger correctly."""
+    from backend.playstyle_funnel import evaluate_schematic_funnels
+
+    off_playstyle = {
+        "dropback_profile": {"pass_short_under_10_pct": 60.0, "deep_shot_rate": 15.0},
+        "run_identity": {"primary_run_concept": "Gap", "gap_pct": 52.0},
+        "qb_threat": {"qb_name": "Josh Allen", "is_mobile": True, "rush_att_per_game": 7.0, "rush_yds_per_game": 45.0},
+    }
+
+    # Defense playing two-high zone, blitzing, conceding underneath throws and QB rush yards
+    def_funnel = {
+        "coverage_shell": {"mfo_pct": 55.0, "zone_pct": 68.0, "man_pct": 32.0, "blitz_pct": 28.0, "mfc_pct": 45.0},
+        "funnel_bleed": {
+            "short_comp_pct": 76.0,
+            "short_target_share": 60.0,
+            "rb_target_share_allowed": 18.0,
+            "te_target_share_allowed": 20.0,
+            "qb_rush_ypg_allowed": 28.0,
+            "gap_ypc_allowed": 4.40,
+            "zone_ypc_allowed": 3.90,
+        },
+    }
+
+    funnels = evaluate_schematic_funnels(off_playstyle, def_funnel, "BUF", "OPP")
+    rule_ids = [f["rule_id"] for f in funnels]
+
+    assert "DEEP_SHELL_UNDERNEATH" in rule_ids
+    assert "QB_SCRAMBLE_LANES" in rule_ids
+    assert "HOT_READ_CHECKDOWN" in rule_ids
+    assert "GROUND_GAP_CLASH" in rule_ids
+
+
+def test_match_target_archetypes_bal_at_dal():
+    """Verify target archetypes map to real players (Lamar Jackson, Derrick Henry, Mark Andrews)."""
+    from backend.playstyle_funnel import (
+        compute_defensive_funnel,
+        compute_offensive_playstyle,
+        evaluate_schematic_funnels,
+        match_target_archetypes,
+    )
+
+    dal_def = compute_defensive_funnel("DAL", season=2026, up_to_week=3)
+    bal_off = compute_offensive_playstyle("BAL", season=2026, up_to_week=3)
+    funnels = evaluate_schematic_funnels(bal_off, dal_def, "BAL", "DAL")
+
+    targets = match_target_archetypes(funnels, "BAL", "DAL", season=2026, up_to_week=3)
+    player_names = [t["player"] for t in targets]
+
+    # Lamar Jackson should be selected for Mobile QB Scramble threat
+    assert "Lamar Jackson" in player_names
+    # Derrick Henry should be selected as lead rusher
+    assert "Derrick Henry" in player_names
+    # Each target item should have required keys
+    for t in targets:
+        assert "player" in t
+        assert "pos" in t
+        assert "team" in t
+        assert "archetype" in t
+        assert "role_context" in t
+        assert "matchup_rationale" in t
+
+
+def test_build_playstyle_funnel_matchup_structure():
+    """Verify the 3-section layout is assembled completely."""
+    from backend.playstyle_funnel import build_playstyle_funnel_matchup
+
+    res = build_playstyle_funnel_matchup("BAL", "DAL", season=2026, up_to_week=3)
+
+    assert "section_1_playstyle_matchup" in res
+    assert "section_2_archetypes_to_target" in res
+    assert "section_3_historical_analogs" in res
+
+    s1 = res["section_1_playstyle_matchup"]
+    assert "away_off_vs_home_def" in s1
+    assert "home_off_vs_away_def" in s1
+
+    s2 = res["section_2_archetypes_to_target"]
+    assert "beneficiary_players" in s2
+    assert "concentrated_alpha_usage" in s2
+
+    s3 = res["section_3_historical_analogs"]
+    assert "home_defense_vs_similar_away" in s3
+    assert "away_defense_vs_similar_home" in s3
+
+
+
