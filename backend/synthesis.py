@@ -45,6 +45,7 @@ def build_matchup_synthesis(
             "confidence": "Low Sample (n < 40)" if rush_eval_away.get("is_low_sample") else "Robust Sample",
             "detail": rush_eval_away.get("diagnostic", ""),
             "importance": rush_z_away,
+            "target_bucket": "#bucket-trenches",
         })
     elif rush_z_home >= 0.40:
         stats.append({
@@ -54,6 +55,7 @@ def build_matchup_synthesis(
             "confidence": "Low Sample (n < 40)" if rush_eval_home.get("is_low_sample") else "Robust Sample",
             "detail": rush_eval_home.get("diagnostic", ""),
             "importance": rush_z_home,
+            "target_bucket": "#bucket-trenches",
         })
     else:
         stats.append({
@@ -63,6 +65,7 @@ def build_matchup_synthesis(
             "confidence": "Standard Sample",
             "detail": "Neither rushing front holds a dominant mismatch at the line of scrimmage.",
             "importance": 0.20,
+            "target_bucket": "#bucket-trenches",
         })
 
     # 2. Coverage Secondary Stat
@@ -88,6 +91,7 @@ def build_matchup_synthesis(
             "Single-high closed shells feature 1-on-1 boundary coverage for perimeter wide receivers."
         ),
         "importance": cov_importance,
+        "target_bucket": "#bucket-passing",
     })
 
     # 3. Tempo / Environment Stat
@@ -100,6 +104,7 @@ def build_matchup_synthesis(
         "confidence": "Neutral Script Baseline",
         "detail": tempo_eval.get("script_note", tempo_eval.get("volume_override_verdict", "")),
         "importance": pace_importance,
+        "target_bucket": "#bucket-script",
     })
 
     # Sort notable stats strictly by deviation from league median (importance)
