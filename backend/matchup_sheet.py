@@ -124,18 +124,19 @@ def build_matchup_stat_sheet(
     home_team: str,
     season: int = 2026,
     up_to_week: Optional[int] = None,
+    include_prior_season: bool = True,
 ) -> Dict[str, Any]:
     """
     Assembles the complete descriptive matchup stat sheet for away_team @ home_team.
     Contains zero projections, probabilities, or pick recommendations.
     """
     # 1. Team A (Away) Offense Tendencies & Team B (Home) Defense Vulnerabilities
-    away_off_tendencies = compute_team_tendency_profile(away_team, season=season, up_to_week=up_to_week)
-    home_def_vulnerabilities = compute_opponent_vulnerability_profile(home_team, season=season, up_to_week=up_to_week)
+    away_off_tendencies = compute_team_tendency_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
+    home_def_vulnerabilities = compute_opponent_vulnerability_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
 
     # 2. Team B (Home) Offense Tendencies & Team A (Away) Defense Vulnerabilities
-    home_off_tendencies = compute_team_tendency_profile(home_team, season=season, up_to_week=up_to_week)
-    away_def_vulnerabilities = compute_opponent_vulnerability_profile(away_team, season=season, up_to_week=up_to_week)
+    home_off_tendencies = compute_team_tendency_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
+    away_def_vulnerabilities = compute_opponent_vulnerability_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
 
     # 3. Similar Opponent Historical Comparison
     # Home defense vs. opponents like Away offense
@@ -177,10 +178,24 @@ def build_matchup_stat_sheet(
         "note": "Injuries displayed as reported facts (status, practice participation). No rating adjustments applied.",
     }
 
+    ng = max(away_off_tendencies.get("n_games") or 0, home_off_tendencies.get("n_games") or 0)
+    week_n = max(1, (up_to_week - 1) if up_to_week is not None else 1)
+    if include_prior_season:
+        sample_label = f"2025 season + {season} through week {week_n} (n={ng} games)"
+    else:
+        sample_label = f"{season} Weeks 1-{week_n} (n={ng} games)"
+
     return {
         "matchup": f"{away_team} @ {home_team}",
         "season": season,
         "up_to_week": up_to_week,
+        "sample_label": sample_label,
+        "sample_window": {
+            "season": season,
+            "sample_label": sample_label,
+            "n_games": ng,
+            "include_prior_season": include_prior_season,
+        },
         "report_type": "Descriptive Team Tendency & Vulnerability Stat Sheet",
         "section_1_away_offense_tendencies": away_off_tendencies,
         "section_2_home_defense_vulnerabilities": home_def_vulnerabilities,

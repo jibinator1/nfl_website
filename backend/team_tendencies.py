@@ -39,8 +39,19 @@ _CACHED_POS_MAP: Optional[Dict[str, str]] = None
 # -----------------------------------------------------------------------------
 # Data Loader Helpers
 # -----------------------------------------------------------------------------
-def load_clean_pbp(season: int = 2026, up_to_week: Optional[int] = None) -> pd.DataFrame:
+def load_clean_pbp(
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+    include_prior_season: bool = False
+) -> pd.DataFrame:
     """Loads and caches clean regular season pass/run plays from local parquet or nflreadpy."""
+    if include_prior_season:
+        df_prior = load_clean_pbp(season=season - 1, up_to_week=None, include_prior_season=False)
+        df_curr = load_clean_pbp(season=season, up_to_week=None, include_prior_season=False)
+        if up_to_week is not None and "week" in df_curr.columns:
+            df_curr = df_curr[df_curr["week"] < up_to_week].copy()
+        return pd.concat([df_prior, df_curr], ignore_index=True)
+
     global _CACHED_PBP
     if season not in _CACHED_PBP:
         local_path = os.path.join(PBP_DIR, f"pbp_{season}.parquet")
@@ -68,8 +79,19 @@ def load_clean_pbp(season: int = 2026, up_to_week: Optional[int] = None) -> pd.D
     return df
 
 
-def load_weekly_stats(season: Optional[int] = None, up_to_week: Optional[int] = None) -> pd.DataFrame:
+def load_weekly_stats(
+    season: Optional[int] = None,
+    up_to_week: Optional[int] = None,
+    include_prior_season: bool = False
+) -> pd.DataFrame:
     """Loads player weekly box stats for archetype analysis."""
+    if include_prior_season and season is not None:
+        w_prior = load_weekly_stats(season=season - 1, up_to_week=None, include_prior_season=False)
+        w_curr = load_weekly_stats(season=season, up_to_week=None, include_prior_season=False)
+        if up_to_week is not None and "week" in w_curr.columns:
+            w_curr = w_curr[w_curr["week"] < up_to_week].copy()
+        return pd.concat([w_prior, w_curr], ignore_index=True)
+
     global _CACHED_WEEKLY
     if _CACHED_WEEKLY is None:
         if os.path.exists(WEEKLY_CACHE_PATH):
@@ -178,6 +200,7 @@ def compute_team_tendency_profile(
     season: int = 2026,
     up_to_week: Optional[int] = None,
     pbp_df: Optional[pd.DataFrame] = None,
+    include_prior_season: bool = False,
 ) -> Dict[str, Any]:
     """
     Computes situational tendency splits for a team's offense compared to league medians:
@@ -188,7 +211,7 @@ def compute_team_tendency_profile(
       - Personnel and formation (shotgun, no-huddle)
       - Red zone positional shares (inside 20, inside 10, inside 5)
     """
-    df = pbp_df if pbp_df is not None else load_clean_pbp(season=season, up_to_week=up_to_week)
+    df = pbp_df if pbp_df is not None else load_clean_pbp(season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
     all_teams = sorted(df["posteam"].dropna().unique().tolist())
     pos_map = get_player_position_map()
 
@@ -357,6 +380,7 @@ def compute_team_tendency_profile(
         "team": team,
         "season": season,
         "up_to_week": up_to_week,
+        "n_games": n_games,
         "total_plays_evaluated": len(df[df["posteam"] == team]),
         "game_state_splits": game_state_splits,
         "down_splits": down_splits,
@@ -394,15 +418,16 @@ def compute_opponent_vulnerability_profile(
     season: int = 2026,
     up_to_week: Optional[int] = None,
     pbp_df: Optional[pd.DataFrame] = None,
+    include_prior_season: bool = False,
 ) -> Dict[str, Any]:
     """
     Computes what a defense allows across ground, aerial, depth, and positional axes.
     Includes opponent-adjusted versions alongside raw descriptive values.
     """
-    df = pbp_df if pbp_df is not None else load_clean_pbp(season=season, up_to_week=up_to_week)
+    df = pbp_df if pbp_df is not None else load_clean_pbp(season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
     all_teams = sorted(df["defteam"].dropna().unique().tolist())
     pos_map = get_player_position_map()
-    weekly_stats = load_weekly_stats(season=season, up_to_week=up_to_week)
+    weekly_stats = load_weekly_stats(season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
 
     df = df.copy()
     df["_is_pass"] = (df["play_type"] == "pass").astype(int)
@@ -645,6 +670,7 @@ def compute_opponent_vulnerability_profile(
         "defense_team": defense_team,
         "season": season,
         "up_to_week": up_to_week,
+        "n_games": n_games,
         "total_plays_defended": len(df[df["defteam"] == defense_team]),
         "rush_defense": rush_defense,
         "pass_defense": pass_defense,
