@@ -982,7 +982,6 @@ def compute_scheme_insights(
         'def_man_pct': h_cov['man_pct'],
         'def_mfo_pct': h_cov['mfo_pct'],
         'def_mfc_pct': h_cov['mfc_pct'],
-        'def_archetype': h_cov['archetype'],
         'shells': {
             'Cover 1 (Man)': h_cov['cover_1'],
             'Cover 2 (MFO)': h_cov['cover_2'],
@@ -1008,7 +1007,6 @@ def compute_scheme_insights(
         'def_man_pct': a_cov['man_pct'],
         'def_mfo_pct': a_cov['mfo_pct'],
         'def_mfc_pct': a_cov['mfc_pct'],
-        'def_archetype': a_cov['archetype'],
         'shells': {
             'Cover 1 (Man)': a_cov['cover_1'],
             'Cover 2 (MFO)': a_cov['cover_2'],
@@ -1211,21 +1209,24 @@ def compute_scheme_insights(
                     'unit': st['unit'],
                     'summary_str': st['summary_str']
                 },
-                'splits': {
-                    'coverage_shell': st['splits_note']
-                },
+                'splits': {'coverage_shell': st['splits_note']} if st.get('splits_note') else {},
                 'red_zone': {
                     'touches_20': st['rz_20'],
                     'touches_10': st['rz_10'],
                     'summary_str': st['rz_summary']
+                },
+                'explosive_plays': {
+                    'exp_10': st['exp_10'],
+                    'exp_20': st['exp_20'],
+                    'summary_str': st['exp_summary']
                 },
                 'defense_context': ctx_str,
                 'profile_type': f"{pos} Usage Profile",
                 'role_description': f"Primary {focus.lower()} option ({st['n_games']} games evaluated)",
                 'season_baseline': st['summary_str'],
                 'context_metric': st['summary_str'],
-                'scheme_delta': st['splits_note'],
-                'rationale': f"{st['summary_str']}. {st['rz_summary']}. {ctx_str}."
+                'scheme_delta': st.get('splits_note') or '',
+                'rationale': f"{st['summary_str']}. {st['rz_summary']}. {st['exp_summary']}. {ctx_str}."
             })
 
         if not profiles:
@@ -1239,14 +1240,15 @@ def compute_scheme_insights(
                     'median': 0.0, 'p25': 0.0, 'p75': 0.0, 'min': 0.0, 'max': 0.0, 'n_games': 0,
                     'unit': '', 'summary_str': 'No qualifying player identified (0 active games)'
                 },
-                'splits': {'coverage_shell': 'No qualifying player identified'},
+                'splits': {},
                 'red_zone': {'touches_20': 0, 'touches_10': 0, 'summary_str': 'No qualifying player identified'},
+                'explosive_plays': {'exp_10': 0, 'exp_20': 0, 'summary_str': 'No qualifying player identified'},
                 'defense_context': '',
                 'profile_type': 'Usage Profile',
                 'role_description': 'No qualifying player identified',
                 'season_baseline': 'No qualifying player identified',
                 'context_metric': 'No qualifying player identified',
-                'scheme_delta': 'No qualifying player identified',
+                'scheme_delta': '',
                 'rationale': 'No qualifying player identified on active roster.'
             })
 
@@ -1272,10 +1274,8 @@ def compute_scheme_insights(
         f"Combined average volume: ~{combined_avg_plays:.1f} plays per game."
     )
     situational_tendencies_str = (
-        f"{a_team} check-down rate: {a_profile['tempo_situational']['checkdown_pct']}%, "
-        f"red zone leader: {a_profile['tempo_situational']['red_zone_touch_leader']}. "
-        f"{h_team} check-down rate: {h_profile['tempo_situational']['checkdown_pct']}%, "
-        f"red zone leader: {h_profile['tempo_situational']['red_zone_touch_leader']}."
+        f"{a_team} check-down rate: {a_profile['tempo_situational']['checkdown_pct']}%. "
+        f"{h_team} check-down rate: {h_profile['tempo_situational']['checkdown_pct']}%."
     )
     game_flow = {
         'away_tempo': a_profile['tempo_situational'],

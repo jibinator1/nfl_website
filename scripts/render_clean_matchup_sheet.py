@@ -41,13 +41,11 @@ for key, g in games_data.items():
     print(f"**{away} Defensive Tendencies:**")
     print(f"  * Middle-Field Open (MFO): {h_vs_a.get('def_mfo_pct', 0.0):.1f}% | Middle-Field Closed (MFC): {h_vs_a.get('def_mfc_pct', 0.0):.1f}%")
     print(f"  * Zone Coverage: {h_vs_a.get('def_zone_pct', 0.0):.1f}% | Man Coverage: {h_vs_a.get('def_man_pct', 0.0):.1f}%")
-    print(f"  * Shell Archetype: {h_vs_a.get('def_archetype', 'N/A')}")
     print(f"  * Summary: {h_vs_a.get('coverage_summary', '')}")
     print()
     print(f"**{home} Defensive Tendencies:**")
     print(f"  * Middle-Field Open (MFO): {a_vs_h.get('def_mfo_pct', 0.0):.1f}% | Middle-Field Closed (MFC): {a_vs_h.get('def_mfc_pct', 0.0):.1f}%")
     print(f"  * Zone Coverage: {a_vs_h.get('def_zone_pct', 0.0):.1f}% | Man Coverage: {a_vs_h.get('def_man_pct', 0.0):.1f}%")
-    print(f"  * Shell Archetype: {a_vs_h.get('def_archetype', 'N/A')}")
     print(f"  * Summary: {a_vs_h.get('coverage_summary', '')}")
     print()
 
@@ -87,9 +85,11 @@ for key, g in games_data.items():
                 print(f"    - {gm.get('season')} Wk {gm.get('week')} vs {gm.get('opponent')}{h2h_flag}: RMSD = {gm.get('rmsd', 0.0):.3f}σ ({gm.get('similarity_tier')}) | Allowed: {rush_val} RB rush yds, {pass_val} pass yds")
             str_med = sim_obj.get('median_rb_rush_yards_strong')
             all_med = sim_obj.get('median_rb_rush_yards_all')
-            str_med_disp = f"{str_med} yds" if str_med is not None else "Suppressed (n < 3 strong analogs)"
-            all_med_disp = f"{all_med} yds" if all_med is not None else "N/A"
-            print(f"  * Median RB Rush Allowed: Strong Analogs = {str_med_disp} | All Evaluated Matches = {all_med_disp}")
+            if str_med is not None:
+                print(f"  * Strong Analogs Median (<= 1.00σ): {str_med} yds")
+            else:
+                print(f"  * Strong Analogs: Sample insufficient (need >= 3 games <= 1.00σ) for style-only isolate")
+            print(f"  * All Qualifying Analogs Median (n={len(games_list)} games <= 1.50σ): {all_med if all_med is not None else 'N/A'} yds")
         print()
 
     _render_sim(h_sim, home, away)
@@ -129,8 +129,12 @@ for key, g in games_data.items():
         print(f"**{p_name} ({p.get('pos')} - {p.get('team')}) | Focus: {p.get('stat_focus')}**")
         l10 = p.get("last_10_stats", {})
         print(f"  * Last {l10.get('n_games', 0)} Games Box Stats: Median {l10.get('median')} {l10.get('unit')} (p25–p75: {l10.get('p25')}–{l10.get('p75')}, Range: {l10.get('min')}–{l10.get('max')})")
-        print(f"  * Coverage Splits: {p.get('splits', {}).get('coverage_shell')}")
-        print(f"  * Red Zone Opportunities: {p.get('red_zone', {}).get('summary_str')}")
+        if p.get("splits", {}).get("coverage_shell"):
+            print(f"  * Coverage Splits: {p['splits']['coverage_shell']}")
+        if p.get("red_zone", {}).get("summary_str"):
+            print(f"  * Red Zone Opportunities: {p['red_zone']['summary_str']}")
+        if p.get("explosive_plays", {}).get("summary_str"):
+            print(f"  * Explosive Gains: {p['explosive_plays']['summary_str']}")
         print(f"  * Opponent Defense Context: {p.get('defense_context')}")
         print()
 

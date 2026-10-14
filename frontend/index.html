@@ -3737,13 +3737,13 @@
                                 <tbody class="divide-y divide-[#21262d] text-[11px]">
                                     ${games.map(g => {
                                         const rmsdVal = g.rmsd != null ? g.rmsd : (g.distance || 0);
-                                        const isStrong = g.similarity_tier_key === 'strong' || rmsdVal <= 0.70;
-                                        const isMod = g.similarity_tier_key === 'moderate' || (rmsdVal > 0.70 && rmsdVal <= 1.10);
+                                        const isStrong = g.similarity_tier_key === 'strong' || rmsdVal <= 1.00;
+                                        const isMod = g.similarity_tier_key === 'moderate' || (rmsdVal > 1.00 && rmsdVal <= 1.30);
                                         const tierBadge = isStrong
-                                            ? '<span class="px-1.5 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800/60 text-[9px] font-semibold">Strong (&le;0.70σ)</span>'
+                                            ? '<span class="px-1.5 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800/60 text-[9px] font-semibold">Strong (&le;1.00σ)</span>'
                                             : (isMod
-                                                ? '<span class="px-1.5 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-800/60 text-[9px]">Mod (0.70-1.10σ)</span>'
-                                                : '<span class="px-1.5 py-0.5 rounded bg-slate-800/70 text-slate-400 border border-slate-700 text-[9px]">Loose (&gt;1.10σ)</span>');
+                                                ? '<span class="px-1.5 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-800/60 text-[9px]">Mod (1.00-1.30σ)</span>'
+                                                : '<span class="px-1.5 py-0.5 rounded bg-slate-800/70 text-slate-400 border border-slate-700 text-[9px]">Loose (1.30-1.50σ)</span>');
                                         const h2hTag = g.is_direct_h2h
                                             ? '<span class="ml-1 px-1 py-0.2 rounded bg-purple-950/80 text-purple-300 border border-purple-800/80 text-[8.5px]">Direct H2H</span>'
                                             : '<span class="ml-1 px-1 py-0.2 rounded bg-slate-800/50 text-slate-400 border border-slate-700/50 text-[8.5px]">Analog</span>';
@@ -3769,7 +3769,7 @@
                                     ${strongSum ? `
                                         <tr class="bg-[#161f28] font-bold text-emerald-300 border-t-2 border-emerald-900/60">
                                             <td class="py-2 px-2.5 uppercase text-[10px]">Strong Matches Median (n=${nStrongGames} games, ${nStrongOpps} opps)</td>
-                                            <td class="py-2 px-2 text-center text-emerald-400">&le; 0.70&sigma; RMSD</td>
+                                            <td class="py-2 px-2 text-center text-emerald-400">&le; 1.00&sigma; RMSD</td>
                                             <td class="py-2 px-2 text-right">${strongSum.rb_carries?.median != null ? strongSum.rb_carries.median.toFixed(0) + ' car, ' : ''}${strongSum.rb_rush_yards?.median != null ? strongSum.rb_rush_yards.median.toFixed(0) + ' yds' : '--'}</td>
                                             <td class="py-2 px-2 text-right">${strongSum.rb_ypc?.median != null ? strongSum.rb_ypc.median.toFixed(2) : '--'}</td>
                                             <td class="py-2 px-2 text-right">${strongSum.rb_rush_epa?.median != null ? (strongSum.rb_rush_epa.median > 0 ? '+' : '') + strongSum.rb_rush_epa.median.toFixed(3) : '--'}</td>
@@ -4266,7 +4266,6 @@ function renderSchemeInsights(d) {
                                 <div>
                                     <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Offense vs ${d.home_team} Defense</span>
                                 </div>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${aCov.def_archetype || 'Hybrid Secondary'}</span>
                             </div>
 
                             <!-- Zone vs Man Bar -->
@@ -4353,7 +4352,6 @@ function renderSchemeInsights(d) {
                                 <div>
                                     <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Offense vs ${d.away_team} Defense</span>
                                 </div>
-                                <span class="text-[10px] px-2 py-0.5 rounded font-mono bg-[#21262d] text-slate-300 border border-[#30363d]">${hCov.def_archetype || 'Hybrid Secondary'}</span>
                             </div>
 
                             <!-- Zone vs Man Bar -->
@@ -4700,6 +4698,12 @@ function renderSchemeInsights(d) {
                                                 <span class="text-slate-200 text-[11px] font-sans leading-tight block">${b.red_zone.summary_str}</span>
                                             </div>
                                         ` : ''}
+                                        ${b.explosive_plays?.summary_str ? `
+                                            <div class="text-[10.5px] text-slate-400 border-t border-[#21262d] pt-1.5">
+                                                <span class="text-slate-300 font-semibold block mb-0.5">Explosive Plays:</span>
+                                                <span class="text-slate-200 text-[11px] font-sans leading-tight block">${b.explosive_plays.summary_str}</span>
+                                            </div>
+                                        ` : ''}
                                         ${b.defense_context ? `
                                             <div class="text-[10.5px] text-slate-400 border-t border-[#21262d] pt-1.5">
                                                 <span class="text-slate-300 font-semibold block mb-0.5">Defense Context:</span>
@@ -5020,7 +5024,6 @@ function renderSchemeInsights(d) {
                         def_man_pct: hMan,
                         def_mfo_pct: hMfo,
                         def_mfc_pct: hMfc,
-                        def_archetype: hArchetype,
                         shells: { "Cover 1 (Man)": hMan > 40 ? 38 : 22, "Cover 2 (MFO)": 18, "Cover 3 (MFC)": hMfc > 50 ? 38 : 26, "Cover 4 Quarters (MFO)": hMfo > 50 ? 32 : 18, "Cover 6 Split (MFO)": 10 },
                         blitz_pct: 26,
                         vulnerability_note: `${h}'s defense aligns in 2 deep safeties, with historical intermediate target distribution.`,
@@ -5033,7 +5036,6 @@ function renderSchemeInsights(d) {
                         def_man_pct: aMan,
                         def_mfo_pct: aMfo,
                         def_mfc_pct: aMfc,
-                        def_archetype: aArchetype,
                         shells: { "Cover 1 (Man)": aMan > 40 ? 38 : 22, "Cover 2 (MFO)": 16, "Cover 3 (MFC)": aMfc > 50 ? 38 : 26, "Cover 4 Quarters (MFO)": aMfo > 50 ? 32 : 18, "Cover 6 Split (MFO)": 10 },
                         blitz_pct: 27,
                         vulnerability_note: `${a}'s defense aligns in 2 deep safeties, with historical intermediate target distribution.`,

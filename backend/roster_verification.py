@@ -191,17 +191,52 @@ def compute_player_historical_box_stats(
         min_val = round(float(series.min()), 1)
         max_val = round(float(series.max()), 1)
 
-    # Red zone counts
-    rz20_col = matches.get("rushing_20", pd.Series(0, index=matches.index)).fillna(0) + \
-               matches.get("receiving_20", pd.Series(0, index=matches.index)).fillna(0)
-    rz10_col = matches.get("rushing_10", pd.Series(0, index=matches.index)).fillna(0) + \
-               matches.get("receiving_10", pd.Series(0, index=matches.index)).fillna(0)
-    rz20_sum = int(rz20_col.sum())
-    rz10_sum = int(rz10_col.sum())
+    # 1. Real Red Zone touches from play-by-play (yardline_100 <= 20 and <= 10)
+    rz20_sum = 0
+    rz10_sum = 0
+    try:
+        from backend.team_tendencies import load_clean_pbp
+        pbp_dfs = []
+        for s in matches["season"].unique():
+            try:
+                pbp_dfs.append(load_clean_pbp(season=int(s)))
+            except Exception:
+                pass
+        if pbp_dfs:
+            pbp_comb = pd.concat(pbp_dfs, ignore_index=True)
+            game_keys = set(zip(matches["season"].astype(int), matches["week"].astype(int)))
+            pbp_sub = pbp_comb[pbp_comb.apply(lambda r: (int(r["season"]), int(r["week"])) in game_keys, axis=1)]
+
+            parts = disp_name.replace(".", " ").split()
+            first_init = parts[0][0].upper()
+            last_name = parts[-1].lower()
+
+            rush_plays = pbp_sub[
+                (pbp_sub["play_type"] == "run") &
+                (pbp_sub["rusher_player_name"].fillna("").str.lower().str.endswith(last_name)) &
+                (pbp_sub["rusher_player_name"].fillna("").str.startswith(first_init))
+            ]
+            rec_plays = pbp_sub[
+                (pbp_sub["complete_pass"] == 1) &
+                (pbp_sub["receiver_player_name"].fillna("").str.lower().str.endswith(last_name)) &
+                (pbp_sub["receiver_player_name"].fillna("").str.startswith(first_init))
+            ]
+
+            rz20_sum = int((rush_plays["yardline_100"] <= 20).sum() + (rec_plays["yardline_100"] <= 20).sum())
+            rz10_sum = int((rush_plays["yardline_100"] <= 10).sum() + (rec_plays["yardline_100"] <= 10).sum())
+    except Exception:
+        rz20_sum = 0
+        rz10_sum = 0
+
+    # 2. Explosive plays (10+ yards and 20+ yards) from weekly box stats
+    exp_10 = int(matches.get("rushing_10", pd.Series(0, index=matches.index)).fillna(0).sum() +
+                 matches.get("receiving_10", pd.Series(0, index=matches.index)).fillna(0).sum())
+    exp_20 = int(matches.get("rushing_20", pd.Series(0, index=matches.index)).fillna(0).sum() +
+                 matches.get("receiving_20", pd.Series(0, index=matches.index)).fillna(0).sum())
 
     summary_str = f"Median: {med:.1f} {unit} (25th: {p25:.1f}, 75th: {p75:.1f}, range: {min_val:.1f}-{max_val:.1f}, n={n_games} games)"
-    rz_summary_str = f"{rz20_sum} touches inside 20, {rz10_sum} inside 10 (n={n_games} games)"
-    split_str = f"n={n_games} games, sub-split not available."
+    rz_summary_str = f"Red zone touches: {rz20_sum} inside 20, {rz10_sum} inside 10 (n={n_games} games)"
+    exp_summary_str = f"Explosive plays: {exp_10} gains of 10+ yds, {exp_20} of 20+ yds (n={n_games} games)"
 
     return {
         "verified_name": disp_name,
@@ -217,5 +252,8 @@ def compute_player_historical_box_stats(
         "rz_20": rz20_sum,
         "rz_10": rz10_sum,
         "rz_summary": rz_summary_str,
-        "splits_note": split_str,
+        "exp_10": exp_10,
+        "exp_20": exp_20,
+        "exp_summary": exp_summary_str,
+        "splits_note": None,  # Omit filler when sub-split is not available
     }
