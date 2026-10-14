@@ -3727,8 +3727,8 @@
 
             if (noAnalogsMsg || games.length < 3) {
                 const fallbackMsg = noAnalogsMsg || (closestRmsd != null
-                    ? `No suitable analogs found in available history. Closest match distance: ${closestRmsd.toFixed(2)}σ, above ceiling.`
-                    : `No suitable analogs found in available history within ceiling.`);
+                    ? `No analogs found within 1.50σ. Closest match: ${closestRmsd.toFixed(2)}σ, above ceiling.`
+                    : `No analogs found within 1.50σ.`);
                 return `
                     <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-2 font-mono">
                         <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
@@ -4719,7 +4719,7 @@ function renderSchemeInsights(d) {
                     </div>
 
                     <!-- Key Playmaker Profiles (Re-labeled Floor / Usual / Ceiling) -->
-                    <div class="grid ${breakouts.length === 4 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : (breakouts.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2')} gap-3.5">
+                    <div class="grid ${breakouts.length >= 6 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : (breakouts.length === 4 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : (breakouts.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'))} gap-3.5">
                         ${breakouts.map(b => `
                             <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 flex flex-col justify-between space-y-3 hover:border-slate-500 transition">
                                 <div class="space-y-3">
@@ -5122,6 +5122,22 @@ function renderSchemeInsights(d) {
                     pace_and_tempo: `Neutral Pace: ${a} averages ${a === 'GB' ? '31.6' : '27.4'}s/play (n=${aGames} games); ${h} averages ${h === 'GB' ? '31.6' : '26.8'}s/play (n=${hGames} games). Combined average volume: ~130 plays per game.`,
                     pace_synthesis: `Neutral Pace: ${a} averages ${a === 'GB' ? '31.6' : '27.4'}s/play (n=${aGames} games); ${h} averages ${h === 'GB' ? '31.6' : '26.8'}s/play (n=${hGames} games). Combined average volume: ~130 plays per game.`,
                     volume_override_verdict: `Neutral Pace: ${a} averages ${a === 'GB' ? '31.6' : '27.4'}s/play (n=${aGames} games); ${h} averages ${h === 'GB' ? '31.6' : '26.8'}s/play (n=${hGames} games). Combined average volume: ~130 plays per game.`
+                },
+                matchup_stat_sheet: {
+                    section_1_away_offense_tendencies: {},
+                    section_2_home_defense_vulnerabilities: {},
+                    section_3_home_offense_tendencies: {},
+                    section_4_away_defense_vulnerabilities: {},
+                    section_5_similar_opponents: {
+                        home_defense_vs_opponents_like_away: {
+                            similar_games: [],
+                            no_analogs_message: 'No analogs found within 1.50σ.'
+                        },
+                        away_defense_vs_opponents_like_home: {
+                            similar_games: [],
+                            no_analogs_message: 'No analogs found within 1.50σ.'
+                        }
+                    }
                 }
             };
         }

@@ -14,6 +14,7 @@ import json
 from typing import Dict, Any, List, Optional, Tuple
 import math
 import copy
+import pandas as pd
 
 from backend.matchup_sheet import build_matchup_stat_sheet
 from backend.coverage_matchup import compute_team_coverage_profile, evaluate_coverage_matchup
@@ -1143,44 +1144,66 @@ def compute_scheme_insights(
         def_gap_ypc = run_def.get('def_gap_ypc_allowed', 4.15)
         def_gap_rank = run_def.get('def_gap_rank', 16)
 
-        # 1. Key targets from team profile
-        for tg in team_prof.get('target_alignment', {}).get('key_targets', []):
-            t_name = tg.get('name', '')
-            t_latest = _get_player_latest_team(t_name)
-            latest_norm = 'LA' if t_latest == 'LAR' else t_latest
-            t_norm = 'LA' if team_code == 'LAR' else team_code
-            if latest_norm and latest_norm != t_norm:
-                continue
-            is_ok, disp = verify_player_on_roster(t_name, team_code, season=season, up_to_week=week)
-            if is_ok and disp and disp not in seen_players:
-                seen_players.add(disp)
-                pos = tg.get('pos', 'WR')
-                focus = 'Rushing Yards' if pos == 'RB' else 'Receiving Yards'
-                cands.append((t_name, disp, pos, focus))
+        roster = get_active_team_roster(team_code, season=season, up_to_week=week)
+        if roster.empty:
+            roster = get_active_team_roster(team_code, season=season - 1)
 
-        # 2. Key rusher / receiver from active roster if needed
-        if len(cands) < 2:
-            roster = get_active_team_roster(team_code, season=season, up_to_week=week)
-            if not roster.empty:
-                rushers = roster.groupby('player_display_name')['carries'].sum().sort_values(ascending=False)
-                for r_name, c_cnt in rushers.items():
-                    if c_cnt > 0 and r_name not in seen_players:
-                        is_ok, disp = verify_player_on_roster(r_name, team_code, season=season, up_to_week=week)
-                        if is_ok and disp:
+        if not roster.empty:
+            # 1. Primary RB by total carries this season (must have > 0 carries)
+            rb_mask = (roster.get('position', pd.Series(index=roster.index)) == 'RB')
+            rb_df = roster[rb_mask] if rb_mask.any() else roster
+            rushers = rb_df.groupby('player_display_name')['carries'].sum().sort_values(ascending=False)
+            for r_name, c_cnt in rushers.items():
+                if c_cnt > 0 and r_name not in seen_players:
+                    is_ok, disp = verify_player_on_roster(r_name, team_code, season=season, up_to_week=week)
+                    if is_ok and disp and disp not in seen_players:
+                        seen_players.add(disp)
+                        cands.append((r_name, disp, 'RB', 'Rushing Yards'))
+                        break
+
+            # 2. Top WR by target share / targets
+            wr_mask = (roster.get('position', pd.Series(index=roster.index)) == 'WR')
+            wr_df = roster[wr_mask] if wr_mask.any() else roster
+            wr_targets = wr_df.groupby('player_display_name')['targets'].sum().sort_values(ascending=False)
+            for w_name, t_cnt in wr_targets.items():
+                if t_cnt > 0 and w_name not in seen_players:
+                    is_ok, disp = verify_player_on_roster(w_name, team_code, season=season, up_to_week=week)
+                    if is_ok and disp and disp not in seen_players:
+                        seen_players.add(disp)
+                        cands.append((w_name, disp, 'WR', 'Receiving Yards'))
+                        break
+
+            # 3. Top remaining pass-catcher by targets (may be WR2 or TE)
+            # The primary TE for each team should appear if they're among the team's top-3 target leaders.
+            pc_mask = roster.get('position', pd.Series(index=roster.index)).isin(['WR', 'TE'])
+            pc_df = roster[pc_mask] if pc_mask.any() else roster
+            pc_targets = pc_df.groupby(['player_display_name', 'position'])['targets'].sum().sort_values(ascending=False)
+            top_3_targets = [idx[0] for idx in pc_targets.head(3).index]
+
+            te_mask = (roster.get('position', pd.Series(index=roster.index)) == 'TE')
+            te_df = roster[te_mask] if te_mask.any() else pd.DataFrame()
+            te_cands = te_df.groupby('player_display_name')['targets'].sum().sort_values(ascending=False) if not te_df.empty else pd.Series(dtype=float)
+            primary_te = te_cands.index[0] if not te_cands.empty and te_cands.iloc[0] > 0 else None
+
+            te_chosen = False
+            if primary_te and primary_te in top_3_targets and primary_te not in seen_players:
+                is_ok, disp = verify_player_on_roster(primary_te, team_code, season=season, up_to_week=week)
+                if is_ok and disp and disp not in seen_players:
+                    seen_players.add(disp)
+                    cands.append((primary_te, disp, 'TE', 'Receiving Yards'))
+                    te_chosen = True
+
+            if not te_chosen:
+                for (pc_name, pc_pos), t_cnt in pc_targets.items():
+                    if t_cnt > 0 and pc_name not in seen_players:
+                        is_ok, disp = verify_player_on_roster(pc_name, team_code, season=season, up_to_week=week)
+                        if is_ok and disp and disp not in seen_players:
                             seen_players.add(disp)
-                            cands.append((r_name, disp, 'RB', 'Rushing Yards'))
-                            break
-                targets = roster.groupby('player_display_name')['targets'].sum().sort_values(ascending=False)
-                for t_name, t_cnt in targets.items():
-                    if t_cnt > 0 and t_name not in seen_players and len(cands) < 2:
-                        is_ok, disp = verify_player_on_roster(t_name, team_code, season=season, up_to_week=week)
-                        if is_ok and disp:
-                            seen_players.add(disp)
-                            cands.append((t_name, disp, 'WR', 'Receiving Yards'))
+                            cands.append((pc_name, disp, pc_pos, 'Receiving Yards'))
                             break
 
         profiles = []
-        for raw_name, disp_name, pos, focus in cands[:2]:
+        for raw_name, disp_name, pos, focus in cands[:3]:
             st = compute_player_historical_box_stats(disp_name, team_code, stat_focus=focus, season=season, up_to_week=week)
             if not st:
                 continue
@@ -1256,7 +1279,7 @@ def compute_scheme_insights(
 
     away_profiles = _extract_team_usage_profiles(a_team, h_team, a_profile, h_profile, h_games)
     home_profiles = _extract_team_usage_profiles(h_team, a_team, h_profile, a_profile, a_games)
-    breakouts = (away_profiles + home_profiles)[:4]
+    breakouts = (away_profiles + home_profiles)
 
     # -------------------------------------------------------------
     # Pillar 5: Pace & Tempo (Situational Environment)

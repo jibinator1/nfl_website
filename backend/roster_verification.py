@@ -207,20 +207,33 @@ def compute_player_historical_box_stats(
             game_keys = set(zip(matches["season"].astype(int), matches["week"].astype(int)))
             pbp_sub = pbp_comb[pbp_comb.apply(lambda r: (int(r["season"]), int(r["week"])) in game_keys, axis=1)]
 
-            parts = disp_name.replace(".", " ").split()
-            first_init = parts[0][0].upper()
-            last_name = parts[-1].lower()
+            player_ids = set(matches["player_id"].dropna().astype(str).unique().tolist()) if "player_id" in matches.columns else set()
+            player_names = set(matches["player_name"].dropna().astype(str).unique().tolist()) if "player_name" in matches.columns else set()
+            disp_names = set(matches["player_display_name"].dropna().astype(str).unique().tolist()) if "player_display_name" in matches.columns else set()
+            disp_names.add(disp_name)
 
-            rush_plays = pbp_sub[
-                (pbp_sub["play_type"] == "run") &
-                (pbp_sub["rusher_player_name"].fillna("").str.lower().str.endswith(last_name)) &
-                (pbp_sub["rusher_player_name"].fillna("").str.startswith(first_init))
-            ]
-            rec_plays = pbp_sub[
-                (pbp_sub["complete_pass"] == 1) &
-                (pbp_sub["receiver_player_name"].fillna("").str.lower().str.endswith(last_name)) &
-                (pbp_sub["receiver_player_name"].fillna("").str.startswith(first_init))
-            ]
+            clean_name = re.sub(r"\b(jr|sr|ii|iii|iv|v)\b", "", disp_name, flags=re.IGNORECASE).strip()
+            parts = clean_name.replace(".", " ").split()
+            first_init = parts[0][0].upper() if parts else ""
+            last_name = parts[-1].lower() if parts else ""
+
+            # Rush plays: must be run play, matching either player_id, full/abbrev name, or first_init + clean last name
+            rush_mask = (pbp_sub["play_type"] == "run")
+            rush_id_mask = pbp_sub["rusher_player_id"].astype(str).isin(player_ids) if (player_ids and "rusher_player_id" in pbp_sub.columns) else pd.Series(False, index=pbp_sub.index)
+            rush_name_col = pbp_sub["rusher_player_name"].fillna("")
+            rush_name_mask = rush_name_col.isin(player_names | disp_names)
+            rush_part_mask = (rush_name_col.str.lower().str.endswith(last_name)) & (rush_name_col.str.startswith(first_init)) if (last_name and first_init) else pd.Series(False, index=pbp_sub.index)
+
+            rush_plays = pbp_sub[rush_mask & (rush_id_mask | rush_name_mask | rush_part_mask)]
+
+            # Rec plays: completed pass, matching player_id, full/abbrev name, or first_init + clean last name
+            rec_mask = (pbp_sub["complete_pass"] == 1)
+            rec_id_mask = pbp_sub["receiver_player_id"].astype(str).isin(player_ids) if (player_ids and "receiver_player_id" in pbp_sub.columns) else pd.Series(False, index=pbp_sub.index)
+            rec_name_col = pbp_sub["receiver_player_name"].fillna("")
+            rec_name_mask = rec_name_col.isin(player_names | disp_names)
+            rec_part_mask = (rec_name_col.str.lower().str.endswith(last_name)) & (rec_name_col.str.startswith(first_init)) if (last_name and first_init) else pd.Series(False, index=pbp_sub.index)
+
+            rec_plays = pbp_sub[rec_mask & (rec_id_mask | rec_name_mask | rec_part_mask)]
 
             rz20_sum = int((rush_plays["yardline_100"] <= 20).sum() + (rec_plays["yardline_100"] <= 20).sum())
             rz10_sum = int((rush_plays["yardline_100"] <= 10).sum() + (rec_plays["yardline_100"] <= 10).sum())

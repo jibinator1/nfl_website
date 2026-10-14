@@ -378,14 +378,29 @@ def find_similar_opponent_games(
 
     # 1.50σ RMSD hard ceiling: Drop any game above 1.50σ from match candidate pool
     third_party_all = all_games_df[~all_games_df["is_direct_h2h"]]
-    closest_distance = float(third_party_all["distance"].min()) if not third_party_all.empty else float(all_games_df["distance"].min())
+    if not third_party_all.empty:
+        closest_row = third_party_all.sort_values("distance").iloc[0]
+    elif not all_games_df.empty:
+        closest_row = all_games_df.sort_values("distance").iloc[0]
+    else:
+        closest_row = None
+
+    if closest_row is not None:
+        closest_distance = float(closest_row["distance"])
+        closest_opp = str(closest_row.get("opponent", "N/A"))
+        closest_season = str(closest_row.get("season", ""))
+        closest_week = str(closest_row.get("week", ""))
+        match_str = f" (vs {closest_opp}, {closest_season} Wk {closest_week})" if closest_opp != "N/A" else ""
+        no_analogs_message = f"No analogs found within 1.50σ. Closest match: {closest_distance:.2f}σ{match_str}."
+    else:
+        closest_distance = None
+        no_analogs_message = "No analogs found within 1.50σ."
 
     ceiling_df = all_games_df[all_games_df["rmsd"] <= 1.50].sort_values("distance").copy()
 
     # If fewer than 3 games remain under the ceiling, do not render a match table at all
     if len(ceiling_df) < 3:
         render_match_table = False
-        no_analogs_message = f"No suitable analogs found in the available history. Closest match distance: {closest_distance:.2f}σ, above the 1.50σ ceiling."
         sorted_df = pd.DataFrame(columns=all_games_df.columns)
     else:
         render_match_table = True
@@ -654,6 +669,8 @@ def find_similar_opponent_games(
         "features_matched": features,
         "render_match_table": render_match_table,
         "no_analogs_message": no_analogs_message,
+        "closest_distance": closest_distance,
+        "closest_rmsd": closest_distance,
         "n_strong": n_strong,
         "n_strong_analog": n_strong_analog,
         "n_strong_analog_games": n_strong_analog_games,

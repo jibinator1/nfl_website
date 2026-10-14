@@ -275,3 +275,18 @@ def test_matchup_stat_sheet_assembly():
     _check_no_prohibited(sheet["disclaimer"], "disclaimer")
     _check_no_prohibited(sheet["section_5_similar_opponents"]["home_defense_vs_opponents_like_away"]["descriptive_narrative"], "narrative")
     _check_no_prohibited(sheet["section_7_key_personnel"]["note"], "personnel_note")
+
+
+def test_player_historical_red_zone_touches():
+    """Verify compute_player_historical_box_stats computes non-zero red zone touches for known active players."""
+    from backend.roster_verification import compute_player_historical_box_stats
+    st = compute_player_historical_box_stats(
+        player_name="Bijan Robinson",
+        team="ATL",
+        stat_focus="Rushing Yards",
+        season=2026,
+        up_to_week=5,
+    )
+    assert st is not None
+    assert st["rz_20"] > 0
+    assert st["rz_10"] > 0
