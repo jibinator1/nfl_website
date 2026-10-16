@@ -52,5 +52,7 @@ last_run.txt
 # Local Cache Parquets & Dynamic Downloads
 data/pbp_cache/pbp_*.parquet
 data/injury_cache.json
+data/player_usage_cache.parquet
 
 .agent/
+

@@ -19,7 +19,7 @@ import pandas as pd
 from backend.matchup_sheet import build_matchup_stat_sheet
 from backend.coverage_matchup import compute_team_coverage_profile, evaluate_coverage_matchup
 from backend.run_matchup import compute_team_rush_profile, evaluate_rush_matchup, rank_ground_candidates
-from backend.target_matchup import compute_player_usage_profile, evaluate_target_matchup
+from backend.target_matchup import evaluate_target_matchup
 from backend.tempo_matchup import compute_team_tempo_profile, evaluate_tempo_matchup
 from backend.synthesis import build_matchup_synthesis
 from backend.injuries import get_game_injuries
@@ -27,6 +27,7 @@ from backend.roster_verification import (
     verify_player_on_roster,
     clean_or_drop_player,
     compute_player_historical_box_stats,
+    compute_player_usage_profile,
     get_active_team_roster,
 )
 
@@ -1218,6 +1219,7 @@ def compute_scheme_insights(
             st = compute_player_historical_box_stats(disp_name, team_code, stat_focus=focus, season=season, up_to_week=week)
             if not st:
                 continue
+            usage_prof = compute_player_usage_profile(disp_name, team_code, season=season, up_to_week=week)
 
             if focus == 'Rushing Yards':
                 if opp_n_games < 6:
@@ -1234,6 +1236,7 @@ def compute_scheme_insights(
                 'team': team_code,
                 'pos': pos,
                 'stat_focus': focus,
+                'usage_profile': usage_prof,
                 'last_10_stats': {
                     'median': st['median'],
                     'p25': st['p25'],
@@ -1271,6 +1274,7 @@ def compute_scheme_insights(
                 'team': team_code,
                 'pos': 'N/A',
                 'stat_focus': 'N/A',
+                'usage_profile': None,
                 'last_10_stats': {
                     'median': 0.0, 'p25': 0.0, 'p75': 0.0, 'min': 0.0, 'max': 0.0, 'n_games': 0,
                     'unit': '', 'summary_str': 'No qualifying player identified (0 active games)'

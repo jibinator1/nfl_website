@@ -14,15 +14,20 @@ from __future__ import annotations
 
 import os
 import re
+import logging
 from typing import Optional, Tuple, Dict, Any, List
 import pandas as pd
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 from backend.team_tendencies import load_weekly_stats
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RZ_CACHE_PATH = os.path.join(ROOT_DIR, "data", "player_red_zone_cache.parquet")
 _CACHED_RZ_DF: Optional[pd.DataFrame] = None
+USAGE_CACHE_PATH = os.path.join(ROOT_DIR, "data", "player_usage_cache.parquet")
+_CACHED_USAGE_DF: Optional[pd.DataFrame] = None
 _ROSTER_CACHE: Dict[Tuple[int, str, Optional[int]], pd.DataFrame] = {}
 
 
@@ -317,3 +322,113 @@ def compute_player_historical_box_stats(
         "is_small_sample": is_small_sample,
         "small_sample_warning": "Small sample (n < 4 games)" if is_small_sample else None,
     }
+
+
+def compute_player_usage_profile(
+    player_name: str,
+    team: str,
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+) -> Optional[Dict[str, Any]]:
+    """
+    Computes per-game median usage metrics for a skill player from active games (snaps > 0).
+    Descriptive only: snap share, carries, target share, WOPR.
+    Returns None if player has no active games in the window.
+    """
+    global _CACHED_USAGE_DF
+    if _CACHED_USAGE_DF is None:
+        if os.path.exists(USAGE_CACHE_PATH):
+            try:
+                _CACHED_USAGE_DF = pd.read_parquet(USAGE_CACHE_PATH)
+            except Exception as e:
+                logger.warning(f"[Usage Profile] Failed reading usage cache from {USAGE_CACHE_PATH}: {e}")
+                _CACHED_USAGE_DF = None
+        else:
+            logger.warning(
+                f"[Usage Profile] Usage cache not found at {USAGE_CACHE_PATH}. "
+                "Season usage profiles will be omitted from player cards."
+            )
+            return None
+
+    if _CACHED_USAGE_DF is None or _CACHED_USAGE_DF.empty:
+        return None
+
+    df = _CACHED_USAGE_DF
+    team_norm = "LA" if team == "LAR" else team
+
+    # Filter season (with prior-season fallback if current has 0 records)
+    sub = df[df["season"] == season].copy()
+    if sub.empty:
+        sub = df[df["season"] == season - 1].copy()
+        if sub.empty:
+            return None
+
+    # Filter team
+    sub = sub[sub["team"].replace({"LAR": "LA"}) == team_norm]
+    if sub.empty:
+        return None
+
+    # Filter week
+    if up_to_week is not None:
+        sub = sub[sub["week"] <= up_to_week]
+        if sub.empty:
+            return None
+
+    # Name matching (display name or short name)
+    clean_target = re.sub(r"[^a-zA-Z]", "", player_name).lower()
+    matches = sub[
+        sub["player_display_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
+    ]
+    if matches.empty and "player_name" in sub.columns:
+        matches = sub[
+            sub["player_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
+        ]
+    if matches.empty:
+        return None
+
+    # Exclude inactive weeks (must have offense_snaps > 0)
+    active_games = matches[matches["offense_snaps"] > 0].copy()
+    n_games = len(active_games)
+    if n_games == 0:
+        return None
+
+    pos = str(active_games["position"].iloc[0]).upper() if "position" in active_games.columns else "WR"
+
+    # Per-game medians
+    med_snap = round(float(active_games["offense_pct"].median() * 100))
+    med_tgt_share = round(float(active_games["target_share"].median() * 100), 1)
+
+    if pos == "RB":
+        med_carries = round(float(active_games["carries"].median()), 1)
+        carries_val = int(med_carries) if med_carries == int(med_carries) else med_carries
+        lines = [
+            {"label": "Snap share", "value": f"{med_snap}%"},
+            {"label": "Carries", "value": str(carries_val)},
+            {"label": "Target share", "value": f"{med_tgt_share:.1f}%"},
+        ]
+        raw_medians = {
+            "snap_share": float(med_snap),
+            "carries": float(carries_val),
+            "target_share": float(med_tgt_share),
+        }
+    else:
+        med_wopr = round(float(active_games["wopr"].median()), 2)
+        lines = [
+            {"label": "Snap share", "value": f"{med_snap}%"},
+            {"label": "Target share", "value": f"{med_tgt_share:.1f}%"},
+            {"label": "WOPR", "value": f"{med_wopr:.2f}"},
+        ]
+        raw_medians = {
+            "snap_share": float(med_snap),
+            "target_share": float(med_tgt_share),
+            "wopr": float(med_wopr),
+        }
+
+    return {
+        "n_games": n_games,
+        "small_sample": n_games < 4,
+        "position": pos,
+        "lines": lines,
+        "raw_medians": raw_medians,
+    }
+
