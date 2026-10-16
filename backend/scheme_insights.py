@@ -753,19 +753,21 @@ def _get_dynamic_sample_context(season: int = 2026, start_date: Optional[str] = 
         opp_w = sub_w[sub_w['opponent_team'] == tm]
         c = opp_w['carries'].sum()
         ry = opp_w['rushing_yards'].sum()
-        team_def_ypc[tm] = float(ry / c) if c > 0 else 4.20
+        team_def_ypc[tm] = float(ry / c) if c > 0 else None
 
         att = opp_w['attempts'].sum()
         py = opp_w['passing_yards'].sum()
-        team_def_ypa[tm] = float(py / att) if att > 0 else 6.80
+        team_def_ypa[tm] = float(py / att) if att > 0 else None
 
         tm_w = sub_w[sub_w['team'] == tm]
         tc = tm_w['carries'].sum()
         tryds = tm_w['rushing_yards'].sum()
-        team_rush_ypc[tm] = float(tryds / tc) if tc > 0 else 4.30
+        team_rush_ypc[tm] = float(tryds / tc) if tc > 0 else None
 
-    ypc_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(team_def_ypc.items(), key=lambda x: x[1]))}
-    ypa_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(team_def_ypa.items(), key=lambda x: x[1]))}
+    valid_ypc = {tm: ypc for tm, ypc in team_def_ypc.items() if ypc is not None}
+    ypc_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(valid_ypc.items(), key=lambda x: x[1]))}
+    valid_ypa = {tm: ypa for tm, ypa in team_def_ypa.items() if ypa is not None}
+    ypa_ranks = {tm: rank + 1 for rank, (tm, _) in enumerate(sorted(valid_ypa.items(), key=lambda x: x[1]))}
 
     team_situational = {}
     if _TEAM_SITUATIONAL_DF is not None and not _TEAM_SITUATIONAL_DF.empty:
@@ -915,7 +917,7 @@ def compute_scheme_insights(
     a_games = 0
     sample_label = f"{season} Season Analysis"
     is_custom_date = bool(start_date and end_date)
-    league_med_ypc = 4.12
+    league_med_ypc = None
 
     if ctx is not None:
         if ctx.get('team_def_ypc'):
@@ -1031,7 +1033,8 @@ def compute_scheme_insights(
     # -------------------------------------------------------------
     def _format_def_rank(val: float, rank: Optional[int], n_g: int) -> Tuple[Optional[int], str]:
         if n_g < 6:
-            return None, f"{val:.2f} YPC (league median {league_med_ypc:.2f}, n={n_g} games -- rank suppressed, small sample)"
+            med_note = f" (league median {league_med_ypc:.2f}, n={n_g} games -- rank suppressed, small sample)" if league_med_ypc is not None else f" (n={n_g} games -- rank suppressed, small sample)"
+            return None, f"{val:.2f} YPC{med_note}"
         return rank, f"Rank #{rank} (n={n_g} games)"
 
     h_gap_rank, h_gap_rank_disp = _format_def_rank(
@@ -1056,6 +1059,8 @@ def compute_scheme_insights(
         a_games
     )
 
+    med_suffix = f" League median: {league_med_ypc:.2f} YPC." if league_med_ypc is not None else ""
+
     run_splits = {
         'away_unit': {
             'team': a_team,
@@ -1071,13 +1076,13 @@ def compute_scheme_insights(
             'opp_def_gap_rank_display': h_gap_rank_disp,
             'comparison_summary': (
                 f"{a_team} Gap Rush: {a_profile['run_scheme']['gap_ypc']:.2f} YPC (n={a_games} games) vs. "
-                f"{h_team} Gap Def: {h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC allowed (n={h_games} games). "
-                f"League median: {league_med_ypc:.2f} YPC."
+                f"{h_team} Gap Def: {h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC allowed (n={h_games} games)."
+                f"{med_suffix}"
             ),
             'alignment_diagnostic': (
                 f"{a_team} Gap Rush: {a_profile['run_scheme']['gap_ypc']:.2f} YPC (n={a_games} games) vs. "
-                f"{h_team} Gap Def: {h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC allowed (n={h_games} games). "
-                f"League median: {league_med_ypc:.2f} YPC."
+                f"{h_team} Gap Def: {h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC allowed (n={h_games} games)."
+                f"{med_suffix}"
             ),
         },
         'home_unit': {
@@ -1094,13 +1099,13 @@ def compute_scheme_insights(
             'opp_def_gap_rank_display': a_gap_rank_disp,
             'comparison_summary': (
                 f"{h_team} Zone Rush: {h_profile['run_scheme']['zone_ypc']:.2f} YPC (n={h_games} games) vs. "
-                f"{a_team} Zone Def: {a_profile['run_scheme']['def_zone_ypc_allowed']:.2f} YPC allowed (n={a_games} games). "
-                f"League median: {league_med_ypc:.2f} YPC."
+                f"{a_team} Zone Def: {a_profile['run_scheme']['def_zone_ypc_allowed']:.2f} YPC allowed (n={a_games} games)."
+                f"{med_suffix}"
             ),
             'alignment_diagnostic': (
                 f"{h_team} Zone Rush: {h_profile['run_scheme']['zone_ypc']:.2f} YPC (n={h_games} games) vs. "
-                f"{a_team} Zone Def: {a_profile['run_scheme']['def_zone_ypc_allowed']:.2f} YPC allowed (n={a_games} games). "
-                f"League median: {league_med_ypc:.2f} YPC."
+                f"{a_team} Zone Def: {a_profile['run_scheme']['def_zone_ypc_allowed']:.2f} YPC allowed (n={a_games} games)."
+                f"{med_suffix}"
             ),
         }
     }
@@ -1216,7 +1221,8 @@ def compute_scheme_insights(
 
             if focus == 'Rushing Yards':
                 if opp_n_games < 6:
-                    ctx_str = f"{opp_code} Rush Def Allowed: {def_gap_ypc:.2f} YPC (league median {league_med_ypc:.2f}, n={opp_n_games} games — rank suppressed, small sample)"
+                    med_note = f"league median {league_med_ypc:.2f}, " if league_med_ypc is not None else ""
+                    ctx_str = f"{opp_code} Rush Def Allowed: {def_gap_ypc:.2f} YPC ({med_note}n={opp_n_games} games — rank suppressed, small sample)"
                 else:
                     ctx_str = f"{opp_code} Rush Def Allowed: {def_gap_ypc:.2f} YPC (Rank #{def_gap_rank}, n={opp_n_games} games)"
             else:
