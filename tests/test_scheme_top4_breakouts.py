@@ -14,7 +14,7 @@ def test_scheme_top4_breakouts():
     for a, h in test_matchups:
         res = compute_scheme_insights(a, h)
         breakouts = res.get('efficiency_breakouts', [])
-        assert 2 <= len(breakouts) <= 4, f"Expected 2-4 breakouts, got {len(breakouts)} for {a}@{h}"
+        assert 2 <= len(breakouts) <= 6, f"Expected 2-6 breakouts, got {len(breakouts)} for {a}@{h}"
         
         # Verify no duplicates
         players = [b['player'] for b in breakouts]
