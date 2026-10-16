@@ -209,8 +209,10 @@ def compute_player_historical_box_stats(
             _CACHED_RZ_DF = pd.read_parquet(RZ_CACHE_PATH)
 
         if _CACHED_RZ_DF is not None and not _CACHED_RZ_DF.empty:
-            game_keys = set(zip(matches["season"].astype(int), matches["week"].astype(int)))
-            sub_rz = _CACHED_RZ_DF[_CACHED_RZ_DF.apply(lambda r: (int(r["season"]), int(r["week"])) in game_keys, axis=1)]
+            # Fast vectorized key matching on season and week (replaces row-by-row apply)
+            rz_keys = _CACHED_RZ_DF["season"].astype(int).astype(str) + "_" + _CACHED_RZ_DF["week"].astype(int).astype(str)
+            target_keys = set(matches["season"].astype(int).astype(str) + "_" + matches["week"].astype(int).astype(str))
+            sub_rz = _CACHED_RZ_DF[rz_keys.isin(target_keys)]
             player_ids = set(matches["player_id"].dropna().astype(str).unique().tolist()) if "player_id" in matches.columns else set()
             disp_names = set(matches["player_display_name"].dropna().astype(str).unique().tolist()) if "player_display_name" in matches.columns else set()
             disp_names.add(disp_name)
@@ -286,9 +288,13 @@ def compute_player_historical_box_stats(
     exp_20 = int(matches.get("rushing_20", pd.Series(0, index=matches.index)).fillna(0).sum() +
                  matches.get("receiving_20", pd.Series(0, index=matches.index)).fillna(0).sum())
 
-    summary_str = f"Median: {med:.1f} {unit} (25th: {p25:.1f}, 75th: {p75:.1f}, range: {min_val:.1f}-{max_val:.1f}, n={n_games} games)"
+    if series.empty:
+        summary_str = f"No recorded stats (n={n_games} games)"
+    else:
+        summary_str = f"Median: {med:.1f} {unit} (25th: {p25:.1f}, 75th: {p75:.1f}, range: {min_val:.1f}-{max_val:.1f}, n={n_games} games)"
     rz_summary_str = f"Red zone touches: {rz20_sum} inside 20, {rz10_sum} inside 10 (n={n_games} games)"
     exp_summary_str = f"Explosive plays: {exp_10} gains of 10+ yds, {exp_20} of 20+ yds (n={n_games} games)"
+    is_small_sample = n_games < 4
 
     return {
         "verified_name": disp_name,
@@ -308,4 +314,6 @@ def compute_player_historical_box_stats(
         "exp_20": exp_20,
         "exp_summary": exp_summary_str,
         "splits_note": None,  # Omit filler when sub-split is not available
+        "is_small_sample": is_small_sample,
+        "small_sample_warning": "Small sample (n < 4 games)" if is_small_sample else None,
     }

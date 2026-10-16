@@ -156,6 +156,25 @@ def format_stat_comparison(
         else:
             rank = int((vals < team_val).sum() + 1)
 
+    if sample_size == 0:
+        return {
+            "raw_value": None,
+            "league_median": round(float(median), 3),
+            "league_p25": round(float(p25), 3),
+            "league_p75": round(float(p75), 3),
+            "rank": None,
+            "rank_display": "N/A (No sample)",
+            "rank_suppressed": True,
+            "n_games": n_games,
+            "total_teams": len(vals) if not vals.empty else 32,
+            "rank_direction": "higher is better" if higher_is_better else "lower is better",
+            "diff_from_median": None,
+            "diff_pct": None,
+            "sample_size": 0,
+            "is_small_sample": True,
+            "unit": unit,
+        }
+
     diff_raw = team_val - median
     diff_pct = (diff_raw / abs(median) * 100.0) if abs(median) > 1e-5 else 0.0
     is_small = sample_size < min_sample
