@@ -105,124 +105,67 @@ for team_code, prof in profiles.items():
     # 1. WR1 stats
     w1_dat = get_p_dat(wr1_name, {'target_share': 0.28, 'air_yards_share': 0.35, 'ypt': 8.8, 'adot': 11.2})
     w1_base = max(24.0, min(34.0, w1_dat['target_share'] * 100))
-    is_w1_slot = wr1_name in SLOT_SPECIALISTS
-    w1_slot = 58.0 if is_w1_slot else 26.0
-    w1_out = 100.0 - w1_slot
-    if is_w1_slot:
-        w1_tgt_zone = round(w1_base * 1.10, 1)
-        w1_tgt_man = round(w1_base * 0.92, 1)
-        w1_yprr_z = round(max(2.20, min(2.85, (w1_dat['ypt'] * 0.26) + 0.25)), 2)
-        w1_yprr_m = round(max(1.80, min(2.50, (w1_dat['ypt'] * 0.24) + 0.15)), 2)
-    else:
-        w1_man_mult = 1.14 + (w1_dat.get('air_yards_share', 0.3) * 0.08)
-        w1_tgt_man = round(w1_base * w1_man_mult, 1)
-        w1_tgt_zone = round(w1_base * 0.94, 1)
-        w1_yprr_m = round(max(2.40, min(3.20, (w1_dat['ypt'] * 0.28) + 0.35)), 2)
-        w1_yprr_z = round(max(2.10, min(2.75, (w1_dat['ypt'] * 0.25) + 0.20)), 2)
-    
+    w1_tgt_man = round(w1_base * 1.10, 1)
+    w1_tgt_zone = round(w1_base * 0.94, 1)
+    w1_ypt = round(float(w1_dat['ypt']), 2)
+
     # 2. WR2 stats
     w2_dat = get_p_dat(wr2_name, {'target_share': 0.18, 'air_yards_share': 0.24, 'ypt': 8.0, 'adot': 12.5})
-    if wr2_name in ('G.Pickens', 'D.Adams', 'A.Cooper', 'X.Worthy', 'M.Evans', 'S.Diggs', 'C.Kupp', 'J.Waddle') or w2_dat.get('air_yards_share', 0) >= 0.28:
-        # Co-alpha boundary deep threat (e.g. D.Adams on Rams, G.Pickens on Cowboys, S.Diggs on Commanders)
-        w2_base = max(21.0, min(26.5, w2_dat['target_share'] * 100))
-        w2_slot = 20.0
-        w2_out = 80.0
-        w2_tgt_man = round(w2_base * 1.16, 1)
-        w2_tgt_zone = round(w2_base * 0.94, 1)
-        w2_yprr_m = round(max(2.60, min(3.15, (w2_dat['ypt'] * 0.28) + 0.35)), 2)
-        w2_yprr_z = round(max(2.15, min(2.70, (w2_dat['ypt'] * 0.25) + 0.20)), 2)
-    else:
-        w2_base = max(16.0, min(23.5, w2_dat['target_share'] * 100))
-        # If WR1 was slot, WR2 is boundary, or vice versa
-        is_w2_slot = wr2_name in SLOT_SPECIALISTS
-        w2_slot = 68.0 if is_w2_slot else 18.0
-        w2_out = 100.0 - w2_slot
-        # WR2 sees slight drop vs Man, slight boost vs Zone honey holes
-        w2_tgt_man = round(w2_base * 0.96, 1)
-        w2_tgt_zone = round(w2_base * 1.03, 1)
-        w2_yprr_m = round(max(1.65, min(2.25, (w2_dat['ypt'] * 0.23) + 0.10)), 2)
-        w2_yprr_z = round(max(1.60, min(2.15, (w2_dat['ypt'] * 0.22) + 0.05)), 2)
-    
+    w2_base = max(16.0, min(24.0, w2_dat['target_share'] * 100))
+    w2_tgt_man = round(w2_base * 1.05, 1)
+    w2_tgt_zone = round(w2_base * 0.96, 1)
+    w2_ypt = round(float(w2_dat['ypt']), 2)
+
     # 3. TE stats
     te_dat = get_p_dat(te_name, {'target_share': 0.18, 'air_yards_share': 0.16, 'ypt': 7.5, 'adot': 7.2})
     te_base = max(14.0, min(24.0, te_dat['target_share'] * 100))
-    te_slot = 44.0
-    te_inline = 46.0
-    te_out = 10.0
-    # TEs thrive vs Zone intermediate voids
-    te_tgt_zone = round(te_base * 1.16, 1)
+    te_tgt_zone = round(te_base * 1.15, 1)
     te_tgt_man = round(te_base * 0.85, 1)
-    te_yprr_z = round(max(1.85, min(2.45, (te_dat['ypt'] * 0.26) + 0.20)), 2)
-    te_yprr_m = round(max(1.45, min(1.95, (te_dat['ypt'] * 0.22) - 0.05)), 2)
-    
+    te_ypt = round(float(te_dat['ypt']), 2)
+
     # 4. RB stats
     rb_dat = get_p_dat(rb_name, {'target_share': 0.12, 'air_yards_share': 0.02, 'ypt': 5.8, 'adot': 0.5})
     rb_base = max(9.0, min(16.0, rb_dat['target_share'] * 100))
-    rb_slot = 10.0
-    rb_out = 5.0
-    rb_inline = 0.0
-    # RBs get checkdowns vs Zone
-    rb_tgt_zone = round(rb_base * 1.25, 1)
-    rb_tgt_man = round(rb_base * 0.75, 1)
-    rb_yprr_z = round(max(1.25, min(1.85, (rb_dat['ypt'] * 0.22) + 0.15)), 2)
-    rb_yprr_m = round(max(0.85, min(1.30, (rb_dat['ypt'] * 0.17) - 0.05)), 2)
-    
-    # Assemble team's 4 key targets in proper hierarchy (WR1, WR2, TE, RB)
+    rb_tgt_zone = round(rb_base * 1.20, 1)
+    rb_tgt_man = round(rb_base * 0.80, 1)
+    rb_ypt = round(float(rb_dat['ypt']), 2)
+
+    # Assemble team's 4 key targets with exact YPT
     new_targets = [
         {
             'name': wr1_name,
             'pos': 'WR',
-            'slot_pct': w1_slot,
-            'outside_pct': w1_out,
-            'inline_pct': 0.0,
             'tgt_man': w1_tgt_man,
             'tgt_zone': w1_tgt_zone,
-            'yprr_man': w1_yprr_m,
-            'yprr_zone': w1_yprr_z
+            'ypt': w1_ypt
         },
         {
             'name': wr2_name,
             'pos': 'WR',
-            'slot_pct': w2_slot,
-            'outside_pct': w2_out,
-            'inline_pct': 0.0,
             'tgt_man': w2_tgt_man,
             'tgt_zone': w2_tgt_zone,
-            'yprr_man': w2_yprr_m,
-            'yprr_zone': w2_yprr_z
+            'ypt': w2_ypt
         },
         {
             'name': te_name,
             'pos': 'TE',
-            'slot_pct': te_slot,
-            'outside_pct': te_out,
-            'inline_pct': te_inline,
             'tgt_man': te_tgt_man,
             'tgt_zone': te_tgt_zone,
-            'yprr_man': te_yprr_m,
-            'yprr_zone': te_yprr_z
+            'ypt': te_ypt
         },
         {
             'name': rb_name,
             'pos': 'RB',
-            'slot_pct': rb_slot,
-            'outside_pct': rb_out,
-            'inline_pct': rb_inline,
             'tgt_man': rb_tgt_man,
             'tgt_zone': rb_tgt_zone,
-            'yprr_man': rb_yprr_m,
-            'yprr_zone': rb_yprr_z
+            'ypt': rb_ypt
         }
     ]
-    
+
     prof['target_alignment']['key_targets'] = new_targets
-    prof['target_alignment']['slot_wr_pct'] = round(float(np.mean([w1_slot, w2_slot]) * 0.65), 1)
-    prof['target_alignment']['wide_wr_pct'] = round(float(np.mean([w1_out, w2_out]) * 0.65), 1)
-    prof['target_alignment']['inline_te_pct'] = round(float(te_inline * 0.38), 1)
-    prof['target_alignment']['backfield_rb_pct'] = round(float(rb_base), 1)
     prof['tempo_situational']['red_zone_touch_leader'] = f"{rb_name} (Lead Goal-Line Share)"
     prof['tempo_situational']['flow_verdict'] = f"Offensive tempo guided by {rb_name} red zone conversion and {prof['tempo_situational'].get('checkdown_pct', 15.0):.1f}% check-down release rate."
-    
+
     updated_teams += 1
 
 print(f"Successfully recalibrated key_targets for {updated_teams} teams!")

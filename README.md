@@ -54,6 +54,40 @@ Live Production URL: **[https://nflwebsite-ten.vercel.app](https://nflwebsite-te
 ### 6. Matchup Vulnerabilities & Trends
 * Automated spotlight detection highlighting defensive pass funnels, soft run fronts, offensive red-zone efficiency, and rest advantages.
 
+### 7. Scheme Insights Engine (Forensic Matchup Scouting)
+
+The Scheme Insights engine is a strictly **descriptive, forensic scouting tool** for NFL matchups. It takes raw play-by-play data and translates it into situational tendencies, historical distributions, and matchup fits. 
+
+It explicitly rejects black-box projections, "betting picks," and fabricated narrative labels. Instead, it provides transparent historical stats, rank context, and sample sizes ($n$) so users can draw their own football conclusions. To prevent early-season noise, it utilizes a combined multi-season sample baseline.
+
+The interface is organized into five sections:
+
+* **Executive Scouting Header**
+  * **Sample Window**: Displays the exact evaluation sample and number of games evaluated.
+  * **Scout Cards**: Three quick-glance summaries covering:
+    * *Passing Game*: Primary coverage shells faced vs. receiver target distribution.
+    * *Trench & Ground*: Offensive Gap vs. Zone run mix matched against opposing defensive front resistance.
+    * *Script & Pace*: Historical play volume and neutral pace environment.
+* **Game Script & Pace**
+  * **Situational Pace**: Seconds per snap in neutral situations (score within 6 points), historical plays per game, check-down frequency, and red-zone touch leaders.
+  * **Coaching Intent**: Six situational boxes showing how each coaching staff changes their pass/run ratios based on the scoreboard (Leading by ≥7, Neutral, Trailing by ≥7). Rates are compared against the league median with team rank and sample size.
+* **Passing Matchup: Shells & Targets**
+  * **Efficiency Comparison**: Compares passing output (yards per pass attempt) directly against the defense's allowed target-depth baseline.
+  * **Defensive Coverage Shells**: Frequencies for Middle-Field Open (Cover 2, 4, 6) vs. Middle-Field Closed (Cover 1, 3), overall Zone vs. Man splits, and a specific 6-shell breakdown.
+  * **Receiver Alignment & Target Rates**: Alignment distributions for primary weapons (Slot, Perimeter/Outside, Inline) and target share splits against Zone vs. Man coverage.
+* **Trenches & Run Game**
+  * **Ground Fit Comparison**: The offense's rushing style (Gap/Power vs. Outside Zone) cross-referenced with the defensive front's allowed YPC against those specific schemes.
+  * **Trench Resistance**: Compares rushing efficiency inside the tackles vs. outside the tackles against defensive allowances.
+  * **Similar Opponent Analog Table**: Finds the closest historical opponent games matching the team's stylistic run/pass identity and displays how the defense actually performed in those specific games (with strict filters for sample size and distance).
+* **Player Profiles & Situational Usage**
+  * **Key Skill Players**: Highlights up to 6 key players (Lead RB, WR1, and primary TE/WR2 for each team).
+  * **Verified Active Rosters**: Pulls directly from active weekly rosters to ensure every player actually took snaps for that team in the current season, eliminating stale or traded names.
+  * **Historical Box Stats**:
+    * Median production over the current sample window.
+    * Interquartile range (25th percentile floor to 75th percentile ceiling).
+    * Exact red-zone touch volume (inside the 20 and inside the 10).
+    * Defensive context (e.g., opposing defense's Zone % or YPC allowed).
+
 ---
 
 ## Live Access & Deployment
@@ -63,6 +97,7 @@ The application is deployed on Vercel Serverless Functions (`@vercel/python`):
 * **Live Dashboard**: [https://nflwebsite-ten.vercel.app](https://nflwebsite-ten.vercel.app)
 * **REST API Endpoints**:
   * `GET /api/status`: Health check and cache status.
+  * `GET /api/scheme-insights`: Forensic scheme tendencies, coverage shells, trench fits, and player usage distributions.
   * `GET /api/floor-streak`: Player floor streaks with hard line thresholds.
   * `GET /api/export-matchups-excel`: Generates and downloads multi-tab matchup workbooks (.xlsx).
   * `GET /api/match-history`: Historical match logs, ATS records, and O/U splits.
@@ -105,6 +140,8 @@ nfl_website/
 │   └── data/                 # Pre-computed parquet cache files
 ├── backend/
 │   ├── server.py             # FastAPI REST endpoints & router mounts
+│   ├── scheme_insights.py    # Multi-season forensic scheme insights & player usage profiles
+│   ├── team_tendencies.py    # Situational pass/run splits & defensive coverage aggregations
 │   ├── data_loader.py        # nflreadpy data pipeline
 │   ├── analytics.py          # Match history, stats rankings, schedule engine, H2H lab
 │   └── pbp_features.py       # Advanced play-by-play aggregations

@@ -1112,21 +1112,31 @@ def compute_scheme_insights(
     }
 
     # -------------------------------------------------------------
-    # Pillar 3: Positional Target Rates & Alignment Matchups
+    # Pillar 3: Positional Target Rates & Coverage Splits
     # -------------------------------------------------------------
     def _evaluate_player_target_alignment(player: Dict[str, Any], opp_cov: Dict[str, Any]) -> Dict[str, Any]:
-        slot_share = player.get('slot_pct', 0)
-        outside_share = player.get('outside_pct', 0)
-        inline_share = player.get('inline_pct', 0)
         tgt_zone = player.get('tgt_zone', 20.0)
         tgt_man = player.get('tgt_man', 20.0)
-        alignment_info = f"Alignment: {slot_share:.0f}% Slot, {outside_share:.0f}% Outside, {inline_share:.0f}% Inline"
         split_info = f"Target Split: {tgt_zone:.1f}% vs Zone, {tgt_man:.1f}% vs Man"
+
+        ypt_val = player.get('ypt')
+        if ypt_val is None:
+            p_name = player.get('name', '')
+            if _WEEKLY_DF is not None and not _WEEKLY_DF.empty and p_name:
+                pw = _WEEKLY_DF[(_WEEKLY_DF['player_name'] == p_name) | (_WEEKLY_DF['player_display_name'] == p_name)]
+                if not pw.empty:
+                    tot_rec_yds = pw['receiving_yards'].sum()
+                    tot_tgts = pw['targets'].sum()
+                    if tot_tgts > 0:
+                        ypt_val = round(float(tot_rec_yds / tot_tgts), 2)
+        if ypt_val is None:
+            ypt_val = 7.5
+
         return {
             **player,
-            'alignment_summary': alignment_info,
+            'ypt': ypt_val,
             'target_split_summary': split_info,
-            'expected_boost': f"{split_info} | {alignment_info}",
+            'expected_boost': split_info,
         }
 
     a_targets = [_evaluate_player_target_alignment(p, h_profile['coverage']) for p in a_profile['target_alignment']['key_targets']]

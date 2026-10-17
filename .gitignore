@@ -54,4 +54,4 @@ data/pbp_cache/pbp_*.parquet
 data/injury_cache.json
 
 .agent/
-
+scratch/

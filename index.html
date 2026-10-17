@@ -3110,38 +3110,21 @@
                     <text x="185" y="54" fill="#94a3b8" font-size="6" text-anchor="middle">High Yards & TD Share</text>
                 </svg>`
             },
-            'YPRR': {
-                title: 'Yards Per Route Run (YPRR)',
-                badge: 'Efficiency Metric',
-                desc: 'Total receiving yards divided by total pass routes run.',
-                what: 'The premier per-snap efficiency metric: total receiving yards divided by pass routes run.',
-                why: 'YPRR > 2.0 indicates an elite separator; > 2.5 is an All-Pro alpha. The strongest leading indicator of receiving yard breakouts.',
+            'YPT': {
+                title: 'Yards Per Target (YPT)',
+                badge: 'Receiving Efficiency',
+                desc: 'Receiving yards divided by total pass targets across evaluated games.',
+                what: 'The exact derived efficiency metric: total receiving yards divided by total targets thrown to this player.',
+                why: 'Reflects how much yardage the offense produces on average every time the quarterback throws to this target.',
                 svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
                     <rect x="18" y="16" width="98" height="58" rx="4" fill="#161b22" stroke="#30363d"/>
                     <text x="67" y="30" fill="#94a3b8" font-size="6.5" font-weight="bold" text-anchor="middle">EFFICIENCY SCALE</text>
-                    <text x="67" y="45" fill="#facc15" font-size="9" font-weight="bold" text-anchor="middle">> 2.25 YPRR</text>
-                    <text x="67" y="60" fill="#10b981" font-size="6" font-weight="bold" text-anchor="middle">Elite WR1 Tier</text>
+                    <text x="67" y="45" fill="#facc15" font-size="9" font-weight="bold" text-anchor="middle">> 8.5 YPT</text>
+                    <text x="67" y="60" fill="#10b981" font-size="6" font-weight="bold" text-anchor="middle">High Efficiency</text>
                     <rect x="130" y="16" width="102" height="58" rx="4" fill="#161b22" stroke="#30363d"/>
                     <text x="181" y="32" fill="#94a3b8" font-size="6.5" font-weight="bold" text-anchor="middle">CALCULATION</text>
-                    <text x="181" y="48" fill="#38bdf8" font-size="7.5" font-weight="bold" text-anchor="middle">Rec Yds ÷ Routes</text>
-                    <text x="181" y="62" fill="#64748b" font-size="6" text-anchor="middle">Filters out snap count</text>
-                </svg>`
-            },
-            'Scheme Edge': {
-                title: 'Scheme Edge (Delta)',
-                badge: 'Matchup Delta',
-                desc: 'Statistical difference between player efficiency against this scheme vs season baseline.',
-                what: 'The statistical difference between a player\'s efficiency against this specific defensive scheme versus their season baseline.',
-                why: 'A positive delta (> +15%) flags an exploitable mismatch where defensive weaknesses play into the player\'s top traits.',
-                svg: `<svg viewBox="0 0 250 90" class="w-full h-[85px] bg-[#0c1017] rounded block">
-                    <line x1="25" y1="65" x2="225" y2="65" stroke="#334155" stroke-width="1.5"/>
-                    <rect x="50" y="45" width="40" height="20" rx="2" fill="#475569"/>
-                    <text x="70" y="40" fill="#94a3b8" font-size="6" font-weight="bold" text-anchor="middle">Baseline 1.8</text>
-                    <rect x="140" y="22" width="40" height="43" rx="2" fill="#10b981"/>
-                    <text x="160" y="17" fill="#10b981" font-size="6.5" font-weight="bold" text-anchor="middle">Vs Scheme 2.4</text>
-                    <path d="M 95 40 Q 115 25 135 25" stroke="#facc15" stroke-width="2" fill="none"/>
-                    <polygon points="137,25 130,22 130,28" fill="#facc15"/>
-                    <text x="115" y="18" fill="#facc15" font-size="7" font-weight="bold" text-anchor="middle">+33% Edge</text>
+                    <text x="181" y="48" fill="#38bdf8" font-size="7.5" font-weight="bold" text-anchor="middle">Rec Yds ÷ Targets</text>
+                    <text x="181" y="62" fill="#64748b" font-size="6" text-anchor="middle">Exact descriptive stat</text>
                 </svg>`
             },
             'Matchup Mechanism': {
@@ -3600,9 +3583,12 @@
         
         function renderStatCmp(stat, unit = '') {
             if (!stat || stat.raw_value == null) return '<span class="text-slate-500">--</span>';
-            const raw = typeof stat.raw_value === 'number' ? stat.raw_value.toFixed(1) : stat.raw_value;
-            const med = typeof stat.league_median === 'number' ? stat.league_median.toFixed(1) : stat.league_median;
-            const diff = typeof stat.diff_from_median === 'number' ? (stat.diff_from_median > 0 ? `+${stat.diff_from_median.toFixed(1)}` : stat.diff_from_median.toFixed(1)) : '';
+            const isPct = unit === '%' || stat.unit === 'rate' || stat.unit === 'pct';
+            const mult = (isPct && typeof stat.raw_value === 'number' && stat.raw_value <= 1.0) ? 100 : 1;
+            const raw = typeof stat.raw_value === 'number' ? (stat.raw_value * mult).toFixed(1) : stat.raw_value;
+            const med = typeof stat.league_median === 'number' ? (stat.league_median * mult).toFixed(1) : stat.league_median;
+            const diffVal = (isPct && typeof stat.diff_from_median === 'number' && Math.abs(stat.diff_from_median) <= 1.0) ? stat.diff_from_median * mult : stat.diff_from_median;
+            const diff = typeof diffVal === 'number' ? (diffVal > 0 ? `+${diffVal.toFixed(1)}` : diffVal.toFixed(1)) : '';
             const diffPct = typeof stat.diff_pct === 'number' ? (stat.diff_pct > 0 ? `+${stat.diff_pct.toFixed(0)}%` : `${stat.diff_pct.toFixed(0)}%`) : '';
             const nGames = stat.n_games != null ? stat.n_games : (stat.sample_size != null ? stat.sample_size : null);
 
@@ -3622,7 +3608,7 @@
                         <span class="text-[10px] text-slate-400">Med: ${med}${unit}</span>
                     </div>
                     <div class="flex items-center justify-between text-[9.5px]">
-                        <span class="${stat.diff_from_median >= 0 ? 'text-emerald-400 font-semibold' : 'text-slate-400'}">${diff ? `${diff} (${diffPct})` : ''}</span>
+                        <span class="${(diffVal != null ? diffVal : stat.diff_from_median) >= 0 ? 'text-emerald-400 font-semibold' : 'text-slate-400'}">${diff ? `${diff}${unit ? unit : ''} (${diffPct})` : ''}</span>
                         <div class="flex items-center space-x-1">
                             ${rkDisplay ? `<span class="px-1 py-0.2 rounded bg-[#21262d] text-slate-300 border border-[#30363d] text-[9px] cursor-help" title="${nGames != null && nGames < 6 ? `Rank suppressed until 6+ games (currently ${nGames} games evaluated)` : ''}">${rkDisplay}</span>` : ''}
                         </div>
@@ -3631,45 +3617,35 @@
             `;
         }
 
-        function renderTugOfWarBar(label, offTeam, offVal, defTeam, defVal, unit = 'YPC', formatFn = null) {
-            const oVal = parseFloat(offVal) || 0;
-            const dVal = parseFloat(defVal) || 0;
-            const diff = oVal - dVal;
-            const absDiff = Math.abs(diff);
+        function renderComparisonCard(title, labelA, valA, labelB, valB, leagueMed = null, unit = '') {
+            const formatVal = (v) => {
+                if (v == null || v === '') return '--';
+                if (typeof v === 'number') return `${v.toFixed(2)}${unit ? ` ${unit}` : ''}`;
+                const num = parseFloat(v);
+                if (!isNaN(num)) return `${num.toFixed(2)}${unit ? ` ${unit}` : ''}`;
+                return `${v}${unit ? ` ${unit}` : ''}`;
+            };
 
-            let advantageBadge = '';
-            let barColor = 'bg-slate-400';
-            let fillPct = 50;
-
-            const fmt = formatFn || ((v) => `${v.toFixed(2)} ${unit}`);
-
-            if (absDiff < 0.15) {
-                advantageBadge = '<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono">Neutral Parity</span>';
-                fillPct = 50;
-            } else if (diff > 0) {
-                advantageBadge = `<span class="px-2 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800/60 text-[10px] font-mono font-bold">${offTeam} Edge (+${absDiff.toFixed(2)} ${unit})</span>`;
-                barColor = 'bg-emerald-400';
-                fillPct = Math.min(88, 50 + (absDiff * 18));
-            } else {
-                advantageBadge = `<span class="px-2 py-0.5 rounded bg-sky-950/70 text-sky-300 border border-sky-800/60 text-[10px] font-mono font-bold">${defTeam} Defense Edge (-${absDiff.toFixed(2)} ${unit})</span>`;
-                barColor = 'bg-sky-400';
-                fillPct = Math.max(12, 50 - (absDiff * 18));
-            }
+            const vA = formatVal(valA);
+            const vB = formatVal(valB);
+            const med = leagueMed != null ? formatVal(leagueMed) : (unit ? `4.20 ${unit}` : '--');
 
             return `
-                <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] space-y-1.5 font-mono">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="font-bold text-slate-200 font-sans">${label}</span>
-                        ${advantageBadge}
-                    </div>
-                    <div class="relative w-full bg-[#21262d] h-2 rounded-full overflow-hidden flex items-center">
-                        <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-400 z-10"></div>
-                        <div class="${barColor} h-full transition-all duration-300" style="width: ${fillPct}%;"></div>
-                    </div>
-                    <div class="flex items-center justify-between text-[10px] text-slate-400">
-                        <span>${offTeam} Offense: <b class="text-slate-200">${fmt(oVal)}</b></span>
-                        <span class="text-slate-500 text-[9px] uppercase tracking-wider">Parity</span>
-                        <span>${defTeam} Def Allowed: <b class="text-slate-200">${fmt(dVal)}</b></span>
+                <div class="bg-[#161b22] p-3 rounded-lg border border-[#21262d] space-y-2 font-mono">
+                    <div class="text-xs font-bold text-slate-200 font-sans">${title}</div>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="bg-[#12161c] p-2.5 rounded border border-[#21262d]">
+                            <span class="text-slate-400 block text-[9.5px] font-sans truncate mb-0.5">${labelA}</span>
+                            <b class="text-slate-100">${vA}</b>
+                        </div>
+                        <div class="bg-[#12161c] p-2.5 rounded border border-[#21262d]">
+                            <span class="text-slate-400 block text-[9.5px] font-sans truncate mb-0.5">League Median</span>
+                            <b class="text-slate-300">${med}</b>
+                        </div>
+                        <div class="bg-[#12161c] p-2.5 rounded border border-[#21262d]">
+                            <span class="text-slate-400 block text-[9.5px] font-sans truncate mb-0.5">${labelB}</span>
+                            <b class="text-slate-100">${vB}</b>
+                        </div>
                     </div>
                 </div>
             `;
@@ -4333,25 +4309,25 @@ function renderSchemeInsights(d) {
 
                     ${secInjAlert}
 
-                    <!-- Visual Tug-of-War Advantage Bar (Passing Game) -->
+                    <!-- Side-by-Side Passing Efficiency Comparison Cards -->
                     <div class="space-y-3">
-                        ${renderTugOfWarBar(
+                        ${renderComparisonCard(
                             `${d.away_team} Pass Offense vs ${d.home_team} Pass Defense Allowed`,
-                            d.away_team,
-                            (awayTend.pass_defense?.short_ypp?.league_median || 6.8),
-                            d.home_team,
-                            (homeVuln.pass_defense?.target_depth_allowed?.short_0_to_9?.yards_per_attempt?.raw_value || 6.6),
-                            'YPA',
-                            (v) => `${v.toFixed(1)} YPA`
+                            `${d.away_team} Pass Offense`,
+                            (awayTend.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || awayTend.pass_defense?.short_ypp?.league_median || 6.8),
+                            `${d.home_team} Def Allowed`,
+                            (homeVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || homeVuln.pass_defense?.target_depth_allowed?.short_0_to_9?.yards_per_attempt?.raw_value || 6.6),
+                            (homeVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.league_median || 6.1),
+                            'YPA'
                         )}
-                        ${renderTugOfWarBar(
+                        ${renderComparisonCard(
                             `${d.home_team} Pass Offense vs ${d.away_team} Pass Defense Allowed`,
-                            d.home_team,
-                            (homeTend.pass_defense?.short_ypp?.league_median || 6.8),
-                            d.away_team,
-                            (awayVuln.pass_defense?.target_depth_allowed?.short_0_to_9?.yards_per_attempt?.raw_value || 6.6),
-                            'YPA',
-                            (v) => `${v.toFixed(1)} YPA`
+                            `${d.home_team} Pass Offense`,
+                            (homeTend.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || homeTend.pass_defense?.short_ypp?.league_median || 6.8),
+                            `${d.away_team} Def Allowed`,
+                            (awayVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || awayVuln.pass_defense?.target_depth_allowed?.short_0_to_9?.yards_per_attempt?.raw_value || 6.6),
+                            (awayVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.league_median || 6.1),
+                            'YPA'
                         )}
                     </div>
 
@@ -4478,59 +4454,6 @@ function renderSchemeInsights(d) {
                         </div>
                     </div>
 
-                    <!-- Alignment Target Distribution & Conceded Depths -->
-                    <div id="pillar-alignment" class="space-y-3 pt-2">
-                        <div class="text-xs font-bold text-slate-200 uppercase font-mono border-b border-[#21262d] pb-1.5">
-                            Target Shares by Alignment &amp; Depth Allowed
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Away Alignment -->
-                            <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
-                                <span class="text-xs font-bold font-mono text-slate-200">${d.away_team} Alignment Target Shares</span>
-                                <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Slot WR', 'Slot WR', 'left')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(aDist.slot_wr_pct || 30)}</b>
-                                    </div>
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Outside WR', 'Outside WR', 'center')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(aDist.wide_wr_pct || 42)}</b>
-                                    </div>
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Inline TE', 'Inline TE', 'center')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(aDist.inline_te_pct || 18)}</b>
-                                    </div>
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Backfield RB', 'Backfield RB', 'right')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(aDist.backfield_rb_pct || 10)}</b>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Home Alignment -->
-                            <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-3.5 space-y-2">
-                                <span class="text-xs font-bold font-mono text-slate-200">${d.home_team} Alignment Target Shares</span>
-                                <div class="grid grid-cols-4 gap-2 text-center text-[11px] font-mono">
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Slot WR', 'Slot WR', 'left')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(hDist.slot_wr_pct || 32)}</b>
-                                    </div>
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Outside WR', 'Outside WR', 'center')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(hDist.wide_wr_pct || 40)}</b>
-                                    </div>
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Inline TE', 'Inline TE', 'center')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(hDist.inline_te_pct || 18)}</b>
-                                    </div>
-                                    <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                        <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Backfield RB', 'Backfield RB', 'right')}</span>
-                                        <b class="text-slate-100 font-bold">${fmtPct(hDist.backfield_rb_pct || 10)}</b>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Key Receivers Target vs Coverage Table -->
                     <div class="overflow-x-auto rounded-xl border border-[#30363d]">
                         <table class="w-full text-left text-xs border-collapse">
@@ -4539,10 +4462,9 @@ function renderSchemeInsights(d) {
                                     <th class="py-2 px-3">Player</th>
                                     <th class="py-2 px-2 text-center">Team</th>
                                     <th class="py-2 px-2 text-center">Pos</th>
-                                    <th class="py-2 px-3">Primary Alignment</th>
                                     <th class="py-2 px-2 text-right">${renderSchemeTip('Tgt% vs Zone', 'Tgt% Zone', 'center')}</th>
                                     <th class="py-2 px-2 text-right">${renderSchemeTip('Tgt% vs Man', 'Tgt% Man', 'center')}</th>
-                                    <th class="py-2 px-2 text-right">${renderSchemeTip('YPRR', 'YPRR', 'right')}</th>
+                                    <th class="py-2 px-2 text-right">${renderSchemeTip('YPT', 'YPT', 'right')}</th>
                                     <th class="py-2 px-3">Coverage Matchup Context</th>
                                 </tr>
                             </thead>
@@ -4552,12 +4474,9 @@ function renderSchemeInsights(d) {
                                         <td class="py-2 px-3 font-bold text-slate-100 font-sans">${p.name || p.player || 'Player'}</td>
                                         <td class="py-2 px-2 text-center text-slate-300 font-bold">${p.team}</td>
                                         <td class="py-2 px-2 text-center text-slate-400">${p.pos}</td>
-                                        <td class="py-2 px-3 text-slate-300">
-                                            ${p.slot_pct > 40 ? `<span>Slot (${p.slot_pct}%)</span>` : (p.inline_pct > 30 ? `<span>Inline TE (${p.inline_pct}%)</span>` : `<span>Outside (${p.outside_pct}%)</span>`)}
-                                        </td>
                                         <td class="py-2 px-2 text-right font-bold text-slate-200">${fmtPct(p.tgt_zone)}</td>
                                         <td class="py-2 px-2 text-right text-slate-400">${fmtPct(p.tgt_man)}</td>
-                                        <td class="py-2 px-2 text-right text-slate-100 font-bold">${fmtDec(p.yprr_zone || p.yprr_man || 1.8)}</td>
+                                        <td class="py-2 px-2 text-right text-slate-100 font-bold">${p.ypt != null ? p.ypt.toFixed(2) : '--'}</td>
                                         <td class="py-2 px-3 font-sans text-slate-300 text-[11px]">
                                             ${formatInsightsText(p.expected_boost || 'Standard progression target look rate.')}
                                         </td>
@@ -4582,27 +4501,29 @@ function renderSchemeInsights(d) {
                                 <p class="text-[11px] text-slate-400">Offensive gap vs zone blocking, defensive front run-stopping resistance, directional tackle gaps, and pass protection</p>
                             </div>
                         </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">Trench Differential</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">Trench Comparison</span>
                     </div>
 
                     ${trenchInjAlert}
 
-                    <!-- Visual Tug-of-War Advantage Bars (Trench Differential) -->
+                    <!-- Side-by-Side Trench Comparison Cards -->
                     <div class="space-y-3">
-                        ${renderTugOfWarBar(
+                        ${renderComparisonCard(
                             `${d.away_team} Gap Rush vs ${d.home_team} Gap Def Allowed`,
-                            d.away_team,
+                            `${d.away_team} Gap Rush`,
                             aRun.gap_ypc,
-                            d.home_team,
+                            `${d.home_team} Gap Def Allowed`,
                             aRun.opp_def_gap_ypc_allowed,
+                            (homeVuln.rush_defense?.directional_gaps?.inside_tackles?.yards_per_carry?.league_median || 4.2),
                             'YPC'
                         )}
-                        ${renderTugOfWarBar(
+                        ${renderComparisonCard(
                             `${d.home_team} Zone Rush vs ${d.away_team} Zone Def Allowed`,
-                            d.home_team,
+                            `${d.home_team} Zone Rush`,
                             hRun.zone_ypc,
-                            d.away_team,
+                            `${d.away_team} Zone Def Allowed`,
                             hRun.opp_def_zone_ypc_allowed,
+                            (awayVuln.rush_defense?.directional_gaps?.outside_tackles?.yards_per_carry?.league_median || 4.4),
                             'YPC'
                         )}
                     </div>
@@ -4645,11 +4566,11 @@ function renderSchemeInsights(d) {
                             <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1 border-t border-[#21262d]">
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9.5px]">Inside Tackles:</span>
-                                    ${renderStatCmp(homeVuln.rb_rush_defense?.inside_tackles_ypc, ' YPC')}
+                                    ${renderStatCmp(homeVuln.rush_defense?.directional_gaps?.inside_tackles?.yards_per_carry, ' YPC')}
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9.5px]">Outside Tackles:</span>
-                                    ${renderStatCmp(homeVuln.rb_rush_defense?.outside_tackles_ypc, ' YPC')}
+                                    ${renderStatCmp(homeVuln.rush_defense?.directional_gaps?.outside_tackles?.yards_per_carry, ' YPC')}
                                 </div>
                             </div>
                         </div>
@@ -4690,11 +4611,11 @@ function renderSchemeInsights(d) {
                             <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1 border-t border-[#21262d]">
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9.5px]">Inside Tackles:</span>
-                                    ${renderStatCmp(awayVuln.rb_rush_defense?.inside_tackles_ypc, ' YPC')}
+                                    ${renderStatCmp(awayVuln.rush_defense?.directional_gaps?.inside_tackles?.yards_per_carry, ' YPC')}
                                 </div>
                                 <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
                                     <span class="text-slate-400 block text-[9.5px]">Outside Tackles:</span>
-                                    ${renderStatCmp(awayVuln.rb_rush_defense?.outside_tackles_ypc, ' YPC')}
+                                    ${renderStatCmp(awayVuln.rush_defense?.directional_gaps?.outside_tackles?.yards_per_carry, ' YPC')}
                                 </div>
                             </div>
                         </div>
@@ -4739,25 +4660,47 @@ function renderSchemeInsights(d) {
                                     </div>
 
                                     <!-- 3 Intuitive Scouting Blocks: Floor / Usual / Ceiling -->
-                                    <div class="grid grid-cols-3 gap-1.5 text-center font-mono">
-                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                            <span class="text-slate-400 block text-[9px] uppercase font-sans">Typical Floor</span>
-                                            <b class="text-slate-200 text-xs">${b.last_10_stats?.p25 != null ? b.last_10_stats.p25.toFixed(1) : '--'}</b>
-                                            <span class="text-[9px] text-slate-500 block">${b.last_10_stats?.unit || 'yds'}</span>
+                                    ${(b.last_10_stats?.n_games || 0) < 4 ? `
+                                        <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] text-center text-xs font-mono text-slate-400">
+                                            Insufficient sample size to calculate distribution (n=${b.last_10_stats?.n_games || 0} games).
                                         </div>
-                                        <div class="bg-[#161b22] p-2 rounded border border-emerald-900/60 bg-emerald-950/20">
-                                            <span class="text-emerald-400 block text-[9px] uppercase font-sans font-bold">Usual Output</span>
-                                            <b class="text-emerald-300 text-xs font-bold">${b.last_10_stats?.median != null ? b.last_10_stats.median.toFixed(1) : '--'}</b>
-                                            <span class="text-[9px] text-emerald-500/80 block">${b.last_10_stats?.unit || 'yds'}</span>
+                                    ` : `
+                                        <div class="grid grid-cols-3 gap-1.5 text-center font-mono">
+                                            <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] uppercase font-sans">Typical Floor</span>
+                                                <b class="text-slate-200 text-xs">${b.last_10_stats?.p25 != null ? b.last_10_stats.p25.toFixed(1) : '--'}</b>
+                                                <span class="text-[9px] text-slate-500 block">${b.last_10_stats?.unit || 'yds'}</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-2 rounded border border-emerald-900/60 bg-emerald-950/20">
+                                                <span class="text-emerald-400 block text-[9px] uppercase font-sans font-bold">Usual Output</span>
+                                                <b class="text-emerald-300 text-xs font-bold">${b.last_10_stats?.median != null ? b.last_10_stats.median.toFixed(1) : '--'}</b>
+                                                <span class="text-[9px] text-emerald-500/80 block">${b.last_10_stats?.unit || 'yds'}</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] uppercase font-sans">Typical Ceiling</span>
+                                                <b class="text-slate-200 text-xs">${b.last_10_stats?.p75 != null ? b.last_10_stats.p75.toFixed(1) : '--'}</b>
+                                                <span class="text-[9px] text-slate-500 block">${b.last_10_stats?.unit || 'yds'}</span>
+                                            </div>
                                         </div>
-                                        <div class="bg-[#161b22] p-2 rounded border border-[#21262d]">
-                                            <span class="text-slate-400 block text-[9px] uppercase font-sans">Typical Ceiling</span>
-                                            <b class="text-slate-200 text-xs">${b.last_10_stats?.p75 != null ? b.last_10_stats.p75.toFixed(1) : '--'}</b>
-                                            <span class="text-[9px] text-slate-500 block">${b.last_10_stats?.unit || 'yds'}</span>
-                                        </div>
-                                    </div>
+                                    `}
 
                                     <div class="bg-[#161b22] p-2.5 rounded-lg border border-[#21262d] space-y-1.5 text-xs font-mono">
+                                        ${b.usage_profile && b.usage_profile.lines && b.usage_profile.lines.length > 0 ? `
+                                            <div class="text-[10.5px] text-slate-400 ${b.red_zone?.summary_str || b.defense_context ? 'border-b border-[#21262d] pb-1.5' : ''}">
+                                                <span class="text-slate-300 font-semibold block mb-1">Season usage:</span>
+                                                <div class="space-y-0.5">
+                                                    ${b.usage_profile.lines.map(line => `
+                                                        <div class="flex justify-between items-center text-[11px] font-sans leading-tight">
+                                                            <span class="text-slate-400">${line.label}:</span>
+                                                            <span class="text-slate-200 font-mono font-semibold">${line.value}</span>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                                <span class="text-[9.5px] text-slate-500 block mt-1">
+                                                    n = ${b.usage_profile.n_games} games${b.usage_profile.small_sample ? ' · <span class="text-amber-400">Small sample (n < 4 games)</span>' : ''}
+                                                </span>
+                                            </div>
+                                        ` : ''}
                                         ${b.red_zone?.summary_str ? `
                                             <div class="text-[10.5px] text-slate-400">
                                                 <span class="text-slate-300 font-semibold block mb-0.5">Red Zone Touches:</span>
@@ -4982,12 +4925,12 @@ function renderSchemeInsights(d) {
                     away_distribution: { slot_wr_pct: 32, wide_wr_pct: 40, inline_te_pct: 18, backfield_rb_pct: 10 },
                     home_distribution: { slot_wr_pct: 34, wide_wr_pct: 38, inline_te_pct: 18, backfield_rb_pct: 10 },
                     away_player_targets: [
-                        { name: aRoster.wr1, pos: 'WR', slot_pct: 35, outside_pct: 65, inline_pct: 0, tgt_zone: 28.5, tgt_man: 32.0, yprr_zone: 2.6, boost_tier: 'High Volume', expected_boost: 'Boundary target rate across evaluated games.' },
-                        { name: aRoster.te, pos: 'TE', slot_pct: 40, outside_pct: 10, inline_pct: 50, tgt_zone: 21.0, tgt_man: 16.5, yprr_zone: 2.1, boost_tier: 'High Volume', expected_boost: 'Target rate on intermediate seam routes.' }
+                        { name: aRoster.wr1, pos: 'WR', tgt_zone: 28.5, tgt_man: 32.0, ypt: 9.2, boost_tier: 'High Volume', expected_boost: 'Boundary target rate across evaluated games.' },
+                        { name: aRoster.te, pos: 'TE', tgt_zone: 21.0, tgt_man: 16.5, ypt: 7.8, boost_tier: 'High Volume', expected_boost: 'Target rate on intermediate seam routes.' }
                     ],
                     home_player_targets: [
-                        { name: hRoster.wr1, pos: 'WR', slot_pct: 38, outside_pct: 62, inline_pct: 0, tgt_zone: 27.5, tgt_man: 29.5, yprr_zone: 2.4, boost_tier: 'High Volume', expected_boost: 'Boundary target rate across evaluated games.' },
-                        { name: hRoster.te, pos: 'TE', slot_pct: 42, outside_pct: 8, inline_pct: 50, tgt_zone: 22.0, tgt_man: 17.0, yprr_zone: 2.0, boost_tier: 'High Volume', expected_boost: 'Target rate on intermediate seam routes.' }
+                        { name: hRoster.wr1, pos: 'WR', tgt_zone: 27.5, tgt_man: 29.5, ypt: 8.8, boost_tier: 'High Volume', expected_boost: 'Boundary target rate across evaluated games.' },
+                        { name: hRoster.te, pos: 'TE', tgt_zone: 22.0, tgt_man: 17.0, ypt: 7.4, boost_tier: 'High Volume', expected_boost: 'Target rate on intermediate seam routes.' }
                     ]
                 },
                 player_usage_profiles: [
@@ -5124,10 +5067,84 @@ function renderSchemeInsights(d) {
                     volume_override_verdict: `Neutral Pace: ${a} averages ${a === 'GB' ? '31.6' : '27.4'}s/play (n=${aGames} games); ${h} averages ${h === 'GB' ? '31.6' : '26.8'}s/play (n=${hGames} games). Combined average volume: ~130 plays per game.`
                 },
                 matchup_stat_sheet: {
-                    section_1_away_offense_tendencies: {},
-                    section_2_home_defense_vulnerabilities: {},
-                    section_3_home_offense_tendencies: {},
-                    section_4_away_defense_vulnerabilities: {},
+                    section_1_away_offense_tendencies: {
+                        team: a,
+                        n_games: aGames,
+                        game_state_splits: {
+                            leading: {
+                                pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: 10 + (seed % 10), n_games: aGames, rank_display: `Rank #${10 + (seed % 10)} (n=${aGames}g)` }
+                            },
+                            neutral: {
+                                pass_rate: { raw_value: (0.55 + ((seed * 2) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 2) % 6) * 0.01 - 0.010), diff_pct: 1.5, rank: 12 + (seed % 8), n_games: aGames, rank_display: `Rank #${12 + (seed % 8)} (n=${aGames}g)` }
+                            },
+                            trailing: {
+                                pass_rate: { raw_value: (0.64 + ((seed * 3) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 3) % 10) * 0.01 - 0.010), diff_pct: 4.8, rank: 8 + (seed % 12), n_games: aGames, rank_display: `Rank #${8 + (seed % 12)} (n=${aGames}g)` }
+                            }
+                        }
+                    },
+                    section_2_home_defense_vulnerabilities: {
+                        team: h,
+                        n_games: hGames,
+                        rush_defense: {
+                            directional_gaps: {
+                                inside_tackles: {
+                                    yards_per_carry: { raw_value: parseFloat((hOppDefGapYpc * 0.94).toFixed(2)), league_median: 3.86, diff_from_median: -0.15, diff_pct: -3.8, rank: hOppDefGapRank, n_games: hGames, rank_display: formatDefRank(hOppDefGapYpc * 0.94, hOppDefGapRank, hGames) }
+                                },
+                                outside_tackles: {
+                                    yards_per_carry: { raw_value: parseFloat((hOppDefGapYpc * 1.05).toFixed(2)), league_median: 4.55, diff_from_median: -0.05, diff_pct: -1.2, rank: hOppDefGapRank, n_games: hGames, rank_display: formatDefRank(hOppDefGapYpc * 1.05, hOppDefGapRank, hGames) }
+                                }
+                            }
+                        },
+                        pass_defense: {
+                            overall_dropbacks: {
+                                yards_per_attempt: { raw_value: 6.1, league_median: 6.1 }
+                            },
+                            target_depth_allowed: {
+                                short_0_to_9: {
+                                    yards_per_attempt: { raw_value: 6.2, league_median: 5.85 }
+                                }
+                            }
+                        }
+                    },
+                    section_3_home_offense_tendencies: {
+                        team: h,
+                        n_games: hGames,
+                        game_state_splits: {
+                            leading: {
+                                pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: 11 + ((seed * 2) % 10), n_games: hGames, rank_display: `Rank #${11 + ((seed * 2) % 10)} (n=${hGames}g)` }
+                            },
+                            neutral: {
+                                pass_rate: { raw_value: (0.56 + ((seed * 3) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 3) % 6) * 0.01), diff_pct: 0.8, rank: 14 + ((seed * 3) % 8), n_games: hGames, rank_display: `Rank #${14 + ((seed * 3) % 8)} (n=${hGames}g)` }
+                            },
+                            trailing: {
+                                pass_rate: { raw_value: (0.65 + ((seed * 4) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 4) % 10) * 0.01), diff_pct: 1.2, rank: 10 + ((seed * 4) % 12), n_games: hGames, rank_display: `Rank #${10 + ((seed * 4) % 12)} (n=${hGames}g)` }
+                            }
+                        }
+                    },
+                    section_4_away_defense_vulnerabilities: {
+                        team: a,
+                        n_games: aGames,
+                        rush_defense: {
+                            directional_gaps: {
+                                inside_tackles: {
+                                    yards_per_carry: { raw_value: parseFloat((aOppDefGapYpc * 0.94).toFixed(2)), league_median: 3.86, diff_from_median: -0.15, diff_pct: -3.8, rank: aOppDefGapRank, n_games: aGames, rank_display: formatDefRank(aOppDefGapYpc * 0.94, aOppDefGapRank, aGames) }
+                                },
+                                outside_tackles: {
+                                    yards_per_carry: { raw_value: parseFloat((aOppDefGapYpc * 1.05).toFixed(2)), league_median: 4.55, diff_from_median: -0.05, diff_pct: -1.2, rank: aOppDefGapRank, n_games: aGames, rank_display: formatDefRank(aOppDefGapYpc * 1.05, aOppDefGapRank, aGames) }
+                                }
+                            }
+                        },
+                        pass_defense: {
+                            overall_dropbacks: {
+                                yards_per_attempt: { raw_value: 6.3, league_median: 6.1 }
+                            },
+                            target_depth_allowed: {
+                                short_0_to_9: {
+                                    yards_per_attempt: { raw_value: 6.1, league_median: 5.85 }
+                                }
+                            }
+                        }
+                    },
                     section_5_similar_opponents: {
                         home_defense_vs_opponents_like_away: {
                             similar_games: [],

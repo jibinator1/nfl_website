@@ -139,38 +139,70 @@ def compute_player_historical_box_stats(
     if not is_ok or not disp_name:
         return None
 
-    # Load player's games: evaluate current season first so n matches the current season window
-    df_curr = load_weekly_stats(season=season, up_to_week=up_to_week)
-    all_w = df_curr if not df_curr.empty else load_weekly_stats(season=season - 1)
-    if all_w.empty:
-        return None
-
+    # Load player's games: if current season has < 6 games, pull remainder from prior season up to max_games
     team_norm = "LA" if team == "LAR" else team
-    sub = all_w[all_w["team"].replace({"LAR": "LA"}) == team_norm].copy()
-    if sub.empty:
-        return None
-
     clean_target = re.sub(r"[^a-zA-Z]", "", disp_name).lower()
-    matches = sub[
-        sub["player_display_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
-    ]
-    if matches.empty:
-        matches = sub[
-            sub["player_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
-        ]
 
-    # If no games found in current season, check prior season as fallback
-    if matches.empty and not df_curr.empty:
-        df_prev = load_weekly_stats(season=season - 1)
-        if not df_prev.empty:
-            sub_prev = df_prev[df_prev["team"].replace({"LAR": "LA"}) == team_norm].copy()
-            matches = sub_prev[
-                sub_prev["player_display_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
+    def _extract_player_games(df_source: Optional[pd.DataFrame]) -> pd.DataFrame:
+        if df_source is None or df_source.empty:
+            return pd.DataFrame()
+        sub = df_source[df_source["team"].replace({"LAR": "LA"}) == team_norm]
+        # Fast direct match on display name or short name
+        p_name_col = sub["player_name"] if "player_name" in sub.columns else pd.Series(index=sub.index, dtype=str)
+        m = sub[(sub["player_display_name"] == disp_name) | (p_name_col == disp_name)]
+        if not m.empty:
+            return m
+        # Lowercase match
+        disp_lower = disp_name.lower()
+        m = sub[
+            (sub["player_display_name"].astype(str).str.lower() == disp_lower) |
+            (p_name_col.astype(str).str.lower() == disp_lower)
+        ]
+        if not m.empty:
+            return m
+        # Clean target fallback within team
+        clean_target = re.sub(r"[^a-zA-Z]", "", disp_name).lower()
+        m = sub[
+            sub["player_display_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
+        ]
+        if not m.empty:
+            return m
+        if "player_name" in sub.columns:
+            m = sub[
+                sub["player_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
             ]
-            if matches.empty:
-                matches = sub_prev[
-                    sub_prev["player_name"].astype(str).str.replace(r"[^a-zA-Z]", "", regex=True).str.lower() == clean_target
-                ]
+            if not m.empty:
+                return m
+        # Fast direct fallback across all teams in case player changed teams between seasons
+        all_name_col = df_source["player_name"] if "player_name" in df_source.columns else pd.Series(index=df_source.index, dtype=str)
+        m = df_source[(df_source["player_display_name"] == disp_name) | (all_name_col == disp_name)]
+        if not m.empty:
+            return m
+        m = df_source[
+            (df_source["player_display_name"].astype(str).str.lower() == disp_lower) |
+            (all_name_col.astype(str).str.lower() == disp_lower)
+        ]
+        if not m.empty:
+            return m
+        return pd.DataFrame()
+
+    df_curr = load_weekly_stats(season=season, up_to_week=up_to_week)
+    matches_curr = _extract_player_games(df_curr)
+
+    if len(matches_curr) < 6:
+        df_prev = load_weekly_stats(season=season - 1)
+        matches_prev = _extract_player_games(df_prev)
+        if not matches_prev.empty:
+            needed = max(0, max_games - len(matches_curr))
+            matches_prev = matches_prev.sort_values(by=["season", "week"], ascending=[False, False]).head(needed)
+            if not matches_curr.empty:
+                matches = pd.concat([matches_curr, matches_prev], ignore_index=True)
+            else:
+                matches = matches_prev
+        else:
+            matches = matches_curr
+    else:
+        matches = matches_curr.sort_values(by=["season", "week"], ascending=[False, False]).head(max_games)
 
     if matches.empty:
         return None
