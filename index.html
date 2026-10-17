@@ -2567,8 +2567,23 @@
                 ];
             }
 
+            if (selectedHome && selectedAway) {
+                const homeU = selectedHome.toUpperCase();
+                const awayU = selectedAway.toUpperCase();
+                const weekNum = parseInt(selectedWeek) || 1;
+                const found = games.some(g => (g.home_team || '').toUpperCase() === homeU && (g.away_team || '').toUpperCase() === awayU);
+                if (!found) {
+                    games.unshift({
+                        home_team: homeU,
+                        away_team: awayU,
+                        week: weekNum,
+                        gameday: ''
+                    });
+                }
+            }
+
             const currentVal = selectEl.value;
-            let targetKey = (selectedHome && selectedAway) ? `${selectedHome}_${selectedAway}_${selectedWeek || 1}` : currentVal;
+            let targetKey = (selectedHome && selectedAway) ? `${selectedHome.toUpperCase()}_${selectedAway.toUpperCase()}_${selectedWeek || 1}` : currentVal;
             let optionsHtml = '';
 
             games.forEach((g, idx) => {
@@ -2659,9 +2674,25 @@
                 }
             } catch (err) {
                 console.warn("Using high-fidelity client scheme generator for fallback:", err);
-                const fallbackData = buildClientSchemeInsightsFallback(homeTeam, awayTeam, week, curSeason, curStart, curEnd);
-                cachedInsights[cacheKey] = fallbackData;
-                renderSchemeInsights(fallbackData);
+                try {
+                    const fallbackData = buildClientSchemeInsightsFallback(homeTeam, awayTeam, week, curSeason, curStart, curEnd);
+                    cachedInsights[cacheKey] = fallbackData;
+                    renderSchemeInsights(fallbackData);
+                } catch (fallbackErr) {
+                    console.error("Critical rendering failure in scheme insights:", fallbackErr);
+                    container.innerHTML = `
+                        <div class="glass-panel rounded-xl p-8 text-center text-slate-400 space-y-3">
+                            <i data-lucide="alert-triangle" class="w-8 h-8 mx-auto text-amber-400"></i>
+                            <p class="text-sm font-semibold text-slate-200">Unable to load scheme insights for ${awayTeam} @ ${homeTeam}</p>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto">${fallbackErr.message || 'An unexpected rendering error occurred.'}</p>
+                            <button onclick="refreshCurrentInsights()" class="mt-2 px-4 py-1.5 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-slate-200 text-xs rounded-lg transition inline-flex items-center gap-1.5">
+                                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                                <span>Retry</span>
+                            </button>
+                        </div>
+                    `;
+                    if (window.lucide) lucide.createIcons({ root: container });
+                }
             } finally {
                 isInsightsLoading = false;
             }
@@ -3569,6 +3600,7 @@
             }
 
             // 4. Key Matchup Splits / Personnel Insights
+            const breakouts = d.efficiency_breakouts || [];
             const edges = (breakouts && breakouts.length > 0) ? breakouts : [
                 {
                     player: `${d.away_team} Primary Target`,
