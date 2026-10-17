@@ -334,6 +334,37 @@ def run():
             diff_m = round(raw_v - med, 3)
             diff_pct = round((diff_m / med) * 100.0, 1) if med > 0 else 0.0
             
+            # Calculate game-state specific pass depth for this team
+            tm_st_passes = merged_part[(merged_part["posteam"] == tm) & (merged_part["_state"] == st) & (merged_part["_is_pass"] == 1)]
+            ay_st = tm_st_passes["air_yards"].dropna() if "air_yards" in tm_st_passes.columns else pd.Series(dtype=float)
+            tot_st_ay = len(ay_st)
+            st_depth = {}
+            if tot_st_ay > 0:
+                for d_key, d_mask in [
+                    ("behind_los", ay_st < 0),
+                    ("short", (ay_st >= 0) & (ay_st <= 9)),
+                    ("intermediate", (ay_st >= 10) & (ay_st <= 19)),
+                    ("deep", ay_st >= 20),
+                ]:
+                    sub_d = tm_st_passes.loc[ay_st[d_mask].index]
+                    cnt_d = len(sub_d)
+                    share_d = round((cnt_d / tot_st_ay) * 100.0, 1)
+                    st_depth[d_key] = {
+                        "attempts_share": share_d,
+                        "frequency_pct": share_d,
+                        "sample_attempts": cnt_d,
+                        "epa_per_attempt": round(float(sub_d["epa"].mean()), 3) if cnt_d > 0 else 0.0,
+                        "success_rate": round(float(sub_d["success"].mean()) * 100.0, 1) if cnt_d > 0 else 0.0,
+                        "yards_per_attempt": round(float(sub_d["yards_gained"].mean()), 2) if cnt_d > 0 else 0.0,
+                    }
+            else:
+                st_depth = {
+                    "behind_los": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 0, "epa_per_attempt": -0.30, "success_rate": 30.0, "yards_per_attempt": 3.0},
+                    "short": {"attempts_share": 52.0, "frequency_pct": 52.0, "sample_attempts": 0, "epa_per_attempt": 0.05, "success_rate": 50.0, "yards_per_attempt": 5.5},
+                    "intermediate": {"attempts_share": 24.0, "frequency_pct": 24.0, "sample_attempts": 0, "epa_per_attempt": 0.30, "success_rate": 50.0, "yards_per_attempt": 8.5},
+                    "deep": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 0, "epa_per_attempt": 0.40, "success_rate": 35.0, "yards_per_attempt": 11.5},
+                }
+
             g_splits[st] = {
                 "pass_rate": {
                     "raw_value": raw_v,
@@ -351,7 +382,8 @@ def run():
                     "sample_size": cnt,
                     "is_small_sample": bool(cnt < 40),
                     "unit": "rate",
-                }
+                },
+                "pass_depth": st_depth,
             }
 
         compiled_32[tm] = {

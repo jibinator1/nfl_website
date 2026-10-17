@@ -3690,6 +3690,216 @@
             `;
         }
 
+        function renderGameStatePassingCard(stKey, stLabel, stColor, stData, team) {
+            const pr = stData?.pass_rate || {};
+            const pd = stData?.pass_depth || {};
+
+            const passPct = pr.raw_value != null ? (pr.raw_value * 100).toFixed(1) + '%' : '--';
+            const rankDisp = pr.rank != null ? `Rank #${pr.rank}` : (pr.sample_size != null ? `n=${pr.sample_size} plays` : '');
+            const nPlays = pr.sample_size != null ? `${pr.sample_size} plays` : '';
+
+            const getShare = (k, defVal) => {
+                const item = pd[k] || {};
+                const s = item.attempts_share ?? item.frequency_pct;
+                return s != null ? parseFloat(s).toFixed(1) : defVal;
+            };
+
+            const getAtt = (k) => {
+                const item = pd[k] || {};
+                return item.sample_attempts != null ? `${item.sample_attempts} att` : '';
+            };
+
+            const bLos = getShare('behind_los', '11.0');
+            const sh = getShare('short', '52.0');
+            const inter = getShare('intermediate', '25.0');
+            const dp = getShare('deep', '12.0');
+
+            const bLosAtt = getAtt('behind_los');
+            const shAtt = getAtt('short');
+            const interAtt = getAtt('intermediate');
+            const dpAtt = getAtt('deep');
+
+            const bW = parseFloat(bLos);
+            const sW = parseFloat(sh);
+            const iW = parseFloat(inter);
+            const dW = parseFloat(dp);
+
+            return `
+                <div class="bg-[#161b22] p-3 rounded-xl border border-[#21262d] space-y-2.5">
+                    <div class="flex items-center justify-between border-b border-[#21262d] pb-1.5">
+                        <span class="text-xs font-bold text-slate-100 ${stColor}">${stLabel}</span>
+                        <span class="text-[9.5px] font-mono text-slate-400">${nPlays}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[9px] text-slate-400 block font-mono">Pass Calling Rate</span>
+                            <span class="text-sm font-bold font-mono text-slate-100">${passPct}</span>
+                        </div>
+                        ${rankDisp ? `<span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d] text-[9.5px] font-mono">${rankDisp}</span>` : ''}
+                    </div>
+
+                    <!-- Visual Proportion Bar -->
+                    <div class="space-y-1">
+                        <div class="w-full bg-[#12161c] h-1.5 rounded-full overflow-hidden flex">
+                            <div class="bg-indigo-400 h-full" style="width: ${bW}%" title="Behind LOS: ${bLos}%"></div>
+                            <div class="bg-sky-400 h-full" style="width: ${sW}%" title="Short (0-9): ${sh}%"></div>
+                            <div class="bg-amber-400 h-full" style="width: ${iW}%" title="Interm (10-19): ${inter}%"></div>
+                            <div class="bg-rose-400 h-full" style="width: ${dW}%" title="Deep (20+): ${dp}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 4-Zone Depth Breakdown -->
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between text-[9px] text-slate-400 font-mono">
+                            <span>Pass Depth Distribution</span>
+                            <span>Share% · Volume</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1 text-center font-mono text-[9px]">
+                            <div class="bg-[#12161c] p-1 rounded border border-[#21262d]">
+                                <span class="text-slate-400 block text-[8px]">Behind</span>
+                                <b class="text-slate-200">${bLos}%</b>
+                                ${bLosAtt ? `<span class="text-[7.5px] text-slate-400 block">${bLosAtt}</span>` : ''}
+                            </div>
+                            <div class="bg-[#12161c] p-1 rounded border border-[#21262d]">
+                                <span class="text-slate-400 block text-[8px]">Short</span>
+                                <b class="text-slate-200">${sh}%</b>
+                                ${shAtt ? `<span class="text-[7.5px] text-slate-400 block">${shAtt}</span>` : ''}
+                            </div>
+                            <div class="bg-[#12161c] p-1 rounded border border-[#21262d]">
+                                <span class="text-slate-400 block text-[8px]">Interm</span>
+                                <b class="text-slate-200">${inter}%</b>
+                                ${interAtt ? `<span class="text-[7.5px] text-slate-400 block">${interAtt}</span>` : ''}
+                            </div>
+                            <div class="bg-[#12161c] p-1 rounded border border-[#21262d] ${parseFloat(dp) > 15 ? 'border-sky-500/50 bg-sky-950/20' : ''}">
+                                <span class="text-slate-400 block text-[8px]">Deep</span>
+                                <b class="${parseFloat(dp) > 15 ? 'text-sky-300 font-bold' : 'text-slate-200'}">${dp}%</b>
+                                ${dpAtt ? `<span class="text-[7.5px] text-slate-400 block">${dpAtt}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGameStatePassingSplitsGrid(tend, team, oppTeam) {
+            const splits = tend?.game_state_splits || {};
+            const lead = splits.leading || {};
+            const neut = splits.neutral || {};
+            const trail = splits.trailing || {};
+
+            const cLead = renderGameStatePassingCard('leading', 'Ahead (≥ +7 pts)', 'text-sky-300', lead, team);
+            const cNeut = renderGameStatePassingCard('neutral', 'Neutral (-6 to +6 pts)', 'text-slate-300', neut, team);
+            const cTrail = renderGameStatePassingCard('trailing', 'Trailing (≤ -7 pts)', 'text-emerald-400', trail, team);
+
+            const getDeep = (st, defVal) => {
+                const item = st.pass_depth?.deep || {};
+                const val = item.attempts_share ?? item.frequency_pct;
+                return val != null ? parseFloat(val).toFixed(1) : defVal;
+            };
+            const getLos = (st, defVal) => {
+                const item = st.pass_depth?.behind_los || {};
+                const val = item.attempts_share ?? item.frequency_pct;
+                return val != null ? parseFloat(val).toFixed(1) : defVal;
+            };
+
+            const leadDeep = getDeep(lead, '8.9');
+            const trailDeep = getDeep(trail, '16.7');
+            const deepShift = (parseFloat(trailDeep) - parseFloat(leadDeep)).toFixed(1);
+            const deepSign = parseFloat(deepShift) >= 0 ? '+' : '';
+
+            const leadLos = getLos(lead, '15.1');
+            const trailLos = getLos(trail, '7.0');
+            const losShift = (parseFloat(trailLos) - parseFloat(leadLos)).toFixed(1);
+
+            const leadPass = lead.pass_rate?.raw_value != null ? (lead.pass_rate.raw_value * 100).toFixed(1) : '50.7';
+            const trailPass = trail.pass_rate?.raw_value != null ? (trail.pass_rate.raw_value * 100).toFixed(1) : '73.3';
+            const passShift = (parseFloat(trailPass) - parseFloat(leadPass)).toFixed(1);
+            const passSign = parseFloat(passShift) >= 0 ? '+' : '';
+
+            const leadRankStr = lead.pass_rate?.rank != null ? ` #${lead.pass_rate.rank}` : '';
+            const trailRankStr = trail.pass_rate?.rank != null ? ` #${trail.pass_rate.rank}` : '';
+
+            return `
+                <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3 font-mono">
+                    <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-100 font-sans">${team} Passing Tendencies Across 3 Game States</h4>
+                            <span class="text-[10px] text-slate-400 font-sans">Pass calling rate and 4-zone throw depth allocation when Ahead vs Neutral vs Trailing</span>
+                        </div>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-sky-300 border border-[#30363d]">Game-State Passing Splits</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        ${cLead}
+                        ${cNeut}
+                        ${cTrail}
+                    </div>
+                    <div class="bg-[#161b22] px-3 py-2 rounded-lg border border-[#21262d] text-[10.5px] text-slate-300 font-sans flex items-center justify-between">
+                        <span><b>Situational Passing Shift:</b> Pass calling shifts by <b class="text-emerald-400">${passSign}${passShift}%</b> (${leadPass}%${leadRankStr} Ahead → ${trailPass}%${trailRankStr} Trailing). Deep target rate shifts by <b class="text-sky-300">${deepSign}${deepShift}%</b> (${leadDeep}% Ahead → ${trailDeep}% Trailing), while screen/behind LOS rate shifts by <b class="text-amber-300">${losShift}%</b> (${leadLos}% → ${trailLos}%).</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGameStatePassingMiniStrip(tend, team) {
+            const splits = tend?.game_state_splits || {};
+            const lead = splits.leading || {};
+            const neut = splits.neutral || {};
+            const trail = splits.trailing || {};
+
+            const leadRate = lead.pass_rate?.raw_value != null ? (lead.pass_rate.raw_value * 100).toFixed(1) : '50.7';
+            const neutRate = neut.pass_rate?.raw_value != null ? (neut.pass_rate.raw_value * 100).toFixed(1) : '57.0';
+            const trailRate = trail.pass_rate?.raw_value != null ? (trail.pass_rate.raw_value * 100).toFixed(1) : '73.3';
+
+            const leadRank = lead.pass_rate?.rank != null ? `#${lead.pass_rate.rank}` : '';
+            const neutRank = neut.pass_rate?.rank != null ? `#${neut.pass_rate.rank}` : '';
+            const trailRank = trail.pass_rate?.rank != null ? `#${trail.pass_rate.rank}` : '';
+
+            const getDepthPct = (st, k) => {
+                const item = st.pass_depth?.[k] || {};
+                const val = item.attempts_share ?? item.frequency_pct;
+                return val != null ? parseFloat(val).toFixed(1) : null;
+            };
+
+            const leadDeep = getDepthPct(lead, 'deep') || '8.9';
+            const neutDeep = getDepthPct(neut, 'deep') || '11.2';
+            const trailDeep = getDepthPct(trail, 'deep') || '16.7';
+
+            const passShift = (parseFloat(trailRate) - parseFloat(leadRate)).toFixed(1);
+            const passSign = parseFloat(passShift) >= 0 ? '+' : '';
+            const deepShift = (parseFloat(trailDeep) - parseFloat(leadDeep)).toFixed(1);
+            const deepSign = parseFloat(deepShift) >= 0 ? '+' : '';
+
+            return `
+                <div class="pt-1.5 border-t border-[#21262d] space-y-1">
+                    <div class="flex items-center justify-between text-[9.5px] font-mono text-slate-400">
+                        <span class="font-bold text-slate-300 uppercase">Game-State Passing Tendencies</span>
+                        <span>Pass % (Rank) · Deep %</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 text-[9.5px] font-mono text-center">
+                        <div class="bg-[#161b22] p-1 rounded border border-[#21262d]">
+                            <span class="text-slate-400 block text-[8px]">Ahead (≥+7)</span>
+                            <b class="text-slate-200">${leadRate}%</b> ${leadRank ? `<span class="text-slate-400 text-[8px]">${leadRank}</span>` : ''}
+                            <span class="text-sky-300 block text-[8.5px]">${leadDeep}% Deep</span>
+                        </div>
+                        <div class="bg-[#161b22] p-1 rounded border border-[#21262d]">
+                            <span class="text-slate-400 block text-[8px]">Neutral (±6)</span>
+                            <b class="text-slate-200">${neutRate}%</b> ${neutRank ? `<span class="text-slate-400 text-[8px]">${neutRank}</span>` : ''}
+                            <span class="text-sky-300 block text-[8.5px]">${neutDeep}% Deep</span>
+                        </div>
+                        <div class="bg-[#161b22] p-1 rounded border border-[#21262d] ${parseFloat(trailRate) >= 70 ? 'border-emerald-700/60 bg-emerald-950/20' : ''}">
+                            <span class="text-slate-400 block text-[8px]">Trailing (≤-7)</span>
+                            <b class="${parseFloat(trailRate) >= 70 ? 'text-emerald-400' : 'text-slate-200'} font-bold">${trailRate}%</b> ${trailRank ? `<span class="text-slate-400 text-[8px]">${trailRank}</span>` : ''}
+                            <span class="text-sky-300 block text-[8.5px] font-bold">${trailDeep}% Deep</span>
+                        </div>
+                    </div>
+                    <div class="text-[9px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
+                        <span>Trailing Shift:</span>
+                        <span class="text-slate-200 font-bold">${passSign}${passShift}% Pass Rate (${leadRate}% → ${trailRate}%), ${deepSign}${deepShift}% Deep (${leadDeep}% → ${trailDeep}%)</span>
+                    </div>
+                </div>
+            `;
+        }
+
         function buildSchemeWrapUp(d) {
             const aCov = d.coverage_tendencies?.away_vs_home || {};
             const hCov = d.coverage_tendencies?.home_vs_away || {};
@@ -3763,6 +3973,7 @@
                     <span>Top Target Matchup:</span>
                     <span class="text-slate-200">${aTopTgt.name} (${aPos}, ${aTgtShare}%) vs ${hPosAllowedYpt} YPT allowed</span>
                 </div>
+                ${renderGameStatePassingMiniStrip(awayTend, d.away_team)}
             </div>`;
 
             // Home Offense vs Away Defense
@@ -3805,6 +4016,7 @@
                     <span>Top Target Matchup:</span>
                     <span class="text-slate-200">${hTopTgt.name} (${hPos}, ${hTgtShare}%) vs ${aPosAllowedYpt} YPT allowed</span>
                 </div>
+                ${renderGameStatePassingMiniStrip(homeTend, d.home_team)}
             </div>`;
 
             const passVerdict = `
@@ -5069,6 +5281,12 @@ function renderSchemeInsights(d) {
                         </div>
                     </div>
 
+                    <!-- Situational Passing Tendencies Across 3 Game States -->
+                    <div class="space-y-4">
+                        ${renderGameStatePassingSplitsGrid(awayTend, d.away_team, d.home_team)}
+                        ${renderGameStatePassingSplitsGrid(homeTend, d.home_team, d.away_team)}
+                    </div>
+
                     <!-- Key Receivers Target vs Coverage Table -->
                     <div class="overflow-x-auto rounded-xl border border-[#30363d]">
                         <table class="w-full text-left text-xs border-collapse">
@@ -5834,13 +6052,31 @@ function renderSchemeInsights(d) {
                         },
                         game_state_splits: {
                             leading: {
-                                pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: 10 + (seed % 10), n_games: aGames, rank_display: `Rank #${10 + (seed % 10)} (n=${aGames}g)` }
+                                pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: 10 + (seed % 10), n_games: aGames, sample_size: 152, rank_display: `Rank #${10 + (seed % 10)} (n=${aGames}g)` },
+                                pass_depth: {
+                                    behind_los: { attempts_share: 15.1, frequency_pct: 15.1, sample_attempts: 23, epa_per_attempt: -0.21, success_rate: 36.4, yards_per_attempt: 3.64 },
+                                    short: { attempts_share: 55.5, frequency_pct: 55.5, sample_attempts: 84, epa_per_attempt: 0.12, success_rate: 54.3, yards_per_attempt: 5.96 },
+                                    intermediate: { attempts_share: 20.5, frequency_pct: 20.5, sample_attempts: 31, epa_per_attempt: 0.28, success_rate: 46.7, yards_per_attempt: 8.17 },
+                                    deep: { attempts_share: 8.9, frequency_pct: 8.9, sample_attempts: 14, epa_per_attempt: 0.46, success_rate: 30.8, yards_per_attempt: 10.54 }
+                                }
                             },
                             neutral: {
-                                pass_rate: { raw_value: (0.55 + ((seed * 2) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 2) % 6) * 0.01 - 0.010), diff_pct: 1.5, rank: 12 + (seed % 8), n_games: aGames, rank_display: `Rank #${12 + (seed % 8)} (n=${aGames}g)` }
+                                pass_rate: { raw_value: (0.55 + ((seed * 2) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 2) % 6) * 0.01 - 0.010), diff_pct: 1.5, rank: 12 + (seed % 8), n_games: aGames, sample_size: 544, rank_display: `Rank #${12 + (seed % 8)} (n=${aGames}g)` },
+                                pass_depth: {
+                                    behind_los: { attempts_share: 10.8, frequency_pct: 10.8, sample_attempts: 59, epa_per_attempt: -0.54, success_rate: 18.2, yards_per_attempt: 2.62 },
+                                    short: { attempts_share: 52.6, frequency_pct: 52.6, sample_attempts: 286, epa_per_attempt: 0.09, success_rate: 51.3, yards_per_attempt: 6.07 },
+                                    intermediate: { attempts_share: 25.4, frequency_pct: 25.4, sample_attempts: 138, epa_per_attempt: 0.51, success_rate: 56.6, yards_per_attempt: 10.18 },
+                                    deep: { attempts_share: 11.2, frequency_pct: 11.2, sample_attempts: 61, epa_per_attempt: 0.44, success_rate: 35.1, yards_per_attempt: 11.35 }
+                                }
                             },
                             trailing: {
-                                pass_rate: { raw_value: (0.64 + ((seed * 3) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 3) % 10) * 0.01 - 0.010), diff_pct: 4.8, rank: 8 + (seed % 12), n_games: aGames, rank_display: `Rank #${8 + (seed % 12)} (n=${aGames}g)` }
+                                pass_rate: { raw_value: (0.64 + ((seed * 3) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 3) % 10) * 0.01 - 0.010), diff_pct: 4.8, rank: 8 + (seed % 12), n_games: aGames, sample_size: 200, rank_display: `Rank #${8 + (seed % 12)} (n=${aGames}g)` },
+                                pass_depth: {
+                                    behind_los: { attempts_share: 7.0, frequency_pct: 7.0, sample_attempts: 14, epa_per_attempt: -0.37, success_rate: 23.1, yards_per_attempt: 2.38 },
+                                    short: { attempts_share: 55.9, frequency_pct: 55.9, sample_attempts: 112, epa_per_attempt: 0.14, success_rate: 55.8, yards_per_attempt: 5.40 },
+                                    intermediate: { attempts_share: 20.4, frequency_pct: 20.4, sample_attempts: 41, epa_per_attempt: -0.23, success_rate: 28.9, yards_per_attempt: 4.84 },
+                                    deep: { attempts_share: 16.7, frequency_pct: 16.7, sample_attempts: 33, epa_per_attempt: 0.26, success_rate: 38.7, yards_per_attempt: 12.03 }
+                                }
                             }
                         }
                     },
@@ -5906,13 +6142,31 @@ function renderSchemeInsights(d) {
                         },
                         game_state_splits: {
                             leading: {
-                                pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: 11 + ((seed * 2) % 10), n_games: hGames, rank_display: `Rank #${11 + ((seed * 2) % 10)} (n=${hGames}g)` }
+                                pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: 11 + ((seed * 2) % 10), n_games: hGames, sample_size: 231, rank_display: `Rank #${11 + ((seed * 2) % 10)} (n=${hGames}g)` },
+                                pass_depth: {
+                                    behind_los: { attempts_share: 17.4, frequency_pct: 17.4, sample_attempts: 40, epa_per_attempt: -0.18, success_rate: 38.0, yards_per_attempt: 4.12 },
+                                    short: { attempts_share: 41.7, frequency_pct: 41.7, sample_attempts: 96, epa_per_attempt: 0.06, success_rate: 50.0, yards_per_attempt: 5.80 },
+                                    intermediate: { attempts_share: 28.0, frequency_pct: 28.0, sample_attempts: 65, epa_per_attempt: 0.22, success_rate: 49.0, yards_per_attempt: 8.50 },
+                                    deep: { attempts_share: 12.8, frequency_pct: 12.8, sample_attempts: 30, epa_per_attempt: 0.38, success_rate: 35.0, yards_per_attempt: 12.40 }
+                                }
                             },
                             neutral: {
-                                pass_rate: { raw_value: (0.56 + ((seed * 3) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 3) % 6) * 0.01), diff_pct: 0.8, rank: 14 + ((seed * 3) % 8), n_games: hGames, rank_display: `Rank #${14 + ((seed * 3) % 8)} (n=${hGames}g)` }
+                                pass_rate: { raw_value: (0.56 + ((seed * 3) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 3) % 6) * 0.01), diff_pct: 0.8, rank: 14 + ((seed * 3) % 8), n_games: hGames, sample_size: 434, rank_display: `Rank #${14 + ((seed * 3) % 8)} (n=${hGames}g)` },
+                                pass_depth: {
+                                    behind_los: { attempts_share: 13.9, frequency_pct: 13.9, sample_attempts: 60, epa_per_attempt: -0.32, success_rate: 28.0, yards_per_attempt: 3.10 },
+                                    short: { attempts_share: 49.0, frequency_pct: 49.0, sample_attempts: 213, epa_per_attempt: 0.08, success_rate: 52.0, yards_per_attempt: 6.10 },
+                                    intermediate: { attempts_share: 24.8, frequency_pct: 24.8, sample_attempts: 108, epa_per_attempt: 0.40, success_rate: 54.0, yards_per_attempt: 9.80 },
+                                    deep: { attempts_share: 12.4, frequency_pct: 12.4, sample_attempts: 54, epa_per_attempt: 0.35, success_rate: 34.0, yards_per_attempt: 11.20 }
+                                }
                             },
                             trailing: {
-                                pass_rate: { raw_value: (0.65 + ((seed * 4) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 4) % 10) * 0.01), diff_pct: 1.2, rank: 10 + ((seed * 4) % 12), n_games: hGames, rank_display: `Rank #${10 + ((seed * 4) % 12)} (n=${hGames}g)` }
+                                pass_rate: { raw_value: (0.65 + ((seed * 4) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 4) % 10) * 0.01), diff_pct: 1.2, rank: 10 + ((seed * 4) % 12), n_games: hGames, sample_size: 122, rank_display: `Rank #${10 + ((seed * 4) % 12)} (n=${hGames}g)` },
+                                pass_depth: {
+                                    behind_los: { attempts_share: 16.4, frequency_pct: 16.4, sample_attempts: 20, epa_per_attempt: -0.25, success_rate: 30.0, yards_per_attempt: 3.40 },
+                                    short: { attempts_share: 44.5, frequency_pct: 44.5, sample_attempts: 54, epa_per_attempt: 0.11, success_rate: 52.0, yards_per_attempt: 5.60 },
+                                    intermediate: { attempts_share: 24.5, frequency_pct: 24.5, sample_attempts: 30, epa_per_attempt: 0.15, success_rate: 40.0, yards_per_attempt: 7.90 },
+                                    deep: { attempts_share: 14.5, frequency_pct: 14.5, sample_attempts: 18, epa_per_attempt: 0.28, success_rate: 33.0, yards_per_attempt: 11.50 }
+                                }
                             }
                         }
                     },

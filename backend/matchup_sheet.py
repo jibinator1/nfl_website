@@ -157,9 +157,33 @@ def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: 
         base_leading = 0.490
         base_trailing = 0.650
         game_state_splits = {
-            "leading": {"pass_rate": {"raw_value": base_leading, "league_median": 0.489, "rank": 12, "n_games": n_games, "sample_size": 200, "is_small_sample": False, "unit": "rate"}},
-            "neutral": {"pass_rate": {"raw_value": base_neutral, "league_median": 0.560, "rank": 12, "n_games": n_games, "sample_size": 400, "is_small_sample": False, "unit": "rate"}},
-            "trailing": {"pass_rate": {"raw_value": base_trailing, "league_median": 0.650, "rank": 12, "n_games": n_games, "sample_size": 250, "is_small_sample": False, "unit": "rate"}},
+            "leading": {
+                "pass_rate": {"raw_value": base_leading, "league_median": 0.489, "rank": 12, "n_games": n_games, "sample_size": 200, "is_small_sample": False, "unit": "rate"},
+                "pass_depth": {
+                    "behind_los": {"attempts_share": 15.0, "frequency_pct": 15.0, "sample_attempts": 30, "epa_per_attempt": -0.20, "success_rate": 35.0},
+                    "short": {"attempts_share": 55.0, "frequency_pct": 55.0, "sample_attempts": 110, "epa_per_attempt": 0.10, "success_rate": 53.0},
+                    "intermediate": {"attempts_share": 21.0, "frequency_pct": 21.0, "sample_attempts": 42, "epa_per_attempt": 0.28, "success_rate": 47.0},
+                    "deep": {"attempts_share": 9.0, "frequency_pct": 9.0, "sample_attempts": 18, "epa_per_attempt": 0.45, "success_rate": 31.0},
+                }
+            },
+            "neutral": {
+                "pass_rate": {"raw_value": base_neutral, "league_median": 0.560, "rank": 12, "n_games": n_games, "sample_size": 400, "is_small_sample": False, "unit": "rate"},
+                "pass_depth": {
+                    "behind_los": {"attempts_share": 11.0, "frequency_pct": 11.0, "sample_attempts": 50, "epa_per_attempt": -0.40, "success_rate": 22.0},
+                    "short": {"attempts_share": 52.0, "frequency_pct": 52.0, "sample_attempts": 250, "epa_per_attempt": 0.10, "success_rate": 51.0},
+                    "intermediate": {"attempts_share": 25.0, "frequency_pct": 25.0, "sample_attempts": 120, "epa_per_attempt": 0.45, "success_rate": 54.0},
+                    "deep": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 60, "epa_per_attempt": 0.40, "success_rate": 35.0},
+                }
+            },
+            "trailing": {
+                "pass_rate": {"raw_value": base_trailing, "league_median": 0.650, "rank": 12, "n_games": n_games, "sample_size": 250, "is_small_sample": False, "unit": "rate"},
+                "pass_depth": {
+                    "behind_los": {"attempts_share": 7.0, "frequency_pct": 7.0, "sample_attempts": 18, "epa_per_attempt": -0.35, "success_rate": 24.0},
+                    "short": {"attempts_share": 56.0, "frequency_pct": 56.0, "sample_attempts": 140, "epa_per_attempt": 0.12, "success_rate": 55.0},
+                    "intermediate": {"attempts_share": 20.0, "frequency_pct": 20.0, "sample_attempts": 50, "epa_per_attempt": -0.20, "success_rate": 30.0},
+                    "deep": {"attempts_share": 17.0, "frequency_pct": 17.0, "sample_attempts": 42, "epa_per_attempt": 0.28, "success_rate": 38.0},
+                }
+            },
         }
 
     pass_ypa_info = t_off.get("passing_ypa", {
