@@ -1,0 +1,4994 @@
+{
+  "ARI": {
+    "team": "ARI",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.44,
+        "league_median": 6.03,
+        "rank": 27,
+        "rank_display": "Rank #27 (n=22 games)",
+        "sample_attempts": 920
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.549,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 1,
+            "rank_display": "Rank #1 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.06,
+            "diff_pct": 12.3,
+            "sample_size": 184,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.633,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 2,
+            "rank_display": "Rank #2 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.073,
+            "diff_pct": 13.0,
+            "sample_size": 626,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.713,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 2,
+            "rank_display": "Rank #2 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.063,
+            "diff_pct": 9.7,
+            "sample_size": 593,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.69,
+        "rush_ypc_vs_heavy_box": 4.72,
+        "carries_light": 253,
+        "carries_heavy": 18
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.83,
+        "league_median": 6.14,
+        "rank": 29,
+        "rank_display": "Rank #29 (n=22 games)",
+        "sample_attempts": 748
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 21.8,
+        "blitz_pct": 27.8,
+        "no_blitz_snaps": 431,
+        "total_pass_snaps": 597
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": 0.068,
+          "success_rate": 49.0,
+          "yards_per_attempt": 5.96,
+          "sample_attempts": 96
+        },
+        "short": {
+          "epa_per_attempt": 0.225,
+          "success_rate": 56.7,
+          "yards_per_attempt": 6.02,
+          "sample_attempts": 363
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.385,
+          "success_rate": 51.4,
+          "yards_per_attempt": 9.06,
+          "sample_attempts": 173
+        },
+        "deep": {
+          "epa_per_attempt": 0.898,
+          "success_rate": 47.9,
+          "yards_per_attempt": 14.62,
+          "sample_attempts": 73
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 56.3,
+          "yards_per_target": 8.24,
+          "epa_per_target": 0.337,
+          "sample_targets": 378
+        },
+        "te": {
+          "target_share": 27.0,
+          "yards_per_target": 8.45,
+          "epa_per_target": 0.517,
+          "sample_targets": 181
+        },
+        "rb": {
+          "target_share": 16.7,
+          "yards_per_target": 6.23,
+          "epa_per_target": 0.099,
+          "sample_targets": 112
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 59.0,
+        "heavy_box_rate": 5.3,
+        "ypc_vs_light_box": 5.26,
+        "ypc_vs_heavy_box": 1.71,
+        "carries_light": 269,
+        "carries_heavy": 24,
+        "total_run_snaps": 456
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.82,
+        "inside_carries": 290,
+        "outside_tackles_ypc": 5.71,
+        "outside_carries": 303,
+        "inside_rank": 10,
+        "outside_rank": 29
+      }
+    }
+  },
+  "ATL": {
+    "team": "ATL",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.28,
+        "league_median": 6.03,
+        "rank": 13,
+        "rank_display": "Rank #13 (n=22 games)",
+        "sample_attempts": 717
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.359,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 30,
+            "rank_display": "Rank #30 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.13,
+            "diff_pct": -26.6,
+            "sample_size": 259,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.557,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 20,
+            "rank_display": "Rank #20 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.003,
+            "diff_pct": -0.5,
+            "sample_size": 734,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.614,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 26,
+            "rank_display": "Rank #26 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.036,
+            "diff_pct": -5.5,
+            "sample_size": 350,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.25,
+        "rush_ypc_vs_heavy_box": 4.76,
+        "carries_light": 305,
+        "carries_heavy": 17
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.73,
+        "league_median": 6.14,
+        "rank": 10,
+        "rank_display": "Rank #10 (n=22 games)",
+        "sample_attempts": 812
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 24.9,
+        "blitz_pct": 35.9,
+        "no_blitz_snaps": 378,
+        "total_pass_snaps": 590
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.276,
+          "success_rate": 30.4,
+          "yards_per_attempt": 3.89,
+          "sample_attempts": 125
+        },
+        "short": {
+          "epa_per_attempt": 0.089,
+          "success_rate": 53.0,
+          "yards_per_attempt": 5.68,
+          "sample_attempts": 355
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.522,
+          "success_rate": 58.6,
+          "yards_per_attempt": 10.02,
+          "sample_attempts": 162
+        },
+        "deep": {
+          "epa_per_attempt": 0.119,
+          "success_rate": 30.2,
+          "yards_per_attempt": 9.94,
+          "sample_attempts": 96
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 60.5,
+          "yards_per_target": 7.83,
+          "epa_per_target": 0.232,
+          "sample_targets": 429
+        },
+        "te": {
+          "target_share": 20.9,
+          "yards_per_target": 7.34,
+          "epa_per_target": 0.143,
+          "sample_targets": 148
+        },
+        "rb": {
+          "target_share": 18.6,
+          "yards_per_target": 4.79,
+          "epa_per_target": -0.032,
+          "sample_targets": 132
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 56.5,
+        "heavy_box_rate": 7.9,
+        "ypc_vs_light_box": 5.53,
+        "ypc_vs_heavy_box": 1.69,
+        "carries_light": 258,
+        "carries_heavy": 36,
+        "total_run_snaps": 457
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.81,
+        "inside_carries": 318,
+        "outside_tackles_ypc": 4.4,
+        "outside_carries": 235,
+        "inside_rank": 32,
+        "outside_rank": 5
+      }
+    }
+  },
+  "BAL": {
+    "team": "BAL",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.75,
+        "league_median": 6.03,
+        "rank": 9,
+        "rank_display": "Rank #9 (n=22 games)",
+        "sample_attempts": 613
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.444,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 24,
+            "rank_display": "Rank #24 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.045,
+            "diff_pct": -9.2,
+            "sample_size": 324,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.475,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 32,
+            "rank_display": "Rank #32 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.085,
+            "diff_pct": -15.2,
+            "sample_size": 648,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.559,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 31,
+            "rank_display": "Rank #31 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.091,
+            "diff_pct": -14.0,
+            "sample_size": 288,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 6.55,
+        "rush_ypc_vs_heavy_box": 4.32,
+        "carries_light": 172,
+        "carries_heavy": 103
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.35,
+        "league_median": 6.14,
+        "rank": 21,
+        "rank_display": "Rank #21 (n=22 games)",
+        "sample_attempts": 841
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 23.4,
+        "blitz_pct": 24.2,
+        "no_blitz_snaps": 499,
+        "total_pass_snaps": 658
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.242,
+          "success_rate": 31.9,
+          "yards_per_attempt": 4.23,
+          "sample_attempts": 141
+        },
+        "short": {
+          "epa_per_attempt": 0.02,
+          "success_rate": 51.7,
+          "yards_per_attempt": 5.4,
+          "sample_attempts": 375
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.509,
+          "success_rate": 53.0,
+          "yards_per_attempt": 8.65,
+          "sample_attempts": 181
+        },
+        "deep": {
+          "epa_per_attempt": 0.717,
+          "success_rate": 46.4,
+          "yards_per_attempt": 14.48,
+          "sample_attempts": 97
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 62.2,
+          "yards_per_target": 8.06,
+          "epa_per_target": 0.324,
+          "sample_targets": 472
+        },
+        "te": {
+          "target_share": 18.6,
+          "yards_per_target": 7.04,
+          "epa_per_target": 0.155,
+          "sample_targets": 141
+        },
+        "rb": {
+          "target_share": 19.2,
+          "yards_per_target": 5.45,
+          "epa_per_target": -0.045,
+          "sample_targets": 146
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 56.6,
+        "heavy_box_rate": 11.0,
+        "ypc_vs_light_box": 4.71,
+        "ypc_vs_heavy_box": 3.37,
+        "carries_light": 237,
+        "carries_heavy": 46,
+        "total_run_snaps": 419
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.51,
+        "inside_carries": 260,
+        "outside_tackles_ypc": 5.1,
+        "outside_carries": 281,
+        "inside_rank": 2,
+        "outside_rank": 21
+      }
+    }
+  },
+  "BUF": {
+    "team": "BUF",
+    "n_games": 23,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.93,
+        "league_median": 6.03,
+        "rank": 7,
+        "rank_display": "Rank #7 (n=23 games)",
+        "sample_attempts": 751
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.46,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 21,
+            "rank_display": "Rank #21 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.029,
+            "diff_pct": -5.9,
+            "sample_size": 324,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.529,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 26,
+            "rank_display": "Rank #26 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.031,
+            "diff_pct": -5.5,
+            "sample_size": 692,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.559,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 30,
+            "rank_display": "Rank #30 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.091,
+            "diff_pct": -14.0,
+            "sample_size": 422,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.85,
+        "rush_ypc_vs_heavy_box": 4.09,
+        "carries_light": 246,
+        "carries_heavy": 86
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.65,
+        "league_median": 6.14,
+        "rank": 7,
+        "rank_display": "Rank #7 (n=23 games)",
+        "sample_attempts": 740
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 26.4,
+        "blitz_pct": 26.5,
+        "no_blitz_snaps": 428,
+        "total_pass_snaps": 582
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.525,
+          "success_rate": 29.2,
+          "yards_per_attempt": 3.24,
+          "sample_attempts": 130
+        },
+        "short": {
+          "epa_per_attempt": 0.101,
+          "success_rate": 49.5,
+          "yards_per_attempt": 5.73,
+          "sample_attempts": 303
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.382,
+          "success_rate": 52.1,
+          "yards_per_attempt": 8.62,
+          "sample_attempts": 167
+        },
+        "deep": {
+          "epa_per_attempt": 0.439,
+          "success_rate": 36.8,
+          "yards_per_attempt": 10.1,
+          "sample_attempts": 87
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 61.5,
+          "yards_per_target": 7.71,
+          "epa_per_target": 0.236,
+          "sample_targets": 398
+        },
+        "te": {
+          "target_share": 18.1,
+          "yards_per_target": 6.09,
+          "epa_per_target": 0.081,
+          "sample_targets": 117
+        },
+        "rb": {
+          "target_share": 20.4,
+          "yards_per_target": 4.97,
+          "epa_per_target": -0.062,
+          "sample_targets": 132
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 53.9,
+        "heavy_box_rate": 8.2,
+        "ypc_vs_light_box": 5.86,
+        "ypc_vs_heavy_box": 4.25,
+        "carries_light": 263,
+        "carries_heavy": 40,
+        "total_run_snaps": 488
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.62,
+        "inside_carries": 315,
+        "outside_tackles_ypc": 5.56,
+        "outside_carries": 280,
+        "inside_rank": 29,
+        "outside_rank": 27
+      }
+    }
+  },
+  "CAR": {
+    "team": "CAR",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.89,
+        "league_median": 6.03,
+        "rank": 19,
+        "rank_display": "Rank #19 (n=22 games)",
+        "sample_attempts": 765
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.488,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 17,
+            "rank_display": "Rank #17 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.001,
+            "diff_pct": -0.2,
+            "sample_size": 170,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.559,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 17,
+            "rank_display": "Rank #17 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.001,
+            "diff_pct": -0.2,
+            "sample_size": 700,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.641,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 20,
+            "rank_display": "Rank #20 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.009,
+            "diff_pct": -1.4,
+            "sample_size": 454,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.72,
+        "rush_ypc_vs_heavy_box": 2.91,
+        "carries_light": 226,
+        "carries_heavy": 56
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.41,
+        "league_median": 6.14,
+        "rank": 23,
+        "rank_display": "Rank #23 (n=22 games)",
+        "sample_attempts": 731
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 16.6,
+        "blitz_pct": 26.1,
+        "no_blitz_snaps": 427,
+        "total_pass_snaps": 578
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.307,
+          "success_rate": 33.6,
+          "yards_per_attempt": 3.8,
+          "sample_attempts": 119
+        },
+        "short": {
+          "epa_per_attempt": 0.238,
+          "success_rate": 55.6,
+          "yards_per_attempt": 6.23,
+          "sample_attempts": 338
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.478,
+          "success_rate": 55.9,
+          "yards_per_attempt": 9.43,
+          "sample_attempts": 161
+        },
+        "deep": {
+          "epa_per_attempt": 0.199,
+          "success_rate": 30.1,
+          "yards_per_attempt": 11.71,
+          "sample_attempts": 73
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 57.3,
+          "yards_per_target": 7.77,
+          "epa_per_target": 0.218,
+          "sample_targets": 377
+        },
+        "te": {
+          "target_share": 24.2,
+          "yards_per_target": 8.25,
+          "epa_per_target": 0.508,
+          "sample_targets": 159
+        },
+        "rb": {
+          "target_share": 18.5,
+          "yards_per_target": 5.4,
+          "epa_per_target": -0.004,
+          "sample_targets": 122
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 53.8,
+        "heavy_box_rate": 4.1,
+        "ypc_vs_light_box": 4.95,
+        "ypc_vs_heavy_box": 2.85,
+        "carries_light": 264,
+        "carries_heavy": 20,
+        "total_run_snaps": 491
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.74,
+        "inside_carries": 311,
+        "outside_tackles_ypc": 4.73,
+        "outside_carries": 293,
+        "inside_rank": 30,
+        "outside_rank": 13
+      }
+    }
+  },
+  "CHI": {
+    "team": "CHI",
+    "n_games": 24,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.33,
+        "league_median": 6.03,
+        "rank": 11,
+        "rank_display": "Rank #11 (n=24 games)",
+        "sample_attempts": 874
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.47,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 20,
+            "rank_display": "Rank #20 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.019,
+            "diff_pct": -3.9,
+            "sample_size": 330,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.527,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 28,
+            "rank_display": "Rank #28 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.033,
+            "diff_pct": -5.9,
+            "sample_size": 810,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.615,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 25,
+            "rank_display": "Rank #25 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.035,
+            "diff_pct": -5.4,
+            "sample_size": 475,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.66,
+        "rush_ypc_vs_heavy_box": 3.0,
+        "carries_light": 303,
+        "carries_heavy": 39
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.82,
+        "league_median": 6.14,
+        "rank": 28,
+        "rank_display": "Rank #28 (n=24 games)",
+        "sample_attempts": 806
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 23.1,
+        "blitz_pct": 29.0,
+        "no_blitz_snaps": 471,
+        "total_pass_snaps": 663
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.264,
+          "success_rate": 32.0,
+          "yards_per_attempt": 3.65,
+          "sample_attempts": 103
+        },
+        "short": {
+          "epa_per_attempt": 0.088,
+          "success_rate": 50.0,
+          "yards_per_attempt": 5.59,
+          "sample_attempts": 376
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.262,
+          "success_rate": 56.3,
+          "yards_per_attempt": 9.92,
+          "sample_attempts": 167
+        },
+        "deep": {
+          "epa_per_attempt": 0.758,
+          "success_rate": 47.1,
+          "yards_per_attempt": 16.25,
+          "sample_attempts": 102
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.6,
+          "yards_per_target": 9.3,
+          "epa_per_target": 0.316,
+          "sample_targets": 424
+        },
+        "te": {
+          "target_share": 24.1,
+          "yards_per_target": 7.0,
+          "epa_per_target": 0.145,
+          "sample_targets": 171
+        },
+        "rb": {
+          "target_share": 16.3,
+          "yards_per_target": 5.51,
+          "epa_per_target": -0.005,
+          "sample_targets": 116
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 58.2,
+        "heavy_box_rate": 9.5,
+        "ypc_vs_light_box": 5.21,
+        "ypc_vs_heavy_box": 4.46,
+        "carries_light": 294,
+        "carries_heavy": 48,
+        "total_run_snaps": 505
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.32,
+        "inside_carries": 263,
+        "outside_tackles_ypc": 5.36,
+        "outside_carries": 345,
+        "inside_rank": 25,
+        "outside_rank": 26
+      }
+    }
+  },
+  "CIN": {
+    "team": "CIN",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.07,
+        "league_median": 6.03,
+        "rank": 15,
+        "rank_display": "Rank #15 (n=22 games)",
+        "sample_attempts": 875
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.516,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 5,
+            "rank_display": "Rank #5 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.027,
+            "diff_pct": 5.5,
+            "sample_size": 244,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.649,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 1,
+            "rank_display": "Rank #1 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.089,
+            "diff_pct": 15.9,
+            "sample_size": 672,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.71,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 3,
+            "rank_display": "Rank #3 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.06,
+            "diff_pct": 9.2,
+            "sample_size": 441,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.73,
+        "rush_ypc_vs_heavy_box": 1.96,
+        "carries_light": 251,
+        "carries_heavy": 24
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.75,
+        "league_median": 6.14,
+        "rank": 26,
+        "rank_display": "Rank #26 (n=22 games)",
+        "sample_attempts": 754
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 25.2,
+        "blitz_pct": 18.0,
+        "no_blitz_snaps": 468,
+        "total_pass_snaps": 571
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": 0.117,
+          "success_rate": 51.2,
+          "yards_per_attempt": 6.2,
+          "sample_attempts": 123
+        },
+        "short": {
+          "epa_per_attempt": 0.267,
+          "success_rate": 56.8,
+          "yards_per_attempt": 7.28,
+          "sample_attempts": 336
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.36,
+          "success_rate": 49.4,
+          "yards_per_attempt": 9.14,
+          "sample_attempts": 160
+        },
+        "deep": {
+          "epa_per_attempt": 0.263,
+          "success_rate": 32.1,
+          "yards_per_attempt": 9.33,
+          "sample_attempts": 78
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 49.1,
+          "yards_per_target": 7.92,
+          "epa_per_target": 0.234,
+          "sample_targets": 325
+        },
+        "te": {
+          "target_share": 32.3,
+          "yards_per_target": 8.87,
+          "epa_per_target": 0.435,
+          "sample_targets": 214
+        },
+        "rb": {
+          "target_share": 18.6,
+          "yards_per_target": 7.09,
+          "epa_per_target": 0.302,
+          "sample_targets": 123
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 64.7,
+        "heavy_box_rate": 6.7,
+        "ypc_vs_light_box": 5.78,
+        "ypc_vs_heavy_box": 4.55,
+        "carries_light": 300,
+        "carries_heavy": 31,
+        "total_run_snaps": 464
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.38,
+        "inside_carries": 272,
+        "outside_tackles_ypc": 6.35,
+        "outside_carries": 306,
+        "inside_rank": 26,
+        "outside_rank": 31
+      }
+    }
+  },
+  "CLE": {
+    "team": "CLE",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 4.76,
+        "league_median": 6.03,
+        "rank": 30,
+        "rank_display": "Rank #30 (n=22 games)",
+        "sample_attempts": 778
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.515,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 7,
+            "rank_display": "Rank #7 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.026,
+            "diff_pct": 5.3,
+            "sample_size": 132,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.562,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 15,
+            "rank_display": "Rank #15 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.002,
+            "diff_pct": 0.4,
+            "sample_size": 687,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.651,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 16,
+            "rank_display": "Rank #16 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.001,
+            "diff_pct": 0.2,
+            "sample_size": 498,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.27,
+        "rush_ypc_vs_heavy_box": 2.1,
+        "carries_light": 219,
+        "carries_heavy": 42
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.37,
+        "league_median": 6.14,
+        "rank": 5,
+        "rank_display": "Rank #5 (n=22 games)",
+        "sample_attempts": 731
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 29.7,
+        "blitz_pct": 28.3,
+        "no_blitz_snaps": 387,
+        "total_pass_snaps": 540
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.268,
+          "success_rate": 33.6,
+          "yards_per_attempt": 3.79,
+          "sample_attempts": 128
+        },
+        "short": {
+          "epa_per_attempt": 0.016,
+          "success_rate": 54.1,
+          "yards_per_attempt": 5.85,
+          "sample_attempts": 303
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.365,
+          "success_rate": 53.8,
+          "yards_per_attempt": 8.95,
+          "sample_attempts": 132
+        },
+        "deep": {
+          "epa_per_attempt": 0.181,
+          "success_rate": 32.3,
+          "yards_per_attempt": 10.19,
+          "sample_attempts": 96
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 55.3,
+          "yards_per_target": 7.79,
+          "epa_per_target": 0.192,
+          "sample_targets": 346
+        },
+        "te": {
+          "target_share": 26.0,
+          "yards_per_target": 7.02,
+          "epa_per_target": 0.05,
+          "sample_targets": 163
+        },
+        "rb": {
+          "target_share": 18.7,
+          "yards_per_target": 4.56,
+          "epa_per_target": -0.212,
+          "sample_targets": 117
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 42.7,
+        "heavy_box_rate": 18.1,
+        "ypc_vs_light_box": 4.16,
+        "ypc_vs_heavy_box": 6.16,
+        "carries_light": 194,
+        "carries_heavy": 82,
+        "total_run_snaps": 454
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.87,
+        "inside_carries": 285,
+        "outside_tackles_ypc": 5.11,
+        "outside_carries": 291,
+        "inside_rank": 12,
+        "outside_rank": 22
+      }
+    }
+  },
+  "DAL": {
+    "team": "DAL",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.88,
+        "league_median": 6.03,
+        "rank": 8,
+        "rank_display": "Rank #8 (n=22 games)",
+        "sample_attempts": 855
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.525,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 3,
+            "rank_display": "Rank #3 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.036,
+            "diff_pct": 7.4,
+            "sample_size": 217,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.606,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 4,
+            "rank_display": "Rank #4 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.046,
+            "diff_pct": 8.2,
+            "sample_size": 690,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.641,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 21,
+            "rank_display": "Rank #21 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.009,
+            "diff_pct": -1.4,
+            "sample_size": 504,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.61,
+        "rush_ypc_vs_heavy_box": 2.09,
+        "carries_light": 257,
+        "carries_heavy": 32
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 7.36,
+        "league_median": 6.14,
+        "rank": 32,
+        "rank_display": "Rank #32 (n=22 games)",
+        "sample_attempts": 736
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 26.9,
+        "blitz_pct": 28.5,
+        "no_blitz_snaps": 424,
+        "total_pass_snaps": 593
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.101,
+          "success_rate": 35.7,
+          "yards_per_attempt": 5.06,
+          "sample_attempts": 126
+        },
+        "short": {
+          "epa_per_attempt": 0.309,
+          "success_rate": 63.4,
+          "yards_per_attempt": 6.86,
+          "sample_attempts": 333
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.559,
+          "success_rate": 55.6,
+          "yards_per_attempt": 9.74,
+          "sample_attempts": 142
+        },
+        "deep": {
+          "epa_per_attempt": 0.897,
+          "success_rate": 46.2,
+          "yards_per_attempt": 15.1,
+          "sample_attempts": 91
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.2,
+          "yards_per_target": 9.6,
+          "epa_per_target": 0.53,
+          "sample_targets": 388
+        },
+        "te": {
+          "target_share": 22.4,
+          "yards_per_target": 7.76,
+          "epa_per_target": 0.452,
+          "sample_targets": 147
+        },
+        "rb": {
+          "target_share": 18.3,
+          "yards_per_target": 6.84,
+          "epa_per_target": 0.118,
+          "sample_targets": 120
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 56.9,
+        "heavy_box_rate": 6.9,
+        "ypc_vs_light_box": 5.67,
+        "ypc_vs_heavy_box": 1.43,
+        "carries_light": 247,
+        "carries_heavy": 30,
+        "total_run_snaps": 434
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.9,
+        "inside_carries": 274,
+        "outside_tackles_ypc": 6.1,
+        "outside_carries": 317,
+        "inside_rank": 14,
+        "outside_rank": 30
+      }
+    }
+  },
+  "DEN": {
+    "team": "DEN",
+    "n_games": 24,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.75,
+        "league_median": 6.03,
+        "rank": 23,
+        "rank_display": "Rank #23 (n=24 games)",
+        "sample_attempts": 890
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.516,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 6,
+            "rank_display": "Rank #6 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.027,
+            "diff_pct": 5.5,
+            "sample_size": 254,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.599,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 6,
+            "rank_display": "Rank #6 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.039,
+            "diff_pct": 7.0,
+            "sample_size": 915,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.659,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 10,
+            "rank_display": "Rank #10 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.009,
+            "diff_pct": 1.4,
+            "sample_size": 320,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.84,
+        "rush_ypc_vs_heavy_box": 3.33,
+        "carries_light": 286,
+        "carries_heavy": 18
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.03,
+        "league_median": 6.14,
+        "rank": 1,
+        "rank_display": "Rank #1 (n=24 games)",
+        "sample_attempts": 900
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 29.9,
+        "blitz_pct": 32.8,
+        "no_blitz_snaps": 488,
+        "total_pass_snaps": 726
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.168,
+          "success_rate": 31.3,
+          "yards_per_attempt": 3.63,
+          "sample_attempts": 131
+        },
+        "short": {
+          "epa_per_attempt": 0.05,
+          "success_rate": 46.5,
+          "yards_per_attempt": 5.96,
+          "sample_attempts": 396
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.268,
+          "success_rate": 48.2,
+          "yards_per_attempt": 8.02,
+          "sample_attempts": 170
+        },
+        "deep": {
+          "epa_per_attempt": 0.068,
+          "success_rate": 25.0,
+          "yards_per_attempt": 7.85,
+          "sample_attempts": 112
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.3,
+          "yards_per_target": 6.66,
+          "epa_per_target": 0.104,
+          "sample_targets": 454
+        },
+        "te": {
+          "target_share": 25.6,
+          "yards_per_target": 7.42,
+          "epa_per_target": 0.279,
+          "sample_targets": 196
+        },
+        "rb": {
+          "target_share": 15.0,
+          "yards_per_target": 4.92,
+          "epa_per_target": -0.188,
+          "sample_targets": 115
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 64.1,
+        "heavy_box_rate": 6.4,
+        "ypc_vs_light_box": 4.52,
+        "ypc_vs_heavy_box": 3.27,
+        "carries_light": 300,
+        "carries_heavy": 30,
+        "total_run_snaps": 468
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.87,
+        "inside_carries": 324,
+        "outside_tackles_ypc": 4.64,
+        "outside_carries": 292,
+        "inside_rank": 13,
+        "outside_rank": 10
+      }
+    }
+  },
+  "DET": {
+    "team": "DET",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.94,
+        "league_median": 6.03,
+        "rank": 6,
+        "rank_display": "Rank #6 (n=22 games)",
+        "sample_attempts": 821
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.501,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 10,
+            "rank_display": "Rank #10 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.012,
+            "diff_pct": 2.5,
+            "sample_size": 387,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.585,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 9,
+            "rank_display": "Rank #9 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.025,
+            "diff_pct": 4.5,
+            "sample_size": 559,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.69,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 4,
+            "rank_display": "Rank #4 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.04,
+            "diff_pct": 6.2,
+            "sample_size": 435,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.92,
+        "rush_ypc_vs_heavy_box": 4.86,
+        "carries_light": 264,
+        "carries_heavy": 22
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.15,
+        "league_median": 6.14,
+        "rank": 17,
+        "rank_display": "Rank #17 (n=22 games)",
+        "sample_attempts": 843
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 25.2,
+        "blitz_pct": 27.8,
+        "no_blitz_snaps": 440,
+        "total_pass_snaps": 609
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.327,
+          "success_rate": 28.7,
+          "yards_per_attempt": 3.54,
+          "sample_attempts": 94
+        },
+        "short": {
+          "epa_per_attempt": 0.113,
+          "success_rate": 52.9,
+          "yards_per_attempt": 5.53,
+          "sample_attempts": 367
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.408,
+          "success_rate": 54.1,
+          "yards_per_attempt": 9.23,
+          "sample_attempts": 194
+        },
+        "deep": {
+          "epa_per_attempt": 0.706,
+          "success_rate": 38.7,
+          "yards_per_attempt": 13.35,
+          "sample_attempts": 111
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.1,
+          "yards_per_target": 8.25,
+          "epa_per_target": 0.354,
+          "sample_targets": 439
+        },
+        "te": {
+          "target_share": 26.8,
+          "yards_per_target": 7.44,
+          "epa_per_target": 0.222,
+          "sample_targets": 199
+        },
+        "rb": {
+          "target_share": 14.1,
+          "yards_per_target": 4.75,
+          "epa_per_target": -0.137,
+          "sample_targets": 105
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 28.1,
+        "heavy_box_rate": 16.0,
+        "ypc_vs_light_box": 5.56,
+        "ypc_vs_heavy_box": 2.46,
+        "carries_light": 121,
+        "carries_heavy": 69,
+        "total_run_snaps": 431
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.96,
+        "inside_carries": 253,
+        "outside_tackles_ypc": 5.14,
+        "outside_carries": 293,
+        "inside_rank": 18,
+        "outside_rank": 23
+      }
+    }
+  },
+  "GB": {
+    "team": "GB",
+    "n_games": 23,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.96,
+        "league_median": 6.03,
+        "rank": 5,
+        "rank_display": "Rank #5 (n=23 games)",
+        "sample_attempts": 762
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.51,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 8,
+            "rank_display": "Rank #8 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.021,
+            "diff_pct": 4.3,
+            "sample_size": 296,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.558,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 18,
+            "rank_display": "Rank #18 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.002,
+            "diff_pct": -0.4,
+            "sample_size": 821,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.648,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 18,
+            "rank_display": "Rank #18 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.002,
+            "diff_pct": -0.3,
+            "sample_size": 236,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.73,
+        "rush_ypc_vs_heavy_box": 2.83,
+        "carries_light": 308,
+        "carries_heavy": 29
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.67,
+        "league_median": 6.14,
+        "rank": 8,
+        "rank_display": "Rank #8 (n=23 games)",
+        "sample_attempts": 806
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 28.0,
+        "blitz_pct": 20.7,
+        "no_blitz_snaps": 503,
+        "total_pass_snaps": 634
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.082,
+          "success_rate": 33.8,
+          "yards_per_attempt": 4.28,
+          "sample_attempts": 142
+        },
+        "short": {
+          "epa_per_attempt": 0.102,
+          "success_rate": 51.5,
+          "yards_per_attempt": 5.39,
+          "sample_attempts": 377
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.447,
+          "success_rate": 53.9,
+          "yards_per_attempt": 9.35,
+          "sample_attempts": 154
+        },
+        "deep": {
+          "epa_per_attempt": 0.437,
+          "success_rate": 35.5,
+          "yards_per_attempt": 10.45,
+          "sample_attempts": 76
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 56.9,
+          "yards_per_target": 7.76,
+          "epa_per_target": 0.329,
+          "sample_targets": 402
+        },
+        "te": {
+          "target_share": 25.5,
+          "yards_per_target": 5.91,
+          "epa_per_target": 0.157,
+          "sample_targets": 180
+        },
+        "rb": {
+          "target_share": 17.7,
+          "yards_per_target": 5.52,
+          "epa_per_target": 0.058,
+          "sample_targets": 125
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 51.5,
+        "heavy_box_rate": 10.2,
+        "ypc_vs_light_box": 4.1,
+        "ypc_vs_heavy_box": 3.31,
+        "carries_light": 258,
+        "carries_heavy": 51,
+        "total_run_snaps": 501
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.71,
+        "inside_carries": 322,
+        "outside_tackles_ypc": 4.78,
+        "outside_carries": 324,
+        "inside_rank": 6,
+        "outside_rank": 16
+      }
+    }
+  },
+  "HOU": {
+    "team": "HOU",
+    "n_games": 24,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.09,
+        "league_median": 6.03,
+        "rank": 14,
+        "rank_display": "Rank #14 (n=24 games)",
+        "sample_attempts": 896
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.507,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 9,
+            "rank_display": "Rank #9 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.018,
+            "diff_pct": 3.7,
+            "sample_size": 300,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.57,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 11,
+            "rank_display": "Rank #11 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.01,
+            "diff_pct": 1.8,
+            "sample_size": 954,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.733,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 1,
+            "rank_display": "Rank #1 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.083,
+            "diff_pct": 12.8,
+            "sample_size": 273,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.57,
+        "rush_ypc_vs_heavy_box": 2.88,
+        "carries_light": 267,
+        "carries_heavy": 68
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.33,
+        "league_median": 6.14,
+        "rank": 3,
+        "rank_display": "Rank #3 (n=24 games)",
+        "sample_attempts": 854
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 27.2,
+        "blitz_pct": 21.9,
+        "no_blitz_snaps": 514,
+        "total_pass_snaps": 658
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.371,
+          "success_rate": 23.0,
+          "yards_per_attempt": 3.28,
+          "sample_attempts": 165
+        },
+        "short": {
+          "epa_per_attempt": -0.047,
+          "success_rate": 43.8,
+          "yards_per_attempt": 5.29,
+          "sample_attempts": 338
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.267,
+          "success_rate": 52.5,
+          "yards_per_attempt": 9.32,
+          "sample_attempts": 177
+        },
+        "deep": {
+          "epa_per_attempt": 0.457,
+          "success_rate": 33.0,
+          "yards_per_attempt": 11.86,
+          "sample_attempts": 94
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.8,
+          "yards_per_target": 7.67,
+          "epa_per_target": 0.17,
+          "sample_targets": 441
+        },
+        "te": {
+          "target_share": 22.1,
+          "yards_per_target": 6.38,
+          "epa_per_target": 0.001,
+          "sample_targets": 163
+        },
+        "rb": {
+          "target_share": 18.0,
+          "yards_per_target": 4.97,
+          "epa_per_target": -0.243,
+          "sample_targets": 133
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 53.2,
+        "heavy_box_rate": 9.5,
+        "ypc_vs_light_box": 4.18,
+        "ypc_vs_heavy_box": 2.55,
+        "carries_light": 235,
+        "carries_heavy": 42,
+        "total_run_snaps": 442
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.96,
+        "inside_carries": 345,
+        "outside_tackles_ypc": 3.84,
+        "outside_carries": 207,
+        "inside_rank": 19,
+        "outside_rank": 1
+      }
+    }
+  },
+  "IND": {
+    "team": "IND",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.33,
+        "league_median": 6.03,
+        "rank": 12,
+        "rank_display": "Rank #12 (n=22 games)",
+        "sample_attempts": 765
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.525,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 4,
+            "rank_display": "Rank #4 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.036,
+            "diff_pct": 7.4,
+            "sample_size": 244,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.563,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 13,
+            "rank_display": "Rank #13 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.003,
+            "diff_pct": 0.5,
+            "sample_size": 792,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.647,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 19,
+            "rank_display": "Rank #19 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.003,
+            "diff_pct": -0.5,
+            "sample_size": 295,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.02,
+        "rush_ypc_vs_heavy_box": 3.79,
+        "carries_light": 268,
+        "carries_heavy": 19
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.54,
+        "league_median": 6.14,
+        "rank": 24,
+        "rank_display": "Rank #24 (n=22 games)",
+        "sample_attempts": 840
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 25.1,
+        "blitz_pct": 28.6,
+        "no_blitz_snaps": 474,
+        "total_pass_snaps": 664
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.481,
+          "success_rate": 30.3,
+          "yards_per_attempt": 3.42,
+          "sample_attempts": 122
+        },
+        "short": {
+          "epa_per_attempt": 0.175,
+          "success_rate": 53.8,
+          "yards_per_attempt": 6.38,
+          "sample_attempts": 407
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.417,
+          "success_rate": 55.0,
+          "yards_per_attempt": 9.99,
+          "sample_attempts": 160
+        },
+        "deep": {
+          "epa_per_attempt": 0.456,
+          "success_rate": 36.4,
+          "yards_per_attempt": 12.01,
+          "sample_attempts": 99
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.3,
+          "yards_per_target": 8.18,
+          "epa_per_target": 0.232,
+          "sample_targets": 448
+        },
+        "te": {
+          "target_share": 24.5,
+          "yards_per_target": 7.85,
+          "epa_per_target": 0.312,
+          "sample_targets": 185
+        },
+        "rb": {
+          "target_share": 16.3,
+          "yards_per_target": 5.51,
+          "epa_per_target": -0.077,
+          "sample_targets": 123
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 58.6,
+        "heavy_box_rate": 9.4,
+        "ypc_vs_light_box": 4.33,
+        "ypc_vs_heavy_box": 2.22,
+        "carries_light": 256,
+        "carries_heavy": 41,
+        "total_run_snaps": 437
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.78,
+        "inside_carries": 274,
+        "outside_tackles_ypc": 4.73,
+        "outside_carries": 288,
+        "inside_rank": 8,
+        "outside_rank": 14
+      }
+    }
+  },
+  "JAX": {
+    "team": "JAX",
+    "n_games": 23,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.46,
+        "league_median": 6.03,
+        "rank": 10,
+        "rank_display": "Rank #10 (n=23 games)",
+        "sample_attempts": 787
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.501,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 12,
+            "rank_display": "Rank #12 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.012,
+            "diff_pct": 2.5,
+            "sample_size": 461,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.564,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 12,
+            "rank_display": "Rank #12 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.004,
+            "diff_pct": 0.7,
+            "sample_size": 769,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.656,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 14,
+            "rank_display": "Rank #14 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.006,
+            "diff_pct": 0.9,
+            "sample_size": 186,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.44,
+        "rush_ypc_vs_heavy_box": 2.72,
+        "carries_light": 331,
+        "carries_heavy": 29
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.92,
+        "league_median": 6.14,
+        "rank": 14,
+        "rank_display": "Rank #14 (n=23 games)",
+        "sample_attempts": 896
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 22.9,
+        "blitz_pct": 26.6,
+        "no_blitz_snaps": 519,
+        "total_pass_snaps": 707
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.338,
+          "success_rate": 31.5,
+          "yards_per_attempt": 3.41,
+          "sample_attempts": 143
+        },
+        "short": {
+          "epa_per_attempt": -0.1,
+          "success_rate": 50.1,
+          "yards_per_attempt": 5.47,
+          "sample_attempts": 409
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.256,
+          "success_rate": 51.6,
+          "yards_per_attempt": 8.27,
+          "sample_attempts": 190
+        },
+        "deep": {
+          "epa_per_attempt": 0.275,
+          "success_rate": 36.2,
+          "yards_per_attempt": 12.33,
+          "sample_attempts": 105
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 60.0,
+          "yards_per_target": 7.33,
+          "epa_per_target": 0.008,
+          "sample_targets": 490
+        },
+        "te": {
+          "target_share": 22.7,
+          "yards_per_target": 6.65,
+          "epa_per_target": 0.112,
+          "sample_targets": 185
+        },
+        "rb": {
+          "target_share": 17.3,
+          "yards_per_target": 5.26,
+          "epa_per_target": -0.102,
+          "sample_targets": 141
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 64.2,
+        "heavy_box_rate": 6.0,
+        "ypc_vs_light_box": 4.53,
+        "ypc_vs_heavy_box": 3.0,
+        "carries_light": 246,
+        "carries_heavy": 23,
+        "total_run_snaps": 383
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.53,
+        "inside_carries": 275,
+        "outside_tackles_ypc": 4.3,
+        "outside_carries": 210,
+        "inside_rank": 3,
+        "outside_rank": 3
+      }
+    }
+  },
+  "KC": {
+    "team": "KC",
+    "n_games": 21,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.06,
+        "league_median": 6.03,
+        "rank": 16,
+        "rank_display": "Rank #16 (n=21 games)",
+        "sample_attempts": 766
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.489,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 16,
+            "rank_display": "Rank #16 (n=21 games)",
+            "rank_suppressed": false,
+            "n_games": 21,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.0,
+            "diff_pct": 0.0,
+            "sample_size": 231,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.597,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 7,
+            "rank_display": "Rank #7 (n=21 games)",
+            "rank_suppressed": false,
+            "n_games": 21,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.037,
+            "diff_pct": 6.6,
+            "sample_size": 791,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.658,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 11,
+            "rank_display": "Rank #11 (n=21 games)",
+            "rank_suppressed": false,
+            "n_games": 21,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.008,
+            "diff_pct": 1.2,
+            "sample_size": 275,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.75,
+        "rush_ypc_vs_heavy_box": 4.43,
+        "carries_light": 294,
+        "carries_heavy": 23
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.1,
+        "league_median": 6.14,
+        "rank": 15,
+        "rank_display": "Rank #15 (n=21 games)",
+        "sample_attempts": 694
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 29.4,
+        "blitz_pct": 35.0,
+        "no_blitz_snaps": 354,
+        "total_pass_snaps": 545
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.178,
+          "success_rate": 39.6,
+          "yards_per_attempt": 4.46,
+          "sample_attempts": 144
+        },
+        "short": {
+          "epa_per_attempt": 0.059,
+          "success_rate": 52.4,
+          "yards_per_attempt": 5.75,
+          "sample_attempts": 313
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.305,
+          "success_rate": 52.0,
+          "yards_per_attempt": 9.28,
+          "sample_attempts": 123
+        },
+        "deep": {
+          "epa_per_attempt": 0.314,
+          "success_rate": 35.6,
+          "yards_per_attempt": 11.23,
+          "sample_attempts": 73
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.5,
+          "yards_per_target": 6.96,
+          "epa_per_target": 0.075,
+          "sample_targets": 368
+        },
+        "te": {
+          "target_share": 23.8,
+          "yards_per_target": 7.74,
+          "epa_per_target": 0.274,
+          "sample_targets": 147
+        },
+        "rb": {
+          "target_share": 16.7,
+          "yards_per_target": 5.95,
+          "epa_per_target": 0.119,
+          "sample_targets": 103
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 53.6,
+        "heavy_box_rate": 6.7,
+        "ypc_vs_light_box": 4.95,
+        "ypc_vs_heavy_box": 2.69,
+        "carries_light": 232,
+        "carries_heavy": 29,
+        "total_run_snaps": 433
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.7,
+        "inside_carries": 254,
+        "outside_tackles_ypc": 4.46,
+        "outside_carries": 279,
+        "inside_rank": 5,
+        "outside_rank": 6
+      }
+    }
+  },
+  "LA": {
+    "team": "LA",
+    "n_games": 24,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 7.27,
+        "league_median": 6.03,
+        "rank": 2,
+        "rank_display": "Rank #2 (n=24 games)",
+        "sample_attempts": 909
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.501,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 11,
+            "rank_display": "Rank #11 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.012,
+            "diff_pct": 2.5,
+            "sample_size": 457,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.63,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 3,
+            "rank_display": "Rank #3 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.07,
+            "diff_pct": 12.5,
+            "sample_size": 803,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.649,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 17,
+            "rank_display": "Rank #17 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.001,
+            "diff_pct": -0.2,
+            "sample_size": 268,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.54,
+        "rush_ypc_vs_heavy_box": 3.44,
+        "carries_light": 273,
+        "carries_heavy": 18
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.7,
+        "league_median": 6.14,
+        "rank": 9,
+        "rank_display": "Rank #9 (n=24 games)",
+        "sample_attempts": 895
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 29.3,
+        "blitz_pct": 20.0,
+        "no_blitz_snaps": 607,
+        "total_pass_snaps": 759
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.224,
+          "success_rate": 34.3,
+          "yards_per_attempt": 4.26,
+          "sample_attempts": 134
+        },
+        "short": {
+          "epa_per_attempt": 0.03,
+          "success_rate": 51.2,
+          "yards_per_attempt": 5.38,
+          "sample_attempts": 430
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.293,
+          "success_rate": 51.1,
+          "yards_per_attempt": 8.98,
+          "sample_attempts": 174
+        },
+        "deep": {
+          "epa_per_attempt": 0.026,
+          "success_rate": 34.8,
+          "yards_per_attempt": 11.12,
+          "sample_attempts": 92
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 58.0,
+          "yards_per_target": 7.71,
+          "epa_per_target": 0.139,
+          "sample_targets": 454
+        },
+        "te": {
+          "target_share": 22.9,
+          "yards_per_target": 5.53,
+          "epa_per_target": 0.005,
+          "sample_targets": 179
+        },
+        "rb": {
+          "target_share": 19.2,
+          "yards_per_target": 5.7,
+          "epa_per_target": -0.024,
+          "sample_targets": 150
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 62.2,
+        "heavy_box_rate": 6.9,
+        "ypc_vs_light_box": 4.48,
+        "ypc_vs_heavy_box": 3.75,
+        "carries_light": 322,
+        "carries_heavy": 36,
+        "total_run_snaps": 518
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.81,
+        "inside_carries": 331,
+        "outside_tackles_ypc": 4.74,
+        "outside_carries": 286,
+        "inside_rank": 9,
+        "outside_rank": 15
+      }
+    }
+  },
+  "LAC": {
+    "team": "LAC",
+    "n_games": 23,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.54,
+        "league_median": 6.03,
+        "rank": 26,
+        "rank_display": "Rank #26 (n=23 games)",
+        "sample_attempts": 822
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.44,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 25,
+            "rank_display": "Rank #25 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.049,
+            "diff_pct": -10.0,
+            "sample_size": 284,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.552,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 23,
+            "rank_display": "Rank #23 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.008,
+            "diff_pct": -1.4,
+            "sample_size": 676,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.667,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 9,
+            "rank_display": "Rank #9 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.017,
+            "diff_pct": 2.6,
+            "sample_size": 486,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.81,
+        "rush_ypc_vs_heavy_box": 3.03,
+        "carries_light": 237,
+        "carries_heavy": 60
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.79,
+        "league_median": 6.14,
+        "rank": 11,
+        "rank_display": "Rank #11 (n=23 games)",
+        "sample_attempts": 736
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 26.0,
+        "blitz_pct": 20.4,
+        "no_blitz_snaps": 465,
+        "total_pass_snaps": 584
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.153,
+          "success_rate": 33.1,
+          "yards_per_attempt": 4.37,
+          "sample_attempts": 133
+        },
+        "short": {
+          "epa_per_attempt": 0.102,
+          "success_rate": 52.3,
+          "yards_per_attempt": 6.07,
+          "sample_attempts": 327
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.118,
+          "success_rate": 47.9,
+          "yards_per_attempt": 8.05,
+          "sample_attempts": 140
+        },
+        "deep": {
+          "epa_per_attempt": 0.185,
+          "success_rate": 32.9,
+          "yards_per_attempt": 12.53,
+          "sample_attempts": 73
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 60.8,
+          "yards_per_target": 7.54,
+          "epa_per_target": 0.108,
+          "sample_targets": 390
+        },
+        "te": {
+          "target_share": 20.9,
+          "yards_per_target": 7.67,
+          "epa_per_target": 0.326,
+          "sample_targets": 134
+        },
+        "rb": {
+          "target_share": 18.3,
+          "yards_per_target": 5.27,
+          "epa_per_target": -0.15,
+          "sample_targets": 117
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 68.3,
+        "heavy_box_rate": 6.0,
+        "ypc_vs_light_box": 4.85,
+        "ypc_vs_heavy_box": 5.46,
+        "carries_light": 295,
+        "carries_heavy": 26,
+        "total_run_snaps": 432
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.95,
+        "inside_carries": 320,
+        "outside_tackles_ypc": 5.0,
+        "outside_carries": 257,
+        "inside_rank": 17,
+        "outside_rank": 19
+      }
+    }
+  },
+  "LV": {
+    "team": "LV",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.38,
+        "league_median": 6.03,
+        "rank": 28,
+        "rank_display": "Rank #28 (n=22 games)",
+        "sample_attempts": 766
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.472,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 19,
+            "rank_display": "Rank #19 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.017,
+            "diff_pct": -3.5,
+            "sample_size": 123,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.582,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 10,
+            "rank_display": "Rank #10 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.022,
+            "diff_pct": 3.9,
+            "sample_size": 595,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.669,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 8,
+            "rank_display": "Rank #8 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.019,
+            "diff_pct": 2.9,
+            "sample_size": 541,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 3.98,
+        "rush_ypc_vs_heavy_box": 1.95,
+        "carries_light": 242,
+        "carries_heavy": 20
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.25,
+        "league_median": 6.14,
+        "rank": 19,
+        "rank_display": "Rank #19 (n=22 games)",
+        "sample_attempts": 736
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 22.0,
+        "blitz_pct": 21.7,
+        "no_blitz_snaps": 440,
+        "total_pass_snaps": 562
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.207,
+          "success_rate": 34.5,
+          "yards_per_attempt": 3.66,
+          "sample_attempts": 139
+        },
+        "short": {
+          "epa_per_attempt": 0.276,
+          "success_rate": 60.5,
+          "yards_per_attempt": 6.1,
+          "sample_attempts": 314
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.558,
+          "success_rate": 58.3,
+          "yards_per_attempt": 10.24,
+          "sample_attempts": 139
+        },
+        "deep": {
+          "epa_per_attempt": 0.263,
+          "success_rate": 31.5,
+          "yards_per_attempt": 11.93,
+          "sample_attempts": 89
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 61.6,
+          "yards_per_target": 8.34,
+          "epa_per_target": 0.323,
+          "sample_targets": 402
+        },
+        "te": {
+          "target_share": 21.0,
+          "yards_per_target": 6.87,
+          "epa_per_target": 0.303,
+          "sample_targets": 137
+        },
+        "rb": {
+          "target_share": 17.5,
+          "yards_per_target": 5.11,
+          "epa_per_target": 0.066,
+          "sample_targets": 114
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 45.5,
+        "heavy_box_rate": 6.5,
+        "ypc_vs_light_box": 4.68,
+        "ypc_vs_heavy_box": 3.25,
+        "carries_light": 224,
+        "carries_heavy": 32,
+        "total_run_snaps": 492
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.92,
+        "inside_carries": 360,
+        "outside_tackles_ypc": 5.14,
+        "outside_carries": 254,
+        "inside_rank": 15,
+        "outside_rank": 24
+      }
+    }
+  },
+  "MIA": {
+    "team": "MIA",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.8,
+        "league_median": 6.03,
+        "rank": 21,
+        "rank_display": "Rank #21 (n=22 games)",
+        "sample_attempts": 662
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.422,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 29,
+            "rank_display": "Rank #29 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.067,
+            "diff_pct": -13.7,
+            "sample_size": 249,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.543,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 24,
+            "rank_display": "Rank #24 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.017,
+            "diff_pct": -3.0,
+            "sample_size": 403,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.599,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 29,
+            "rank_display": "Rank #29 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.051,
+            "diff_pct": -7.8,
+            "sample_size": 564,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.06,
+        "rush_ypc_vs_heavy_box": 5.44,
+        "carries_light": 211,
+        "carries_heavy": 25
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.76,
+        "league_median": 6.14,
+        "rank": 27,
+        "rank_display": "Rank #27 (n=22 games)",
+        "sample_attempts": 704
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 24.2,
+        "blitz_pct": 32.3,
+        "no_blitz_snaps": 376,
+        "total_pass_snaps": 555
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": 0.024,
+          "success_rate": 43.6,
+          "yards_per_attempt": 5.02,
+          "sample_attempts": 110
+        },
+        "short": {
+          "epa_per_attempt": 0.227,
+          "success_rate": 58.1,
+          "yards_per_attempt": 6.44,
+          "sample_attempts": 356
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.726,
+          "success_rate": 63.3,
+          "yards_per_attempt": 11.56,
+          "sample_attempts": 128
+        },
+        "deep": {
+          "epa_per_attempt": 0.321,
+          "success_rate": 40.0,
+          "yards_per_attempt": 10.91,
+          "sample_attempts": 65
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 52.5,
+          "yards_per_target": 8.14,
+          "epa_per_target": 0.317,
+          "sample_targets": 333
+        },
+        "te": {
+          "target_share": 28.5,
+          "yards_per_target": 8.31,
+          "epa_per_target": 0.349,
+          "sample_targets": 181
+        },
+        "rb": {
+          "target_share": 18.9,
+          "yards_per_target": 6.45,
+          "epa_per_target": 0.315,
+          "sample_targets": 120
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 46.9,
+        "heavy_box_rate": 13.9,
+        "ypc_vs_light_box": 5.0,
+        "ypc_vs_heavy_box": 4.33,
+        "carries_light": 216,
+        "carries_heavy": 64,
+        "total_run_snaps": 461
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.38,
+        "inside_carries": 366,
+        "outside_tackles_ypc": 5.28,
+        "outside_carries": 229,
+        "inside_rank": 27,
+        "outside_rank": 25
+      }
+    }
+  },
+  "MIN": {
+    "team": "MIN",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.24,
+        "league_median": 6.03,
+        "rank": 29,
+        "rank_display": "Rank #29 (n=22 games)",
+        "sample_attempts": 702
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.432,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 26,
+            "rank_display": "Rank #26 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.057,
+            "diff_pct": -11.7,
+            "sample_size": 192,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.558,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 19,
+            "rank_display": "Rank #19 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.002,
+            "diff_pct": -0.4,
+            "sample_size": 703,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.656,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 13,
+            "rank_display": "Rank #13 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.006,
+            "diff_pct": 0.9,
+            "sample_size": 346,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.0,
+        "rush_ypc_vs_heavy_box": 5.77,
+        "carries_light": 251,
+        "carries_heavy": 22
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.33,
+        "league_median": 6.14,
+        "rank": 4,
+        "rank_display": "Rank #4 (n=22 games)",
+        "sample_attempts": 668
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 30.7,
+        "blitz_pct": 46.2,
+        "no_blitz_snaps": 267,
+        "total_pass_snaps": 496
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.338,
+          "success_rate": 26.7,
+          "yards_per_attempt": 3.76,
+          "sample_attempts": 105
+        },
+        "short": {
+          "epa_per_attempt": 0.002,
+          "success_rate": 44.6,
+          "yards_per_attempt": 5.36,
+          "sample_attempts": 307
+        },
+        "intermediate": {
+          "epa_per_attempt": -0.031,
+          "success_rate": 45.0,
+          "yards_per_attempt": 8.94,
+          "sample_attempts": 131
+        },
+        "deep": {
+          "epa_per_attempt": 0.754,
+          "success_rate": 41.4,
+          "yards_per_attempt": 13.57,
+          "sample_attempts": 58
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 58.9,
+          "yards_per_target": 7.82,
+          "epa_per_target": 0.144,
+          "sample_targets": 337
+        },
+        "te": {
+          "target_share": 24.7,
+          "yards_per_target": 6.67,
+          "epa_per_target": 0.102,
+          "sample_targets": 141
+        },
+        "rb": {
+          "target_share": 16.4,
+          "yards_per_target": 4.5,
+          "epa_per_target": -0.333,
+          "sample_targets": 94
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 57.8,
+        "heavy_box_rate": 7.9,
+        "ypc_vs_light_box": 4.52,
+        "ypc_vs_heavy_box": 2.02,
+        "carries_light": 301,
+        "carries_heavy": 41,
+        "total_run_snaps": 521
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.42,
+        "inside_carries": 318,
+        "outside_tackles_ypc": 4.72,
+        "outside_carries": 306,
+        "inside_rank": 1,
+        "outside_rank": 12
+      }
+    }
+  },
+  "NE": {
+    "team": "NE",
+    "n_games": 26,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 7.16,
+        "league_median": 6.03,
+        "rank": 3,
+        "rank_display": "Rank #3 (n=26 games)",
+        "sample_attempts": 863
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.494,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 14,
+            "rank_display": "Rank #14 (n=26 games)",
+            "rank_suppressed": false,
+            "n_games": 26,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.005,
+            "diff_pct": 1.0,
+            "sample_size": 498,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.541,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 25,
+            "rank_display": "Rank #25 (n=26 games)",
+            "rank_suppressed": false,
+            "n_games": 26,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.019,
+            "diff_pct": -3.4,
+            "sample_size": 801,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.652,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 15,
+            "rank_display": "Rank #15 (n=26 games)",
+            "rank_suppressed": false,
+            "n_games": 26,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.002,
+            "diff_pct": 0.3,
+            "sample_size": 282,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.86,
+        "rush_ypc_vs_heavy_box": 4.74,
+        "carries_light": 243,
+        "carries_heavy": 106
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.51,
+        "league_median": 6.14,
+        "rank": 6,
+        "rank_display": "Rank #6 (n=26 games)",
+        "sample_attempts": 895
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 26.2,
+        "blitz_pct": 32.3,
+        "no_blitz_snaps": 489,
+        "total_pass_snaps": 722
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.406,
+          "success_rate": 32.7,
+          "yards_per_attempt": 3.56,
+          "sample_attempts": 150
+        },
+        "short": {
+          "epa_per_attempt": 0.036,
+          "success_rate": 50.4,
+          "yards_per_attempt": 5.98,
+          "sample_attempts": 425
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.338,
+          "success_rate": 52.7,
+          "yards_per_attempt": 8.33,
+          "sample_attempts": 169
+        },
+        "deep": {
+          "epa_per_attempt": 0.141,
+          "success_rate": 31.5,
+          "yards_per_attempt": 9.53,
+          "sample_attempts": 89
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 57.2,
+          "yards_per_target": 6.94,
+          "epa_per_target": 0.09,
+          "sample_targets": 453
+        },
+        "te": {
+          "target_share": 24.0,
+          "yards_per_target": 7.27,
+          "epa_per_target": 0.155,
+          "sample_targets": 190
+        },
+        "rb": {
+          "target_share": 18.8,
+          "yards_per_target": 5.28,
+          "epa_per_target": -0.146,
+          "sample_targets": 149
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 44.8,
+        "heavy_box_rate": 11.5,
+        "ypc_vs_light_box": 4.38,
+        "ypc_vs_heavy_box": 2.71,
+        "carries_light": 226,
+        "carries_heavy": 58,
+        "total_run_snaps": 504
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.72,
+        "inside_carries": 299,
+        "outside_tackles_ypc": 4.59,
+        "outside_carries": 312,
+        "inside_rank": 7,
+        "outside_rank": 8
+      }
+    }
+  },
+  "NO": {
+    "team": "NO",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.78,
+        "league_median": 6.03,
+        "rank": 22,
+        "rank_display": "Rank #22 (n=22 games)",
+        "sample_attempts": 853
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.357,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 31,
+            "rank_display": "Rank #31 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.132,
+            "diff_pct": -27.0,
+            "sample_size": 42,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.586,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 8,
+            "rank_display": "Rank #8 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.026,
+            "diff_pct": 4.6,
+            "sample_size": 541,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.639,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 22,
+            "rank_display": "Rank #22 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.011,
+            "diff_pct": -1.7,
+            "sample_size": 815,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.27,
+        "rush_ypc_vs_heavy_box": 2.73,
+        "carries_light": 259,
+        "carries_heavy": 30
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.92,
+        "league_median": 6.14,
+        "rank": 13,
+        "rank_display": "Rank #13 (n=22 games)",
+        "sample_attempts": 694
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 26.5,
+        "blitz_pct": 26.0,
+        "no_blitz_snaps": 393,
+        "total_pass_snaps": 531
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.2,
+          "success_rate": 37.0,
+          "yards_per_attempt": 4.41,
+          "sample_attempts": 127
+        },
+        "short": {
+          "epa_per_attempt": 0.147,
+          "success_rate": 55.3,
+          "yards_per_attempt": 6.12,
+          "sample_attempts": 304
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.395,
+          "success_rate": 51.6,
+          "yards_per_attempt": 8.94,
+          "sample_attempts": 126
+        },
+        "deep": {
+          "epa_per_attempt": 0.487,
+          "success_rate": 36.2,
+          "yards_per_attempt": 11.61,
+          "sample_attempts": 80
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 56.8,
+          "yards_per_target": 7.84,
+          "epa_per_target": 0.213,
+          "sample_targets": 346
+        },
+        "te": {
+          "target_share": 28.1,
+          "yards_per_target": 7.16,
+          "epa_per_target": 0.268,
+          "sample_targets": 171
+        },
+        "rb": {
+          "target_share": 15.1,
+          "yards_per_target": 5.79,
+          "epa_per_target": 0.084,
+          "sample_targets": 92
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 61.6,
+        "heavy_box_rate": 3.6,
+        "ypc_vs_light_box": 4.35,
+        "ypc_vs_heavy_box": 1.44,
+        "carries_light": 307,
+        "carries_heavy": 18,
+        "total_run_snaps": 498
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.03,
+        "inside_carries": 340,
+        "outside_tackles_ypc": 4.98,
+        "outside_carries": 295,
+        "inside_rank": 20,
+        "outside_rank": 18
+      }
+    }
+  },
+  "NYG": {
+    "team": "NYG",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.92,
+        "league_median": 6.03,
+        "rank": 18,
+        "rank_display": "Rank #18 (n=22 games)",
+        "sample_attempts": 756
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.45,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 23,
+            "rank_display": "Rank #23 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.039,
+            "diff_pct": -8.0,
+            "sample_size": 260,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.52,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 29,
+            "rank_display": "Rank #29 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.04,
+            "diff_pct": -7.1,
+            "sample_size": 689,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.62,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 24,
+            "rank_display": "Rank #24 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.03,
+            "diff_pct": -4.6,
+            "sample_size": 453,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.92,
+        "rush_ypc_vs_heavy_box": 1.4,
+        "carries_light": 290,
+        "carries_heavy": 35
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.13,
+        "league_median": 6.14,
+        "rank": 16,
+        "rank_display": "Rank #16 (n=22 games)",
+        "sample_attempts": 758
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 24.0,
+        "blitz_pct": 29.9,
+        "no_blitz_snaps": 413,
+        "total_pass_snaps": 589
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.276,
+          "success_rate": 34.7,
+          "yards_per_attempt": 4.07,
+          "sample_attempts": 118
+        },
+        "short": {
+          "epa_per_attempt": 0.078,
+          "success_rate": 50.0,
+          "yards_per_attempt": 5.68,
+          "sample_attempts": 364
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.474,
+          "success_rate": 62.4,
+          "yards_per_attempt": 10.26,
+          "sample_attempts": 133
+        },
+        "deep": {
+          "epa_per_attempt": 0.393,
+          "success_rate": 35.9,
+          "yards_per_attempt": 11.36,
+          "sample_attempts": 92
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 60.2,
+          "yards_per_target": 8.02,
+          "epa_per_target": 0.237,
+          "sample_targets": 409
+        },
+        "te": {
+          "target_share": 23.4,
+          "yards_per_target": 6.7,
+          "epa_per_target": 0.164,
+          "sample_targets": 159
+        },
+        "rb": {
+          "target_share": 16.3,
+          "yards_per_target": 5.44,
+          "epa_per_target": -0.023,
+          "sample_targets": 111
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 55.5,
+        "heavy_box_rate": 8.1,
+        "ypc_vs_light_box": 6.14,
+        "ypc_vs_heavy_box": 2.86,
+        "carries_light": 246,
+        "carries_heavy": 36,
+        "total_run_snaps": 443
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.31,
+        "inside_carries": 268,
+        "outside_tackles_ypc": 6.83,
+        "outside_carries": 290,
+        "inside_rank": 24,
+        "outside_rank": 32
+      }
+    }
+  },
+  "NYJ": {
+    "team": "NYJ",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 4.62,
+        "league_median": 6.03,
+        "rank": 31,
+        "rank_display": "Rank #31 (n=22 games)",
+        "sample_attempts": 720
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.426,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 28,
+            "rank_display": "Rank #28 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.063,
+            "diff_pct": -12.9,
+            "sample_size": 61,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.481,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 31,
+            "rank_display": "Rank #31 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.079,
+            "diff_pct": -14.1,
+            "sample_size": 557,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.626,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 23,
+            "rank_display": "Rank #23 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.024,
+            "diff_pct": -3.7,
+            "sample_size": 681,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.03,
+        "rush_ypc_vs_heavy_box": 4.02,
+        "carries_light": 237,
+        "carries_heavy": 55
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.33,
+        "league_median": 6.14,
+        "rank": 20,
+        "rank_display": "Rank #20 (n=22 games)",
+        "sample_attempts": 719
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 19.5,
+        "blitz_pct": 29.0,
+        "no_blitz_snaps": 385,
+        "total_pass_snaps": 542
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.022,
+          "success_rate": 35.1,
+          "yards_per_attempt": 5.19,
+          "sample_attempts": 131
+        },
+        "short": {
+          "epa_per_attempt": 0.324,
+          "success_rate": 56.6,
+          "yards_per_attempt": 6.17,
+          "sample_attempts": 332
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.433,
+          "success_rate": 52.1,
+          "yards_per_attempt": 9.48,
+          "sample_attempts": 146
+        },
+        "deep": {
+          "epa_per_attempt": 0.482,
+          "success_rate": 36.9,
+          "yards_per_attempt": 11.0,
+          "sample_attempts": 65
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 58.1,
+          "yards_per_target": 7.93,
+          "epa_per_target": 0.391,
+          "sample_targets": 374
+        },
+        "te": {
+          "target_share": 24.8,
+          "yards_per_target": 7.08,
+          "epa_per_target": 0.284,
+          "sample_targets": 160
+        },
+        "rb": {
+          "target_share": 17.1,
+          "yards_per_target": 6.63,
+          "epa_per_target": 0.283,
+          "sample_targets": 110
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 41.5,
+        "heavy_box_rate": 16.0,
+        "ypc_vs_light_box": 5.16,
+        "ypc_vs_heavy_box": 4.32,
+        "carries_light": 212,
+        "carries_heavy": 82,
+        "total_run_snaps": 511
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.74,
+        "inside_carries": 331,
+        "outside_tackles_ypc": 4.58,
+        "outside_carries": 310,
+        "inside_rank": 31,
+        "outside_rank": 7
+      }
+    }
+  },
+  "PHI": {
+    "team": "PHI",
+    "n_games": 23,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.87,
+        "league_median": 6.03,
+        "rank": 20,
+        "rank_display": "Rank #20 (n=23 games)",
+        "sample_attempts": 736
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.457,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 22,
+            "rank_display": "Rank #22 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.032,
+            "diff_pct": -6.5,
+            "sample_size": 328,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.562,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 14,
+            "rank_display": "Rank #14 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.002,
+            "diff_pct": 0.4,
+            "sample_size": 800,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.602,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 28,
+            "rank_display": "Rank #28 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.048,
+            "diff_pct": -7.4,
+            "sample_size": 226,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.44,
+        "rush_ypc_vs_heavy_box": 2.06,
+        "carries_light": 245,
+        "carries_heavy": 48
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.88,
+        "league_median": 6.14,
+        "rank": 12,
+        "rank_display": "Rank #12 (n=23 games)",
+        "sample_attempts": 800
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 29.1,
+        "blitz_pct": 19.7,
+        "no_blitz_snaps": 494,
+        "total_pass_snaps": 615
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.279,
+          "success_rate": 32.5,
+          "yards_per_attempt": 3.89,
+          "sample_attempts": 123
+        },
+        "short": {
+          "epa_per_attempt": -0.052,
+          "success_rate": 47.6,
+          "yards_per_attempt": 5.19,
+          "sample_attempts": 372
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.393,
+          "success_rate": 52.5,
+          "yards_per_attempt": 9.99,
+          "sample_attempts": 160
+        },
+        "deep": {
+          "epa_per_attempt": 0.291,
+          "success_rate": 30.1,
+          "yards_per_attempt": 10.74,
+          "sample_attempts": 93
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 62.1,
+          "yards_per_target": 7.64,
+          "epa_per_target": 0.108,
+          "sample_targets": 440
+        },
+        "te": {
+          "target_share": 20.5,
+          "yards_per_target": 5.32,
+          "epa_per_target": -0.036,
+          "sample_targets": 145
+        },
+        "rb": {
+          "target_share": 17.5,
+          "yards_per_target": 6.57,
+          "epa_per_target": 0.132,
+          "sample_targets": 124
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 69.0,
+        "heavy_box_rate": 4.0,
+        "ypc_vs_light_box": 4.79,
+        "ypc_vs_heavy_box": 2.15,
+        "carries_light": 349,
+        "carries_heavy": 20,
+        "total_run_snaps": 506
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.07,
+        "inside_carries": 330,
+        "outside_tackles_ypc": 4.62,
+        "outside_carries": 314,
+        "inside_rank": 21,
+        "outside_rank": 9
+      }
+    }
+  },
+  "PIT": {
+    "team": "PIT",
+    "n_games": 23,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.71,
+        "league_median": 6.03,
+        "rank": 24,
+        "rank_display": "Rank #24 (n=23 games)",
+        "sample_attempts": 818
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.543,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 2,
+            "rank_display": "Rank #2 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.054,
+            "diff_pct": 11.0,
+            "sample_size": 219,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.603,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 5,
+            "rank_display": "Rank #5 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.043,
+            "diff_pct": 7.7,
+            "sample_size": 740,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.676,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 6,
+            "rank_display": "Rank #6 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.026,
+            "diff_pct": 4.0,
+            "sample_size": 374,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.52,
+        "rush_ypc_vs_heavy_box": 3.16,
+        "carries_light": 169,
+        "carries_heavy": 50
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.36,
+        "league_median": 6.14,
+        "rank": 22,
+        "rank_display": "Rank #22 (n=23 games)",
+        "sample_attempts": 865
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 25.4,
+        "blitz_pct": 30.9,
+        "no_blitz_snaps": 481,
+        "total_pass_snaps": 696
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.304,
+          "success_rate": 32.1,
+          "yards_per_attempt": 4.54,
+          "sample_attempts": 131
+        },
+        "short": {
+          "epa_per_attempt": 0.065,
+          "success_rate": 52.5,
+          "yards_per_attempt": 5.77,
+          "sample_attempts": 421
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.504,
+          "success_rate": 54.1,
+          "yards_per_attempt": 9.59,
+          "sample_attempts": 172
+        },
+        "deep": {
+          "epa_per_attempt": 0.873,
+          "success_rate": 47.3,
+          "yards_per_attempt": 15.95,
+          "sample_attempts": 74
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 59.2,
+          "yards_per_target": 8.15,
+          "epa_per_target": 0.269,
+          "sample_targets": 458
+        },
+        "te": {
+          "target_share": 23.7,
+          "yards_per_target": 7.62,
+          "epa_per_target": 0.236,
+          "sample_targets": 183
+        },
+        "rb": {
+          "target_share": 17.1,
+          "yards_per_target": 5.53,
+          "epa_per_target": -0.063,
+          "sample_targets": 132
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 48.1,
+        "heavy_box_rate": 17.1,
+        "ypc_vs_light_box": 4.53,
+        "ypc_vs_heavy_box": 4.02,
+        "carries_light": 228,
+        "carries_heavy": 81,
+        "total_run_snaps": 474
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.85,
+        "inside_carries": 323,
+        "outside_tackles_ypc": 5.08,
+        "outside_carries": 272,
+        "inside_rank": 11,
+        "outside_rank": 20
+      }
+    }
+  },
+  "SEA": {
+    "team": "SEA",
+    "n_games": 25,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 7.37,
+        "league_median": 6.03,
+        "rank": 1,
+        "rank_display": "Rank #1 (n=25 games)",
+        "sample_attempts": 761
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.429,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 27,
+            "rank_display": "Rank #27 (n=25 games)",
+            "rank_suppressed": false,
+            "n_games": 25,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.06,
+            "diff_pct": -12.3,
+            "sample_size": 576,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.556,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 21,
+            "rank_display": "Rank #21 (n=25 games)",
+            "rank_suppressed": false,
+            "n_games": 25,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.004,
+            "diff_pct": -0.7,
+            "sample_size": 662,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.606,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 27,
+            "rank_display": "Rank #27 (n=25 games)",
+            "rank_suppressed": false,
+            "n_games": 25,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.044,
+            "diff_pct": -6.8,
+            "sample_size": 241,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.3,
+        "rush_ypc_vs_heavy_box": 3.81,
+        "carries_light": 288,
+        "carries_heavy": 69
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 5.13,
+        "league_median": 6.14,
+        "rank": 2,
+        "rank_display": "Rank #2 (n=25 games)",
+        "sample_attempts": 936
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 26.5,
+        "blitz_pct": 21.0,
+        "no_blitz_snaps": 607,
+        "total_pass_snaps": 768
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.171,
+          "success_rate": 35.2,
+          "yards_per_attempt": 4.26,
+          "sample_attempts": 193
+        },
+        "short": {
+          "epa_per_attempt": 0.096,
+          "success_rate": 51.0,
+          "yards_per_attempt": 5.32,
+          "sample_attempts": 398
+        },
+        "intermediate": {
+          "epa_per_attempt": -0.007,
+          "success_rate": 43.6,
+          "yards_per_attempt": 7.66,
+          "sample_attempts": 163
+        },
+        "deep": {
+          "epa_per_attempt": 0.132,
+          "success_rate": 35.8,
+          "yards_per_attempt": 10.15,
+          "sample_attempts": 106
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 53.9,
+          "yards_per_target": 6.61,
+          "epa_per_target": 0.02,
+          "sample_targets": 439
+        },
+        "te": {
+          "target_share": 24.7,
+          "yards_per_target": 6.92,
+          "epa_per_target": 0.222,
+          "sample_targets": 201
+        },
+        "rb": {
+          "target_share": 21.4,
+          "yards_per_target": 5.25,
+          "epa_per_target": 0.035,
+          "sample_targets": 174
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 70.0,
+        "heavy_box_rate": 4.6,
+        "ypc_vs_light_box": 4.13,
+        "ypc_vs_heavy_box": 1.59,
+        "carries_light": 334,
+        "carries_heavy": 22,
+        "total_run_snaps": 477
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.63,
+        "inside_carries": 363,
+        "outside_tackles_ypc": 4.35,
+        "outside_carries": 244,
+        "inside_rank": 4,
+        "outside_rank": 4
+      }
+    }
+  },
+  "SF": {
+    "team": "SF",
+    "n_games": 24,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 7.07,
+        "league_median": 6.03,
+        "rank": 4,
+        "rank_display": "Rank #4 (n=24 games)",
+        "sample_attempts": 814
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.482,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 18,
+            "rank_display": "Rank #18 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.007,
+            "diff_pct": -1.4,
+            "sample_size": 396,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.556,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 22,
+            "rank_display": "Rank #22 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.004,
+            "diff_pct": -0.7,
+            "sample_size": 770,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.67,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 7,
+            "rank_display": "Rank #7 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.02,
+            "diff_pct": 3.1,
+            "sample_size": 291,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 3.86,
+        "rush_ypc_vs_heavy_box": 2.62,
+        "carries_light": 319,
+        "carries_heavy": 21
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.2,
+        "league_median": 6.14,
+        "rank": 18,
+        "rank_display": "Rank #18 (n=24 games)",
+        "sample_attempts": 842
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 18.4,
+        "blitz_pct": 22.5,
+        "no_blitz_snaps": 510,
+        "total_pass_snaps": 658
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.119,
+          "success_rate": 37.2,
+          "yards_per_attempt": 4.54,
+          "sample_attempts": 145
+        },
+        "short": {
+          "epa_per_attempt": 0.11,
+          "success_rate": 54.0,
+          "yards_per_attempt": 5.76,
+          "sample_attempts": 404
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.314,
+          "success_rate": 50.6,
+          "yards_per_attempt": 8.52,
+          "sample_attempts": 164
+        },
+        "deep": {
+          "epa_per_attempt": 0.526,
+          "success_rate": 35.9,
+          "yards_per_attempt": 11.67,
+          "sample_attempts": 92
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 53.9,
+          "yards_per_target": 7.95,
+          "epa_per_target": 0.303,
+          "sample_targets": 418
+        },
+        "te": {
+          "target_share": 24.6,
+          "yards_per_target": 6.22,
+          "epa_per_target": 0.037,
+          "sample_targets": 191
+        },
+        "rb": {
+          "target_share": 21.4,
+          "yards_per_target": 5.42,
+          "epa_per_target": 0.045,
+          "sample_targets": 166
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 76.1,
+        "heavy_box_rate": 3.1,
+        "ypc_vs_light_box": 4.69,
+        "ypc_vs_heavy_box": 4.33,
+        "carries_light": 369,
+        "carries_heavy": 15,
+        "total_run_snaps": 485
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 3.94,
+        "inside_carries": 345,
+        "outside_tackles_ypc": 4.88,
+        "outside_carries": 264,
+        "inside_rank": 16,
+        "outside_rank": 17
+      }
+    }
+  },
+  "TB": {
+    "team": "TB",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 5.68,
+        "league_median": 6.03,
+        "rank": 25,
+        "rank_display": "Rank #25 (n=22 games)",
+        "sample_attempts": 769
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.5,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 13,
+            "rank_display": "Rank #13 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.011,
+            "diff_pct": 2.2,
+            "sample_size": 154,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.527,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 27,
+            "rank_display": "Rank #27 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.033,
+            "diff_pct": -5.9,
+            "sample_size": 802,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.656,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 12,
+            "rank_display": "Rank #12 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.006,
+            "diff_pct": 0.9,
+            "sample_size": 410,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.6,
+        "rush_ypc_vs_heavy_box": 2.23,
+        "carries_light": 280,
+        "carries_heavy": 26
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.67,
+        "league_median": 6.14,
+        "rank": 25,
+        "rank_display": "Rank #25 (n=22 games)",
+        "sample_attempts": 777
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 27.7,
+        "blitz_pct": 34.3,
+        "no_blitz_snaps": 397,
+        "total_pass_snaps": 604
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.077,
+          "success_rate": 43.3,
+          "yards_per_attempt": 5.61,
+          "sample_attempts": 120
+        },
+        "short": {
+          "epa_per_attempt": 0.13,
+          "success_rate": 56.3,
+          "yards_per_attempt": 6.59,
+          "sample_attempts": 375
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.37,
+          "success_rate": 54.8,
+          "yards_per_attempt": 10.28,
+          "sample_attempts": 155
+        },
+        "deep": {
+          "epa_per_attempt": 0.265,
+          "success_rate": 31.6,
+          "yards_per_attempt": 9.7,
+          "sample_attempts": 79
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 58.0,
+          "yards_per_target": 7.77,
+          "epa_per_target": 0.113,
+          "sample_targets": 412
+        },
+        "te": {
+          "target_share": 24.6,
+          "yards_per_target": 7.26,
+          "epa_per_target": 0.309,
+          "sample_targets": 175
+        },
+        "rb": {
+          "target_share": 17.3,
+          "yards_per_target": 8.37,
+          "epa_per_target": 0.279,
+          "sample_targets": 123
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 51.3,
+        "heavy_box_rate": 12.4,
+        "ypc_vs_light_box": 4.83,
+        "ypc_vs_heavy_box": 3.94,
+        "carries_light": 198,
+        "carries_heavy": 48,
+        "total_run_snaps": 386
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.46,
+        "inside_carries": 246,
+        "outside_tackles_ypc": 4.11,
+        "outside_carries": 238,
+        "inside_rank": 28,
+        "outside_rank": 2
+      }
+    }
+  },
+  "TEN": {
+    "team": "TEN",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 4.62,
+        "league_median": 6.03,
+        "rank": 32,
+        "rank_display": "Rank #32 (n=22 games)",
+        "sample_attempts": 789
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.327,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 32,
+            "rank_display": "Rank #32 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.162,
+            "diff_pct": -33.1,
+            "sample_size": 52,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.562,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 16,
+            "rank_display": "Rank #16 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.002,
+            "diff_pct": 0.4,
+            "sample_size": 504,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.686,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 5,
+            "rank_display": "Rank #5 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.036,
+            "diff_pct": 5.5,
+            "sample_size": 713,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 4.76,
+        "rush_ypc_vs_heavy_box": 4.0,
+        "carries_light": 224,
+        "carries_heavy": 45
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 7.01,
+        "league_median": 6.14,
+        "rank": 31,
+        "rank_display": "Rank #31 (n=22 games)",
+        "sample_attempts": 714
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 26.8,
+        "blitz_pct": 23.7,
+        "no_blitz_snaps": 426,
+        "total_pass_snaps": 558
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.2,
+          "success_rate": 35.1,
+          "yards_per_attempt": 4.68,
+          "sample_attempts": 111
+        },
+        "short": {
+          "epa_per_attempt": 0.174,
+          "success_rate": 53.8,
+          "yards_per_attempt": 6.08,
+          "sample_attempts": 333
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.791,
+          "success_rate": 65.9,
+          "yards_per_attempt": 11.52,
+          "sample_attempts": 135
+        },
+        "deep": {
+          "epa_per_attempt": 0.966,
+          "success_rate": 48.1,
+          "yards_per_attempt": 15.62,
+          "sample_attempts": 81
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 61.0,
+          "yards_per_target": 9.59,
+          "epa_per_target": 0.517,
+          "sample_targets": 384
+        },
+        "te": {
+          "target_share": 24.2,
+          "yards_per_target": 7.2,
+          "epa_per_target": 0.278,
+          "sample_targets": 152
+        },
+        "rb": {
+          "target_share": 14.8,
+          "yards_per_target": 6.18,
+          "epa_per_target": 0.019,
+          "sample_targets": 93
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 53.5,
+        "heavy_box_rate": 10.4,
+        "ypc_vs_light_box": 5.03,
+        "ypc_vs_heavy_box": 4.04,
+        "carries_light": 232,
+        "carries_heavy": 45,
+        "total_run_snaps": 434
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.09,
+        "inside_carries": 314,
+        "outside_tackles_ypc": 4.71,
+        "outside_carries": 269,
+        "inside_rank": 22,
+        "outside_rank": 11
+      }
+    }
+  },
+  "WAS": {
+    "team": "WAS",
+    "n_games": 22,
+    "offense": {
+      "passing_ypa": {
+        "raw_value": 6.01,
+        "league_median": 6.03,
+        "rank": 17,
+        "rank_display": "Rank #17 (n=22 games)",
+        "sample_attempts": 678
+      },
+      "game_state_splits": {
+        "leading": {
+          "pass_rate": {
+            "raw_value": 0.49,
+            "league_median": 0.489,
+            "league_p25": 0.443,
+            "league_p75": 0.508,
+            "rank": 15,
+            "rank_display": "Rank #15 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.001,
+            "diff_pct": 0.2,
+            "sample_size": 155,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "neutral": {
+          "pass_rate": {
+            "raw_value": 0.507,
+            "league_median": 0.56,
+            "league_p25": 0.543,
+            "league_p75": 0.585,
+            "rank": 30,
+            "rank_display": "Rank #30 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.053,
+            "diff_pct": -9.5,
+            "sample_size": 560,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        },
+        "trailing": {
+          "pass_rate": {
+            "raw_value": 0.545,
+            "league_median": 0.65,
+            "league_p25": 0.619,
+            "league_p75": 0.667,
+            "rank": 32,
+            "rank_display": "Rank #32 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.105,
+            "diff_pct": -16.2,
+            "sample_size": 583,
+            "is_small_sample": false,
+            "unit": "rate"
+          }
+        }
+      },
+      "box_counts": {
+        "rush_ypc_vs_light_box": 5.02,
+        "rush_ypc_vs_heavy_box": 2.32,
+        "carries_light": 326,
+        "carries_heavy": 22
+      }
+    },
+    "defense": {
+      "passing_ypa_allowed": {
+        "raw_value": 6.9,
+        "league_median": 6.14,
+        "rank": 30,
+        "rank_display": "Rank #30 (n=22 games)",
+        "sample_attempts": 782
+      },
+      "pressure_without_blitz": {
+        "pressure_no_blitz_pct": 27.2,
+        "blitz_pct": 26.8,
+        "no_blitz_snaps": 427,
+        "total_pass_snaps": 583
+      },
+      "pass_depth_allowed": {
+        "behind_los": {
+          "epa_per_attempt": -0.246,
+          "success_rate": 35.6,
+          "yards_per_attempt": 4.34,
+          "sample_attempts": 135
+        },
+        "short": {
+          "epa_per_attempt": 0.299,
+          "success_rate": 56.3,
+          "yards_per_attempt": 6.79,
+          "sample_attempts": 341
+        },
+        "intermediate": {
+          "epa_per_attempt": 0.506,
+          "success_rate": 59.2,
+          "yards_per_attempt": 10.17,
+          "sample_attempts": 174
+        },
+        "deep": {
+          "epa_per_attempt": 0.621,
+          "success_rate": 40.5,
+          "yards_per_attempt": 13.19,
+          "sample_attempts": 79
+        }
+      },
+      "positional_targets_allowed": {
+        "wr": {
+          "target_share": 61.6,
+          "yards_per_target": 8.42,
+          "epa_per_target": 0.312,
+          "sample_targets": 426
+        },
+        "te": {
+          "target_share": 22.5,
+          "yards_per_target": 9.06,
+          "epa_per_target": 0.545,
+          "sample_targets": 156
+        },
+        "rb": {
+          "target_share": 15.9,
+          "yards_per_target": 6.41,
+          "epa_per_target": 0.096,
+          "sample_targets": 110
+        }
+      },
+      "box_counts": {
+        "light_box_rate": 63.5,
+        "heavy_box_rate": 2.2,
+        "ypc_vs_light_box": 5.52,
+        "ypc_vs_heavy_box": 1.55,
+        "carries_light": 311,
+        "carries_heavy": 11,
+        "total_run_snaps": 490
+      },
+      "directional_gaps": {
+        "inside_tackles_ypc": 4.18,
+        "inside_carries": 319,
+        "outside_tackles_ypc": 5.58,
+        "outside_carries": 283,
+        "inside_rank": 23,
+        "outside_rank": 28
+      }
+    }
+  }
+}

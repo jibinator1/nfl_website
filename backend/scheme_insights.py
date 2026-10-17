@@ -454,6 +454,29 @@ def _build_generic_team_profile(team: str) -> Dict[str, Any]:
 
 
 _DATA_PROFILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'scheme_profiles_32.json')
+_SCOUTING_32_CACHE = None
+
+def _load_32_team_scouting_data() -> Dict[str, Any]:
+    global _SCOUTING_32_CACHE
+    if _SCOUTING_32_CACHE is not None:
+        return _SCOUTING_32_CACHE
+    candidate_paths = [
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'team_tendencies_32.json'),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'api', 'data', 'team_tendencies_32.json'),
+        os.path.join(os.getcwd(), 'data', 'team_tendencies_32.json'),
+        os.path.join(os.getcwd(), 'api', 'data', 'team_tendencies_32.json')
+    ]
+    for p in candidate_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, 'r', encoding='utf-8') as f:
+                    _SCOUTING_32_CACHE = json.load(f)
+                    return _SCOUTING_32_CACHE
+            except Exception:
+                pass
+    _SCOUTING_32_CACHE = {}
+    return _SCOUTING_32_CACHE
+
 _PROFILES_LOADED = False
 _PARQUET_LOADED = False
 _SCHEDULES_DF = None
@@ -981,10 +1004,19 @@ def compute_scheme_insights(
     # -------------------------------------------------------------
     # Matchup Battle 1: Away Offense vs Home Defense
     h_cov = h_profile['coverage']
+    a_cov = a_profile['coverage']
     h_cov_summary = (
         f"{h_team} Defense: {h_cov['mfo_pct']:.1f}% Middle-Field Open (MFO), "
         f"{h_cov['zone_pct']:.1f}% Zone, {h_cov['man_pct']:.1f}% Man (n={h_games} games)."
     )
+    scouting_32 = _load_32_team_scouting_data()
+    h_scout_def = scouting_32.get(h_team, {}).get('defense', {})
+    a_scout_def = scouting_32.get(a_team, {}).get('defense', {})
+    h_pnb = h_scout_def.get('pressure_without_blitz', {}).get('pressure_no_blitz_pct', 24.5)
+    a_pnb = a_scout_def.get('pressure_without_blitz', {}).get('pressure_no_blitz_pct', 24.5)
+    h_blitz = h_scout_def.get('pressure_without_blitz', {}).get('blitz_pct', h_cov.get('blitz_pct', 26.0))
+    a_blitz = a_scout_def.get('pressure_without_blitz', {}).get('blitz_pct', a_cov.get('blitz_pct', 26.0))
+
     a_vs_h_cov = {
         'offense_team': a_team,
         'defense_team': h_team,
@@ -992,6 +1024,10 @@ def compute_scheme_insights(
         'def_man_pct': h_cov['man_pct'],
         'def_mfo_pct': h_cov['mfo_pct'],
         'def_mfc_pct': h_cov['mfc_pct'],
+        'blitz_pct': h_blitz,
+        'pressure_no_blitz_pct': h_pnb,
+        'pass_depth_allowed': h_scout_def.get('pass_depth_allowed', {}),
+        'positional_targets_allowed': h_scout_def.get('positional_targets_allowed', {}),
         'shells': {
             'Cover 1 (Man)': h_cov['cover_1'],
             'Cover 2 (MFO)': h_cov['cover_2'],
@@ -1017,6 +1053,10 @@ def compute_scheme_insights(
         'def_man_pct': a_cov['man_pct'],
         'def_mfo_pct': a_cov['mfo_pct'],
         'def_mfc_pct': a_cov['mfc_pct'],
+        'blitz_pct': a_blitz,
+        'pressure_no_blitz_pct': a_pnb,
+        'pass_depth_allowed': a_scout_def.get('pass_depth_allowed', {}),
+        'positional_targets_allowed': a_scout_def.get('positional_targets_allowed', {}),
         'shells': {
             'Cover 1 (Man)': a_cov['cover_1'],
             'Cover 2 (MFO)': a_cov['cover_2'],
@@ -1075,6 +1115,8 @@ def compute_scheme_insights(
             'opp_def_gap_ypc_allowed': h_profile['run_scheme']['def_gap_ypc_allowed'],
             'opp_def_gap_rank': h_gap_rank,
             'opp_def_gap_rank_display': h_gap_rank_disp,
+            'opp_box_counts': scouting_32.get(h_team, {}).get('defense', {}).get('box_counts', {}),
+            'team_box_counts': scouting_32.get(a_team, {}).get('offense', {}).get('box_counts', {}),
             'comparison_summary': (
                 f"{a_team} Gap Rush: {a_profile['run_scheme']['gap_ypc']:.2f} YPC (n={a_games} games) vs. "
                 f"{h_team} Gap Def: {h_profile['run_scheme']['def_gap_ypc_allowed']:.2f} YPC allowed (n={h_games} games)."
@@ -1098,6 +1140,8 @@ def compute_scheme_insights(
             'opp_def_gap_ypc_allowed': a_profile['run_scheme']['def_gap_ypc_allowed'],
             'opp_def_gap_rank': a_gap_rank,
             'opp_def_gap_rank_display': a_gap_rank_disp,
+            'opp_box_counts': scouting_32.get(a_team, {}).get('defense', {}).get('box_counts', {}),
+            'team_box_counts': scouting_32.get(h_team, {}).get('offense', {}).get('box_counts', {}),
             'comparison_summary': (
                 f"{h_team} Zone Rush: {h_profile['run_scheme']['zone_ypc']:.2f} YPC (n={h_games} games) vs. "
                 f"{a_team} Zone Def: {a_profile['run_scheme']['def_zone_ypc_allowed']:.2f} YPC allowed (n={a_games} games)."

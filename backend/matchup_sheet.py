@@ -116,84 +116,73 @@ def get_head_to_head_meeting(
     }
 
 
+import json
+
+_SCOUTING_32_DATA = None
+
+def _load_32_team_scouting_data() -> Dict[str, Any]:
+    global _SCOUTING_32_DATA
+    if _SCOUTING_32_DATA is not None:
+        return _SCOUTING_32_DATA
+    candidate_paths = [
+        os.path.join(ROOT_DIR, "data", "team_tendencies_32.json"),
+        os.path.join(ROOT_DIR, "api", "data", "team_tendencies_32.json"),
+        os.path.join(os.getcwd(), "data", "team_tendencies_32.json"),
+        os.path.join(os.getcwd(), "api", "data", "team_tendencies_32.json"),
+    ]
+    for p in candidate_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    _SCOUTING_32_DATA = json.load(f)
+                    return _SCOUTING_32_DATA
+            except Exception:
+                pass
+    _SCOUTING_32_DATA = {}
+    return _SCOUTING_32_DATA
+
+
 # -----------------------------------------------------------------------------
 # Assembly: Full Matchup Stat Sheet
 # -----------------------------------------------------------------------------
 def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: Optional[int] = None) -> Dict[str, Any]:
-    from backend.scheme_insights import get_team_scheme_profile
-    prof = get_team_scheme_profile(team)
-    tempo = prof.get("tempo_situational", {})
-    n_games = 22 if season >= 2026 else 17
+    scouting = _load_32_team_scouting_data()
+    t_entry = scouting.get(team, {})
+    t_off = t_entry.get("offense", {})
+    n_games = t_entry.get("n_games", 22 if season >= 2026 else 17)
 
-    base_neutral = 0.560
-    if tempo.get("third_down_pass_rate"):
-        base_neutral = round(float(0.50 + (tempo.get("third_down_pass_rate", 75.0) - 70.0) * 0.003), 3)
-    base_neutral = max(0.48, min(0.64, base_neutral))
-    base_leading = round(base_neutral * 0.88, 3)
-    base_trailing = round(base_neutral * 1.18, 3)
+    game_state_splits = t_off.get("game_state_splits")
+    if not game_state_splits:
+        base_neutral = 0.560
+        base_leading = 0.490
+        base_trailing = 0.650
+        game_state_splits = {
+            "leading": {"pass_rate": {"raw_value": base_leading, "league_median": 0.489, "rank": 12, "n_games": n_games, "sample_size": 200, "is_small_sample": False, "unit": "rate"}},
+            "neutral": {"pass_rate": {"raw_value": base_neutral, "league_median": 0.560, "rank": 12, "n_games": n_games, "sample_size": 400, "is_small_sample": False, "unit": "rate"}},
+            "trailing": {"pass_rate": {"raw_value": base_trailing, "league_median": 0.650, "rank": 12, "n_games": n_games, "sample_size": 250, "is_small_sample": False, "unit": "rate"}},
+        }
+
+    pass_ypa_info = t_off.get("passing_ypa", {
+        "raw_value": 6.30,
+        "league_median": 6.30,
+        "rank": 16,
+        "rank_display": f"Rank #16 (n={n_games} games)",
+        "sample_attempts": 500,
+    })
+
+    box_counts = t_off.get("box_counts", {
+        "rush_ypc_vs_light_box": 4.30,
+        "rush_ypc_vs_heavy_box": 3.10,
+        "carries_light": 100,
+        "carries_heavy": 30,
+    })
 
     return {
         "team": team,
         "n_games": n_games,
-        "game_state_splits": {
-            "leading": {
-                "pass_rate": {
-                    "raw_value": base_leading,
-                    "league_median": 0.489,
-                    "league_p25": 0.450,
-                    "league_p75": 0.530,
-                    "rank": 14,
-                    "rank_display": f"Rank #14 (n={n_games} games)",
-                    "rank_suppressed": False,
-                    "n_games": n_games,
-                    "total_teams": 32,
-                    "rank_direction": "higher is better",
-                    "diff_from_median": round(base_leading - 0.489, 3),
-                    "diff_pct": round(((base_leading - 0.489) / 0.489) * 100, 1),
-                    "sample_size": 180,
-                    "is_small_sample": False,
-                    "unit": "rate",
-                }
-            },
-            "neutral": {
-                "pass_rate": {
-                    "raw_value": base_neutral,
-                    "league_median": 0.560,
-                    "league_p25": 0.530,
-                    "league_p75": 0.590,
-                    "rank": 14,
-                    "rank_display": f"Rank #14 (n={n_games} games)",
-                    "rank_suppressed": False,
-                    "n_games": n_games,
-                    "total_teams": 32,
-                    "rank_direction": "higher is better",
-                    "diff_from_median": round(base_neutral - 0.560, 3),
-                    "diff_pct": round(((base_neutral - 0.560) / 0.560) * 100, 1),
-                    "sample_size": 350,
-                    "is_small_sample": False,
-                    "unit": "rate",
-                }
-            },
-            "trailing": {
-                "pass_rate": {
-                    "raw_value": base_trailing,
-                    "league_median": 0.650,
-                    "league_p25": 0.620,
-                    "league_p75": 0.690,
-                    "rank": 14,
-                    "rank_display": f"Rank #14 (n={n_games} games)",
-                    "rank_suppressed": False,
-                    "n_games": n_games,
-                    "total_teams": 32,
-                    "rank_direction": "higher is better",
-                    "diff_from_median": round(base_trailing - 0.650, 3),
-                    "diff_pct": round(((base_trailing - 0.650) / 0.650) * 100, 1),
-                    "sample_size": 220,
-                    "is_small_sample": False,
-                    "unit": "rate",
-                }
-            },
-        },
+        "passing_offense": pass_ypa_info,
+        "game_state_splits": game_state_splits,
+        "box_counts": box_counts,
         "down_distance_tendencies": {},
         "red_zone_tendencies": {},
         "explosive_tendencies": {},
@@ -201,18 +190,65 @@ def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: 
 
 
 def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_week: Optional[int] = None) -> Dict[str, Any]:
+    scouting = _load_32_team_scouting_data()
+    t_entry = scouting.get(team, {})
+    t_def = t_entry.get("defense", {})
+    n_games = t_entry.get("n_games", 22 if season >= 2026 else 17)
+
     from backend.scheme_insights import get_team_scheme_profile
     prof = get_team_scheme_profile(team)
     run_s = prof.get("run_scheme", {})
-    n_games = 22 if season >= 2026 else 17
-
     gap_ypc = float(run_s.get("def_gap_ypc_allowed", 4.20))
     zone_ypc = float(run_s.get("def_zone_ypc_allowed", 4.40))
     gap_rk = int(run_s.get("def_gap_rank", 16))
     zone_rk = int(run_s.get("def_zone_rank", 16))
 
-    inside_ypc = round(gap_ypc * 0.98, 2)
-    outside_ypc = round(zone_ypc * 1.02, 2)
+    tg = t_def.get("directional_gaps", {})
+    inside_ypc = float(tg.get("inside_tackles_ypc", round(gap_ypc * 0.98, 2)))
+    outside_ypc = float(tg.get("outside_tackles_ypc", round(zone_ypc * 1.02, 2)))
+    inside_rk = int(tg.get("inside_rank", gap_rk))
+    outside_rk = int(tg.get("outside_rank", zone_rk))
+
+    pass_ypa_info = t_def.get("passing_ypa_allowed", {
+        "raw_value": 6.10,
+        "league_median": 6.10,
+        "rank": 16,
+        "rank_display": f"Rank #16 (n={n_games} games)",
+        "sample_attempts": 500,
+    })
+
+    pressure_nb = t_def.get("pressure_without_blitz", {
+        "pressure_no_blitz_pct": 24.5,
+        "blitz_pct": 26.0,
+        "no_blitz_snaps": 300,
+        "total_pass_snaps": 400,
+    })
+
+    pass_depth = t_def.get("pass_depth_allowed", {})
+    if not pass_depth:
+        pass_depth = {
+            "behind_los": {"epa_per_attempt": -0.35, "success_rate": 28.0, "yards_per_attempt": 3.3, "sample_attempts": 100},
+            "short_0_to_9": {"epa_per_attempt": -0.07, "success_rate": 48.0, "yards_per_attempt": 5.4, "sample_attempts": 250},
+            "intermediate_10_to_19": {"epa_per_attempt": 0.25, "success_rate": 52.0, "yards_per_attempt": 8.8, "sample_attempts": 120},
+            "deep_20_plus": {"epa_per_attempt": 0.35, "success_rate": 35.0, "yards_per_attempt": 12.0, "sample_attempts": 60},
+        }
+
+    pos_targets = t_def.get("positional_targets_allowed", {})
+    if not pos_targets:
+        pos_targets = {
+            "wr": {"target_share": 60.0, "yards_per_target": 7.4, "sample_targets": 300},
+            "te": {"target_share": 22.0, "yards_per_target": 6.5, "sample_targets": 110},
+            "rb": {"target_share": 18.0, "yards_per_target": 5.1, "sample_targets": 90},
+        }
+
+    box_counts = t_def.get("box_counts", {
+        "light_box_rate": 55.0,
+        "heavy_box_rate": 8.0,
+        "ypc_vs_light_box": 4.30,
+        "ypc_vs_heavy_box": 3.10,
+        "carries_light": 150,
+        "carries_heavy": 30,
+    })
 
     return {
         "team": team,
@@ -237,8 +273,8 @@ def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_w
                         "league_median": 3.86,
                         "diff_from_median": round(inside_ypc - 3.86, 2),
                         "diff_pct": round(((inside_ypc - 3.86) / 3.86) * 100, 1),
-                        "rank": gap_rk,
-                        "rank_display": f"Rank #{gap_rk} (n={n_games} games)",
+                        "rank": inside_rk,
+                        "rank_display": f"Rank #{inside_rk} (n={n_games} games)",
                         "n_games": n_games,
                         "unit": "yards",
                     }
@@ -249,35 +285,23 @@ def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_w
                         "league_median": 4.55,
                         "diff_from_median": round(outside_ypc - 4.55, 2),
                         "diff_pct": round(((outside_ypc - 4.55) / 4.55) * 100, 1),
-                        "rank": zone_rk,
-                        "rank_display": f"Rank #{zone_rk} (n={n_games} games)",
+                        "rank": outside_rk,
+                        "rank_display": f"Rank #{outside_rk} (n={n_games} games)",
                         "n_games": n_games,
                         "unit": "yards",
                     }
                 },
             },
+            "box_counts": box_counts,
         },
         "pass_defense": {
             "overall_dropbacks": {
-                "yards_per_attempt": {
-                    "raw_value": 6.20,
-                    "league_median": 6.10,
-                    "diff_from_median": 0.10,
-                    "diff_pct": 1.6,
-                    "rank": 16,
-                    "rank_display": f"Rank #16 (n={n_games} games)",
-                    "n_games": n_games,
-                    "unit": "yards",
-                }
+                "yards_per_attempt": pass_ypa_info,
+                "pressure_no_blitz_pct": pressure_nb.get("pressure_no_blitz_pct", 24.5),
+                "blitz_pct": pressure_nb.get("blitz_pct", 26.0),
             },
-            "target_depth_allowed": {
-                "short_0_to_9": {
-                    "yards_per_attempt": {
-                        "raw_value": 5.90,
-                        "league_median": 5.85,
-                    }
-                }
-            }
+            "target_depth_allowed": pass_depth,
+            "positional_targets_allowed": pos_targets,
         }
     }
 
@@ -294,26 +318,33 @@ def build_matchup_stat_sheet(
     Contains zero projections, probabilities, or pick recommendations.
     """
     # 1. Team A (Away) Offense Tendencies & Team B (Home) Defense Vulnerabilities
-    try:
-        away_off_tendencies = compute_team_tendency_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
-    except Exception:
+    scouting = _load_32_team_scouting_data()
+    if away_team in scouting and home_team in scouting:
         away_off_tendencies = _build_fallback_tendency_profile(away_team, season=season, up_to_week=up_to_week)
-
-    try:
-        home_def_vulnerabilities = compute_opponent_vulnerability_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
-    except Exception:
         home_def_vulnerabilities = _build_fallback_vulnerability_profile(home_team, season=season, up_to_week=up_to_week)
-
-    # 2. Team B (Home) Offense Tendencies & Team A (Away) Defense Vulnerabilities
-    try:
-        home_off_tendencies = compute_team_tendency_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
-    except Exception:
         home_off_tendencies = _build_fallback_tendency_profile(home_team, season=season, up_to_week=up_to_week)
-
-    try:
-        away_def_vulnerabilities = compute_opponent_vulnerability_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
-    except Exception:
         away_def_vulnerabilities = _build_fallback_vulnerability_profile(away_team, season=season, up_to_week=up_to_week)
+    else:
+        try:
+            away_off_tendencies = compute_team_tendency_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
+        except Exception:
+            away_off_tendencies = _build_fallback_tendency_profile(away_team, season=season, up_to_week=up_to_week)
+
+        try:
+            home_def_vulnerabilities = compute_opponent_vulnerability_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
+        except Exception:
+            home_def_vulnerabilities = _build_fallback_vulnerability_profile(home_team, season=season, up_to_week=up_to_week)
+
+        # 2. Team B (Home) Offense Tendencies & Team A (Away) Defense Vulnerabilities
+        try:
+            home_off_tendencies = compute_team_tendency_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
+        except Exception:
+            home_off_tendencies = _build_fallback_tendency_profile(home_team, season=season, up_to_week=up_to_week)
+
+        try:
+            away_def_vulnerabilities = compute_opponent_vulnerability_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
+        except Exception:
+            away_def_vulnerabilities = _build_fallback_vulnerability_profile(away_team, season=season, up_to_week=up_to_week)
 
     # 3. Similar Opponent Historical Comparison
     try:

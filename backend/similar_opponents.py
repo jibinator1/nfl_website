@@ -398,10 +398,30 @@ def find_similar_opponent_games(
 
     ceiling_df = all_games_df[all_games_df["rmsd"] <= 1.50].sort_values("distance").copy()
 
-    # If fewer than 3 games remain under the ceiling, do not render a match table at all
-    if len(ceiling_df) < 3:
-        render_match_table = False
-        sorted_df = pd.DataFrame(columns=all_games_df.columns)
+    # If no games remain under the 1.50σ ceiling, fallback to the single closest match with warning
+    closest_match_fallback = False
+    if len(ceiling_df) == 0:
+        if closest_row is not None:
+            render_match_table = True
+            sorted_df = pd.DataFrame([closest_row]).copy()
+            sorted_df["similarity_rank"] = [1]
+            dist_val = float(closest_row["distance"])
+            opp_val = str(closest_row.get("opponent", "N/A"))
+            s_val = str(closest_row.get("season", ""))
+            w_val = str(closest_row.get("week", ""))
+            warning_msg = f"No strong analogs found. Closest stylistic match: {s_val} Wk {w_val} vs {opp_val} ({dist_val:.2f}σ)."
+            no_analogs_message = warning_msg
+            sample_warning = warning_msg
+            descriptive_narrative = warning_msg
+            closest_match_fallback = True
+        else:
+            render_match_table = False
+            sorted_df = pd.DataFrame(columns=all_games_df.columns)
+    elif len(ceiling_df) < 3:
+        render_match_table = True
+        no_analogs_message = ""
+        sorted_df = ceiling_df.copy()
+        sorted_df["similarity_rank"] = range(1, len(sorted_df) + 1)
     else:
         render_match_table = True
         no_analogs_message = ""
@@ -668,6 +688,7 @@ def find_similar_opponent_games(
         "target_offensive_profile": target_prof,
         "features_matched": features,
         "render_match_table": render_match_table,
+        "closest_match_fallback": closest_match_fallback,
         "no_analogs_message": no_analogs_message,
         "closest_distance": closest_distance,
         "closest_rmsd": closest_distance,

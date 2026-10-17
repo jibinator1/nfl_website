@@ -3501,52 +3501,77 @@
             const runSplits = d.run_scheme_splits || {};
             const aRun = runSplits.away_unit || {};
             const hRun = runSplits.home_unit || {};
-            const tgts = d.positional_target_rates || {};
-            const breakouts = d.efficiency_breakouts || [];
             const flow = d.game_flow_tempo || {};
             const aTempo = flow.away_tempo || {};
             const hTempo = flow.home_tempo || {};
+            const sheet = d.matchup_stat_sheet || {};
+            const awayTend = sheet.section_1_away_offense_tendencies || {};
+            const homeVuln = sheet.section_2_home_defense_vulnerabilities || {};
+            const homeTend = sheet.section_3_home_offense_tendencies || {};
+            const awayVuln = sheet.section_4_away_defense_vulnerabilities || {};
 
-            // 1. Pass Game & Coverage Tendency Takeaways
-            const hDefZone = parseFloat(aCov.def_zone_pct || 65);
-            const aDefZone = parseFloat(hCov.def_zone_pct || 65);
-            const hDefMfo = parseFloat(aCov.def_mfo_pct || 50);
-            const aDefMfo = parseFloat(hCov.def_mfo_pct || 50);
+            // 1. Pass Game & Secondary Outliers
+            const awayDefYpa = awayVuln.pass_defense?.overall_dropbacks?.yards_per_attempt;
+            const homeDefYpa = homeVuln.pass_defense?.overall_dropbacks?.yards_per_attempt;
+            const awayOffYpa = awayTend.passing_offense?.raw_value || 6.09;
+            const homeOffYpa = homeTend.passing_offense?.raw_value || 6.46;
 
             let passVerdict = '';
-            if (hDefMfo >= 50 && aDefMfo >= 50) {
-                passVerdict = `Both defenses operate primarily in Middle-Field Open (2-High) safety shells (${hDefMfo.toFixed(0)}% and ${aDefMfo.toFixed(0)}%). <span class="block mt-1 text-slate-200"><b>Situational Usage Tendency:</b> Slot receivers and tight ends find underneath space, or vertical seam routes between the two safeties.</span>`;
-            } else if (hDefZone >= 65 || aDefZone >= 65) {
-                passVerdict = `Zone coverage structures predominate in this passing matchup (${hDefZone.toFixed(0)}% and ${aDefZone.toFixed(0)}%). <span class="block mt-1 text-slate-200"><b>Situational Usage Tendency:</b> Receptions concentrate on short throws, quick option routes, and backfield checkdowns.</span>`;
+            if (awayDefYpa && awayDefYpa.rank != null && (awayDefYpa.rank <= 6 || awayDefYpa.rank >= 27)) {
+                const adj = awayDefYpa.rank <= 6 ? 'is elite against the pass' : 'concedes high efficiency through the air';
+                passVerdict = `<b>${d.away_team} Pass Defense</b> ${adj} (${parseFloat(awayDefYpa.raw_value).toFixed(2)} YPA allowed, #${awayDefYpa.rank} in NFL). ${d.home_team} Pass Offense averages ${parseFloat(homeOffYpa).toFixed(2)} YPA.`;
+            } else if (homeDefYpa && homeDefYpa.rank != null && (homeDefYpa.rank <= 6 || homeDefYpa.rank >= 27)) {
+                const adj = homeDefYpa.rank <= 6 ? 'is elite against the pass' : 'concedes high efficiency through the air';
+                passVerdict = `<b>${d.home_team} Pass Defense</b> ${adj} (${parseFloat(homeDefYpa.raw_value).toFixed(2)} YPA allowed, #${homeDefYpa.rank} in NFL). ${d.away_team} Pass Offense averages ${parseFloat(awayOffYpa).toFixed(2)} YPA.`;
+            } else if (aCov.pressure_no_blitz_pct && parseFloat(aCov.pressure_no_blitz_pct) >= 25.0) {
+                passVerdict = `<b>${d.home_team} Pass Rush</b> generates ${parseFloat(aCov.pressure_no_blitz_pct).toFixed(1)}% pressure without blitzing, allowing coverage to maintain 7 defenders in safety shells against ${d.away_team}.`;
+            } else if (hCov.pressure_no_blitz_pct && parseFloat(hCov.pressure_no_blitz_pct) >= 25.0) {
+                passVerdict = `<b>${d.away_team} Pass Rush</b> generates ${parseFloat(hCov.pressure_no_blitz_pct).toFixed(1)}% pressure without blitzing, allowing coverage to maintain 7 defenders in safety shells against ${d.home_team}.`;
             } else {
-                passVerdict = `Single-high (Middle-Field Closed) and man coverage looks predominate (${(100 - hDefMfo).toFixed(0)}% and ${(100 - aDefMfo).toFixed(0)}%). <span class="block mt-1 text-slate-200"><b>Situational Usage Tendency:</b> Outside receivers on boundary routes face single coverage where explosive yardage outpaces raw catch totals.</span>`;
+                const hDefMfo = parseFloat(aCov.def_mfo_pct || 50);
+                const aDefMfo = parseFloat(hCov.def_mfo_pct || 50);
+                if (hDefMfo >= 50 && aDefMfo >= 50) {
+                    passVerdict = `Both defenses operate primarily in Middle-Field Open (2-High) safety shells (${hDefMfo.toFixed(0)}% and ${aDefMfo.toFixed(0)}%), funneling targets underneath and to intermediate seams.`;
+                } else {
+                    passVerdict = `${d.home_team} Defense: ${hDefMfo.toFixed(0)}% MFO shells (${parseFloat(aCov.blitz_pct || 26).toFixed(0)}% blitz) vs ${d.away_team} Defense: ${aDefMfo.toFixed(0)}% MFO shells (${parseFloat(hCov.blitz_pct || 26).toFixed(0)}% blitz).`;
+                }
             }
 
-            // 2. Run Game & Trench Differential Takeaways
-            const aZonePct = parseFloat(aRun.offense_zone_pct || 50);
-            const aGapPct = parseFloat(aRun.offense_gap_pct || 50);
-            const hZonePct = parseFloat(hRun.offense_zone_pct || 50);
-            const hGapPct = parseFloat(hRun.offense_gap_pct || 50);
+            // 2. Trench & Run Game Outliers
+            const aGapRank = aRun.opp_def_gap_rank;
+            const hGapRank = hRun.opp_def_gap_rank;
+            const aGapYpc = aRun.opp_def_gap_ypc_allowed;
+            const hGapYpc = hRun.opp_def_gap_ypc_allowed;
+            const aOffGapPct = parseFloat(aRun.offense_gap_pct || 50);
+            const hOffGapPct = parseFloat(hRun.offense_gap_pct || 50);
 
-            const hAllowsGap = parseFloat(aRun.opp_def_gap_ypc_allowed || 4.3);
-            const hAllowsZone = parseFloat(aRun.opp_def_zone_ypc_allowed || 4.1);
-            const aAllowsGap = parseFloat(hRun.opp_def_gap_ypc_allowed || 4.3);
-            const aAllowsZone = parseFloat(hRun.opp_def_zone_ypc_allowed || 4.1);
+            let runVerdict = '';
+            if (aGapRank != null && (aGapRank <= 8 || aGapRank >= 25)) {
+                const adj = aGapRank <= 8 ? 'is elite against Gap runs' : 'concedes high efficiency on Gap runs';
+                runVerdict = `<b>${d.home_team} Run Defense</b> ${adj} (${parseFloat(aGapYpc).toFixed(2)} YPC, #${aGapRank} in NFL). ${d.away_team} runs Gap ${aOffGapPct.toFixed(0)}% of the time.`;
+            } else if (hGapRank != null && (hGapRank <= 8 || hGapRank >= 25)) {
+                const adj = hGapRank <= 8 ? 'is elite against Gap runs' : 'concedes high efficiency on Gap runs';
+                runVerdict = `<b>${d.away_team} Run Defense</b> ${adj} (${parseFloat(hGapYpc).toFixed(2)} YPC, #${hGapRank} in NFL). ${d.home_team} runs Gap ${hOffGapPct.toFixed(0)}% of the time.`;
+            } else {
+                runVerdict = `${d.away_team} ground split: ${aOffGapPct.toFixed(0)}% Gap / ${(100 - aOffGapPct).toFixed(0)}% Zone vs ${d.home_team} defense allowing ${parseFloat(aGapYpc || 4.2).toFixed(2)} YPC on gap runs. ${d.home_team} runs ${hOffGapPct.toFixed(0)}% Gap.`;
+            }
 
-            let runVerdict = `${d.away_team} ground split: ${(aGapPct > aZonePct ? aGapPct : aZonePct).toFixed(0)}% ${(aGapPct > aZonePct ? 'Gap' : 'Zone')} rushing vs ${d.home_team} defense allowing ${hAllowsGap.toFixed(2)} YPC on gap runs and ${hAllowsZone.toFixed(2)} YPC on zone. ${d.home_team} ground split: ${(hGapPct > hZonePct ? hGapPct : hZonePct).toFixed(0)}% ${(hGapPct > hZonePct ? 'Gap' : 'Zone')} vs ${d.away_team} defense allowing ${aAllowsGap.toFixed(2)} YPC on gap runs and ${aAllowsZone.toFixed(2)} YPC on zone.`;
-
-            // 3. Pace, Game Flow & Touch Concentration Takeaways
+            // 3. Pace, Script & Situational Outliers
+            const aTrailSplit = awayTend.game_state_splits?.trailing?.pass_rate;
+            const hTrailSplit = homeTend.game_state_splits?.trailing?.pass_rate;
             const totalPlays = Math.round((aTempo.recent_avg_plays || aTempo.proj_plays || 64) + (hTempo.recent_avg_plays || hTempo.proj_plays || 64));
             const aPaceSec = parseFloat(aTempo.neutral_pace_sec || 27.5);
             const hPaceSec = parseFloat(hTempo.neutral_pace_sec || 27.5);
 
             let paceVerdict = '';
-            if (aPaceSec < 26.5 && hPaceSec < 26.5) {
-                paceVerdict = `Fast-paced matchup environment (~${totalPlays} total combined plays/game).`;
-            } else if (aPaceSec > 29 || hPaceSec > 29) {
-                paceVerdict = `Deliberate tempo (~${totalPlays} total combined plays/game). Red zone touch leaders: ${aTempo.red_zone_touch_leader || `${d.away_team} Primary Back`} and ${hTempo.red_zone_touch_leader || `${d.home_team} Primary Back`}.`;
+            if (aTrailSplit && aTrailSplit.rank != null && (aTrailSplit.rank <= 6 || aTrailSplit.rank >= 27)) {
+                const adj = aTrailSplit.rank <= 6 ? 'is exceptionally pass-heavy when trailing' : 'stays run-committed even when trailing';
+                paceVerdict = `<b>${d.away_team} Pass Calling</b> ${adj} (${(parseFloat(aTrailSplit.raw_value) * 100).toFixed(1)}% pass rate, #${aTrailSplit.rank} in NFL). Neutral pace: ${aPaceSec.toFixed(1)}s/snap.`;
+            } else if (hTrailSplit && hTrailSplit.rank != null && (hTrailSplit.rank <= 6 || hTrailSplit.rank >= 27)) {
+                const adj = hTrailSplit.rank <= 6 ? 'is exceptionally pass-heavy when trailing' : 'stays run-committed even when trailing';
+                paceVerdict = `<b>${d.home_team} Pass Calling</b> ${adj} (${(parseFloat(hTrailSplit.raw_value) * 100).toFixed(1)}% pass rate, #${hTrailSplit.rank} in NFL). Neutral pace: ${hPaceSec.toFixed(1)}s/snap.`;
             } else {
-                paceVerdict = `Balanced tempo with a combined average of ~${totalPlays} plays per game.`;
+                paceVerdict = `Neutral pace: ${d.away_team} ${aPaceSec.toFixed(1)}s/snap vs ${d.home_team} ${hPaceSec.toFixed(1)}s/snap. Combined pace projects ~${totalPlays} total plays.`;
             }
 
             // 4. Key Matchup Splits / Personnel Insights
@@ -3701,7 +3726,9 @@
             const repeats = Object.keys(oppCounts).filter(k => oppCounts[k] > 1);
             const repeatFootnote = repeats.length > 0 ? ` (includes ${oppCounts[repeats[0]]} games vs ${repeats[0]})` : '';
 
-            if (noAnalogsMsg || games.length < 3) {
+            const isClosestFallback = !!simData.closest_match_fallback;
+
+            if (games.length === 0) {
                 const fallbackMsg = noAnalogsMsg || (closestRmsd != null
                     ? `No analogs found within 1.50σ. Closest match: ${closestRmsd.toFixed(2)}σ, above ceiling.`
                     : `No analogs found within 1.50σ.`);
@@ -3725,12 +3752,15 @@
                             <h4 class="text-xs font-bold text-slate-100 font-mono">${defTeam} Defense vs Opponents Similar to ${oppTeam}</h4>
                             <span class="text-[10px] text-slate-400 font-mono">Historical performance against matching offensive run/pass stylistic profiles</span>
                         </div>
-                        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">Top ${nTotalGames} Games (${nStrongGames} Strong Matches)</span>
+                        ${isClosestFallback 
+                            ? `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-700/60 font-semibold">Closest Match Fallback (n=1)</span>`
+                            : `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">Top ${nTotalGames} Games (${nStrongGames} Strong Matches)</span>`
+                        }
                     </div>
 
-                    ${sampleWarning ? `
-                        <div class="bg-slate-800/40 border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-slate-300 leading-relaxed font-sans">
-                            <span class="font-bold text-slate-200">Sample Context:</span> ${sampleWarning}
+                    ${(isClosestFallback || sampleWarning) ? `
+                        <div class="${isClosestFallback ? 'bg-amber-950/30 border border-amber-700/50 text-amber-200' : 'bg-slate-800/40 border border-slate-700/60 text-slate-300'} rounded-lg p-2.5 text-[11px] leading-relaxed font-sans">
+                            <span class="font-bold ${isClosestFallback ? 'text-amber-300' : 'text-slate-200'}">${isClosestFallback ? 'Notice:' : 'Sample Context:'}</span> ${sampleWarning || noAnalogsMsg}
                             ${h2hDisclaimer ? `<span class="block mt-1 text-slate-400 text-[10.5px]">${h2hDisclaimer}</span>` : ''}
                         </div>
                     ` : ''}
@@ -4326,19 +4356,19 @@ function renderSchemeInsights(d) {
                         ${renderComparisonCard(
                             `${d.away_team} Pass Offense vs ${d.home_team} Pass Defense Allowed`,
                             `${d.away_team} Pass Offense`,
-                            (awayTend.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || awayTend.pass_defense?.short_ypp?.league_median || 6.8),
+                            (awayTend.passing_offense?.raw_value || awayTend.passing_offense?.yards_per_attempt?.raw_value || 6.09),
                             `${d.home_team} Def Allowed`,
-                            (homeVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || homeVuln.pass_defense?.target_depth_allowed?.short_0_to_9?.yards_per_attempt?.raw_value || 6.6),
-                            (homeVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.league_median || 6.1),
+                            (homeVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || 5.92),
+                            (homeVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.league_median || 6.14),
                             'YPA'
                         )}
                         ${renderComparisonCard(
                             `${d.home_team} Pass Offense vs ${d.away_team} Pass Defense Allowed`,
                             `${d.home_team} Pass Offense`,
-                            (homeTend.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || homeTend.pass_defense?.short_ypp?.league_median || 6.8),
+                            (homeTend.passing_offense?.raw_value || homeTend.passing_offense?.yards_per_attempt?.raw_value || 6.46),
                             `${d.away_team} Def Allowed`,
-                            (awayVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || awayVuln.pass_defense?.target_depth_allowed?.short_0_to_9?.yards_per_attempt?.raw_value || 6.6),
-                            (awayVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.league_median || 6.1),
+                            (awayVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.raw_value || 5.33),
+                            (awayVuln.pass_defense?.overall_dropbacks?.yards_per_attempt?.league_median || 6.14),
                             'YPA'
                         )}
                     </div>
@@ -4349,7 +4379,7 @@ function renderSchemeInsights(d) {
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.away_team} Offense vs ${d.home_team} Defense</span>
-                                <span class="text-[10px] font-mono text-slate-400">Blitz: ${fmtPct(aCov.blitz_pct || 28)}</span>
+                                <span class="text-[10px] font-mono text-slate-400">Blitz: ${fmtPct(aCov.blitz_pct || 26)} · Press (No Blitz): ${fmtPct(aCov.pressure_no_blitz_pct || 24.5)}</span>
                             </div>
 
                             <!-- Zone vs Man Bar -->
@@ -4376,8 +4406,8 @@ function renderSchemeInsights(d) {
                                 </div>
                             </div>
 
-                            <!-- 6-Shells Distribution Grid -->
-                            <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono pt-1">
+                            <!-- 8-Shells & Pressure Grid -->
+                            <div class="grid grid-cols-4 gap-1.5 text-[11px] font-mono pt-1">
                                 <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
                                     <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 1', 'Cover 1', 'left')}</span>
                                     <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 1 (Man)'] || 22)}</b>
@@ -4399,17 +4429,94 @@ function renderSchemeInsights(d) {
                                     <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 6 Split (MFO)'] || 12)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'right')}</span>
-                                    <b class="text-slate-200">${fmtPct(aCov.blitz_pct || 28)}</b>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 0', 'Cover 0', 'right')}</span>
+                                    <b class="text-slate-200">${fmtPct(aCov.shells?.['Cover 0 Blitz'] || 4)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'left')}</span>
+                                    <b class="text-slate-200">${fmtPct(aCov.blitz_pct || 26)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Pressure (No Blitz)', 'Press (No Blitz)', 'right')}</span>
+                                    <b class="text-slate-200">${fmtPct(aCov.pressure_no_blitz_pct || 24.5)}</b>
                                 </div>
                             </div>
+
+                            <!-- Pass Depth Allowed -->
+                            ${(() => {
+                                const pDepth = aCov.pass_depth_allowed || homeVuln.pass_defense?.target_depth_allowed || {};
+                                const bLos = pDepth.behind_los || {};
+                                const sh = pDepth.short || pDepth.short_0_to_9 || {};
+                                const inter = pDepth.intermediate || pDepth.intermediate_10_to_19 || {};
+                                const dp = pDepth.deep || pDepth.deep_20_plus || {};
+                                return `
+                                    <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
+                                        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                            <span class="font-bold text-slate-300 uppercase">${d.home_team} Pass Depth Defense Allowed</span>
+                                            <span>EPA · Success%</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10.5px] font-mono text-center">
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Behind LOS (&lt;0)</span>
+                                                <b class="text-slate-200">${fmtSigned(bLos.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(bLos.success_rate)} Succ</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Short (0–9)</span>
+                                                <b class="text-slate-200">${fmtSigned(sh.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(sh.success_rate)} Succ</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Int (10–19)</span>
+                                                <b class="text-slate-200">${fmtSigned(inter.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(inter.success_rate)} Succ</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Deep (20+)</span>
+                                                <b class="text-slate-200">${fmtSigned(dp.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(dp.success_rate)} Succ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
+
+                            <!-- Positional Targets Allowed -->
+                            ${(() => {
+                                const posT = aCov.positional_targets_allowed || homeVuln.pass_defense?.positional_targets_allowed || {};
+                                return `
+                                    <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
+                                        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                            <span class="font-bold text-slate-300 uppercase">${d.home_team} Targets Allowed by Position</span>
+                                            <span>Share% · YPT</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-1.5 text-[10.5px] font-mono text-center">
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">WR Allowed</span>
+                                                <b class="text-slate-200">${fmtPct(posT.wr?.target_share)}</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.wr?.yards_per_target)} YPT</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">TE Allowed</span>
+                                                <b class="text-slate-200">${fmtPct(posT.te?.target_share)}</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.te?.yards_per_target)} YPT</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">RB Allowed</span>
+                                                <b class="text-slate-200">${fmtPct(posT.rb?.target_share)}</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.rb?.yards_per_target)} YPT</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
                         </div>
 
                         <!-- Home Offense vs Away Defense -->
                         <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-200 font-mono">${d.home_team} Offense vs ${d.away_team} Defense</span>
-                                <span class="text-[10px] font-mono text-slate-400">Blitz: ${fmtPct(hCov.blitz_pct || 28)}</span>
+                                <span class="text-[10px] font-mono text-slate-400">Blitz: ${fmtPct(hCov.blitz_pct || 26)} · Press (No Blitz): ${fmtPct(hCov.pressure_no_blitz_pct || 24.5)}</span>
                             </div>
 
                             <!-- Zone vs Man Bar -->
@@ -4436,8 +4543,8 @@ function renderSchemeInsights(d) {
                                 </div>
                             </div>
 
-                            <!-- 6-Shells Distribution Grid -->
-                            <div class="grid grid-cols-3 gap-1.5 text-[11px] font-mono pt-1">
+                            <!-- 8-Shells & Pressure Grid -->
+                            <div class="grid grid-cols-4 gap-1.5 text-[11px] font-mono pt-1">
                                 <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
                                     <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 1', 'Cover 1', 'left')}</span>
                                     <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 1 (Man)'] || 22)}</b>
@@ -4459,10 +4566,87 @@ function renderSchemeInsights(d) {
                                     <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 6 Split (MFO)'] || 12)}</b>
                                 </div>
                                 <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
-                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'right')}</span>
-                                    <b class="text-slate-200">${fmtPct(hCov.blitz_pct || 28)}</b>
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Cover 0', 'Cover 0', 'right')}</span>
+                                    <b class="text-slate-200">${fmtPct(hCov.shells?.['Cover 0 Blitz'] || 4)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Blitz %', 'Blitz %', 'left')}</span>
+                                    <b class="text-slate-200">${fmtPct(hCov.blitz_pct || 26)}</b>
+                                </div>
+                                <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] text-center">
+                                    <span class="text-slate-400 block text-[9px] mb-0.5">${renderSchemeTip('Pressure (No Blitz)', 'Press (No Blitz)', 'right')}</span>
+                                    <b class="text-slate-200">${fmtPct(hCov.pressure_no_blitz_pct || 24.5)}</b>
                                 </div>
                             </div>
+
+                            <!-- Pass Depth Allowed -->
+                            ${(() => {
+                                const pDepth = hCov.pass_depth_allowed || awayVuln.pass_defense?.target_depth_allowed || {};
+                                const bLos = pDepth.behind_los || {};
+                                const sh = pDepth.short || pDepth.short_0_to_9 || {};
+                                const inter = pDepth.intermediate || pDepth.intermediate_10_to_19 || {};
+                                const dp = pDepth.deep || pDepth.deep_20_plus || {};
+                                return `
+                                    <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
+                                        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                            <span class="font-bold text-slate-300 uppercase">${d.away_team} Pass Depth Defense Allowed</span>
+                                            <span>EPA · Success%</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-[10.5px] font-mono text-center">
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Behind LOS (&lt;0)</span>
+                                                <b class="text-slate-200">${fmtSigned(bLos.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(bLos.success_rate)} Succ</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Short (0–9)</span>
+                                                <b class="text-slate-200">${fmtSigned(sh.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(sh.success_rate)} Succ</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Int (10–19)</span>
+                                                <b class="text-slate-200">${fmtSigned(inter.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(inter.success_rate)} Succ</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">Deep (20+)</span>
+                                                <b class="text-slate-200">${fmtSigned(dp.epa_per_attempt)} EPA</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtPct(dp.success_rate)} Succ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
+
+                            <!-- Positional Targets Allowed -->
+                            ${(() => {
+                                const posT = hCov.positional_targets_allowed || awayVuln.pass_defense?.positional_targets_allowed || {};
+                                return `
+                                    <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
+                                        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                            <span class="font-bold text-slate-300 uppercase">${d.away_team} Targets Allowed by Position</span>
+                                            <span>Share% · YPT</span>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-1.5 text-[10.5px] font-mono text-center">
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">WR Allowed</span>
+                                                <b class="text-slate-200">${fmtPct(posT.wr?.target_share)}</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.wr?.yards_per_target)} YPT</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">TE Allowed</span>
+                                                <b class="text-slate-200">${fmtPct(posT.te?.target_share)}</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.te?.yards_per_target)} YPT</span>
+                                            </div>
+                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
+                                                <span class="text-slate-400 block text-[9px] mb-0.5">RB Allowed</span>
+                                                <b class="text-slate-200">${fmtPct(posT.rb?.target_share)}</b>
+                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.rb?.yards_per_target)} YPT</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
                         </div>
                     </div>
 
@@ -4585,6 +4769,50 @@ function renderSchemeInsights(d) {
                                     ${renderStatCmp(homeVuln.rush_defense?.directional_gaps?.outside_tackles?.yards_per_carry, ' YPC')}
                                 </div>
                             </div>
+
+                            <!-- Box Counts & Resistance -->
+                            ${(() => {
+                                const dBox = aRun.opp_box_counts || homeVuln.rush_defense?.box_counts || {};
+                                const oBox = aRun.team_box_counts || awayTend.box_counts || {};
+                                return `
+                                    <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
+                                        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                            <span class="font-bold text-slate-300 uppercase">${d.home_team} Box Counts &amp; Resistance</span>
+                                            <span>Light (≤6) vs Heavy (≥8)</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                                            <div class="bg-[#161b22] p-2 rounded border border-[#21262d] space-y-1">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-slate-400 text-[9.5px]">Light Box (≤6):</span>
+                                                    <b class="text-slate-200">${fmtPct(dBox.light_box_rate)}</b>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">Def Allowed:</span>
+                                                    <span class="text-slate-200 font-bold">${fmtDec(dBox.ypc_vs_light_box)} YPC</span>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">${d.away_team} Offense:</span>
+                                                    <span class="text-slate-300">${fmtDec(oBox.rush_ypc_vs_light_box)} YPC</span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-[#161b22] p-2 rounded border border-[#21262d] space-y-1">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-slate-400 text-[9.5px]">Heavy Box (≥8):</span>
+                                                    <b class="text-slate-200">${fmtPct(dBox.heavy_box_rate)}</b>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">Def Allowed:</span>
+                                                    <span class="text-slate-200 font-bold">${fmtDec(dBox.ypc_vs_heavy_box)} YPC</span>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">${d.away_team} Offense:</span>
+                                                    <span class="text-slate-300">${fmtDec(oBox.rush_ypc_vs_heavy_box)} YPC</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
                         </div>
 
                         <!-- Home Rushing Attack -->
@@ -4630,6 +4858,50 @@ function renderSchemeInsights(d) {
                                     ${renderStatCmp(awayVuln.rush_defense?.directional_gaps?.outside_tackles?.yards_per_carry, ' YPC')}
                                 </div>
                             </div>
+
+                            <!-- Box Counts & Resistance -->
+                            ${(() => {
+                                const dBox = hRun.opp_box_counts || awayVuln.rush_defense?.box_counts || {};
+                                const oBox = hRun.team_box_counts || homeTend.box_counts || {};
+                                return `
+                                    <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
+                                        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+                                            <span class="font-bold text-slate-300 uppercase">${d.away_team} Box Counts &amp; Resistance</span>
+                                            <span>Light (≤6) vs Heavy (≥8)</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                                            <div class="bg-[#161b22] p-2 rounded border border-[#21262d] space-y-1">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-slate-400 text-[9.5px]">Light Box (≤6):</span>
+                                                    <b class="text-slate-200">${fmtPct(dBox.light_box_rate)}</b>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">Def Allowed:</span>
+                                                    <span class="text-slate-200 font-bold">${fmtDec(dBox.ypc_vs_light_box)} YPC</span>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">${d.home_team} Offense:</span>
+                                                    <span class="text-slate-300">${fmtDec(oBox.rush_ypc_vs_light_box)} YPC</span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-[#161b22] p-2 rounded border border-[#21262d] space-y-1">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-slate-400 text-[9.5px]">Heavy Box (≥8):</span>
+                                                    <b class="text-slate-200">${fmtPct(dBox.heavy_box_rate)}</b>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">Def Allowed:</span>
+                                                    <span class="text-slate-200 font-bold">${fmtDec(dBox.ypc_vs_heavy_box)} YPC</span>
+                                                </div>
+                                                <div class="flex justify-between items-center text-[10px]">
+                                                    <span class="text-slate-400">${d.home_team} Offense:</span>
+                                                    <span class="text-slate-300">${fmtDec(oBox.rush_ypc_vs_heavy_box)} YPC</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
                         </div>
                     </div>
                 </div>
@@ -4883,8 +5155,20 @@ function renderSchemeInsights(d) {
                         def_man_pct: hMan,
                         def_mfo_pct: hMfo,
                         def_mfc_pct: hMfc,
-                        shells: { "Cover 1 (Man)": hMan > 40 ? 38 : 22, "Cover 2 (MFO)": 18, "Cover 3 (MFC)": hMfc > 50 ? 38 : 26, "Cover 4 Quarters (MFO)": hMfo > 50 ? 32 : 18, "Cover 6 Split (MFO)": 10 },
+                        shells: { "Cover 1 (Man)": hMan > 40 ? 38 : 22, "Cover 2 (MFO)": 18, "Cover 3 (MFC)": hMfc > 50 ? 38 : 26, "Cover 4 Quarters (MFO)": hMfo > 50 ? 32 : 18, "Cover 6 Split (MFO)": 10, "Cover 0 Blitz": 4 },
                         blitz_pct: 26,
+                        pressure_no_blitz_pct: 24.5,
+                        pass_depth_allowed: {
+                            behind_los: { epa_per_attempt: -0.34, success_rate: 31.5, yards_per_attempt: 3.41 },
+                            short: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47 },
+                            intermediate: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27 },
+                            deep: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33 }
+                        },
+                        positional_targets_allowed: {
+                            wr: { target_share: 60.0, yards_per_target: 7.33 },
+                            te: { target_share: 22.7, yards_per_target: 6.65 },
+                            rb: { target_share: 17.3, yards_per_target: 5.26 }
+                        },
                         vulnerability_note: `${h}'s defense aligns in 2 deep safeties, with historical intermediate target distribution.`,
                         offense_exploit: `${a} targets inside passes and seam concepts.`
                     },
@@ -4895,8 +5179,20 @@ function renderSchemeInsights(d) {
                         def_man_pct: aMan,
                         def_mfo_pct: aMfo,
                         def_mfc_pct: aMfc,
-                        shells: { "Cover 1 (Man)": aMan > 40 ? 38 : 22, "Cover 2 (MFO)": 16, "Cover 3 (MFC)": aMfc > 50 ? 38 : 26, "Cover 4 Quarters (MFO)": aMfo > 50 ? 32 : 18, "Cover 6 Split (MFO)": 10 },
+                        shells: { "Cover 1 (Man)": aMan > 40 ? 38 : 22, "Cover 2 (MFO)": 16, "Cover 3 (MFC)": aMfc > 50 ? 38 : 26, "Cover 4 Quarters (MFO)": aMfo > 50 ? 32 : 18, "Cover 6 Split (MFO)": 10, "Cover 0 Blitz": 4 },
                         blitz_pct: 27,
+                        pressure_no_blitz_pct: 24.5,
+                        pass_depth_allowed: {
+                            behind_los: { epa_per_attempt: -0.38, success_rate: 29.5, yards_per_attempt: 3.25 },
+                            short: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20 },
+                            intermediate: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10 },
+                            deep: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90 }
+                        },
+                        positional_targets_allowed: {
+                            wr: { target_share: 58.5, yards_per_target: 7.10 },
+                            te: { target_share: 21.5, yards_per_target: 6.40 },
+                            rb: { target_share: 20.0, yards_per_target: 5.05 }
+                        },
                         vulnerability_note: `${a}'s defense aligns in 2 deep safeties, with historical intermediate target distribution.`,
                         offense_exploit: `${h} targets inside passes and seam concepts.`
                     }
@@ -4914,6 +5210,16 @@ function renderSchemeInsights(d) {
                         opp_def_gap_ypc_allowed: hOppDefGapYpc,
                         opp_def_gap_rank: hGames < 6 ? null : hOppDefGapRank,
                         opp_def_gap_rank_display: formatDefRank(hOppDefGapYpc, hOppDefGapRank, hGames),
+                        opp_box_counts: {
+                            light_box_rate: 58.5,
+                            heavy_box_rate: 7.5,
+                            ypc_vs_light_box: parseFloat((hOppDefGapYpc * 1.02).toFixed(2)),
+                            ypc_vs_heavy_box: parseFloat((hOppDefGapYpc * 0.72).toFixed(2))
+                        },
+                        team_box_counts: {
+                            rush_ypc_vs_light_box: 4.45,
+                            rush_ypc_vs_heavy_box: 2.85
+                        },
                         comparison_summary: `${a} Gap: 4.20 YPC (n=${aGames} games) vs ${h} Allowed: ${hOppDefGapYpc.toFixed(2)} YPC (n=${hGames} games). League median: 4.12 YPC.`,
                         alignment_diagnostic: `${a} Gap: 4.20 YPC (n=${aGames} games) vs ${h} Allowed: ${hOppDefGapYpc.toFixed(2)} YPC (n=${hGames} games). League median: 4.12 YPC.`
                     },
@@ -4929,6 +5235,16 @@ function renderSchemeInsights(d) {
                         opp_def_gap_ypc_allowed: aOppDefGapYpc,
                         opp_def_gap_rank: aGames < 6 ? null : aOppDefGapRank,
                         opp_def_gap_rank_display: formatDefRank(aOppDefGapYpc, aOppDefGapRank, aGames),
+                        opp_box_counts: {
+                            light_box_rate: 53.2,
+                            heavy_box_rate: 9.5,
+                            ypc_vs_light_box: parseFloat((aOppDefGapYpc * 0.98).toFixed(2)),
+                            ypc_vs_heavy_box: parseFloat((aOppDefGapYpc * 0.68).toFixed(2))
+                        },
+                        team_box_counts: {
+                            rush_ypc_vs_light_box: 4.40,
+                            rush_ypc_vs_heavy_box: 2.75
+                        },
                         comparison_summary: `${h} Zone: 4.10 YPC (n=${hGames} games) vs ${a} Allowed: ${(aOppDefGapYpc * 1.02).toFixed(2)} YPC (n=${aGames} games). League median: 4.12 YPC.`,
                         alignment_diagnostic: `${h} Zone: 4.10 YPC (n=${hGames} games) vs ${a} Allowed: ${(aOppDefGapYpc * 1.02).toFixed(2)} YPC (n=${aGames} games). League median: 4.12 YPC.`
                     }
@@ -5082,6 +5398,15 @@ function renderSchemeInsights(d) {
                     section_1_away_offense_tendencies: {
                         team: a,
                         n_games: aGames,
+                        passing_offense: {
+                            raw_value: parseFloat((6.1 + ((seed % 5) * 0.15)).toFixed(2)),
+                            league_median: 6.03,
+                            rank: 10 + (seed % 10)
+                        },
+                        box_counts: {
+                            rush_ypc_vs_light_box: 4.45,
+                            rush_ypc_vs_heavy_box: 2.85
+                        },
                         game_state_splits: {
                             leading: {
                                 pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: 10 + (seed % 10), n_games: aGames, rank_display: `Rank #${10 + (seed % 10)} (n=${aGames}g)` }
@@ -5105,22 +5430,43 @@ function renderSchemeInsights(d) {
                                 outside_tackles: {
                                     yards_per_carry: { raw_value: parseFloat((hOppDefGapYpc * 1.05).toFixed(2)), league_median: 4.55, diff_from_median: -0.05, diff_pct: -1.2, rank: hOppDefGapRank, n_games: hGames, rank_display: formatDefRank(hOppDefGapYpc * 1.05, hOppDefGapRank, hGames) }
                                 }
+                            },
+                            box_counts: {
+                                light_box_rate: 58.5,
+                                heavy_box_rate: 7.5,
+                                ypc_vs_light_box: parseFloat((hOppDefGapYpc * 1.02).toFixed(2)),
+                                ypc_vs_heavy_box: parseFloat((hOppDefGapYpc * 0.72).toFixed(2))
                             }
                         },
                         pass_defense: {
                             overall_dropbacks: {
-                                yards_per_attempt: { raw_value: 6.1, league_median: 6.1 }
+                                yards_per_attempt: { raw_value: 5.92, league_median: 6.14, rank: 14 }
                             },
                             target_depth_allowed: {
-                                short_0_to_9: {
-                                    yards_per_attempt: { raw_value: 6.2, league_median: 5.85 }
-                                }
+                                behind_los: { epa_per_attempt: -0.34, success_rate: 31.5, yards_per_attempt: 3.41 },
+                                short_0_to_9: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47 },
+                                intermediate_10_to_19: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27 },
+                                deep_20_plus: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33 }
+                            },
+                            positional_targets_allowed: {
+                                wr: { target_share: 60.0, yards_per_target: 7.33 },
+                                te: { target_share: 22.7, yards_per_target: 6.65 },
+                                rb: { target_share: 17.3, yards_per_target: 5.26 }
                             }
                         }
                     },
                     section_3_home_offense_tendencies: {
                         team: h,
                         n_games: hGames,
+                        passing_offense: {
+                            raw_value: parseFloat((6.3 + (((seed * 2) % 5) * 0.15)).toFixed(2)),
+                            league_median: 6.03,
+                            rank: 8 + ((seed * 2) % 10)
+                        },
+                        box_counts: {
+                            rush_ypc_vs_light_box: 4.40,
+                            rush_ypc_vs_heavy_box: 2.75
+                        },
                         game_state_splits: {
                             leading: {
                                 pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: 11 + ((seed * 2) % 10), n_games: hGames, rank_display: `Rank #${11 + ((seed * 2) % 10)} (n=${hGames}g)` }
@@ -5144,16 +5490,28 @@ function renderSchemeInsights(d) {
                                 outside_tackles: {
                                     yards_per_carry: { raw_value: parseFloat((aOppDefGapYpc * 1.05).toFixed(2)), league_median: 4.55, diff_from_median: -0.05, diff_pct: -1.2, rank: aOppDefGapRank, n_games: aGames, rank_display: formatDefRank(aOppDefGapYpc * 1.05, aOppDefGapRank, aGames) }
                                 }
+                            },
+                            box_counts: {
+                                light_box_rate: 53.2,
+                                heavy_box_rate: 9.5,
+                                ypc_vs_light_box: parseFloat((aOppDefGapYpc * 0.98).toFixed(2)),
+                                ypc_vs_heavy_box: parseFloat((aOppDefGapYpc * 0.68).toFixed(2))
                             }
                         },
                         pass_defense: {
                             overall_dropbacks: {
-                                yards_per_attempt: { raw_value: 6.3, league_median: 6.1 }
+                                yards_per_attempt: { raw_value: 5.33, league_median: 6.14, rank: 3 }
                             },
                             target_depth_allowed: {
-                                short_0_to_9: {
-                                    yards_per_attempt: { raw_value: 6.1, league_median: 5.85 }
-                                }
+                                behind_los: { epa_per_attempt: -0.38, success_rate: 29.5, yards_per_attempt: 3.25 },
+                                short_0_to_9: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20 },
+                                intermediate_10_to_19: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10 },
+                                deep_20_plus: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90 }
+                            },
+                            positional_targets_allowed: {
+                                wr: { target_share: 58.5, yards_per_target: 7.10 },
+                                te: { target_share: 21.5, yards_per_target: 6.40 },
+                                rb: { target_share: 20.0, yards_per_target: 5.05 }
                             }
                         }
                     },
