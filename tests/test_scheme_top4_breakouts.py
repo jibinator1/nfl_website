@@ -87,10 +87,10 @@ def test_jax_engram_and_washington():
     assert 'E.Engram' not in jax_players
     
     # Parker Washington is JAX WR1 and appears in JAX breakouts
-    assert 'P.Washington' in jax_players
+    assert 'Parker Washington' in jax_players
     
     # Brenton Strange is JAX TE1
-    assert 'B.Strange' in jax_players
+    assert 'Brenton Strange' in jax_players
 
 def test_den_engram():
     from backend.scheme_insights import get_team_scheme_profile
