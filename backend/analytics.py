@@ -434,7 +434,7 @@ def compute_team_stat_overview(weekly_df, schedules_df, season=None, start_date=
         df = df.merge(sit_features, on='team', how='left')
 
     df['games_played'] = df['games_played'].fillna(df['team'].map(team_games)).fillna(1)
-    df = df.fillna(0)
+    df = df.fillna(0).copy()
 
     # Per Game & Efficiency Metrics
     df['pts_per_game'] = (df['total_pts'] / df['games_played']).round(1)
