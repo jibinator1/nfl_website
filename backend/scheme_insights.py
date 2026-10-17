@@ -986,8 +986,13 @@ def compute_scheme_insights(
             if a_team in ctx['team_situational']:
                 a_profile['tempo_situational'] = ctx['team_situational'][a_team]
 
-        sample_label = ctx['sample_label']
-        is_custom_date = ctx['is_custom_date']
+    scouting_32 = _load_32_team_scouting_data()
+    h_scout_def = scouting_32.get(h_team, {}).get('defense', {})
+    a_scout_def = scouting_32.get(a_team, {}).get('defense', {})
+    if h_games == 0:
+        h_games = scouting_32.get(h_team, {}).get('n_games', 22 if season >= 2026 else 17)
+    if a_games == 0:
+        a_games = scouting_32.get(a_team, {}).get('n_games', 22 if season >= 2026 else 17)
 
     sample_window = {
         'season': season,
@@ -1009,9 +1014,6 @@ def compute_scheme_insights(
         f"{h_team} Defense: {h_cov['mfo_pct']:.1f}% Middle-Field Open (MFO), "
         f"{h_cov['zone_pct']:.1f}% Zone, {h_cov['man_pct']:.1f}% Man (n={h_games} games)."
     )
-    scouting_32 = _load_32_team_scouting_data()
-    h_scout_def = scouting_32.get(h_team, {}).get('defense', {})
-    a_scout_def = scouting_32.get(a_team, {}).get('defense', {})
     h_pnb = h_scout_def.get('pressure_without_blitz', {}).get('pressure_no_blitz_pct', 24.5)
     a_pnb = a_scout_def.get('pressure_without_blitz', {}).get('pressure_no_blitz_pct', 24.5)
     h_blitz = h_scout_def.get('pressure_without_blitz', {}).get('blitz_pct', h_cov.get('blitz_pct', 26.0))

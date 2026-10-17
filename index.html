@@ -3518,15 +3518,13 @@
 
             let passVerdict = '';
             if (awayDefYpa && awayDefYpa.rank != null && (awayDefYpa.rank <= 6 || awayDefYpa.rank >= 27)) {
-                const adj = awayDefYpa.rank <= 6 ? 'is elite against the pass' : 'concedes high efficiency through the air';
-                passVerdict = `<b>${d.away_team} Pass Defense</b> ${adj} (${parseFloat(awayDefYpa.raw_value).toFixed(2)} YPA allowed, #${awayDefYpa.rank} in NFL). ${d.home_team} Pass Offense averages ${parseFloat(homeOffYpa).toFixed(2)} YPA.`;
+                passVerdict = `<b>${d.away_team} Pass Defense</b> ranks #${awayDefYpa.rank} in the NFL allowing ${parseFloat(awayDefYpa.raw_value).toFixed(2)} YPA. ${d.home_team} Pass Offense averages ${parseFloat(homeOffYpa).toFixed(2)} YPA.`;
             } else if (homeDefYpa && homeDefYpa.rank != null && (homeDefYpa.rank <= 6 || homeDefYpa.rank >= 27)) {
-                const adj = homeDefYpa.rank <= 6 ? 'is elite against the pass' : 'concedes high efficiency through the air';
-                passVerdict = `<b>${d.home_team} Pass Defense</b> ${adj} (${parseFloat(homeDefYpa.raw_value).toFixed(2)} YPA allowed, #${homeDefYpa.rank} in NFL). ${d.away_team} Pass Offense averages ${parseFloat(awayOffYpa).toFixed(2)} YPA.`;
+                passVerdict = `<b>${d.home_team} Pass Defense</b> ranks #${homeDefYpa.rank} in the NFL allowing ${parseFloat(homeDefYpa.raw_value).toFixed(2)} YPA. ${d.away_team} Pass Offense averages ${parseFloat(awayOffYpa).toFixed(2)} YPA.`;
             } else if (aCov.pressure_no_blitz_pct && parseFloat(aCov.pressure_no_blitz_pct) >= 25.0) {
-                passVerdict = `<b>${d.home_team} Pass Rush</b> generates ${parseFloat(aCov.pressure_no_blitz_pct).toFixed(1)}% pressure without blitzing, allowing coverage to maintain 7 defenders in safety shells against ${d.away_team}.`;
+                passVerdict = `<b>${d.home_team} Pass Rush</b> generates ${parseFloat(aCov.pressure_no_blitz_pct).toFixed(1)}% pressure without blitzing, defending with 7 in coverage against ${d.away_team}.`;
             } else if (hCov.pressure_no_blitz_pct && parseFloat(hCov.pressure_no_blitz_pct) >= 25.0) {
-                passVerdict = `<b>${d.away_team} Pass Rush</b> generates ${parseFloat(hCov.pressure_no_blitz_pct).toFixed(1)}% pressure without blitzing, allowing coverage to maintain 7 defenders in safety shells against ${d.home_team}.`;
+                passVerdict = `<b>${d.away_team} Pass Rush</b> generates ${parseFloat(hCov.pressure_no_blitz_pct).toFixed(1)}% pressure without blitzing, defending with 7 in coverage against ${d.home_team}.`;
             } else {
                 const hDefMfo = parseFloat(aCov.def_mfo_pct || 50);
                 const aDefMfo = parseFloat(hCov.def_mfo_pct || 50);
@@ -3547,11 +3545,9 @@
 
             let runVerdict = '';
             if (aGapRank != null && (aGapRank <= 8 || aGapRank >= 25)) {
-                const adj = aGapRank <= 8 ? 'is elite against Gap runs' : 'concedes high efficiency on Gap runs';
-                runVerdict = `<b>${d.home_team} Run Defense</b> ${adj} (${parseFloat(aGapYpc).toFixed(2)} YPC, #${aGapRank} in NFL). ${d.away_team} runs Gap ${aOffGapPct.toFixed(0)}% of the time.`;
+                runVerdict = `<b>${d.home_team} Run Defense</b> ranks #${aGapRank} in the NFL allowing ${parseFloat(aGapYpc).toFixed(2)} YPC on Gap runs. ${d.away_team} runs Gap ${aOffGapPct.toFixed(0)}% of the time.`;
             } else if (hGapRank != null && (hGapRank <= 8 || hGapRank >= 25)) {
-                const adj = hGapRank <= 8 ? 'is elite against Gap runs' : 'concedes high efficiency on Gap runs';
-                runVerdict = `<b>${d.away_team} Run Defense</b> ${adj} (${parseFloat(hGapYpc).toFixed(2)} YPC, #${hGapRank} in NFL). ${d.home_team} runs Gap ${hOffGapPct.toFixed(0)}% of the time.`;
+                runVerdict = `<b>${d.away_team} Run Defense</b> ranks #${hGapRank} in the NFL allowing ${parseFloat(hGapYpc).toFixed(2)} YPC on Gap runs. ${d.home_team} runs Gap ${hOffGapPct.toFixed(0)}% of the time.`;
             } else {
                 runVerdict = `${d.away_team} ground split: ${aOffGapPct.toFixed(0)}% Gap / ${(100 - aOffGapPct).toFixed(0)}% Zone vs ${d.home_team} defense allowing ${parseFloat(aGapYpc || 4.2).toFixed(2)} YPC on gap runs. ${d.home_team} runs ${hOffGapPct.toFixed(0)}% Gap.`;
             }
@@ -3565,11 +3561,9 @@
 
             let paceVerdict = '';
             if (aTrailSplit && aTrailSplit.rank != null && (aTrailSplit.rank <= 6 || aTrailSplit.rank >= 27)) {
-                const adj = aTrailSplit.rank <= 6 ? 'is exceptionally pass-heavy when trailing' : 'stays run-committed even when trailing';
-                paceVerdict = `<b>${d.away_team} Pass Calling</b> ${adj} (${(parseFloat(aTrailSplit.raw_value) * 100).toFixed(1)}% pass rate, #${aTrailSplit.rank} in NFL). Neutral pace: ${aPaceSec.toFixed(1)}s/snap.`;
+                paceVerdict = `<b>${d.away_team} Pass Calling</b> ranks #${aTrailSplit.rank} in the NFL with a ${(parseFloat(aTrailSplit.raw_value) * 100).toFixed(1)}% pass rate when trailing. Neutral pace: ${aPaceSec.toFixed(1)}s/snap.`;
             } else if (hTrailSplit && hTrailSplit.rank != null && (hTrailSplit.rank <= 6 || hTrailSplit.rank >= 27)) {
-                const adj = hTrailSplit.rank <= 6 ? 'is exceptionally pass-heavy when trailing' : 'stays run-committed even when trailing';
-                paceVerdict = `<b>${d.home_team} Pass Calling</b> ${adj} (${(parseFloat(hTrailSplit.raw_value) * 100).toFixed(1)}% pass rate, #${hTrailSplit.rank} in NFL). Neutral pace: ${hPaceSec.toFixed(1)}s/snap.`;
+                paceVerdict = `<b>${d.home_team} Pass Calling</b> ranks #${hTrailSplit.rank} in the NFL with a ${(parseFloat(hTrailSplit.raw_value) * 100).toFixed(1)}% pass rate when trailing. Neutral pace: ${hPaceSec.toFixed(1)}s/snap.`;
             } else {
                 paceVerdict = `Neutral pace: ${d.away_team} ${aPaceSec.toFixed(1)}s/snap vs ${d.home_team} ${hPaceSec.toFixed(1)}s/snap. Combined pace projects ~${totalPlays} total plays.`;
             }
