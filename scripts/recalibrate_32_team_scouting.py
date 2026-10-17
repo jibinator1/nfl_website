@@ -210,8 +210,9 @@ def run():
                 "total_pass_snaps": 0,
             }
 
-    # 5. Pass Depth EPA & SR Allowed
+    # 5. Pass Depth EPA & SR Allowed & Offensive Pass Depth Distribution
     pass_depth_allowed_data = {}
+    off_pass_depth_data = {}
     for tm in teams:
         dp = merged_part[(merged_part["defteam"] == tm) & (merged_part["_is_pass"] == 1) & (merged_part["air_yards"].notna())]
         depth_splits = {}
@@ -238,6 +239,29 @@ def run():
                     "sample_attempts": 0,
                 }
         pass_depth_allowed_data[tm] = depth_splits
+
+        # Offensive Pass Depth Distribution
+        op = merged_part[(merged_part["posteam"] == tm) & (merged_part["_is_pass"] == 1) & (merged_part["air_yards"].notna())]
+        tot_op = len(op)
+        off_splits = {}
+        for d_key, cond in [
+            ("behind_los", op["air_yards"] < 0),
+            ("short", (op["air_yards"] >= 0) & (op["air_yards"] < 10)),
+            ("intermediate", (op["air_yards"] >= 10) & (op["air_yards"] < 20)),
+            ("deep", op["air_yards"] >= 20),
+        ]:
+            sub = op[cond]
+            n_att = len(sub)
+            share = round(float(n_att / tot_op * 100.0), 1) if tot_op > 0 else 0.0
+            off_splits[d_key] = {
+                "attempts_share": share,
+                "frequency_pct": share,
+                "epa_per_attempt": round(float(sub["epa"].mean()), 3) if n_att > 0 else 0.0,
+                "success_rate": round(float(sub["success"].mean() * 100.0), 1) if n_att > 0 else 45.0,
+                "yards_per_attempt": round(float(sub["yards_gained"].mean()), 2) if n_att > 0 else 6.0,
+                "sample_attempts": n_att,
+            }
+        off_pass_depth_data[tm] = off_splits
 
     # 6. Positional Targets Allowed (WR, TE, RB) and YPT
     pos_targets_allowed_data = {}
@@ -342,6 +366,8 @@ def run():
                     "sample_attempts": off_ypa_n[tm],
                 },
                 "game_state_splits": g_splits,
+                "pass_depth": off_pass_depth_data[tm],
+                "pass_depth_distribution": off_pass_depth_data[tm],
                 "box_counts": off_box_data[tm],
             },
             "defense": {

@@ -69,6 +69,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 16.0,
+          "frequency_pct": 16.0,
+          "epa_per_attempt": -0.169,
+          "success_rate": 35.6,
+          "yards_per_attempt": 3.67,
+          "sample_attempts": 135
+        },
+        "short": {
+          "attempts_share": 54.5,
+          "frequency_pct": 54.5,
+          "epa_per_attempt": 0.163,
+          "success_rate": 53.8,
+          "yards_per_attempt": 5.84,
+          "sample_attempts": 461
+        },
+        "intermediate": {
+          "attempts_share": 20.0,
+          "frequency_pct": 20.0,
+          "epa_per_attempt": 0.479,
+          "success_rate": 55.6,
+          "yards_per_attempt": 9.45,
+          "sample_attempts": 169
+        },
+        "deep": {
+          "attempts_share": 9.6,
+          "frequency_pct": 9.6,
+          "epa_per_attempt": -0.008,
+          "success_rate": 28.4,
+          "yards_per_attempt": 8.49,
+          "sample_attempts": 81
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 16.0,
+          "frequency_pct": 16.0,
+          "epa_per_attempt": -0.169,
+          "success_rate": 35.6,
+          "yards_per_attempt": 3.67,
+          "sample_attempts": 135
+        },
+        "short": {
+          "attempts_share": 54.5,
+          "frequency_pct": 54.5,
+          "epa_per_attempt": 0.163,
+          "success_rate": 53.8,
+          "yards_per_attempt": 5.84,
+          "sample_attempts": 461
+        },
+        "intermediate": {
+          "attempts_share": 20.0,
+          "frequency_pct": 20.0,
+          "epa_per_attempt": 0.479,
+          "success_rate": 55.6,
+          "yards_per_attempt": 9.45,
+          "sample_attempts": 169
+        },
+        "deep": {
+          "attempts_share": 9.6,
+          "frequency_pct": 9.6,
+          "epa_per_attempt": -0.008,
+          "success_rate": 28.4,
+          "yards_per_attempt": 8.49,
+          "sample_attempts": 81
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.69,
         "rush_ypc_vs_heavy_box": 4.72,
@@ -223,6 +291,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 21.7,
+          "frequency_pct": 21.7,
+          "epa_per_attempt": -0.229,
+          "success_rate": 39.5,
+          "yards_per_attempt": 5.03,
+          "sample_attempts": 147
+        },
+        "short": {
+          "attempts_share": 43.5,
+          "frequency_pct": 43.5,
+          "epa_per_attempt": 0.15,
+          "success_rate": 53.1,
+          "yards_per_attempt": 6.44,
+          "sample_attempts": 294
+        },
+        "intermediate": {
+          "attempts_share": 24.7,
+          "frequency_pct": 24.7,
+          "epa_per_attempt": 0.208,
+          "success_rate": 51.5,
+          "yards_per_attempt": 9.06,
+          "sample_attempts": 167
+        },
+        "deep": {
+          "attempts_share": 10.1,
+          "frequency_pct": 10.1,
+          "epa_per_attempt": 0.063,
+          "success_rate": 26.5,
+          "yards_per_attempt": 8.81,
+          "sample_attempts": 68
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 21.7,
+          "frequency_pct": 21.7,
+          "epa_per_attempt": -0.229,
+          "success_rate": 39.5,
+          "yards_per_attempt": 5.03,
+          "sample_attempts": 147
+        },
+        "short": {
+          "attempts_share": 43.5,
+          "frequency_pct": 43.5,
+          "epa_per_attempt": 0.15,
+          "success_rate": 53.1,
+          "yards_per_attempt": 6.44,
+          "sample_attempts": 294
+        },
+        "intermediate": {
+          "attempts_share": 24.7,
+          "frequency_pct": 24.7,
+          "epa_per_attempt": 0.208,
+          "success_rate": 51.5,
+          "yards_per_attempt": 9.06,
+          "sample_attempts": 167
+        },
+        "deep": {
+          "attempts_share": 10.1,
+          "frequency_pct": 10.1,
+          "epa_per_attempt": 0.063,
+          "success_rate": 26.5,
+          "yards_per_attempt": 8.81,
+          "sample_attempts": 68
         }
       },
       "box_counts": {
@@ -381,6 +517,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 14.8,
+          "frequency_pct": 14.8,
+          "epa_per_attempt": -0.196,
+          "success_rate": 34.1,
+          "yards_per_attempt": 4.41,
+          "sample_attempts": 82
+        },
+        "short": {
+          "attempts_share": 51.1,
+          "frequency_pct": 51.1,
+          "epa_per_attempt": 0.096,
+          "success_rate": 57.2,
+          "yards_per_attempt": 6.55,
+          "sample_attempts": 283
+        },
+        "intermediate": {
+          "attempts_share": 22.4,
+          "frequency_pct": 22.4,
+          "epa_per_attempt": 0.441,
+          "success_rate": 57.3,
+          "yards_per_attempt": 10.31,
+          "sample_attempts": 124
+        },
+        "deep": {
+          "attempts_share": 11.7,
+          "frequency_pct": 11.7,
+          "epa_per_attempt": 0.762,
+          "success_rate": 44.6,
+          "yards_per_attempt": 15.6,
+          "sample_attempts": 65
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 14.8,
+          "frequency_pct": 14.8,
+          "epa_per_attempt": -0.196,
+          "success_rate": 34.1,
+          "yards_per_attempt": 4.41,
+          "sample_attempts": 82
+        },
+        "short": {
+          "attempts_share": 51.1,
+          "frequency_pct": 51.1,
+          "epa_per_attempt": 0.096,
+          "success_rate": 57.2,
+          "yards_per_attempt": 6.55,
+          "sample_attempts": 283
+        },
+        "intermediate": {
+          "attempts_share": 22.4,
+          "frequency_pct": 22.4,
+          "epa_per_attempt": 0.441,
+          "success_rate": 57.3,
+          "yards_per_attempt": 10.31,
+          "sample_attempts": 124
+        },
+        "deep": {
+          "attempts_share": 11.7,
+          "frequency_pct": 11.7,
+          "epa_per_attempt": 0.762,
+          "success_rate": 44.6,
+          "yards_per_attempt": 15.6,
+          "sample_attempts": 65
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 6.55,
         "rush_ypc_vs_heavy_box": 4.32,
@@ -535,6 +739,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 20.5,
+          "frequency_pct": 20.5,
+          "epa_per_attempt": -0.017,
+          "success_rate": 39.0,
+          "yards_per_attempt": 5.52,
+          "sample_attempts": 141
+        },
+        "short": {
+          "attempts_share": 44.1,
+          "frequency_pct": 44.1,
+          "epa_per_attempt": 0.249,
+          "success_rate": 54.1,
+          "yards_per_attempt": 6.52,
+          "sample_attempts": 303
+        },
+        "intermediate": {
+          "attempts_share": 22.9,
+          "frequency_pct": 22.9,
+          "epa_per_attempt": 0.641,
+          "success_rate": 61.1,
+          "yards_per_attempt": 11.29,
+          "sample_attempts": 157
+        },
+        "deep": {
+          "attempts_share": 12.5,
+          "frequency_pct": 12.5,
+          "epa_per_attempt": 0.548,
+          "success_rate": 38.4,
+          "yards_per_attempt": 12.21,
+          "sample_attempts": 86
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 20.5,
+          "frequency_pct": 20.5,
+          "epa_per_attempt": -0.017,
+          "success_rate": 39.0,
+          "yards_per_attempt": 5.52,
+          "sample_attempts": 141
+        },
+        "short": {
+          "attempts_share": 44.1,
+          "frequency_pct": 44.1,
+          "epa_per_attempt": 0.249,
+          "success_rate": 54.1,
+          "yards_per_attempt": 6.52,
+          "sample_attempts": 303
+        },
+        "intermediate": {
+          "attempts_share": 22.9,
+          "frequency_pct": 22.9,
+          "epa_per_attempt": 0.641,
+          "success_rate": 61.1,
+          "yards_per_attempt": 11.29,
+          "sample_attempts": 157
+        },
+        "deep": {
+          "attempts_share": 12.5,
+          "frequency_pct": 12.5,
+          "epa_per_attempt": 0.548,
+          "success_rate": 38.4,
+          "yards_per_attempt": 12.21,
+          "sample_attempts": 86
         }
       },
       "box_counts": {
@@ -693,6 +965,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 17.3,
+          "frequency_pct": 17.3,
+          "epa_per_attempt": -0.238,
+          "success_rate": 34.7,
+          "yards_per_attempt": 4.05,
+          "sample_attempts": 124
+        },
+        "short": {
+          "attempts_share": 49.5,
+          "frequency_pct": 49.5,
+          "epa_per_attempt": 0.083,
+          "success_rate": 50.3,
+          "yards_per_attempt": 5.63,
+          "sample_attempts": 354
+        },
+        "intermediate": {
+          "attempts_share": 23.2,
+          "frequency_pct": 23.2,
+          "epa_per_attempt": 0.213,
+          "success_rate": 45.2,
+          "yards_per_attempt": 7.83,
+          "sample_attempts": 166
+        },
+        "deep": {
+          "attempts_share": 9.9,
+          "frequency_pct": 9.9,
+          "epa_per_attempt": 0.845,
+          "success_rate": 45.1,
+          "yards_per_attempt": 14.66,
+          "sample_attempts": 71
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 17.3,
+          "frequency_pct": 17.3,
+          "epa_per_attempt": -0.238,
+          "success_rate": 34.7,
+          "yards_per_attempt": 4.05,
+          "sample_attempts": 124
+        },
+        "short": {
+          "attempts_share": 49.5,
+          "frequency_pct": 49.5,
+          "epa_per_attempt": 0.083,
+          "success_rate": 50.3,
+          "yards_per_attempt": 5.63,
+          "sample_attempts": 354
+        },
+        "intermediate": {
+          "attempts_share": 23.2,
+          "frequency_pct": 23.2,
+          "epa_per_attempt": 0.213,
+          "success_rate": 45.2,
+          "yards_per_attempt": 7.83,
+          "sample_attempts": 166
+        },
+        "deep": {
+          "attempts_share": 9.9,
+          "frequency_pct": 9.9,
+          "epa_per_attempt": 0.845,
+          "success_rate": 45.1,
+          "yards_per_attempt": 14.66,
+          "sample_attempts": 71
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.72,
         "rush_ypc_vs_heavy_box": 2.91,
@@ -847,6 +1187,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 16.6,
+          "frequency_pct": 16.6,
+          "epa_per_attempt": -0.219,
+          "success_rate": 37.0,
+          "yards_per_attempt": 4.88,
+          "sample_attempts": 138
+        },
+        "short": {
+          "attempts_share": 46.5,
+          "frequency_pct": 46.5,
+          "epa_per_attempt": 0.218,
+          "success_rate": 54.8,
+          "yards_per_attempt": 6.17,
+          "sample_attempts": 387
+        },
+        "intermediate": {
+          "attempts_share": 22.6,
+          "frequency_pct": 22.6,
+          "epa_per_attempt": 0.091,
+          "success_rate": 40.4,
+          "yards_per_attempt": 7.32,
+          "sample_attempts": 188
+        },
+        "deep": {
+          "attempts_share": 14.4,
+          "frequency_pct": 14.4,
+          "epa_per_attempt": 0.447,
+          "success_rate": 40.0,
+          "yards_per_attempt": 11.18,
+          "sample_attempts": 120
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 16.6,
+          "frequency_pct": 16.6,
+          "epa_per_attempt": -0.219,
+          "success_rate": 37.0,
+          "yards_per_attempt": 4.88,
+          "sample_attempts": 138
+        },
+        "short": {
+          "attempts_share": 46.5,
+          "frequency_pct": 46.5,
+          "epa_per_attempt": 0.218,
+          "success_rate": 54.8,
+          "yards_per_attempt": 6.17,
+          "sample_attempts": 387
+        },
+        "intermediate": {
+          "attempts_share": 22.6,
+          "frequency_pct": 22.6,
+          "epa_per_attempt": 0.091,
+          "success_rate": 40.4,
+          "yards_per_attempt": 7.32,
+          "sample_attempts": 188
+        },
+        "deep": {
+          "attempts_share": 14.4,
+          "frequency_pct": 14.4,
+          "epa_per_attempt": 0.447,
+          "success_rate": 40.0,
+          "yards_per_attempt": 11.18,
+          "sample_attempts": 120
         }
       },
       "box_counts": {
@@ -1005,6 +1413,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 17.4,
+          "frequency_pct": 17.4,
+          "epa_per_attempt": -0.513,
+          "success_rate": 29.2,
+          "yards_per_attempt": 3.0,
+          "sample_attempts": 144
+        },
+        "short": {
+          "attempts_share": 51.1,
+          "frequency_pct": 51.1,
+          "epa_per_attempt": -0.01,
+          "success_rate": 52.4,
+          "yards_per_attempt": 5.66,
+          "sample_attempts": 422
+        },
+        "intermediate": {
+          "attempts_share": 20.8,
+          "frequency_pct": 20.8,
+          "epa_per_attempt": 0.591,
+          "success_rate": 62.2,
+          "yards_per_attempt": 9.89,
+          "sample_attempts": 172
+        },
+        "deep": {
+          "attempts_share": 10.7,
+          "frequency_pct": 10.7,
+          "epa_per_attempt": 0.707,
+          "success_rate": 38.6,
+          "yards_per_attempt": 12.31,
+          "sample_attempts": 88
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 17.4,
+          "frequency_pct": 17.4,
+          "epa_per_attempt": -0.513,
+          "success_rate": 29.2,
+          "yards_per_attempt": 3.0,
+          "sample_attempts": 144
+        },
+        "short": {
+          "attempts_share": 51.1,
+          "frequency_pct": 51.1,
+          "epa_per_attempt": -0.01,
+          "success_rate": 52.4,
+          "yards_per_attempt": 5.66,
+          "sample_attempts": 422
+        },
+        "intermediate": {
+          "attempts_share": 20.8,
+          "frequency_pct": 20.8,
+          "epa_per_attempt": 0.591,
+          "success_rate": 62.2,
+          "yards_per_attempt": 9.89,
+          "sample_attempts": 172
+        },
+        "deep": {
+          "attempts_share": 10.7,
+          "frequency_pct": 10.7,
+          "epa_per_attempt": 0.707,
+          "success_rate": 38.6,
+          "yards_per_attempt": 12.31,
+          "sample_attempts": 88
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.73,
         "rush_ypc_vs_heavy_box": 1.96,
@@ -1159,6 +1635,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 21.1,
+          "frequency_pct": 21.1,
+          "epa_per_attempt": -0.202,
+          "success_rate": 32.2,
+          "yards_per_attempt": 4.3,
+          "sample_attempts": 149
+        },
+        "short": {
+          "attempts_share": 49.8,
+          "frequency_pct": 49.8,
+          "epa_per_attempt": -0.099,
+          "success_rate": 41.3,
+          "yards_per_attempt": 4.97,
+          "sample_attempts": 351
+        },
+        "intermediate": {
+          "attempts_share": 18.7,
+          "frequency_pct": 18.7,
+          "epa_per_attempt": 0.18,
+          "success_rate": 43.2,
+          "yards_per_attempt": 7.85,
+          "sample_attempts": 132
+        },
+        "deep": {
+          "attempts_share": 10.4,
+          "frequency_pct": 10.4,
+          "epa_per_attempt": -0.154,
+          "success_rate": 28.8,
+          "yards_per_attempt": 10.16,
+          "sample_attempts": 73
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 21.1,
+          "frequency_pct": 21.1,
+          "epa_per_attempt": -0.202,
+          "success_rate": 32.2,
+          "yards_per_attempt": 4.3,
+          "sample_attempts": 149
+        },
+        "short": {
+          "attempts_share": 49.8,
+          "frequency_pct": 49.8,
+          "epa_per_attempt": -0.099,
+          "success_rate": 41.3,
+          "yards_per_attempt": 4.97,
+          "sample_attempts": 351
+        },
+        "intermediate": {
+          "attempts_share": 18.7,
+          "frequency_pct": 18.7,
+          "epa_per_attempt": 0.18,
+          "success_rate": 43.2,
+          "yards_per_attempt": 7.85,
+          "sample_attempts": 132
+        },
+        "deep": {
+          "attempts_share": 10.4,
+          "frequency_pct": 10.4,
+          "epa_per_attempt": -0.154,
+          "success_rate": 28.8,
+          "yards_per_attempt": 10.16,
+          "sample_attempts": 73
         }
       },
       "box_counts": {
@@ -1317,6 +1861,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 17.1,
+          "frequency_pct": 17.1,
+          "epa_per_attempt": -0.227,
+          "success_rate": 34.5,
+          "yards_per_attempt": 3.66,
+          "sample_attempts": 139
+        },
+        "short": {
+          "attempts_share": 50.2,
+          "frequency_pct": 50.2,
+          "epa_per_attempt": 0.163,
+          "success_rate": 54.7,
+          "yards_per_attempt": 6.19,
+          "sample_attempts": 408
+        },
+        "intermediate": {
+          "attempts_share": 22.0,
+          "frequency_pct": 22.0,
+          "epa_per_attempt": 0.536,
+          "success_rate": 55.3,
+          "yards_per_attempt": 9.61,
+          "sample_attempts": 179
+        },
+        "deep": {
+          "attempts_share": 10.7,
+          "frequency_pct": 10.7,
+          "epa_per_attempt": 0.797,
+          "success_rate": 43.7,
+          "yards_per_attempt": 15.62,
+          "sample_attempts": 87
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 17.1,
+          "frequency_pct": 17.1,
+          "epa_per_attempt": -0.227,
+          "success_rate": 34.5,
+          "yards_per_attempt": 3.66,
+          "sample_attempts": 139
+        },
+        "short": {
+          "attempts_share": 50.2,
+          "frequency_pct": 50.2,
+          "epa_per_attempt": 0.163,
+          "success_rate": 54.7,
+          "yards_per_attempt": 6.19,
+          "sample_attempts": 408
+        },
+        "intermediate": {
+          "attempts_share": 22.0,
+          "frequency_pct": 22.0,
+          "epa_per_attempt": 0.536,
+          "success_rate": 55.3,
+          "yards_per_attempt": 9.61,
+          "sample_attempts": 179
+        },
+        "deep": {
+          "attempts_share": 10.7,
+          "frequency_pct": 10.7,
+          "epa_per_attempt": 0.797,
+          "success_rate": 43.7,
+          "yards_per_attempt": 15.62,
+          "sample_attempts": 87
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 5.61,
         "rush_ypc_vs_heavy_box": 2.09,
@@ -1471,6 +2083,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 22.7,
+          "frequency_pct": 22.7,
+          "epa_per_attempt": -0.27,
+          "success_rate": 30.1,
+          "yards_per_attempt": 3.58,
+          "sample_attempts": 193
+        },
+        "short": {
+          "attempts_share": 50.3,
+          "frequency_pct": 50.3,
+          "epa_per_attempt": 0.149,
+          "success_rate": 49.8,
+          "yards_per_attempt": 5.5,
+          "sample_attempts": 428
+        },
+        "intermediate": {
+          "attempts_share": 16.0,
+          "frequency_pct": 16.0,
+          "epa_per_attempt": 0.15,
+          "success_rate": 47.8,
+          "yards_per_attempt": 8.27,
+          "sample_attempts": 136
+        },
+        "deep": {
+          "attempts_share": 11.0,
+          "frequency_pct": 11.0,
+          "epa_per_attempt": 0.511,
+          "success_rate": 37.2,
+          "yards_per_attempt": 11.85,
+          "sample_attempts": 94
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 22.7,
+          "frequency_pct": 22.7,
+          "epa_per_attempt": -0.27,
+          "success_rate": 30.1,
+          "yards_per_attempt": 3.58,
+          "sample_attempts": 193
+        },
+        "short": {
+          "attempts_share": 50.3,
+          "frequency_pct": 50.3,
+          "epa_per_attempt": 0.149,
+          "success_rate": 49.8,
+          "yards_per_attempt": 5.5,
+          "sample_attempts": 428
+        },
+        "intermediate": {
+          "attempts_share": 16.0,
+          "frequency_pct": 16.0,
+          "epa_per_attempt": 0.15,
+          "success_rate": 47.8,
+          "yards_per_attempt": 8.27,
+          "sample_attempts": 136
+        },
+        "deep": {
+          "attempts_share": 11.0,
+          "frequency_pct": 11.0,
+          "epa_per_attempt": 0.511,
+          "success_rate": 37.2,
+          "yards_per_attempt": 11.85,
+          "sample_attempts": 94
         }
       },
       "box_counts": {
@@ -1629,6 +2309,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 18.7,
+          "frequency_pct": 18.7,
+          "epa_per_attempt": -0.017,
+          "success_rate": 34.7,
+          "yards_per_attempt": 4.76,
+          "sample_attempts": 144
+        },
+        "short": {
+          "attempts_share": 52.4,
+          "frequency_pct": 52.4,
+          "epa_per_attempt": 0.236,
+          "success_rate": 55.4,
+          "yards_per_attempt": 6.45,
+          "sample_attempts": 404
+        },
+        "intermediate": {
+          "attempts_share": 21.9,
+          "frequency_pct": 21.9,
+          "epa_per_attempt": 0.717,
+          "success_rate": 59.8,
+          "yards_per_attempt": 11.85,
+          "sample_attempts": 169
+        },
+        "deep": {
+          "attempts_share": 7.0,
+          "frequency_pct": 7.0,
+          "epa_per_attempt": 0.835,
+          "success_rate": 48.1,
+          "yards_per_attempt": 14.0,
+          "sample_attempts": 54
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 18.7,
+          "frequency_pct": 18.7,
+          "epa_per_attempt": -0.017,
+          "success_rate": 34.7,
+          "yards_per_attempt": 4.76,
+          "sample_attempts": 144
+        },
+        "short": {
+          "attempts_share": 52.4,
+          "frequency_pct": 52.4,
+          "epa_per_attempt": 0.236,
+          "success_rate": 55.4,
+          "yards_per_attempt": 6.45,
+          "sample_attempts": 404
+        },
+        "intermediate": {
+          "attempts_share": 21.9,
+          "frequency_pct": 21.9,
+          "epa_per_attempt": 0.717,
+          "success_rate": 59.8,
+          "yards_per_attempt": 11.85,
+          "sample_attempts": 169
+        },
+        "deep": {
+          "attempts_share": 7.0,
+          "frequency_pct": 7.0,
+          "epa_per_attempt": 0.835,
+          "success_rate": 48.1,
+          "yards_per_attempt": 14.0,
+          "sample_attempts": 54
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.92,
         "rush_ypc_vs_heavy_box": 4.86,
@@ -1783,6 +2531,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 18.5,
+          "frequency_pct": 18.5,
+          "epa_per_attempt": -0.083,
+          "success_rate": 34.6,
+          "yards_per_attempt": 4.06,
+          "sample_attempts": 133
+        },
+        "short": {
+          "attempts_share": 44.5,
+          "frequency_pct": 44.5,
+          "epa_per_attempt": 0.2,
+          "success_rate": 53.8,
+          "yards_per_attempt": 5.66,
+          "sample_attempts": 320
+        },
+        "intermediate": {
+          "attempts_share": 21.8,
+          "frequency_pct": 21.8,
+          "epa_per_attempt": 0.547,
+          "success_rate": 59.2,
+          "yards_per_attempt": 10.43,
+          "sample_attempts": 157
+        },
+        "deep": {
+          "attempts_share": 15.2,
+          "frequency_pct": 15.2,
+          "epa_per_attempt": 0.734,
+          "success_rate": 44.0,
+          "yards_per_attempt": 14.57,
+          "sample_attempts": 109
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 18.5,
+          "frequency_pct": 18.5,
+          "epa_per_attempt": -0.083,
+          "success_rate": 34.6,
+          "yards_per_attempt": 4.06,
+          "sample_attempts": 133
+        },
+        "short": {
+          "attempts_share": 44.5,
+          "frequency_pct": 44.5,
+          "epa_per_attempt": 0.2,
+          "success_rate": 53.8,
+          "yards_per_attempt": 5.66,
+          "sample_attempts": 320
+        },
+        "intermediate": {
+          "attempts_share": 21.8,
+          "frequency_pct": 21.8,
+          "epa_per_attempt": 0.547,
+          "success_rate": 59.2,
+          "yards_per_attempt": 10.43,
+          "sample_attempts": 157
+        },
+        "deep": {
+          "attempts_share": 15.2,
+          "frequency_pct": 15.2,
+          "epa_per_attempt": 0.734,
+          "success_rate": 44.0,
+          "yards_per_attempt": 14.57,
+          "sample_attempts": 109
         }
       },
       "box_counts": {
@@ -1941,6 +2757,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 10.7,
+          "frequency_pct": 10.7,
+          "epa_per_attempt": -0.437,
+          "success_rate": 23.3,
+          "yards_per_attempt": 2.83,
+          "sample_attempts": 90
+        },
+        "short": {
+          "attempts_share": 53.8,
+          "frequency_pct": 53.8,
+          "epa_per_attempt": 0.106,
+          "success_rate": 52.9,
+          "yards_per_attempt": 5.9,
+          "sample_attempts": 452
+        },
+        "intermediate": {
+          "attempts_share": 23.5,
+          "frequency_pct": 23.5,
+          "epa_per_attempt": 0.333,
+          "success_rate": 49.7,
+          "yards_per_attempt": 8.84,
+          "sample_attempts": 197
+        },
+        "deep": {
+          "attempts_share": 12.0,
+          "frequency_pct": 12.0,
+          "epa_per_attempt": 0.387,
+          "success_rate": 35.6,
+          "yards_per_attempt": 11.46,
+          "sample_attempts": 101
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 10.7,
+          "frequency_pct": 10.7,
+          "epa_per_attempt": -0.437,
+          "success_rate": 23.3,
+          "yards_per_attempt": 2.83,
+          "sample_attempts": 90
+        },
+        "short": {
+          "attempts_share": 53.8,
+          "frequency_pct": 53.8,
+          "epa_per_attempt": 0.106,
+          "success_rate": 52.9,
+          "yards_per_attempt": 5.9,
+          "sample_attempts": 452
+        },
+        "intermediate": {
+          "attempts_share": 23.5,
+          "frequency_pct": 23.5,
+          "epa_per_attempt": 0.333,
+          "success_rate": 49.7,
+          "yards_per_attempt": 8.84,
+          "sample_attempts": 197
+        },
+        "deep": {
+          "attempts_share": 12.0,
+          "frequency_pct": 12.0,
+          "epa_per_attempt": 0.387,
+          "success_rate": 35.6,
+          "yards_per_attempt": 11.46,
+          "sample_attempts": 101
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.57,
         "rush_ypc_vs_heavy_box": 2.88,
@@ -2095,6 +2979,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 16.1,
+          "frequency_pct": 16.1,
+          "epa_per_attempt": -0.138,
+          "success_rate": 32.8,
+          "yards_per_attempt": 4.29,
+          "sample_attempts": 116
+        },
+        "short": {
+          "attempts_share": 51.3,
+          "frequency_pct": 51.3,
+          "epa_per_attempt": 0.033,
+          "success_rate": 51.6,
+          "yards_per_attempt": 5.83,
+          "sample_attempts": 370
+        },
+        "intermediate": {
+          "attempts_share": 22.2,
+          "frequency_pct": 22.2,
+          "epa_per_attempt": 0.523,
+          "success_rate": 56.9,
+          "yards_per_attempt": 10.04,
+          "sample_attempts": 160
+        },
+        "deep": {
+          "attempts_share": 10.4,
+          "frequency_pct": 10.4,
+          "epa_per_attempt": 0.22,
+          "success_rate": 29.3,
+          "yards_per_attempt": 11.27,
+          "sample_attempts": 75
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 16.1,
+          "frequency_pct": 16.1,
+          "epa_per_attempt": -0.138,
+          "success_rate": 32.8,
+          "yards_per_attempt": 4.29,
+          "sample_attempts": 116
+        },
+        "short": {
+          "attempts_share": 51.3,
+          "frequency_pct": 51.3,
+          "epa_per_attempt": 0.033,
+          "success_rate": 51.6,
+          "yards_per_attempt": 5.83,
+          "sample_attempts": 370
+        },
+        "intermediate": {
+          "attempts_share": 22.2,
+          "frequency_pct": 22.2,
+          "epa_per_attempt": 0.523,
+          "success_rate": 56.9,
+          "yards_per_attempt": 10.04,
+          "sample_attempts": 160
+        },
+        "deep": {
+          "attempts_share": 10.4,
+          "frequency_pct": 10.4,
+          "epa_per_attempt": 0.22,
+          "success_rate": 29.3,
+          "yards_per_attempt": 11.27,
+          "sample_attempts": 75
         }
       },
       "box_counts": {
@@ -2253,6 +3205,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 15.3,
+          "frequency_pct": 15.3,
+          "epa_per_attempt": -0.206,
+          "success_rate": 32.1,
+          "yards_per_attempt": 4.15,
+          "sample_attempts": 112
+        },
+        "short": {
+          "attempts_share": 46.2,
+          "frequency_pct": 46.2,
+          "epa_per_attempt": 0.147,
+          "success_rate": 55.9,
+          "yards_per_attempt": 6.25,
+          "sample_attempts": 338
+        },
+        "intermediate": {
+          "attempts_share": 25.7,
+          "frequency_pct": 25.7,
+          "epa_per_attempt": 0.43,
+          "success_rate": 58.0,
+          "yards_per_attempt": 9.24,
+          "sample_attempts": 188
+        },
+        "deep": {
+          "attempts_share": 12.8,
+          "frequency_pct": 12.8,
+          "epa_per_attempt": 0.567,
+          "success_rate": 39.4,
+          "yards_per_attempt": 11.61,
+          "sample_attempts": 94
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 15.3,
+          "frequency_pct": 15.3,
+          "epa_per_attempt": -0.206,
+          "success_rate": 32.1,
+          "yards_per_attempt": 4.15,
+          "sample_attempts": 112
+        },
+        "short": {
+          "attempts_share": 46.2,
+          "frequency_pct": 46.2,
+          "epa_per_attempt": 0.147,
+          "success_rate": 55.9,
+          "yards_per_attempt": 6.25,
+          "sample_attempts": 338
+        },
+        "intermediate": {
+          "attempts_share": 25.7,
+          "frequency_pct": 25.7,
+          "epa_per_attempt": 0.43,
+          "success_rate": 58.0,
+          "yards_per_attempt": 9.24,
+          "sample_attempts": 188
+        },
+        "deep": {
+          "attempts_share": 12.8,
+          "frequency_pct": 12.8,
+          "epa_per_attempt": 0.567,
+          "success_rate": 39.4,
+          "yards_per_attempt": 11.61,
+          "sample_attempts": 94
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.44,
         "rush_ypc_vs_heavy_box": 2.72,
@@ -2407,6 +3427,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 24.7,
+          "frequency_pct": 24.7,
+          "epa_per_attempt": -0.054,
+          "success_rate": 44.0,
+          "yards_per_attempt": 4.62,
+          "sample_attempts": 175
+        },
+        "short": {
+          "attempts_share": 46.3,
+          "frequency_pct": 46.3,
+          "epa_per_attempt": 0.132,
+          "success_rate": 52.4,
+          "yards_per_attempt": 5.59,
+          "sample_attempts": 328
+        },
+        "intermediate": {
+          "attempts_share": 15.7,
+          "frequency_pct": 15.7,
+          "epa_per_attempt": 0.469,
+          "success_rate": 57.7,
+          "yards_per_attempt": 11.37,
+          "sample_attempts": 111
+        },
+        "deep": {
+          "attempts_share": 13.4,
+          "frequency_pct": 13.4,
+          "epa_per_attempt": 0.385,
+          "success_rate": 31.6,
+          "yards_per_attempt": 11.36,
+          "sample_attempts": 95
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 24.7,
+          "frequency_pct": 24.7,
+          "epa_per_attempt": -0.054,
+          "success_rate": 44.0,
+          "yards_per_attempt": 4.62,
+          "sample_attempts": 175
+        },
+        "short": {
+          "attempts_share": 46.3,
+          "frequency_pct": 46.3,
+          "epa_per_attempt": 0.132,
+          "success_rate": 52.4,
+          "yards_per_attempt": 5.59,
+          "sample_attempts": 328
+        },
+        "intermediate": {
+          "attempts_share": 15.7,
+          "frequency_pct": 15.7,
+          "epa_per_attempt": 0.469,
+          "success_rate": 57.7,
+          "yards_per_attempt": 11.37,
+          "sample_attempts": 111
+        },
+        "deep": {
+          "attempts_share": 13.4,
+          "frequency_pct": 13.4,
+          "epa_per_attempt": 0.385,
+          "success_rate": 31.6,
+          "yards_per_attempt": 11.36,
+          "sample_attempts": 95
         }
       },
       "box_counts": {
@@ -2565,6 +3653,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 9.3,
+          "frequency_pct": 9.3,
+          "epa_per_attempt": -0.151,
+          "success_rate": 42.0,
+          "yards_per_attempt": 4.73,
+          "sample_attempts": 81
+        },
+        "short": {
+          "attempts_share": 52.3,
+          "frequency_pct": 52.3,
+          "epa_per_attempt": 0.163,
+          "success_rate": 57.1,
+          "yards_per_attempt": 5.85,
+          "sample_attempts": 457
+        },
+        "intermediate": {
+          "attempts_share": 22.9,
+          "frequency_pct": 22.9,
+          "epa_per_attempt": 0.489,
+          "success_rate": 56.0,
+          "yards_per_attempt": 10.23,
+          "sample_attempts": 200
+        },
+        "deep": {
+          "attempts_share": 15.6,
+          "frequency_pct": 15.6,
+          "epa_per_attempt": 0.563,
+          "success_rate": 41.2,
+          "yards_per_attempt": 12.8,
+          "sample_attempts": 136
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 9.3,
+          "frequency_pct": 9.3,
+          "epa_per_attempt": -0.151,
+          "success_rate": 42.0,
+          "yards_per_attempt": 4.73,
+          "sample_attempts": 81
+        },
+        "short": {
+          "attempts_share": 52.3,
+          "frequency_pct": 52.3,
+          "epa_per_attempt": 0.163,
+          "success_rate": 57.1,
+          "yards_per_attempt": 5.85,
+          "sample_attempts": 457
+        },
+        "intermediate": {
+          "attempts_share": 22.9,
+          "frequency_pct": 22.9,
+          "epa_per_attempt": 0.489,
+          "success_rate": 56.0,
+          "yards_per_attempt": 10.23,
+          "sample_attempts": 200
+        },
+        "deep": {
+          "attempts_share": 15.6,
+          "frequency_pct": 15.6,
+          "epa_per_attempt": 0.563,
+          "success_rate": 41.2,
+          "yards_per_attempt": 12.8,
+          "sample_attempts": 136
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 5.54,
         "rush_ypc_vs_heavy_box": 3.44,
@@ -2719,6 +3875,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 16.8,
+          "frequency_pct": 16.8,
+          "epa_per_attempt": -0.271,
+          "success_rate": 36.3,
+          "yards_per_attempt": 3.97,
+          "sample_attempts": 124
+        },
+        "short": {
+          "attempts_share": 49.8,
+          "frequency_pct": 49.8,
+          "epa_per_attempt": 0.139,
+          "success_rate": 53.8,
+          "yards_per_attempt": 6.04,
+          "sample_attempts": 368
+        },
+        "intermediate": {
+          "attempts_share": 20.6,
+          "frequency_pct": 20.6,
+          "epa_per_attempt": 0.191,
+          "success_rate": 50.0,
+          "yards_per_attempt": 9.06,
+          "sample_attempts": 152
+        },
+        "deep": {
+          "attempts_share": 12.9,
+          "frequency_pct": 12.9,
+          "epa_per_attempt": 0.128,
+          "success_rate": 30.5,
+          "yards_per_attempt": 10.09,
+          "sample_attempts": 95
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 16.8,
+          "frequency_pct": 16.8,
+          "epa_per_attempt": -0.271,
+          "success_rate": 36.3,
+          "yards_per_attempt": 3.97,
+          "sample_attempts": 124
+        },
+        "short": {
+          "attempts_share": 49.8,
+          "frequency_pct": 49.8,
+          "epa_per_attempt": 0.139,
+          "success_rate": 53.8,
+          "yards_per_attempt": 6.04,
+          "sample_attempts": 368
+        },
+        "intermediate": {
+          "attempts_share": 20.6,
+          "frequency_pct": 20.6,
+          "epa_per_attempt": 0.191,
+          "success_rate": 50.0,
+          "yards_per_attempt": 9.06,
+          "sample_attempts": 152
+        },
+        "deep": {
+          "attempts_share": 12.9,
+          "frequency_pct": 12.9,
+          "epa_per_attempt": 0.128,
+          "success_rate": 30.5,
+          "yards_per_attempt": 10.09,
+          "sample_attempts": 95
         }
       },
       "box_counts": {
@@ -2877,6 +4101,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 19.0,
+          "frequency_pct": 19.0,
+          "epa_per_attempt": -0.289,
+          "success_rate": 30.5,
+          "yards_per_attempt": 3.4,
+          "sample_attempts": 131
+        },
+        "short": {
+          "attempts_share": 53.3,
+          "frequency_pct": 53.3,
+          "epa_per_attempt": 0.082,
+          "success_rate": 52.9,
+          "yards_per_attempt": 6.36,
+          "sample_attempts": 367
+        },
+        "intermediate": {
+          "attempts_share": 17.6,
+          "frequency_pct": 17.6,
+          "epa_per_attempt": 0.231,
+          "success_rate": 51.2,
+          "yards_per_attempt": 8.44,
+          "sample_attempts": 121
+        },
+        "deep": {
+          "attempts_share": 10.2,
+          "frequency_pct": 10.2,
+          "epa_per_attempt": 0.359,
+          "success_rate": 41.4,
+          "yards_per_attempt": 11.9,
+          "sample_attempts": 70
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 19.0,
+          "frequency_pct": 19.0,
+          "epa_per_attempt": -0.289,
+          "success_rate": 30.5,
+          "yards_per_attempt": 3.4,
+          "sample_attempts": 131
+        },
+        "short": {
+          "attempts_share": 53.3,
+          "frequency_pct": 53.3,
+          "epa_per_attempt": 0.082,
+          "success_rate": 52.9,
+          "yards_per_attempt": 6.36,
+          "sample_attempts": 367
+        },
+        "intermediate": {
+          "attempts_share": 17.6,
+          "frequency_pct": 17.6,
+          "epa_per_attempt": 0.231,
+          "success_rate": 51.2,
+          "yards_per_attempt": 8.44,
+          "sample_attempts": 121
+        },
+        "deep": {
+          "attempts_share": 10.2,
+          "frequency_pct": 10.2,
+          "epa_per_attempt": 0.359,
+          "success_rate": 41.4,
+          "yards_per_attempt": 11.9,
+          "sample_attempts": 70
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 3.98,
         "rush_ypc_vs_heavy_box": 1.95,
@@ -3031,6 +4323,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 22.3,
+          "frequency_pct": 22.3,
+          "epa_per_attempt": -0.244,
+          "success_rate": 31.9,
+          "yards_per_attempt": 3.81,
+          "sample_attempts": 135
+        },
+        "short": {
+          "attempts_share": 44.1,
+          "frequency_pct": 44.1,
+          "epa_per_attempt": 0.13,
+          "success_rate": 53.9,
+          "yards_per_attempt": 6.37,
+          "sample_attempts": 267
+        },
+        "intermediate": {
+          "attempts_share": 21.5,
+          "frequency_pct": 21.5,
+          "epa_per_attempt": 0.438,
+          "success_rate": 55.4,
+          "yards_per_attempt": 10.04,
+          "sample_attempts": 130
+        },
+        "deep": {
+          "attempts_share": 12.2,
+          "frequency_pct": 12.2,
+          "epa_per_attempt": -0.094,
+          "success_rate": 23.0,
+          "yards_per_attempt": 8.78,
+          "sample_attempts": 74
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 22.3,
+          "frequency_pct": 22.3,
+          "epa_per_attempt": -0.244,
+          "success_rate": 31.9,
+          "yards_per_attempt": 3.81,
+          "sample_attempts": 135
+        },
+        "short": {
+          "attempts_share": 44.1,
+          "frequency_pct": 44.1,
+          "epa_per_attempt": 0.13,
+          "success_rate": 53.9,
+          "yards_per_attempt": 6.37,
+          "sample_attempts": 267
+        },
+        "intermediate": {
+          "attempts_share": 21.5,
+          "frequency_pct": 21.5,
+          "epa_per_attempt": 0.438,
+          "success_rate": 55.4,
+          "yards_per_attempt": 10.04,
+          "sample_attempts": 130
+        },
+        "deep": {
+          "attempts_share": 12.2,
+          "frequency_pct": 12.2,
+          "epa_per_attempt": -0.094,
+          "success_rate": 23.0,
+          "yards_per_attempt": 8.78,
+          "sample_attempts": 74
         }
       },
       "box_counts": {
@@ -3189,6 +4549,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 21.4,
+          "frequency_pct": 21.4,
+          "epa_per_attempt": -0.445,
+          "success_rate": 35.3,
+          "yards_per_attempt": 3.93,
+          "sample_attempts": 133
+        },
+        "short": {
+          "attempts_share": 43.9,
+          "frequency_pct": 43.9,
+          "epa_per_attempt": 0.046,
+          "success_rate": 48.0,
+          "yards_per_attempt": 5.35,
+          "sample_attempts": 273
+        },
+        "intermediate": {
+          "attempts_share": 22.5,
+          "frequency_pct": 22.5,
+          "epa_per_attempt": 0.284,
+          "success_rate": 52.9,
+          "yards_per_attempt": 9.11,
+          "sample_attempts": 140
+        },
+        "deep": {
+          "attempts_share": 12.2,
+          "frequency_pct": 12.2,
+          "epa_per_attempt": 0.263,
+          "success_rate": 35.5,
+          "yards_per_attempt": 11.67,
+          "sample_attempts": 76
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 21.4,
+          "frequency_pct": 21.4,
+          "epa_per_attempt": -0.445,
+          "success_rate": 35.3,
+          "yards_per_attempt": 3.93,
+          "sample_attempts": 133
+        },
+        "short": {
+          "attempts_share": 43.9,
+          "frequency_pct": 43.9,
+          "epa_per_attempt": 0.046,
+          "success_rate": 48.0,
+          "yards_per_attempt": 5.35,
+          "sample_attempts": 273
+        },
+        "intermediate": {
+          "attempts_share": 22.5,
+          "frequency_pct": 22.5,
+          "epa_per_attempt": 0.284,
+          "success_rate": 52.9,
+          "yards_per_attempt": 9.11,
+          "sample_attempts": 140
+        },
+        "deep": {
+          "attempts_share": 12.2,
+          "frequency_pct": 12.2,
+          "epa_per_attempt": 0.263,
+          "success_rate": 35.5,
+          "yards_per_attempt": 11.67,
+          "sample_attempts": 76
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 5.0,
         "rush_ypc_vs_heavy_box": 5.77,
@@ -3343,6 +4771,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 14.1,
+          "frequency_pct": 14.1,
+          "epa_per_attempt": -0.158,
+          "success_rate": 39.1,
+          "yards_per_attempt": 5.45,
+          "sample_attempts": 110
+        },
+        "short": {
+          "attempts_share": 48.7,
+          "frequency_pct": 48.7,
+          "epa_per_attempt": 0.261,
+          "success_rate": 59.7,
+          "yards_per_attempt": 6.42,
+          "sample_attempts": 380
+        },
+        "intermediate": {
+          "attempts_share": 21.5,
+          "frequency_pct": 21.5,
+          "epa_per_attempt": 0.589,
+          "success_rate": 61.9,
+          "yards_per_attempt": 10.71,
+          "sample_attempts": 168
+        },
+        "deep": {
+          "attempts_share": 15.6,
+          "frequency_pct": 15.6,
+          "epa_per_attempt": 0.717,
+          "success_rate": 45.1,
+          "yards_per_attempt": 14.13,
+          "sample_attempts": 122
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 14.1,
+          "frequency_pct": 14.1,
+          "epa_per_attempt": -0.158,
+          "success_rate": 39.1,
+          "yards_per_attempt": 5.45,
+          "sample_attempts": 110
+        },
+        "short": {
+          "attempts_share": 48.7,
+          "frequency_pct": 48.7,
+          "epa_per_attempt": 0.261,
+          "success_rate": 59.7,
+          "yards_per_attempt": 6.42,
+          "sample_attempts": 380
+        },
+        "intermediate": {
+          "attempts_share": 21.5,
+          "frequency_pct": 21.5,
+          "epa_per_attempt": 0.589,
+          "success_rate": 61.9,
+          "yards_per_attempt": 10.71,
+          "sample_attempts": 168
+        },
+        "deep": {
+          "attempts_share": 15.6,
+          "frequency_pct": 15.6,
+          "epa_per_attempt": 0.717,
+          "success_rate": 45.1,
+          "yards_per_attempt": 14.13,
+          "sample_attempts": 122
         }
       },
       "box_counts": {
@@ -3501,6 +4997,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 15.6,
+          "frequency_pct": 15.6,
+          "epa_per_attempt": -0.432,
+          "success_rate": 29.3,
+          "yards_per_attempt": 4.21,
+          "sample_attempts": 123
+        },
+        "short": {
+          "attempts_share": 49.9,
+          "frequency_pct": 49.9,
+          "epa_per_attempt": 0.018,
+          "success_rate": 52.5,
+          "yards_per_attempt": 5.37,
+          "sample_attempts": 394
+        },
+        "intermediate": {
+          "attempts_share": 21.9,
+          "frequency_pct": 21.9,
+          "epa_per_attempt": 0.521,
+          "success_rate": 60.7,
+          "yards_per_attempt": 9.38,
+          "sample_attempts": 173
+        },
+        "deep": {
+          "attempts_share": 12.5,
+          "frequency_pct": 12.5,
+          "epa_per_attempt": 0.23,
+          "success_rate": 30.3,
+          "yards_per_attempt": 10.81,
+          "sample_attempts": 99
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 15.6,
+          "frequency_pct": 15.6,
+          "epa_per_attempt": -0.432,
+          "success_rate": 29.3,
+          "yards_per_attempt": 4.21,
+          "sample_attempts": 123
+        },
+        "short": {
+          "attempts_share": 49.9,
+          "frequency_pct": 49.9,
+          "epa_per_attempt": 0.018,
+          "success_rate": 52.5,
+          "yards_per_attempt": 5.37,
+          "sample_attempts": 394
+        },
+        "intermediate": {
+          "attempts_share": 21.9,
+          "frequency_pct": 21.9,
+          "epa_per_attempt": 0.521,
+          "success_rate": 60.7,
+          "yards_per_attempt": 9.38,
+          "sample_attempts": 173
+        },
+        "deep": {
+          "attempts_share": 12.5,
+          "frequency_pct": 12.5,
+          "epa_per_attempt": 0.23,
+          "success_rate": 30.3,
+          "yards_per_attempt": 10.81,
+          "sample_attempts": 99
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.27,
         "rush_ypc_vs_heavy_box": 2.73,
@@ -3655,6 +5219,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 18.8,
+          "frequency_pct": 18.8,
+          "epa_per_attempt": -0.116,
+          "success_rate": 39.2,
+          "yards_per_attempt": 4.52,
+          "sample_attempts": 130
+        },
+        "short": {
+          "attempts_share": 44.3,
+          "frequency_pct": 44.3,
+          "epa_per_attempt": -0.029,
+          "success_rate": 47.7,
+          "yards_per_attempt": 5.38,
+          "sample_attempts": 306
+        },
+        "intermediate": {
+          "attempts_share": 22.7,
+          "frequency_pct": 22.7,
+          "epa_per_attempt": 0.448,
+          "success_rate": 51.0,
+          "yards_per_attempt": 8.69,
+          "sample_attempts": 157
+        },
+        "deep": {
+          "attempts_share": 14.2,
+          "frequency_pct": 14.2,
+          "epa_per_attempt": 0.524,
+          "success_rate": 37.8,
+          "yards_per_attempt": 11.85,
+          "sample_attempts": 98
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 18.8,
+          "frequency_pct": 18.8,
+          "epa_per_attempt": -0.116,
+          "success_rate": 39.2,
+          "yards_per_attempt": 4.52,
+          "sample_attempts": 130
+        },
+        "short": {
+          "attempts_share": 44.3,
+          "frequency_pct": 44.3,
+          "epa_per_attempt": -0.029,
+          "success_rate": 47.7,
+          "yards_per_attempt": 5.38,
+          "sample_attempts": 306
+        },
+        "intermediate": {
+          "attempts_share": 22.7,
+          "frequency_pct": 22.7,
+          "epa_per_attempt": 0.448,
+          "success_rate": 51.0,
+          "yards_per_attempt": 8.69,
+          "sample_attempts": 157
+        },
+        "deep": {
+          "attempts_share": 14.2,
+          "frequency_pct": 14.2,
+          "epa_per_attempt": 0.524,
+          "success_rate": 37.8,
+          "yards_per_attempt": 11.85,
+          "sample_attempts": 98
         }
       },
       "box_counts": {
@@ -3813,6 +5445,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 16.3,
+          "frequency_pct": 16.3,
+          "epa_per_attempt": -0.364,
+          "success_rate": 26.0,
+          "yards_per_attempt": 3.34,
+          "sample_attempts": 104
+        },
+        "short": {
+          "attempts_share": 57.8,
+          "frequency_pct": 57.8,
+          "epa_per_attempt": 0.086,
+          "success_rate": 50.8,
+          "yards_per_attempt": 5.84,
+          "sample_attempts": 368
+        },
+        "intermediate": {
+          "attempts_share": 16.8,
+          "frequency_pct": 16.8,
+          "epa_per_attempt": 0.169,
+          "success_rate": 47.7,
+          "yards_per_attempt": 7.55,
+          "sample_attempts": 107
+        },
+        "deep": {
+          "attempts_share": 9.1,
+          "frequency_pct": 9.1,
+          "epa_per_attempt": 0.277,
+          "success_rate": 32.8,
+          "yards_per_attempt": 9.41,
+          "sample_attempts": 58
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 16.3,
+          "frequency_pct": 16.3,
+          "epa_per_attempt": -0.364,
+          "success_rate": 26.0,
+          "yards_per_attempt": 3.34,
+          "sample_attempts": 104
+        },
+        "short": {
+          "attempts_share": 57.8,
+          "frequency_pct": 57.8,
+          "epa_per_attempt": 0.086,
+          "success_rate": 50.8,
+          "yards_per_attempt": 5.84,
+          "sample_attempts": 368
+        },
+        "intermediate": {
+          "attempts_share": 16.8,
+          "frequency_pct": 16.8,
+          "epa_per_attempt": 0.169,
+          "success_rate": 47.7,
+          "yards_per_attempt": 7.55,
+          "sample_attempts": 107
+        },
+        "deep": {
+          "attempts_share": 9.1,
+          "frequency_pct": 9.1,
+          "epa_per_attempt": 0.277,
+          "success_rate": 32.8,
+          "yards_per_attempt": 9.41,
+          "sample_attempts": 58
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 5.03,
         "rush_ypc_vs_heavy_box": 4.02,
@@ -3967,6 +5667,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 13.0,
+          "frequency_pct": 13.0,
+          "epa_per_attempt": -0.378,
+          "success_rate": 27.0,
+          "yards_per_attempt": 2.99,
+          "sample_attempts": 89
+        },
+        "short": {
+          "attempts_share": 52.8,
+          "frequency_pct": 52.8,
+          "epa_per_attempt": -0.01,
+          "success_rate": 49.4,
+          "yards_per_attempt": 5.38,
+          "sample_attempts": 362
+        },
+        "intermediate": {
+          "attempts_share": 20.9,
+          "frequency_pct": 20.9,
+          "epa_per_attempt": 0.373,
+          "success_rate": 50.3,
+          "yards_per_attempt": 8.54,
+          "sample_attempts": 143
+        },
+        "deep": {
+          "attempts_share": 13.3,
+          "frequency_pct": 13.3,
+          "epa_per_attempt": 0.614,
+          "success_rate": 36.3,
+          "yards_per_attempt": 12.79,
+          "sample_attempts": 91
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 13.0,
+          "frequency_pct": 13.0,
+          "epa_per_attempt": -0.378,
+          "success_rate": 27.0,
+          "yards_per_attempt": 2.99,
+          "sample_attempts": 89
+        },
+        "short": {
+          "attempts_share": 52.8,
+          "frequency_pct": 52.8,
+          "epa_per_attempt": -0.01,
+          "success_rate": 49.4,
+          "yards_per_attempt": 5.38,
+          "sample_attempts": 362
+        },
+        "intermediate": {
+          "attempts_share": 20.9,
+          "frequency_pct": 20.9,
+          "epa_per_attempt": 0.373,
+          "success_rate": 50.3,
+          "yards_per_attempt": 8.54,
+          "sample_attempts": 143
+        },
+        "deep": {
+          "attempts_share": 13.3,
+          "frequency_pct": 13.3,
+          "epa_per_attempt": 0.614,
+          "success_rate": 36.3,
+          "yards_per_attempt": 12.79,
+          "sample_attempts": 91
         }
       },
       "box_counts": {
@@ -4125,6 +5893,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 24.3,
+          "frequency_pct": 24.3,
+          "epa_per_attempt": -0.053,
+          "success_rate": 40.3,
+          "yards_per_attempt": 4.69,
+          "sample_attempts": 186
+        },
+        "short": {
+          "attempts_share": 47.8,
+          "frequency_pct": 47.8,
+          "epa_per_attempt": 0.148,
+          "success_rate": 51.1,
+          "yards_per_attempt": 6.33,
+          "sample_attempts": 366
+        },
+        "intermediate": {
+          "attempts_share": 16.4,
+          "frequency_pct": 16.4,
+          "epa_per_attempt": 0.263,
+          "success_rate": 46.0,
+          "yards_per_attempt": 8.52,
+          "sample_attempts": 126
+        },
+        "deep": {
+          "attempts_share": 11.5,
+          "frequency_pct": 11.5,
+          "epa_per_attempt": -0.034,
+          "success_rate": 25.0,
+          "yards_per_attempt": 8.55,
+          "sample_attempts": 88
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 24.3,
+          "frequency_pct": 24.3,
+          "epa_per_attempt": -0.053,
+          "success_rate": 40.3,
+          "yards_per_attempt": 4.69,
+          "sample_attempts": 186
+        },
+        "short": {
+          "attempts_share": 47.8,
+          "frequency_pct": 47.8,
+          "epa_per_attempt": 0.148,
+          "success_rate": 51.1,
+          "yards_per_attempt": 6.33,
+          "sample_attempts": 366
+        },
+        "intermediate": {
+          "attempts_share": 16.4,
+          "frequency_pct": 16.4,
+          "epa_per_attempt": 0.263,
+          "success_rate": 46.0,
+          "yards_per_attempt": 8.52,
+          "sample_attempts": 126
+        },
+        "deep": {
+          "attempts_share": 11.5,
+          "frequency_pct": 11.5,
+          "epa_per_attempt": -0.034,
+          "success_rate": 25.0,
+          "yards_per_attempt": 8.55,
+          "sample_attempts": 88
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.52,
         "rush_ypc_vs_heavy_box": 3.16,
@@ -4279,6 +6115,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 15.0,
+          "frequency_pct": 15.0,
+          "epa_per_attempt": -0.253,
+          "success_rate": 34.6,
+          "yards_per_attempt": 5.5,
+          "sample_attempts": 107
+        },
+        "short": {
+          "attempts_share": 50.8,
+          "frequency_pct": 50.8,
+          "epa_per_attempt": 0.139,
+          "success_rate": 55.9,
+          "yards_per_attempt": 6.22,
+          "sample_attempts": 363
+        },
+        "intermediate": {
+          "attempts_share": 23.1,
+          "frequency_pct": 23.1,
+          "epa_per_attempt": 0.432,
+          "success_rate": 59.4,
+          "yards_per_attempt": 10.24,
+          "sample_attempts": 165
+        },
+        "deep": {
+          "attempts_share": 11.2,
+          "frequency_pct": 11.2,
+          "epa_per_attempt": 0.911,
+          "success_rate": 50.0,
+          "yards_per_attempt": 17.36,
+          "sample_attempts": 80
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 15.0,
+          "frequency_pct": 15.0,
+          "epa_per_attempt": -0.253,
+          "success_rate": 34.6,
+          "yards_per_attempt": 5.5,
+          "sample_attempts": 107
+        },
+        "short": {
+          "attempts_share": 50.8,
+          "frequency_pct": 50.8,
+          "epa_per_attempt": 0.139,
+          "success_rate": 55.9,
+          "yards_per_attempt": 6.22,
+          "sample_attempts": 363
+        },
+        "intermediate": {
+          "attempts_share": 23.1,
+          "frequency_pct": 23.1,
+          "epa_per_attempt": 0.432,
+          "success_rate": 59.4,
+          "yards_per_attempt": 10.24,
+          "sample_attempts": 165
+        },
+        "deep": {
+          "attempts_share": 11.2,
+          "frequency_pct": 11.2,
+          "epa_per_attempt": 0.911,
+          "success_rate": 50.0,
+          "yards_per_attempt": 17.36,
+          "sample_attempts": 80
         }
       },
       "box_counts": {
@@ -4437,6 +6341,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 14.1,
+          "frequency_pct": 14.1,
+          "epa_per_attempt": -0.098,
+          "success_rate": 40.4,
+          "yards_per_attempt": 4.73,
+          "sample_attempts": 109
+        },
+        "short": {
+          "attempts_share": 52.3,
+          "frequency_pct": 52.3,
+          "epa_per_attempt": 0.227,
+          "success_rate": 57.3,
+          "yards_per_attempt": 6.33,
+          "sample_attempts": 405
+        },
+        "intermediate": {
+          "attempts_share": 24.0,
+          "frequency_pct": 24.0,
+          "epa_per_attempt": 0.536,
+          "success_rate": 61.8,
+          "yards_per_attempt": 10.76,
+          "sample_attempts": 186
+        },
+        "deep": {
+          "attempts_share": 9.7,
+          "frequency_pct": 9.7,
+          "epa_per_attempt": 0.345,
+          "success_rate": 42.7,
+          "yards_per_attempt": 11.56,
+          "sample_attempts": 75
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 14.1,
+          "frequency_pct": 14.1,
+          "epa_per_attempt": -0.098,
+          "success_rate": 40.4,
+          "yards_per_attempt": 4.73,
+          "sample_attempts": 109
+        },
+        "short": {
+          "attempts_share": 52.3,
+          "frequency_pct": 52.3,
+          "epa_per_attempt": 0.227,
+          "success_rate": 57.3,
+          "yards_per_attempt": 6.33,
+          "sample_attempts": 405
+        },
+        "intermediate": {
+          "attempts_share": 24.0,
+          "frequency_pct": 24.0,
+          "epa_per_attempt": 0.536,
+          "success_rate": 61.8,
+          "yards_per_attempt": 10.76,
+          "sample_attempts": 186
+        },
+        "deep": {
+          "attempts_share": 9.7,
+          "frequency_pct": 9.7,
+          "epa_per_attempt": 0.345,
+          "success_rate": 42.7,
+          "yards_per_attempt": 11.56,
+          "sample_attempts": 75
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 3.86,
         "rush_ypc_vs_heavy_box": 2.62,
@@ -4591,6 +6563,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 21.6,
+          "frequency_pct": 21.6,
+          "epa_per_attempt": -0.064,
+          "success_rate": 35.9,
+          "yards_per_attempt": 4.8,
+          "sample_attempts": 153
+        },
+        "short": {
+          "attempts_share": 41.5,
+          "frequency_pct": 41.5,
+          "epa_per_attempt": 0.048,
+          "success_rate": 51.0,
+          "yards_per_attempt": 5.6,
+          "sample_attempts": 294
+        },
+        "intermediate": {
+          "attempts_share": 24.4,
+          "frequency_pct": 24.4,
+          "epa_per_attempt": 0.124,
+          "success_rate": 48.0,
+          "yards_per_attempt": 8.0,
+          "sample_attempts": 173
+        },
+        "deep": {
+          "attempts_share": 12.4,
+          "frequency_pct": 12.4,
+          "epa_per_attempt": 0.361,
+          "success_rate": 30.7,
+          "yards_per_attempt": 10.72,
+          "sample_attempts": 88
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 21.6,
+          "frequency_pct": 21.6,
+          "epa_per_attempt": -0.064,
+          "success_rate": 35.9,
+          "yards_per_attempt": 4.8,
+          "sample_attempts": 153
+        },
+        "short": {
+          "attempts_share": 41.5,
+          "frequency_pct": 41.5,
+          "epa_per_attempt": 0.048,
+          "success_rate": 51.0,
+          "yards_per_attempt": 5.6,
+          "sample_attempts": 294
+        },
+        "intermediate": {
+          "attempts_share": 24.4,
+          "frequency_pct": 24.4,
+          "epa_per_attempt": 0.124,
+          "success_rate": 48.0,
+          "yards_per_attempt": 8.0,
+          "sample_attempts": 173
+        },
+        "deep": {
+          "attempts_share": 12.4,
+          "frequency_pct": 12.4,
+          "epa_per_attempt": 0.361,
+          "success_rate": 30.7,
+          "yards_per_attempt": 10.72,
+          "sample_attempts": 88
         }
       },
       "box_counts": {
@@ -4749,6 +6789,74 @@
           }
         }
       },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 20.8,
+          "frequency_pct": 20.8,
+          "epa_per_attempt": -0.374,
+          "success_rate": 25.3,
+          "yards_per_attempt": 3.61,
+          "sample_attempts": 150
+        },
+        "short": {
+          "attempts_share": 48.1,
+          "frequency_pct": 48.1,
+          "epa_per_attempt": -0.042,
+          "success_rate": 47.8,
+          "yards_per_attempt": 5.27,
+          "sample_attempts": 347
+        },
+        "intermediate": {
+          "attempts_share": 21.6,
+          "frequency_pct": 21.6,
+          "epa_per_attempt": 0.093,
+          "success_rate": 40.4,
+          "yards_per_attempt": 6.62,
+          "sample_attempts": 156
+        },
+        "deep": {
+          "attempts_share": 9.6,
+          "frequency_pct": 9.6,
+          "epa_per_attempt": 0.31,
+          "success_rate": 33.3,
+          "yards_per_attempt": 10.67,
+          "sample_attempts": 69
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 20.8,
+          "frequency_pct": 20.8,
+          "epa_per_attempt": -0.374,
+          "success_rate": 25.3,
+          "yards_per_attempt": 3.61,
+          "sample_attempts": 150
+        },
+        "short": {
+          "attempts_share": 48.1,
+          "frequency_pct": 48.1,
+          "epa_per_attempt": -0.042,
+          "success_rate": 47.8,
+          "yards_per_attempt": 5.27,
+          "sample_attempts": 347
+        },
+        "intermediate": {
+          "attempts_share": 21.6,
+          "frequency_pct": 21.6,
+          "epa_per_attempt": 0.093,
+          "success_rate": 40.4,
+          "yards_per_attempt": 6.62,
+          "sample_attempts": 156
+        },
+        "deep": {
+          "attempts_share": 9.6,
+          "frequency_pct": 9.6,
+          "epa_per_attempt": 0.31,
+          "success_rate": 33.3,
+          "yards_per_attempt": 10.67,
+          "sample_attempts": 69
+        }
+      },
       "box_counts": {
         "rush_ypc_vs_light_box": 4.76,
         "rush_ypc_vs_heavy_box": 4.0,
@@ -4903,6 +7011,74 @@
             "is_small_sample": false,
             "unit": "rate"
           }
+        }
+      },
+      "pass_depth": {
+        "behind_los": {
+          "attempts_share": 17.6,
+          "frequency_pct": 17.6,
+          "epa_per_attempt": -0.349,
+          "success_rate": 35.5,
+          "yards_per_attempt": 4.39,
+          "sample_attempts": 110
+        },
+        "short": {
+          "attempts_share": 43.5,
+          "frequency_pct": 43.5,
+          "epa_per_attempt": 0.152,
+          "success_rate": 53.3,
+          "yards_per_attempt": 5.57,
+          "sample_attempts": 272
+        },
+        "intermediate": {
+          "attempts_share": 24.5,
+          "frequency_pct": 24.5,
+          "epa_per_attempt": 0.32,
+          "success_rate": 54.9,
+          "yards_per_attempt": 9.01,
+          "sample_attempts": 153
+        },
+        "deep": {
+          "attempts_share": 14.4,
+          "frequency_pct": 14.4,
+          "epa_per_attempt": 0.207,
+          "success_rate": 33.3,
+          "yards_per_attempt": 10.4,
+          "sample_attempts": 90
+        }
+      },
+      "pass_depth_distribution": {
+        "behind_los": {
+          "attempts_share": 17.6,
+          "frequency_pct": 17.6,
+          "epa_per_attempt": -0.349,
+          "success_rate": 35.5,
+          "yards_per_attempt": 4.39,
+          "sample_attempts": 110
+        },
+        "short": {
+          "attempts_share": 43.5,
+          "frequency_pct": 43.5,
+          "epa_per_attempt": 0.152,
+          "success_rate": 53.3,
+          "yards_per_attempt": 5.57,
+          "sample_attempts": 272
+        },
+        "intermediate": {
+          "attempts_share": 24.5,
+          "frequency_pct": 24.5,
+          "epa_per_attempt": 0.32,
+          "success_rate": 54.9,
+          "yards_per_attempt": 9.01,
+          "sample_attempts": 153
+        },
+        "deep": {
+          "attempts_share": 14.4,
+          "frequency_pct": 14.4,
+          "epa_per_attempt": 0.207,
+          "success_rate": 33.3,
+          "yards_per_attempt": 10.4,
+          "sample_attempts": 90
         }
       },
       "box_counts": {

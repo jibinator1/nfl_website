@@ -177,10 +177,19 @@ def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: 
         "carries_heavy": 30,
     })
 
+    pass_depth = t_off.get("pass_depth", {
+        "behind_los": {"frequency_pct": 12.0, "attempts_share": 12.0, "epa_per_attempt": -0.30, "yards_per_attempt": 3.5, "sample_attempts": 100},
+        "short": {"frequency_pct": 50.0, "attempts_share": 50.0, "epa_per_attempt": 0.10, "yards_per_attempt": 6.0, "sample_attempts": 400},
+        "intermediate": {"frequency_pct": 25.0, "attempts_share": 25.0, "epa_per_attempt": 0.35, "yards_per_attempt": 9.0, "sample_attempts": 190},
+        "deep": {"frequency_pct": 13.0, "attempts_share": 13.0, "epa_per_attempt": 0.40, "yards_per_attempt": 11.5, "sample_attempts": 100},
+    })
+
     return {
         "team": team,
         "n_games": n_games,
         "passing_offense": pass_ypa_info,
+        "pass_depth": pass_depth,
+        "pass_depth_distribution": pass_depth,
         "game_state_splits": game_state_splits,
         "box_counts": box_counts,
         "down_distance_tendencies": {},
@@ -301,6 +310,7 @@ def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_w
                 "blitz_pct": pressure_nb.get("blitz_pct", 26.0),
             },
             "target_depth_allowed": pass_depth,
+            "pass_depth_allowed": pass_depth,
             "positional_targets_allowed": pos_targets,
         }
     }
