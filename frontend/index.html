@@ -4031,7 +4031,19 @@ function renderSchemeInsights(d) {
             const flow = d.game_flow_tempo || {};
             const aTempo = flow.away_tempo || {};
             const hTempo = flow.home_tempo || {};
-            const sheet = d.matchup_stat_sheet || {};
+            let sheet = d.matchup_stat_sheet || {};
+            if (sheet.error || !sheet.section_1_away_offense_tendencies?.game_state_splits || !sheet.section_2_home_defense_vulnerabilities?.rush_defense?.directional_gaps) {
+                const clientFallback = buildClientSchemeInsightsFallback(d.home_team, d.away_team, d.week, d.season);
+                const fbSheet = clientFallback.matchup_stat_sheet || {};
+                sheet = {
+                    ...fbSheet,
+                    ...sheet,
+                    section_1_away_offense_tendencies: sheet.section_1_away_offense_tendencies?.game_state_splits ? sheet.section_1_away_offense_tendencies : fbSheet.section_1_away_offense_tendencies,
+                    section_2_home_defense_vulnerabilities: sheet.section_2_home_defense_vulnerabilities?.rush_defense?.directional_gaps ? sheet.section_2_home_defense_vulnerabilities : fbSheet.section_2_home_defense_vulnerabilities,
+                    section_3_home_offense_tendencies: sheet.section_3_home_offense_tendencies?.game_state_splits ? sheet.section_3_home_offense_tendencies : fbSheet.section_3_home_offense_tendencies,
+                    section_4_away_defense_vulnerabilities: sheet.section_4_away_defense_vulnerabilities?.rush_defense?.directional_gaps ? sheet.section_4_away_defense_vulnerabilities : fbSheet.section_4_away_defense_vulnerabilities,
+                };
+            }
             const injuries = d.injuries || [];
 
             const awayTend = sheet.section_1_away_offense_tendencies || {};

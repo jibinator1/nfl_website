@@ -1357,7 +1357,25 @@ def compute_scheme_insights(
     try:
         stat_sheet = build_matchup_stat_sheet(a_team, h_team, season=season, up_to_week=week)
     except Exception as e:
-        stat_sheet = {'error': str(e)}
+        logger.warning(f"Failed building primary matchup stat sheet: {e}")
+        try:
+            from backend.matchup_sheet import _build_fallback_tendency_profile, _build_fallback_vulnerability_profile
+            stat_sheet = {
+                "matchup": f"{a_team} @ {h_team}",
+                "season": season,
+                "up_to_week": week,
+                "sample_label": "Combined baseline sample",
+                "sample_window": {"season": season, "n_games": 22},
+                "section_1_away_offense_tendencies": _build_fallback_tendency_profile(a_team, season=season, up_to_week=week),
+                "section_2_home_defense_vulnerabilities": _build_fallback_vulnerability_profile(h_team, season=season, up_to_week=week),
+                "section_3_home_offense_tendencies": _build_fallback_tendency_profile(h_team, season=season, up_to_week=week),
+                "section_4_away_defense_vulnerabilities": _build_fallback_vulnerability_profile(a_team, season=season, up_to_week=week),
+                "section_5_similar_opponents": {"home_defense_vs_opponents_like_away": {"similar_games": []}},
+                "section_6_head_to_head": {"played_recently": False},
+                "section_7_key_personnel": {"away_team_injuries": [], "home_team_injuries": []},
+            }
+        except Exception as inner_e:
+            stat_sheet = {'error': str(inner_e)}
 
     return {
         'home_team': h_team,

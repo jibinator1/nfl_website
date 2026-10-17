@@ -45,46 +45,30 @@
         {
           "name": "Mi.Wilson",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.9,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.4,
-          "yprr_zone": 2.1
+          "ypt": 7.03
         },
         {
           "name": "K.Bourne",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 2.21,
-          "yprr_zone": 2.07
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 9.15
         },
         {
           "name": "T.McBride",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 20.4,
-          "tgt_zone": 27.8,
-          "yprr_man": 1.55,
-          "yprr_zone": 2.09
+          "tgt_zone": 27.6,
+          "ypt": 7.24
         },
         {
           "name": "J.Love",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.25
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 2.57
         }
       ]
     },
@@ -97,7 +81,7 @@
       "rz_pass_rate": 58.3,
       "third_down_pass_rate": 76.4,
       "checkdown_pct": 21.5,
-      "flow_verdict": "Offensive tempo guided by J.Love (Lead Goal-Line Share) and 21.5% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Love red zone conversion and 21.5% check-down release rate."
     }
   },
   "ATL": {
@@ -146,46 +130,30 @@
         {
           "name": "D.London",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 33.6,
-          "tgt_zone": 27.0,
-          "yprr_man": 2.78,
-          "yprr_zone": 2.37
+          "tgt_man": 31.7,
+          "tgt_zone": 27.1,
+          "ypt": 8.75
         },
         {
           "name": "J.Dotson",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.71,
-          "yprr_zone": 1.6
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 7.29
         },
         {
           "name": "K.Pitts",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 14.8,
-          "tgt_zone": 20.2,
-          "yprr_man": 1.7,
-          "yprr_zone": 2.27
+          "tgt_zone": 20.0,
+          "ypt": 7.92
         },
         {
           "name": "Bi.Robinson",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 12.0,
-          "tgt_zone": 20.0,
-          "yprr_man": 1.08,
-          "yprr_zone": 1.62
+          "tgt_man": 12.8,
+          "tgt_zone": 19.2,
+          "ypt": 6.08
         }
       ]
     },
@@ -198,7 +166,7 @@
       "rz_pass_rate": 21.4,
       "third_down_pass_rate": 69.8,
       "checkdown_pct": 32.4,
-      "flow_verdict": "Offensive tempo guided by Bi.Robinson (Lead Goal-Line Share) and 32.4% check-down rate."
+      "flow_verdict": "Offensive tempo guided by Bi.Robinson red zone conversion and 32.4% check-down release rate."
     }
   },
   "BAL": {
@@ -247,46 +215,30 @@
         {
           "name": "Z.Flowers",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 32.4,
+          "tgt_man": 30.6,
           "tgt_zone": 26.2,
-          "yprr_man": 3.2,
-          "yprr_zone": 2.75
+          "ypt": 10.09
         },
         {
           "name": "R.Bateman",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 2.22,
-          "yprr_zone": 2.08
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 9.26
         },
         {
           "name": "M.Andrews",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 14.3,
-          "tgt_zone": 19.5,
-          "yprr_man": 1.63,
-          "yprr_zone": 2.18
+          "tgt_man": 14.4,
+          "tgt_zone": 19.4,
+          "ypt": 7.53
         },
         {
           "name": "D.Henry",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 1.27,
-          "yprr_zone": 1.85
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 7.79
         }
       ]
     },
@@ -299,7 +251,7 @@
       "rz_pass_rate": 34.9,
       "third_down_pass_rate": 75.0,
       "checkdown_pct": 15.5,
-      "flow_verdict": "Offensive tempo guided by D.Henry (Lead Goal-Line Share) and 15.5% check-down rate."
+      "flow_verdict": "Offensive tempo guided by D.Henry red zone conversion and 15.5% check-down release rate."
     }
   },
   "BUF": {
@@ -348,46 +300,30 @@
         {
           "name": "K.Shakir",
           "pos": "WR",
-          "slot_pct": 58.0,
-          "outside_pct": 42.0,
-          "inline_pct": 0.0,
-          "tgt_man": 22.1,
-          "tgt_zone": 26.4,
-          "yprr_man": 2.04,
-          "yprr_zone": 2.3
+          "tgt_man": 26.4,
+          "tgt_zone": 22.6,
+          "ypt": 8.13
         },
         {
           "name": "D.Moore",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.75,
-          "yprr_zone": 1.62
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 7.15
         },
         {
           "name": "D.Kincaid",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 14.9,
-          "tgt_zone": 20.4,
-          "yprr_man": 1.93,
-          "yprr_zone": 2.45
+          "tgt_man": 14.8,
+          "tgt_zone": 20.0,
+          "ypt": 8.94
         },
         {
           "name": "J.Cook",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 1.06,
-          "yprr_zone": 1.58
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 6.52
         }
       ]
     },
@@ -400,7 +336,7 @@
       "rz_pass_rate": 46.5,
       "third_down_pass_rate": 75.0,
       "checkdown_pct": 20.8,
-      "flow_verdict": "Offensive tempo guided by J.Cook (Lead Goal-Line Share) and 20.8% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Cook red zone conversion and 20.8% check-down release rate."
     }
   },
   "CAR": {
@@ -449,46 +385,30 @@
         {
           "name": "T.McMillan",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 30.5,
+          "tgt_man": 28.6,
           "tgt_zone": 24.4,
-          "yprr_man": 2.78,
-          "yprr_zone": 2.37
+          "ypt": 8.69
         },
         {
           "name": "J.Coker",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 2.25,
-          "yprr_zone": 2.15
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 9.86
         },
         {
           "name": "D.Waller",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.2,
-          "yprr_man": 1.74,
-          "yprr_zone": 2.31
+          "tgt_zone": 16.1,
+          "ypt": 8.13
         },
         {
           "name": "C.Hubbard",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 7.1,
-          "tgt_zone": 11.9,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.25
+          "tgt_man": 7.6,
+          "tgt_zone": 11.4,
+          "ypt": 4.6
         }
       ]
     },
@@ -501,7 +421,7 @@
       "rz_pass_rate": 63.8,
       "third_down_pass_rate": 78.0,
       "checkdown_pct": 15.1,
-      "flow_verdict": "Offensive tempo guided by C.Hubbard (Lead Goal-Line Share) and 15.1% check-down rate."
+      "flow_verdict": "Offensive tempo guided by C.Hubbard red zone conversion and 15.1% check-down release rate."
     }
   },
   "CHI": {
@@ -550,46 +470,30 @@
         {
           "name": "L.Burden",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.6,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 3.09,
-          "yprr_zone": 2.65
+          "ypt": 9.66
         },
         {
           "name": "K.Raymond",
           "pos": "WR",
-          "slot_pct": 68.0,
-          "outside_pct": 32.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 2.25,
-          "yprr_zone": 2.15
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 9.24
         },
         {
           "name": "C.Loveland",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 13.8,
-          "tgt_zone": 18.8,
-          "yprr_man": 1.72,
-          "yprr_zone": 2.29
+          "tgt_man": 13.6,
+          "tgt_zone": 18.4,
+          "ypt": 7.84
         },
         {
           "name": "D.Swift",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 7.2,
-          "tgt_zone": 12.1,
-          "yprr_man": 1.13,
-          "yprr_zone": 1.67
+          "tgt_man": 7.8,
+          "tgt_zone": 11.7,
+          "ypt": 6.89
         }
       ]
     },
@@ -602,7 +506,7 @@
       "rz_pass_rate": 42.5,
       "third_down_pass_rate": 64.3,
       "checkdown_pct": 19.6,
-      "flow_verdict": "Offensive tempo guided by D.Swift (Lead Goal-Line Share) and 19.6% check-down rate."
+      "flow_verdict": "Offensive tempo guided by D.Swift red zone conversion and 19.6% check-down release rate."
     }
   },
   "CIN": {
@@ -651,46 +555,30 @@
         {
           "name": "T.Higgins",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.0,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.81,
-          "yprr_zone": 2.39
+          "ypt": 8.72
         },
         {
           "name": "J.Chase",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 30.7,
-          "tgt_zone": 24.9,
-          "yprr_man": 2.75,
-          "yprr_zone": 2.35
+          "tgt_man": 25.2,
+          "tgt_zone": 23.0,
+          "ypt": 8.57
         },
         {
           "name": "M.Gesicki",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.2,
-          "yprr_man": 1.72,
-          "yprr_zone": 2.29
+          "tgt_zone": 16.1,
+          "ypt": 7.96
         },
         {
           "name": "C.Brown",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 9.6,
-          "tgt_zone": 16.1,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.27
+          "tgt_man": 10.3,
+          "tgt_zone": 15.4,
+          "ypt": 5.09
         }
       ]
     },
@@ -703,7 +591,7 @@
       "rz_pass_rate": 51.6,
       "third_down_pass_rate": 77.4,
       "checkdown_pct": 22.9,
-      "flow_verdict": "Offensive tempo guided by C.Brown (Lead Goal-Line Share) and 22.9% check-down rate."
+      "flow_verdict": "Offensive tempo guided by C.Brown red zone conversion and 22.9% check-down release rate."
     }
   },
   "CLE": {
@@ -752,46 +640,30 @@
         {
           "name": "K.Concepcion",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.0,
-          "tgt_zone": 22.8,
-          "yprr_man": 2.4,
-          "yprr_zone": 2.1
+          "tgt_man": 26.4,
+          "tgt_zone": 22.6,
+          "ypt": 5.14
         },
         {
           "name": "D.Boston",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 24.4,
-          "tgt_zone": 19.7,
-          "yprr_man": 3.15,
-          "yprr_zone": 2.7
+          "tgt_man": 20.6,
+          "tgt_zone": 18.8,
+          "ypt": 11.38
         },
         {
           "name": "H.Fannin",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 18.2,
-          "tgt_zone": 24.8,
-          "yprr_man": 1.45,
-          "yprr_zone": 1.97
+          "tgt_man": 17.8,
+          "tgt_zone": 24.1,
+          "ypt": 6.63
         },
         {
           "name": "Q.Judkins",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 7.1,
-          "tgt_zone": 11.8,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.28
+          "tgt_man": 7.7,
+          "tgt_zone": 11.5,
+          "ypt": 4.88
         }
       ]
     },
@@ -804,7 +676,7 @@
       "rz_pass_rate": 54.8,
       "third_down_pass_rate": 60.9,
       "checkdown_pct": 28.1,
-      "flow_verdict": "Offensive tempo guided by Q.Judkins (Lead Goal-Line Share) and 28.1% check-down rate."
+      "flow_verdict": "Offensive tempo guided by Q.Judkins red zone conversion and 28.1% check-down release rate."
     }
   },
   "DAL": {
@@ -853,46 +725,30 @@
         {
           "name": "C.Lamb",
           "pos": "WR",
-          "slot_pct": 58.0,
-          "outside_pct": 42.0,
-          "inline_pct": 0.0,
-          "tgt_man": 24.7,
-          "tgt_zone": 29.5,
-          "yprr_man": 2.23,
-          "yprr_zone": 2.51
+          "tgt_man": 29.5,
+          "tgt_zone": 25.3,
+          "ypt": 8.68
         },
         {
           "name": "G.Pickens",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.0,
-          "tgt_zone": 22.7,
-          "yprr_man": 3.02,
-          "yprr_zone": 2.59
+          "tgt_man": 25.2,
+          "tgt_zone": 23.0,
+          "ypt": 9.55
         },
         {
           "name": "J.Ferguson",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 13.7,
-          "tgt_zone": 18.7,
-          "yprr_man": 1.45,
-          "yprr_zone": 1.85
+          "tgt_zone": 18.5,
+          "ypt": 5.72
         },
         {
           "name": "J.Williams",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 1.29,
-          "yprr_zone": 1.85
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 7.95
         }
       ]
     },
@@ -905,7 +761,7 @@
       "rz_pass_rate": 50.0,
       "third_down_pass_rate": 84.7,
       "checkdown_pct": 19.0,
-      "flow_verdict": "Offensive tempo guided by J.Williams (Lead Goal-Line Share) and 19.0% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Williams red zone conversion and 19.0% check-down release rate."
     }
   },
   "DEN": {
@@ -954,46 +810,30 @@
         {
           "name": "J.Waddle",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.0,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.81,
-          "yprr_zone": 2.4
+          "ypt": 8.52
         },
         {
           "name": "C.Sutton",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 24.4,
-          "tgt_zone": 19.7,
-          "yprr_man": 2.6,
-          "yprr_zone": 2.15
+          "tgt_man": 20.8,
+          "tgt_zone": 19.0,
+          "ypt": 7.74
         },
         {
           "name": "E.Engram",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 14.4,
-          "tgt_zone": 19.6,
-          "yprr_man": 1.45,
-          "yprr_zone": 1.85
+          "tgt_man": 14.2,
+          "tgt_zone": 19.2,
+          "ypt": 6.04
         },
         {
           "name": "J.Dobbins",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.25
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 3.56
         }
       ]
     },
@@ -1006,7 +846,7 @@
       "rz_pass_rate": 61.8,
       "third_down_pass_rate": 76.9,
       "checkdown_pct": 31.7,
-      "flow_verdict": "Offensive tempo guided by J.Dobbins (Lead Goal-Line Share) and 31.7% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Dobbins red zone conversion and 31.7% check-down release rate."
     }
   },
   "DET": {
@@ -1055,46 +895,30 @@
         {
           "name": "A.St. Brown",
           "pos": "WR",
-          "slot_pct": 58.0,
-          "outside_pct": 42.0,
-          "inline_pct": 0.0,
-          "tgt_man": 26.9,
-          "tgt_zone": 32.1,
-          "yprr_man": 2.13,
-          "yprr_zone": 2.4
+          "tgt_man": 32.4,
+          "tgt_zone": 27.7,
+          "ypt": 8.21
         },
         {
           "name": "J.Williams",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.92,
-          "yprr_zone": 1.79
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 7.95
         },
         {
           "name": "S.LaPorta",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 21.0,
-          "yprr_man": 1.89,
-          "yprr_zone": 2.45
+          "tgt_man": 15.3,
+          "tgt_zone": 20.7,
+          "ypt": 9.06
         },
         {
           "name": "J.Gibbs",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 10.7,
-          "tgt_zone": 17.8,
-          "yprr_man": 1.16,
-          "yprr_zone": 1.72
+          "tgt_man": 11.5,
+          "tgt_zone": 17.3,
+          "ypt": 7.2
         }
       ]
     },
@@ -1107,7 +931,7 @@
       "rz_pass_rate": 60.3,
       "third_down_pass_rate": 84.8,
       "checkdown_pct": 16.0,
-      "flow_verdict": "Offensive tempo guided by J.Gibbs (Lead Goal-Line Share) and 16.0% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Gibbs red zone conversion and 16.0% check-down release rate."
     }
   },
   "GB": {
@@ -1156,46 +980,30 @@
         {
           "name": "M.Golden",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.8,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.55,
-          "yprr_zone": 2.16
+          "ypt": 8.61
         },
         {
           "name": "C.Watson",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 24.4,
-          "tgt_zone": 19.7,
-          "yprr_man": 3.15,
-          "yprr_zone": 2.7
+          "tgt_man": 19.0,
+          "tgt_zone": 17.3,
+          "ypt": 11.52
         },
         {
           "name": "T.Kraft",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 13.9,
-          "tgt_zone": 18.9,
-          "yprr_man": 1.95,
-          "yprr_zone": 2.45
+          "tgt_zone": 18.7,
+          "ypt": 9.85
         },
         {
           "name": "M.Lloyd",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.25
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 4.14
         }
       ]
     },
@@ -1208,7 +1016,7 @@
       "rz_pass_rate": 56.8,
       "third_down_pass_rate": 93.3,
       "checkdown_pct": 21.0,
-      "flow_verdict": "Offensive tempo guided by M.Lloyd (Lead Goal-Line Share) and 21.0% check-down rate."
+      "flow_verdict": "Offensive tempo guided by M.Lloyd red zone conversion and 21.0% check-down release rate."
     }
   },
   "HOU": {
@@ -1257,46 +1065,30 @@
         {
           "name": "N.Collins",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.8,
-          "tgt_zone": 23.2,
-          "yprr_man": 3.09,
-          "yprr_zone": 2.64
+          "tgt_man": 27.0,
+          "tgt_zone": 23.1,
+          "ypt": 9.72
         },
         {
           "name": "X.Hutchinson",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.65,
-          "yprr_zone": 1.6
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 6.81
         },
         {
           "name": "D.Schultz",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 14.7,
-          "tgt_zone": 20.0,
-          "yprr_man": 1.49,
-          "yprr_zone": 2.02
+          "tgt_man": 14.6,
+          "tgt_zone": 19.7,
+          "ypt": 7.0
         },
         {
-          "name": "J.Mixon",
+          "name": "D.Montgomery",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 1.3,
-          "yprr_zone": 1.85
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 8.11
         }
       ]
     },
@@ -1305,11 +1097,11 @@
       "pace_rank": 8,
       "proj_plays": 62.5,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "Joe Mixon (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "D.Montgomery (Lead Goal-Line Share)",
       "rz_pass_rate": 63.6,
       "third_down_pass_rate": 79.2,
       "checkdown_pct": 10.6,
-      "flow_verdict": "Offensive tempo guided by Joe Mixon (Lead Goal-Line Share) and 10.6% check-down rate."
+      "flow_verdict": "Offensive tempo guided by D.Montgomery red zone conversion and 10.6% check-down release rate."
     }
   },
   "IND": {
@@ -1358,46 +1150,30 @@
         {
           "name": "J.Downs",
           "pos": "WR",
-          "slot_pct": 58.0,
-          "outside_pct": 42.0,
-          "inline_pct": 0.0,
-          "tgt_man": 22.1,
-          "tgt_zone": 26.4,
-          "yprr_man": 1.84,
-          "yprr_zone": 2.2
+          "tgt_man": 26.4,
+          "tgt_zone": 22.6,
+          "ypt": 7.07
         },
         {
           "name": "K.Allen",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 19.6,
-          "tgt_zone": 21.0,
-          "yprr_man": 1.65,
-          "yprr_zone": 1.6
+          "tgt_man": 21.4,
+          "tgt_zone": 19.6,
+          "ypt": 6.12
         },
         {
           "name": "T.Warren",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 18.3,
-          "tgt_zone": 24.9,
-          "yprr_man": 1.45,
-          "yprr_zone": 1.97
+          "tgt_zone": 24.7,
+          "ypt": 6.96
         },
         {
           "name": "J.Taylor",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 0.9,
-          "yprr_zone": 1.38
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 5.74
         }
       ]
     },
@@ -1410,7 +1186,7 @@
       "rz_pass_rate": 42.1,
       "third_down_pass_rate": 69.2,
       "checkdown_pct": 22.1,
-      "flow_verdict": "Offensive tempo guided by J.Taylor (Lead Goal-Line Share) and 22.1% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Taylor red zone conversion and 22.1% check-down release rate."
     }
   },
   "JAX": {
@@ -1459,46 +1235,30 @@
         {
           "name": "P.Washington",
           "pos": "WR",
-          "slot_pct": 58.0,
-          "outside_pct": 42.0,
-          "inline_pct": 0.0,
-          "tgt_man": 22.1,
-          "tgt_zone": 26.4,
-          "yprr_man": 2.19,
-          "yprr_zone": 2.46
+          "tgt_man": 26.4,
+          "tgt_zone": 22.6,
+          "ypt": 8.78
         },
         {
           "name": "B.Thomas Jr.",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 26.3,
-          "tgt_zone": 21.3,
-          "yprr_man": 2.84,
-          "yprr_zone": 2.42
+          "tgt_man": 23.8,
+          "tgt_zone": 21.8,
+          "ypt": 8.88
         },
         {
           "name": "B.Strange",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 12.0,
-          "tgt_zone": 16.3,
-          "yprr_man": 1.83,
-          "yprr_zone": 2.42
+          "tgt_man": 12.2,
+          "tgt_zone": 16.4,
+          "ypt": 8.53
         },
         {
           "name": "B.Tuten",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 1.03,
-          "yprr_zone": 1.54
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 6.54
         }
       ]
     },
@@ -1511,7 +1271,7 @@
       "rz_pass_rate": 52.9,
       "third_down_pass_rate": 56.8,
       "checkdown_pct": 14.3,
-      "flow_verdict": "Offensive tempo guided by B.Tuten (Lead Goal-Line Share) and 14.3% check-down rate."
+      "flow_verdict": "Offensive tempo guided by B.Tuten red zone conversion and 14.3% check-down release rate."
     }
   },
   "KC": {
@@ -1560,46 +1320,30 @@
         {
           "name": "X.Worthy",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.8,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.4,
-          "yprr_zone": 2.1
+          "ypt": 6.75
         },
         {
           "name": "R.Rice",
           "pos": "WR",
-          "slot_pct": 68.0,
-          "outside_pct": 32.0,
-          "inline_pct": 0.0,
-          "tgt_man": 22.6,
-          "tgt_zone": 24.2,
-          "yprr_man": 2.05,
-          "yprr_zone": 1.91
+          "tgt_man": 25.2,
+          "tgt_zone": 23.0,
+          "ypt": 8.46
         },
         {
           "name": "T.Kelce",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 18.0,
-          "tgt_zone": 24.5,
-          "yprr_man": 1.56,
-          "yprr_zone": 2.1
+          "tgt_zone": 24.3,
+          "ypt": 7.3
         },
         {
           "name": "K.Walker",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 8.0,
-          "tgt_zone": 13.3,
-          "yprr_man": 1.0,
-          "yprr_zone": 1.5
+          "tgt_man": 8.5,
+          "tgt_zone": 12.7,
+          "ypt": 6.16
         }
       ]
     },
@@ -1612,7 +1356,7 @@
       "rz_pass_rate": 56.0,
       "third_down_pass_rate": 73.5,
       "checkdown_pct": 30.4,
-      "flow_verdict": "Offensive tempo guided by K.Walker (Lead Goal-Line Share) and 30.4% check-down rate."
+      "flow_verdict": "Offensive tempo guided by K.Walker red zone conversion and 30.4% check-down release rate."
     }
   },
   "LA": {
@@ -1661,46 +1405,30 @@
         {
           "name": "D.Adams",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 31.6,
-          "tgt_zone": 25.4,
-          "yprr_man": 2.49,
-          "yprr_zone": 2.11
+          "tgt_man": 29.3,
+          "tgt_zone": 25.0,
+          "ypt": 7.64
         },
         {
           "name": "P.Nacua",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 30.7,
-          "tgt_zone": 24.9,
-          "yprr_man": 3.13,
-          "yprr_zone": 2.68
+          "tgt_man": 25.2,
+          "tgt_zone": 23.0,
+          "ypt": 9.6
         },
         {
           "name": "T.Higbee",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.2,
-          "yprr_man": 1.55,
-          "yprr_zone": 2.09
+          "tgt_zone": 16.1,
+          "ypt": 7.82
         },
         {
           "name": "K.Williams",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 1.01,
-          "yprr_zone": 1.52
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 6.53
         }
       ]
     },
@@ -1713,7 +1441,7 @@
       "rz_pass_rate": 48.6,
       "third_down_pass_rate": 78.0,
       "checkdown_pct": 11.9,
-      "flow_verdict": "Offensive tempo guided by K.Williams (Lead Goal-Line Share) and 11.9% check-down rate."
+      "flow_verdict": "Offensive tempo guided by K.Williams red zone conversion and 11.9% check-down release rate."
     }
   },
   "LAC": {
@@ -1762,46 +1490,30 @@
         {
           "name": "T.Harris",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.6,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.68,
-          "yprr_zone": 2.28
+          "ypt": 8.07
         },
         {
           "name": "Q.Johnston",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 19.2,
-          "tgt_zone": 20.6,
-          "yprr_man": 1.94,
-          "yprr_zone": 1.81
+          "tgt_man": 21.0,
+          "tgt_zone": 19.2,
+          "ypt": 8.01
         },
         {
           "name": "O.Gadsden",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.3,
-          "yprr_man": 1.91,
-          "yprr_zone": 2.45
+          "tgt_zone": 16.1,
+          "ypt": 8.82
         },
         {
           "name": "O.Hampton",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 7.1,
-          "tgt_zone": 11.9,
-          "yprr_man": 0.89,
-          "yprr_zone": 1.37
+          "tgt_man": 7.3,
+          "tgt_zone": 11.0,
+          "ypt": 5.54
         }
       ]
     },
@@ -1814,7 +1526,7 @@
       "rz_pass_rate": 40.5,
       "third_down_pass_rate": 78.8,
       "checkdown_pct": 21.2,
-      "flow_verdict": "Offensive tempo guided by O.Hampton (Lead Goal-Line Share) and 21.2% check-down rate."
+      "flow_verdict": "Offensive tempo guided by O.Hampton red zone conversion and 21.2% check-down release rate."
     }
   },
   "LV": {
@@ -1863,46 +1575,30 @@
         {
           "name": "T.Tucker",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.8,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.45,
-          "yprr_zone": 2.1
+          "ypt": 7.51
         },
         {
           "name": "J.Nailor",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 2.07,
-          "yprr_zone": 1.94
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 8.58
         },
         {
           "name": "B.Bowers",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 20.4,
-          "tgt_zone": 27.8,
-          "yprr_man": 1.69,
-          "yprr_zone": 2.25
+          "tgt_zone": 27.6,
+          "ypt": 8.01
         },
         {
           "name": "A.Jeanty",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 11.5,
-          "tgt_zone": 19.2,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.31
+          "tgt_man": 12.3,
+          "tgt_zone": 18.5,
+          "ypt": 5.45
         }
       ]
     },
@@ -1915,7 +1611,7 @@
       "rz_pass_rate": 58.7,
       "third_down_pass_rate": 82.4,
       "checkdown_pct": 11.4,
-      "flow_verdict": "Offensive tempo guided by A.Jeanty (Lead Goal-Line Share) and 11.4% check-down rate."
+      "flow_verdict": "Offensive tempo guided by A.Jeanty red zone conversion and 11.4% check-down release rate."
     }
   },
   "MIA": {
@@ -1964,46 +1660,30 @@
         {
           "name": "M.Washington",
           "pos": "WR",
-          "slot_pct": 58.0,
-          "outside_pct": 42.0,
-          "inline_pct": 0.0,
-          "tgt_man": 22.1,
-          "tgt_zone": 26.4,
-          "yprr_man": 1.8,
-          "yprr_zone": 2.2
+          "tgt_man": 26.4,
+          "tgt_zone": 22.6,
+          "ypt": 5.72
         },
         {
           "name": "C.Bell",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.73,
-          "yprr_zone": 1.61
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 6.13
         },
         {
           "name": "G.Dulcich",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.2,
-          "yprr_man": 1.7,
-          "yprr_zone": 2.27
+          "tgt_zone": 16.1,
+          "ypt": 7.9
         },
         {
           "name": "D.Achane",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 12.0,
-          "tgt_zone": 20.0,
-          "yprr_man": 0.99,
-          "yprr_zone": 1.5
+          "tgt_man": 12.8,
+          "tgt_zone": 19.2,
+          "ypt": 6.14
         }
       ]
     },
@@ -2016,7 +1696,7 @@
       "rz_pass_rate": 33.3,
       "third_down_pass_rate": 68.0,
       "checkdown_pct": 23.7,
-      "flow_verdict": "Offensive tempo guided by D.Achane (Lead Goal-Line Share) and 23.7% check-down rate."
+      "flow_verdict": "Offensive tempo guided by D.Achane red zone conversion and 23.7% check-down release rate."
     }
   },
   "MIN": {
@@ -2065,46 +1745,30 @@
         {
           "name": "J.Addison",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.0,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.66,
-          "yprr_zone": 2.26
+          "ypt": 8.24
         },
         {
           "name": "J.Jefferson",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 26.9,
-          "tgt_zone": 21.8,
-          "yprr_man": 2.83,
-          "yprr_zone": 2.41
+          "tgt_man": 23.9,
+          "tgt_zone": 21.9,
+          "ypt": 8.9
         },
         {
           "name": "T.Hockenson",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 15.2,
-          "tgt_zone": 20.7,
-          "yprr_man": 1.5,
-          "yprr_zone": 2.04
+          "tgt_man": 14.8,
+          "tgt_zone": 20.0,
+          "ypt": 7.06
         },
         {
           "name": "A.Jones",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 8.9,
-          "tgt_zone": 14.9,
-          "yprr_man": 0.92,
-          "yprr_zone": 1.41
+          "tgt_man": 9.5,
+          "tgt_zone": 14.3,
+          "ypt": 5.61
         }
       ]
     },
@@ -2113,11 +1777,11 @@
       "pace_rank": 1,
       "proj_plays": 58.5,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "J.Mason (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "A.Jones (Lead Goal-Line Share)",
       "rz_pass_rate": 56.5,
       "third_down_pass_rate": 85.0,
       "checkdown_pct": 25.0,
-      "flow_verdict": "Offensive tempo guided by J.Mason (Lead Goal-Line Share) and 25.0% check-down rate."
+      "flow_verdict": "Offensive tempo guided by A.Jones red zone conversion and 25.0% check-down release rate."
     }
   },
   "NE": {
@@ -2166,46 +1830,30 @@
         {
           "name": "M.Hollins",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.7,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.71,
-          "yprr_zone": 2.31
+          "ypt": 8.42
         },
         {
           "name": "R.Doubs",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 24.4,
-          "tgt_zone": 19.7,
-          "yprr_man": 2.77,
-          "yprr_zone": 2.36
+          "tgt_man": 19.6,
+          "tgt_zone": 17.9,
+          "ypt": 8.58
         },
         {
           "name": "H.Henry",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 15.5,
-          "tgt_zone": 21.2,
-          "yprr_man": 1.69,
-          "yprr_zone": 2.26
+          "tgt_man": 15.4,
+          "tgt_zone": 20.8,
+          "ypt": 7.98
         },
         {
           "name": "R.Stevenson",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 7.4,
-          "tgt_zone": 12.4,
-          "yprr_man": 1.04,
-          "yprr_zone": 1.56
+          "tgt_man": 7.9,
+          "tgt_zone": 11.9,
+          "ypt": 6.43
         }
       ]
     },
@@ -2214,11 +1862,11 @@
       "pace_rank": 6,
       "proj_plays": 62.5,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "D.Maye (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "R.Stevenson (Lead Goal-Line Share)",
       "rz_pass_rate": 70.8,
       "third_down_pass_rate": 72.5,
       "checkdown_pct": 20.9,
-      "flow_verdict": "Offensive tempo guided by D.Maye (Lead Goal-Line Share) and 20.9% check-down rate."
+      "flow_verdict": "Offensive tempo guided by R.Stevenson red zone conversion and 20.9% check-down release rate."
     }
   },
   "NO": {
@@ -2267,46 +1915,30 @@
         {
           "name": "C.Olave",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 30.9,
+          "tgt_man": 29.0,
           "tgt_zone": 24.8,
-          "yprr_man": 2.67,
-          "yprr_zone": 2.27
+          "ypt": 8.27
         },
         {
           "name": "D.Vele",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.93,
-          "yprr_zone": 1.8
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 7.79
         },
         {
           "name": "J.Johnson",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.2,
-          "yprr_man": 1.83,
-          "yprr_zone": 2.43
+          "tgt_zone": 16.1,
+          "ypt": 8.43
         },
         {
           "name": "T.Etienne",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.27
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 5.08
         }
       ]
     },
@@ -2315,11 +1947,11 @@
       "pace_rank": 5,
       "proj_plays": 72.8,
       "proj_top_pct": 50.0,
-      "red_zone_touch_leader": "T.Shough (Lead Goal-Line Share)",
+      "red_zone_touch_leader": "T.Etienne (Lead Goal-Line Share)",
       "rz_pass_rate": 59.6,
       "third_down_pass_rate": 77.4,
       "checkdown_pct": 17.2,
-      "flow_verdict": "Offensive tempo guided by T.Shough (Lead Goal-Line Share) and 17.2% check-down rate."
+      "flow_verdict": "Offensive tempo guided by T.Etienne red zone conversion and 17.2% check-down release rate."
     }
   },
   "NYG": {
@@ -2368,46 +2000,30 @@
         {
           "name": "M.Nabers",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 37.8,
-          "tgt_zone": 30.2,
-          "yprr_man": 2.4,
-          "yprr_zone": 2.1
+          "tgt_man": 35.7,
+          "tgt_zone": 30.5,
+          "ypt": 7.19
         },
         {
           "name": "M.Fields",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 2.03,
-          "yprr_zone": 1.9
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 8.59
         },
         {
           "name": "I.Likely",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 12.8,
-          "tgt_zone": 17.5,
-          "yprr_man": 1.61,
-          "yprr_zone": 2.16
+          "tgt_man": 13.1,
+          "tgt_zone": 17.7,
+          "ypt": 7.52
         },
         {
           "name": "C.Skattebo",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 8.6,
-          "tgt_zone": 14.4,
-          "yprr_man": 1.09,
-          "yprr_zone": 1.62
+          "tgt_man": 8.9,
+          "tgt_zone": 13.3,
+          "ypt": 6.5
         }
       ]
     },
@@ -2420,7 +2036,7 @@
       "rz_pass_rate": 44.1,
       "third_down_pass_rate": 80.8,
       "checkdown_pct": 16.1,
-      "flow_verdict": "Offensive tempo guided by C.Skattebo (Lead Goal-Line Share) and 16.1% check-down rate."
+      "flow_verdict": "Offensive tempo guided by C.Skattebo red zone conversion and 16.1% check-down release rate."
     }
   },
   "NYJ": {
@@ -2469,46 +2085,30 @@
         {
           "name": "G.Wilson",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 33.6,
-          "tgt_zone": 26.9,
-          "yprr_man": 2.4,
-          "yprr_zone": 2.1
+          "tgt_man": 31.8,
+          "tgt_zone": 27.2,
+          "ypt": 7.35
         },
         {
           "name": "A.Mitchell",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.65,
-          "yprr_zone": 1.6
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 6.17
         },
         {
           "name": "K.Sadiq",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 14.9,
-          "tgt_zone": 20.4,
-          "yprr_man": 1.7,
-          "yprr_zone": 2.27
+          "tgt_man": 13.7,
+          "tgt_zone": 18.5,
+          "ypt": 6.95
         },
         {
           "name": "B.Hall",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 9.1,
-          "tgt_zone": 15.2,
-          "yprr_man": 1.14,
-          "yprr_zone": 1.69
+          "tgt_man": 9.5,
+          "tgt_zone": 14.2,
+          "ypt": 6.98
         }
       ]
     },
@@ -2521,7 +2121,7 @@
       "rz_pass_rate": 50.0,
       "third_down_pass_rate": 75.5,
       "checkdown_pct": 19.2,
-      "flow_verdict": "Offensive tempo guided by B.Hall (Lead Goal-Line Share) and 19.2% check-down rate."
+      "flow_verdict": "Offensive tempo guided by B.Hall red zone conversion and 19.2% check-down release rate."
     }
   },
   "PHI": {
@@ -2570,46 +2170,30 @@
         {
           "name": "D.Smith",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 31.1,
+          "tgt_man": 29.3,
           "tgt_zone": 25.0,
-          "yprr_man": 2.89,
-          "yprr_zone": 2.47
+          "ypt": 9.07
         },
         {
           "name": "D.Wicks",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.65,
-          "yprr_zone": 1.6
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 6.71
         },
         {
           "name": "D.Goedert",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 16.8,
+          "tgt_man": 16.9,
           "tgt_zone": 22.9,
-          "yprr_man": 1.77,
-          "yprr_zone": 2.35
+          "ypt": 8.04
         },
         {
           "name": "S.Barkley",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 8.5,
-          "tgt_zone": 14.2,
-          "yprr_man": 0.9,
-          "yprr_zone": 1.38
+          "tgt_man": 9.1,
+          "tgt_zone": 13.7,
+          "ypt": 5.59
         }
       ]
     },
@@ -2622,7 +2206,7 @@
       "rz_pass_rate": 37.8,
       "third_down_pass_rate": 77.4,
       "checkdown_pct": 19.7,
-      "flow_verdict": "Offensive tempo guided by S.Barkley (Lead Goal-Line Share) and 19.7% check-down rate."
+      "flow_verdict": "Offensive tempo guided by S.Barkley red zone conversion and 19.7% check-down release rate."
     }
   },
   "PIT": {
@@ -2671,46 +2255,30 @@
         {
           "name": "D.Metcalf",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.1,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.75,
-          "yprr_zone": 2.34
+          "ypt": 8.47
         },
         {
           "name": "R.Wilson",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 15.4,
-          "tgt_zone": 16.5,
-          "yprr_man": 1.91,
-          "yprr_zone": 1.78
+          "tgt_man": 16.8,
+          "tgt_zone": 15.4,
+          "ypt": 7.7
         },
         {
           "name": "P.Freiermuth",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 12.0,
-          "tgt_zone": 16.4,
-          "yprr_man": 1.79,
-          "yprr_zone": 2.38
+          "tgt_man": 12.3,
+          "tgt_zone": 16.6,
+          "ypt": 8.28
         },
         {
           "name": "J.Warren",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 8.2,
-          "tgt_zone": 13.7,
-          "yprr_man": 1.14,
-          "yprr_zone": 1.69
+          "tgt_man": 9.0,
+          "tgt_zone": 13.5,
+          "ypt": 7.4
         }
       ]
     },
@@ -2723,7 +2291,7 @@
       "rz_pass_rate": 71.0,
       "third_down_pass_rate": 85.7,
       "checkdown_pct": 22.6,
-      "flow_verdict": "Offensive tempo guided by J.Warren (Lead Goal-Line Share) and 22.6% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Warren red zone conversion and 22.6% check-down release rate."
     }
   },
   "SEA": {
@@ -2772,46 +2340,30 @@
         {
           "name": "J.Smith-Njigba",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 36.4,
-          "tgt_zone": 29.1,
-          "yprr_man": 3.14,
-          "yprr_zone": 2.69
+          "tgt_man": 34.2,
+          "tgt_zone": 29.2,
+          "ypt": 9.95
         },
         {
           "name": "R.Shaheed",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 24.4,
-          "tgt_zone": 19.7,
-          "yprr_man": 2.6,
-          "yprr_zone": 2.15
+          "tgt_man": 18.4,
+          "tgt_zone": 16.9,
+          "ypt": 7.49
         },
         {
           "name": "A.Barner",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.2,
-          "yprr_man": 1.52,
-          "yprr_zone": 2.06
+          "tgt_zone": 16.1,
+          "ypt": 6.94
         },
         {
           "name": "E.Wilson",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 1.02,
-          "yprr_zone": 1.53
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 5.96
         }
       ]
     },
@@ -2824,7 +2376,7 @@
       "rz_pass_rate": 45.7,
       "third_down_pass_rate": 75.6,
       "checkdown_pct": 20.2,
-      "flow_verdict": "Offensive tempo guided by E.Wilson (Lead Goal-Line Share) and 20.2% check-down rate."
+      "flow_verdict": "Offensive tempo guided by E.Wilson red zone conversion and 20.2% check-down release rate."
     }
   },
   "SF": {
@@ -2873,46 +2425,30 @@
         {
           "name": "M.Evans",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.8,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.59,
-          "yprr_zone": 2.2
+          "ypt": 8.13
         },
         {
           "name": "D.Samuel",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 20.5,
-          "tgt_zone": 22.0,
-          "yprr_man": 1.95,
-          "yprr_zone": 1.82
+          "tgt_man": 22.2,
+          "tgt_zone": 20.3,
+          "ypt": 8.02
         },
         {
           "name": "G.Kittle",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 17.8,
-          "tgt_zone": 24.3,
-          "yprr_man": 1.95,
-          "yprr_zone": 2.45
+          "tgt_zone": 24.1,
+          "ypt": 10.48
         },
         {
           "name": "C.McCaffrey",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 12.0,
-          "tgt_zone": 20.0,
-          "yprr_man": 1.14,
-          "yprr_zone": 1.69
+          "tgt_man": 12.8,
+          "tgt_zone": 19.2,
+          "ypt": 6.98
         }
       ]
     },
@@ -2925,7 +2461,7 @@
       "rz_pass_rate": 48.8,
       "third_down_pass_rate": 72.5,
       "checkdown_pct": 18.8,
-      "flow_verdict": "Offensive tempo guided by C.McCaffrey (Lead Goal-Line Share) and 18.8% check-down rate."
+      "flow_verdict": "Offensive tempo guided by C.McCaffrey red zone conversion and 18.8% check-down release rate."
     }
   },
   "TB": {
@@ -2974,46 +2510,30 @@
         {
           "name": "E.Egbuka",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 28.0,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.4,
-          "yprr_zone": 2.1
+          "ypt": 7.06
         },
         {
           "name": "C.Godwin",
           "pos": "WR",
-          "slot_pct": 18.0,
-          "outside_pct": 82.0,
-          "inline_pct": 0.0,
-          "tgt_man": 19.8,
-          "tgt_zone": 21.2,
-          "yprr_man": 2.01,
-          "yprr_zone": 1.88
+          "tgt_man": 21.6,
+          "tgt_zone": 19.8,
+          "ypt": 8.32
         },
         {
           "name": "C.Otton",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 15.3,
-          "tgt_zone": 20.9,
-          "yprr_man": 1.48,
-          "yprr_zone": 2.01
+          "tgt_zone": 20.7,
+          "ypt": 6.94
         },
         {
           "name": "B.Irving",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 7.6,
-          "tgt_zone": 12.6,
-          "yprr_man": 1.15,
-          "yprr_zone": 1.7
+          "tgt_man": 8.1,
+          "tgt_zone": 12.1,
+          "ypt": 7.05
         }
       ]
     },
@@ -3026,7 +2546,7 @@
       "rz_pass_rate": 47.9,
       "third_down_pass_rate": 73.5,
       "checkdown_pct": 25.0,
-      "flow_verdict": "Offensive tempo guided by B.Irving (Lead Goal-Line Share) and 25.0% check-down rate."
+      "flow_verdict": "Offensive tempo guided by B.Irving red zone conversion and 25.0% check-down release rate."
     }
   },
   "TEN": {
@@ -3075,46 +2595,30 @@
         {
           "name": "C.Tate",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 35.1,
-          "tgt_zone": 28.1,
-          "yprr_man": 2.7,
-          "yprr_zone": 2.29
+          "tgt_man": 29.4,
+          "tgt_zone": 25.1,
+          "ypt": 7.41
         },
         {
           "name": "W.Robinson",
           "pos": "WR",
-          "slot_pct": 68.0,
-          "outside_pct": 32.0,
-          "inline_pct": 0.0,
-          "tgt_man": 22.6,
-          "tgt_zone": 24.2,
-          "yprr_man": 1.65,
-          "yprr_zone": 1.6
+          "tgt_man": 25.2,
+          "tgt_zone": 23.0,
+          "ypt": 6.09
         },
         {
           "name": "G.Helm",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
           "tgt_man": 11.9,
-          "tgt_zone": 16.2,
-          "yprr_man": 1.45,
-          "yprr_zone": 1.85
+          "tgt_zone": 16.1,
+          "ypt": 6.13
         },
         {
           "name": "T.Pollard",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 7.3,
-          "tgt_zone": 12.2,
-          "yprr_man": 0.85,
-          "yprr_zone": 1.25
+          "tgt_man": 7.7,
+          "tgt_zone": 11.5,
+          "ypt": 4.25
         }
       ]
     },
@@ -3127,7 +2631,7 @@
       "rz_pass_rate": 35.7,
       "third_down_pass_rate": 70.8,
       "checkdown_pct": 19.8,
-      "flow_verdict": "Offensive tempo guided by T.Pollard (Lead Goal-Line Share) and 19.8% check-down rate."
+      "flow_verdict": "Offensive tempo guided by T.Pollard red zone conversion and 19.8% check-down release rate."
     }
   },
   "WAS": {
@@ -3176,46 +2680,30 @@
         {
           "name": "S.Diggs",
           "pos": "WR",
-          "slot_pct": 26.0,
-          "outside_pct": 74.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.8,
+          "tgt_man": 26.4,
           "tgt_zone": 22.6,
-          "yprr_man": 2.74,
-          "yprr_zone": 2.33
+          "ypt": 8.52
         },
         {
           "name": "T.McLaurin",
           "pos": "WR",
-          "slot_pct": 20.0,
-          "outside_pct": 80.0,
-          "inline_pct": 0.0,
-          "tgt_man": 27.0,
-          "tgt_zone": 21.9,
-          "yprr_man": 2.91,
-          "yprr_zone": 2.49
+          "tgt_man": 24.3,
+          "tgt_zone": 22.2,
+          "ypt": 9.27
         },
         {
           "name": "C.Okonkwo",
           "pos": "TE",
-          "slot_pct": 44.0,
-          "outside_pct": 10.0,
-          "inline_pct": 46.0,
-          "tgt_man": 12.2,
-          "tgt_zone": 16.6,
-          "yprr_man": 1.45,
-          "yprr_zone": 1.97
+          "tgt_man": 12.5,
+          "tgt_zone": 16.9,
+          "ypt": 6.91
         },
         {
           "name": "J.Croskey-Merritt",
           "pos": "RB",
-          "slot_pct": 10.0,
-          "outside_pct": 5.0,
-          "inline_pct": 0.0,
-          "tgt_man": 6.8,
-          "tgt_zone": 11.2,
-          "yprr_man": 0.87,
-          "yprr_zone": 1.34
+          "tgt_man": 7.2,
+          "tgt_zone": 10.8,
+          "ypt": 5.4
         }
       ]
     },
@@ -3228,7 +2716,7 @@
       "rz_pass_rate": 50.0,
       "third_down_pass_rate": 71.9,
       "checkdown_pct": 16.8,
-      "flow_verdict": "Offensive tempo guided by J.Croskey-Merritt (Lead Goal-Line Share) and 16.8% check-down rate."
+      "flow_verdict": "Offensive tempo guided by J.Croskey-Merritt red zone conversion and 16.8% check-down release rate."
     }
   }
 }
