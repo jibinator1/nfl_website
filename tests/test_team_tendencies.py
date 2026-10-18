@@ -382,5 +382,31 @@ def test_pass_depth_rankings_and_league_medians():
     assert cov["deep"]["rank"] == 30
     assert cov["deep"]["league_median"] == jax_def["deep"]["league_median"]
 
+    # Situational pass depth ranks verification
+    lead_pd = dyn_full["HOU"]["offense"]["game_state_splits"]["leading"]["pass_depth"]
+    neut_pd = dyn_full["HOU"]["offense"]["game_state_splits"]["neutral"]["pass_depth"]
+    trail_pd = dyn_full["HOU"]["offense"]["game_state_splits"]["trailing"]["pass_depth"]
+    for zone in ["behind_los", "short", "intermediate", "deep", "deep_16_plus"]:
+        assert lead_pd[zone]["rank"] is not None
+        assert 1 <= lead_pd[zone]["rank"] <= 32
+        assert neut_pd[zone]["rank"] is not None
+        assert 1 <= neut_pd[zone]["rank"] <= 32
+        assert trail_pd[zone]["rank"] is not None
+        assert 1 <= trail_pd[zone]["rank"] <= 32
+
+    # Positional targets allowed ranks verification
+    jax_pos = dyn_full["JAX"]["defense"]["positional_targets_allowed"]
+    for p in ["wr", "te", "rb"]:
+        assert jax_pos[p]["rank"] is not None
+        assert 1 <= jax_pos[p]["rank"] <= 32
+        assert "league_median" in jax_pos[p]
+
+    # Box counts ranks verification
+    jax_box_def = dyn_full["JAX"]["defense"]["box_counts"]
+    hou_box_off = dyn_full["HOU"]["offense"]["box_counts"]
+    assert 1 <= jax_box_def["light_box_rate_rank"] <= 32
+    assert 1 <= hou_box_off["rush_ypc_vs_light_box_rank"] <= 32
+
+
 
 

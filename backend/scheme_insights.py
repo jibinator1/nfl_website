@@ -897,6 +897,68 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
         for k in depth_keys
     }
 
+    # Situational pass depth ranks: Ahead, Neutral, Trailing (ranked by highest share %)
+    med_lead_depth_share = {
+        k: round(float(np.median([v['lead_depth'][k]['attempts_share'] for v in raw.values()])), 1)
+        for k in depth_keys
+    }
+    rk_lead_depth_share = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['lead_depth'][k]['attempts_share'], reverse=True))}
+        for k in depth_keys
+    }
+
+    med_neut_depth_share = {
+        k: round(float(np.median([v['neut_depth'][k]['attempts_share'] for v in raw.values()])), 1)
+        for k in depth_keys
+    }
+    rk_neut_depth_share = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['neut_depth'][k]['attempts_share'], reverse=True))}
+        for k in depth_keys
+    }
+
+    med_trail_depth_share = {
+        k: round(float(np.median([v['trail_depth'][k]['attempts_share'] for v in raw.values()])), 1)
+        for k in depth_keys
+    }
+    rk_trail_depth_share = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['trail_depth'][k]['attempts_share'], reverse=True))}
+        for k in depth_keys
+    }
+
+    # Positional targets allowed ranks and medians (#1 lowest YPT allowed = best defense)
+    med_pos_ypt = {
+        p: round(float(np.median([v['pos'][p]['yards_per_target'] for v in raw.values()])), 2)
+        for p in ['wr', 'te', 'rb']
+    }
+    rk_pos_ypt = {
+        p: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['pos'][p]['yards_per_target']))}
+        for p in ['wr', 'te', 'rb']
+    }
+    med_pos_share = {
+        p: round(float(np.median([v['pos'][p]['target_share'] for v in raw.values()])), 1)
+        for p in ['wr', 'te', 'rb']
+    }
+    rk_pos_share = {
+        p: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['pos'][p]['target_share'], reverse=True))}
+        for p in ['wr', 'te', 'rb']
+    }
+
+    # Box count ranks and medians
+    med_d_lt_rate = round(float(np.median([v['d_lt_rate'] for v in raw.values()])), 3)
+    med_d_hv_rate = round(float(np.median([v['d_hv_rate'] for v in raw.values()])), 3)
+    med_d_ypc_lt = round(float(np.median([v['d_ypc_lt'] for v in raw.values()])), 2)
+    med_d_ypc_hv = round(float(np.median([v['d_ypc_hv'] for v in raw.values()])), 2)
+
+    rk_d_lt_rate = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['d_lt_rate'], reverse=True))}
+    rk_d_hv_rate = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['d_hv_rate'], reverse=True))}
+    rk_d_ypc_lt = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['d_ypc_lt']))}
+    rk_d_ypc_hv = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['d_ypc_hv']))}
+
+    med_o_ypc_lt = round(float(np.median([v['o_ypc_lt'] for v in raw.values()])), 2)
+    med_o_ypc_hv = round(float(np.median([v['o_ypc_hv'] for v in raw.values()])), 2)
+    rk_o_ypc_lt = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['o_ypc_lt'], reverse=True))}
+    rk_o_ypc_hv = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['o_ypc_hv'], reverse=True))}
+
     compiled = {}
     for tm in teams:
         d = raw[tm]
@@ -962,6 +1024,50 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
         off_pd['intermediate_10_to_19'] = off_pd['intermediate']
         off_pd['deep_20_plus'] = off_pd['deep']
 
+        def _enrich_state_depth(orig_depth, rk_dict, med_dict):
+            enriched = {}
+            for k in depth_keys:
+                orig = orig_depth[k]
+                rk = rk_dict[k][tm]
+                med = med_dict[k]
+                enriched[k] = {
+                    **orig,
+                    'rank': None if is_small else rk,
+                    'league_median': med,
+                    'rank_display': make_disp(orig['attempts_share'] / 100.0, rk, med / 100.0, is_rate=True),
+                    'n_games': ng,
+                }
+            enriched['short_0_to_5'] = enriched['short']
+            enriched['intermediate_6_to_15'] = enriched['intermediate']
+            enriched['deep_16_plus'] = enriched['deep']
+            enriched['short_0_to_9'] = enriched['short']
+            enriched['intermediate_10_to_19'] = enriched['intermediate']
+            enriched['deep_20_plus'] = enriched['deep']
+            return enriched
+
+        lead_depth_enriched = _enrich_state_depth(d['lead_depth'], rk_lead_depth_share, med_lead_depth_share)
+        neut_depth_enriched = _enrich_state_depth(d['neut_depth'], rk_neut_depth_share, med_neut_depth_share)
+        trail_depth_enriched = _enrich_state_depth(d['trail_depth'], rk_trail_depth_share, med_trail_depth_share)
+
+        pos_enriched = {}
+        for p in ['wr', 'te', 'rb']:
+            orig = d['pos'][p]
+            rk_y = rk_pos_ypt[p][tm]
+            med_y = med_pos_ypt[p]
+            rk_s = rk_pos_share[p][tm]
+            med_s = med_pos_share[p]
+            pos_enriched[p] = {
+                **orig,
+                'rank': None if is_small else rk_y,
+                'ypt_rank': None if is_small else rk_y,
+                'league_median': med_y,
+                'ypt_league_median': med_y,
+                'target_share_rank': None if is_small else rk_s,
+                'target_share_league_median': med_s,
+                'rank_display': make_disp(orig['yards_per_target'], rk_y, med_y, " YPT"),
+                'n_games': ng,
+            }
+
         compiled[tm] = {
             'n_games': ng,
             'is_small_sample': is_small,
@@ -978,9 +1084,14 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                 'pass_depth_distribution': off_pd,
                 'box_counts': {
                     'rush_ypc_vs_light_box': d['o_ypc_lt'],
+                    'rush_ypc_vs_light_box_rank': None if is_small else rk_o_ypc_lt[tm],
+                    'rush_ypc_vs_light_box_median': med_o_ypc_lt,
                     'rush_ypc_vs_heavy_box': d['o_ypc_hv'],
+                    'rush_ypc_vs_heavy_box_rank': None if is_small else rk_o_ypc_hv[tm],
+                    'rush_ypc_vs_heavy_box_median': med_o_ypc_hv,
                     'carries_light': d['o_c_lt'],
                     'carries_heavy': d['o_c_hv'],
+                    'n_games': ng,
                 },
                 'game_state_splits': {
                     'leading': {
@@ -1004,7 +1115,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'is_small_sample': bool(d['lt'] < 1),
                             'unit': 'rate'
                         },
-                        'pass_depth': d['lead_depth'],
+                        'pass_depth': lead_depth_enriched,
                     },
                     'neutral': {
                         'pass_rate': {
@@ -1027,7 +1138,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'is_small_sample': bool(d['nt'] < 1),
                             'unit': 'rate'
                         },
-                        'pass_depth': d['neut_depth'],
+                        'pass_depth': neut_depth_enriched,
                     },
                     'trailing': {
                         'pass_rate': {
@@ -1050,7 +1161,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'is_small_sample': bool(d['tt'] < 1),
                             'unit': 'rate'
                         },
-                        'pass_depth': d['trail_depth'],
+                        'pass_depth': trail_depth_enriched,
                     }
                 }
             },
@@ -1065,9 +1176,18 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                 },
                 'box_counts': {
                     'light_box_rate': d['d_lt_rate'],
+                    'light_box_rate_rank': None if is_small else rk_d_lt_rate[tm],
+                    'light_box_rate_median': med_d_lt_rate,
                     'heavy_box_rate': d['d_hv_rate'],
+                    'heavy_box_rate_rank': None if is_small else rk_d_hv_rate[tm],
+                    'heavy_box_rate_median': med_d_hv_rate,
                     'ypc_vs_light_box': d['d_ypc_lt'],
+                    'ypc_vs_light_box_rank': None if is_small else rk_d_ypc_lt[tm],
+                    'ypc_vs_light_box_median': med_d_ypc_lt,
                     'ypc_vs_heavy_box': d['d_ypc_hv'],
+                    'ypc_vs_heavy_box_rank': None if is_small else rk_d_ypc_hv[tm],
+                    'ypc_vs_heavy_box_median': med_d_ypc_hv,
+                    'n_games': ng,
                 },
                 'pressure_without_blitz': {
                     'pressure_no_blitz_pct': d['pnb_rate'],
@@ -1075,7 +1195,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                     'no_blitz_snaps': d['prs_nb'],
                     'total_pass_snaps': d['prs_tot'],
                 },
-                'positional_targets_allowed': d['pos'],
+                'positional_targets_allowed': pos_enriched,
                 'pass_depth_allowed': def_pda,
                 'target_depth_allowed': def_pda,
                 'directional_gaps': {

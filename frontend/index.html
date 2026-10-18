@@ -681,9 +681,24 @@
 
     <!-- Frontend Application Logic -->
     <script>
-        // State variables (Defaulted to previous season start 2025-09-04 through current active week 2026-10-15)
-        let startDate = '2025-09-04';
-        let endDate = '2026-10-15';
+        function getTodayDateString() {
+            const d = new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function getDefaultStartDateString() {
+            const d = new Date();
+            // Start of active NFL season is Sept 1. If currently Jan-July (month < 7), season started Sept 1 of prior year.
+            const startYear = d.getMonth() < 7 ? d.getFullYear() - 1 : d.getFullYear();
+            return `${startYear}-09-01`;
+        }
+
+        // State variables (Defaulted dynamically to September 1st of active season through today's date)
+        let startDate = getDefaultStartDateString();
+        let endDate = getTodayDateString();
         let propsDate = '2026-10-11';
         let isPropsEnabled = true;
 
@@ -3535,6 +3550,48 @@
             });
         }
 
+        function formatRankTierTag(rank, options = {}) {
+            if (rank == null) return '';
+            const r = parseInt(rank, 10);
+            if (isNaN(r) || r < 1) return '';
+
+            const { invert = false, prefix = '#', suffix = '', mode = 'badge' } = options;
+
+            let tier = 'Mid';
+            let colorClass = 'text-slate-300 bg-slate-800/80 border-slate-700/60';
+            let textOnlyColor = 'text-slate-400';
+
+            if (!invert) {
+                if (r <= 10) {
+                    tier = 'High';
+                    colorClass = 'text-emerald-300 bg-emerald-950/70 border-emerald-800/60';
+                    textOnlyColor = 'text-emerald-400';
+                } else if (r >= 22) {
+                    tier = 'Low';
+                    colorClass = 'text-rose-300 bg-rose-950/70 border-rose-800/60';
+                    textOnlyColor = 'text-rose-400';
+                }
+            } else {
+                if (r <= 10) {
+                    tier = 'Low Allowed';
+                    colorClass = 'text-emerald-300 bg-emerald-950/70 border-emerald-800/60';
+                    textOnlyColor = 'text-emerald-400';
+                } else if (r >= 22) {
+                    tier = 'High Allowed';
+                    colorClass = 'text-rose-300 bg-rose-950/70 border-rose-800/60';
+                    textOnlyColor = 'text-rose-400';
+                } else {
+                    tier = 'Mid';
+                }
+            }
+
+            if (mode === 'text') {
+                return `<span class="${textOnlyColor} font-mono text-[8px] font-semibold">${prefix}${r}${suffix ? ' ' + suffix : ''} (${tier})</span>`;
+            }
+
+            return `<span class="px-1.5 py-0.5 rounded text-[8px] font-mono border ${colorClass} inline-flex items-center gap-0.5 whitespace-nowrap">${prefix}${r}${suffix ? ' ' + suffix : ''} <span class="opacity-80 font-semibold">${tier}</span></span>`;
+        }
+
         function renderPassDepthSpectrumSvg(offDepth, defDepth, teamOff, teamDef) {
             const depthLevels = [
                 { key: 'behind_los', altKey: 'behind_los', altKey2: 'behind_los', label: 'Behind (<0)', range: '<0', defBaseline: -0.34 },
@@ -3557,10 +3614,12 @@
                 const dItem = getVal(defDepth, lvl.key, lvl.altKey, lvl.altKey2);
 
                 const share = oItem.attempts_share != null ? parseFloat(oItem.attempts_share) : (oItem.frequency_pct != null ? parseFloat(oItem.frequency_pct) : 0);
-                const oRank = oItem.rank != null ? `#${oItem.rank} Vol` : (oItem.n_games < 1 ? 'n<1' : '');
+                const oTier = oItem.rank != null ? (oItem.rank <= 10 ? 'High' : (oItem.rank >= 22 ? 'Low' : 'Mid')) : '';
+                const oRank = oItem.rank != null ? `#${oItem.rank} ${oTier}` : (oItem.n_games < 1 ? 'n<1' : '');
                 
                 const epa = dItem.epa_per_attempt != null ? (typeof dItem.epa_per_attempt === 'object' ? parseFloat(dItem.epa_per_attempt.raw_value) : parseFloat(dItem.epa_per_attempt)) : 0;
-                const dRank = dItem.rank != null ? `#${dItem.rank} Def` : (dItem.n_games < 1 ? 'n<1' : '');
+                const dTier = dItem.rank != null ? (dItem.rank <= 10 ? 'Stingy' : (dItem.rank >= 22 ? 'Vuln' : 'Mid')) : '';
+                const dRank = dItem.rank != null ? `#${dItem.rank} ${dTier}` : (dItem.n_games < 1 ? 'n<1' : '');
                 const dMed = dItem.league_median != null ? parseFloat(dItem.league_median) : lvl.defBaseline;
 
                 // Offense intensity (sky blue theme)
@@ -3635,7 +3694,7 @@
             `;
         }
 
-        function renderGroundAlignmentSvg(gapPct, zonePct, gapYpc, zoneYpc, gapRank, zoneRank, lightBoxRate, heavyBoxRate, defLightYpc, offLightYpc, offHeavyYpc) {
+        function renderGroundAlignmentSvg(gapPct, zonePct, gapYpc, zoneYpc, gapRank, zoneRank, lightBoxRate, heavyBoxRate, defLightYpc, offLightYpc, offHeavyYpc, lightBoxRank = null, heavyBoxRank = null) {
             const height = 66;
 
             const gapBarW = Math.min(156, Math.max(12, (gapPct / 100) * 156));
@@ -3645,8 +3704,17 @@
             const lightW = Math.min(148, Math.max(20, (lightBoxRate / 100) * frontW));
             const heavyW = Math.max(8, frontW - lightW);
 
+            const formatTier = (r) => {
+                if (r == null) return '';
+                const val = parseInt(r, 10);
+                if (isNaN(val)) return '';
+                const tier = val <= 10 ? 'High' : (val >= 22 ? 'Low' : 'Mid');
+                return `#${val} ${tier}`;
+            };
+
             const gapRankStr = gapRank != null ? `(#${gapRank})` : '';
             const zoneRankStr = zoneRank != null ? `(#${zoneRank})` : '';
+            const lightRankStr = lightBoxRank != null ? ` (${formatTier(lightBoxRank)})` : '';
 
             return `
                 <svg viewBox="0 0 340 ${height}" width="100%" height="auto" class="overflow-visible font-sans" preserveAspectRatio="xMidYMid meet">
@@ -3669,7 +3737,7 @@
                     <text x="176" y="9" fill="#94a3b8" font-size="8" font-family="monospace">DEF BOX USAGE &amp; OFF YPC</text>
                     <rect x="176" y="13" width="160" height="22" rx="3" fill="#1e293b" stroke="#334155" stroke-width="1"/>
                     <rect x="176" y="13" width="${lightW}" height="22" rx="3" fill="rgba(13, 148, 136, 0.8)" stroke="#14b8a6" stroke-width="0.8"/>
-                    <text x="182" y="27" fill="#f8fafc" font-size="8.5" font-weight="bold" font-family="monospace">${lightBoxRate.toFixed(0)}% Light Box</text>
+                    <text x="182" y="27" fill="#f8fafc" font-size="8.5" font-weight="bold" font-family="monospace">${lightBoxRate.toFixed(0)}% Light Box${lightRankStr}</text>
                     <text x="330" y="27" text-anchor="end" fill="#94a3b8" font-size="8" font-family="monospace">${heavyBoxRate.toFixed(0)}% Hvy</text>
 
                     <rect x="176" y="38" width="77" height="22" rx="3" fill="#161b22" stroke="#21262d" stroke-width="1"/>
@@ -3709,9 +3777,17 @@
             const neutRun = (100 - neutRate * 100).toFixed(1);
             const trailRun = (100 - trailRate * 100).toFixed(1);
 
-            const leadRankStr = leadRank != null ? `#${leadRank}` : '';
-            const neutRankStr = neutRank != null ? `#${neutRank}` : '';
-            const trailRankStr = trailRank != null ? `#${trailRank}` : '';
+            const formatRankTier = (r) => {
+                if (r == null) return '';
+                const val = parseInt(r, 10);
+                if (isNaN(val)) return '';
+                const tier = val <= 10 ? 'High' : (val >= 22 ? 'Low' : 'Mid');
+                return `#${val} ${tier}`;
+            };
+
+            const leadRankStr = formatRankTier(leadRank);
+            const neutRankStr = formatRankTier(neutRank);
+            const trailRankStr = formatRankTier(trailRank);
 
             return `
                 <svg viewBox="0 0 340 ${height}" width="100%" height="auto" class="overflow-visible font-sans" preserveAspectRatio="xMidYMid meet">
@@ -3755,20 +3831,30 @@
 
             const passPct = passVal != null ? passVal.toFixed(1) + '%' : '--';
             const runPct = runVal != null ? runVal.toFixed(1) + '%' : '--';
-            const passRankDisp = pr.rank != null ? `Pass #${pr.rank}` : (pr.sample_size != null ? `n=${pr.sample_size}` : '');
-            const rushRankDisp = rr.rank != null ? `Run #${rr.rank}` : '';
+            const passRankTag = formatRankTierTag(pr.rank, { suffix: 'Pass' });
+            const rushRankTag = formatRankTierTag(rr.rank, { suffix: 'Run' });
             const nPlays = pr.sample_size != null ? `${pr.sample_size} plays` : '';
 
-            const getShare = (k, alt1, alt2, defVal) => {
+            const getDepthItem = (k, alt1, alt2, defShare) => {
                 const item = pd[k] || pd[alt1] || (alt2 ? pd[alt2] : null) || {};
                 const s = item.attempts_share ?? item.frequency_pct;
-                return s != null ? parseFloat(s).toFixed(1) : defVal;
+                return { item, share: s != null ? parseFloat(s).toFixed(1) : defShare };
             };
 
-            const bLos = getShare('behind_los', 'behind_los', null, '11.6');
-            const sh = getShare('short', 'short_0_to_5', 'short_0_to_9', '38.7');
-            const inter = getShare('intermediate', 'intermediate_6_to_15', 'intermediate_10_to_19', '32.1');
-            const dp = getShare('deep', 'deep_16_plus', 'deep_20_plus', '17.6');
+            const bLosData = getDepthItem('behind_los', 'behind_los', null, '11.6');
+            const shData = getDepthItem('short', 'short_0_to_5', 'short_0_to_9', '38.7');
+            const interData = getDepthItem('intermediate', 'intermediate_6_to_15', 'intermediate_10_to_19', '32.1');
+            const dpData = getDepthItem('deep', 'deep_16_plus', 'deep_20_plus', '17.6');
+
+            const bLos = bLosData.share;
+            const sh = shData.share;
+            const inter = interData.share;
+            const dp = dpData.share;
+
+            const bLosRankTag = formatRankTierTag(bLosData.item?.rank, { mode: 'text' });
+            const shRankTag = formatRankTierTag(shData.item?.rank, { mode: 'text' });
+            const interRankTag = formatRankTierTag(interData.item?.rank, { mode: 'text' });
+            const dpRankTag = formatRankTierTag(dpData.item?.rank, { mode: 'text' });
 
             const bW = parseFloat(bLos);
             const sW = parseFloat(sh);
@@ -3791,8 +3877,8 @@
                                 <span class="text-sm font-bold text-slate-300">${runPct} <span class="text-[9.5px] font-normal text-slate-400">Run</span></span>
                             </div>
                             <div class="flex items-center space-x-1.5 text-[9px]">
-                                ${passRankDisp ? `<span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${passRankDisp}</span>` : ''}
-                                ${rushRankDisp ? `<span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">${rushRankDisp}</span>` : ''}
+                                ${passRankTag || (pr.sample_size != null ? `<span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">n=${pr.sample_size}</span>` : '')}
+                                ${rushRankTag}
                             </div>
                         </div>
 
@@ -3803,11 +3889,11 @@
                         </div>
                     </div>
 
-                    <!-- 4-Zone Throw Depth Profile: Clean Visual Bar & Data Row -->
+                    <!-- 4-Zone Throw Depth Profile: Clean Visual Bar & Data Row with League Ranks -->
                     <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
                         <div class="flex items-center justify-between text-[9px] text-slate-400 font-mono">
-                            <span class="text-slate-300">Throw Depth Allocation</span>
-                            <span>&lt;0 · 0–5 · 6–15 · 16+</span>
+                            <span class="text-slate-300 font-medium">Throw Depth Allocation</span>
+                            <span>&lt;0 · 0–5 · 6–15 · 16+ yds</span>
                         </div>
                         <div class="w-full bg-[#12161c] h-2 rounded-full overflow-hidden flex" title="Throw Depth: <0 (${bLos}%) | 0-5 (${sh}%) | 6-15 (${inter}%) | 16+ (${dp}%)">
                             <div class="bg-slate-500 h-full" style="width: ${bW}%"></div>
@@ -3816,10 +3902,26 @@
                             <div class="bg-sky-300 h-full" style="width: ${dW}%"></div>
                         </div>
                         <div class="grid grid-cols-4 gap-1 text-[9.5px] font-mono text-center pt-0.5">
-                            <div><span class="text-slate-500 block text-[8px]">&lt;0 yds</span><b class="text-slate-300">${bLos}%</b></div>
-                            <div><span class="text-slate-500 block text-[8px]">0–5 yds</span><b class="text-slate-300">${sh}%</b></div>
-                            <div><span class="text-slate-500 block text-[8px]">6–15 yds</span><b class="text-slate-300">${inter}%</b></div>
-                            <div><span class="text-slate-500 block text-[8px]">16+ yds</span><b class="text-sky-300 font-bold">${dp}%</b></div>
+                            <div>
+                                <span class="text-slate-500 block text-[8px]">&lt;0 yds</span>
+                                <b class="text-slate-300">${bLos}%</b>
+                                <span class="block text-[7.5px] mt-0.5">${bLosRankTag || '<span class="text-slate-500">Share</span>'}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[8px]">0–5 yds</span>
+                                <b class="text-slate-300">${sh}%</b>
+                                <span class="block text-[7.5px] mt-0.5">${shRankTag || '<span class="text-slate-500">Share</span>'}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[8px]">6–15 yds</span>
+                                <b class="text-slate-300">${inter}%</b>
+                                <span class="block text-[7.5px] mt-0.5">${interRankTag || '<span class="text-slate-500">Share</span>'}</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block text-[8px]">16+ yds</span>
+                                <b class="text-sky-300 font-bold">${dp}%</b>
+                                <span class="block text-[7.5px] mt-0.5">${dpRankTag || '<span class="text-slate-500">Share</span>'}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3857,14 +3959,14 @@
             const runShift = (parseFloat(trailRun) - parseFloat(leadRun)).toFixed(1);
             const runSign = parseFloat(runShift) >= 0 ? '+' : '';
 
-            const leadRankStr = lead.pass_rate?.rank != null ? ` #${lead.pass_rate.rank}` : '';
-            const trailRankStr = trail.pass_rate?.rank != null ? ` #${trail.pass_rate.rank}` : '';
+            const leadRankTier = lead.pass_rate?.rank != null ? ` (#${lead.pass_rate.rank} ${lead.pass_rate.rank <= 10 ? 'High' : (lead.pass_rate.rank >= 22 ? 'Low' : 'Mid')})` : '';
+            const trailRankTier = trail.pass_rate?.rank != null ? ` (#${trail.pass_rate.rank} ${trail.pass_rate.rank <= 10 ? 'High' : (trail.pass_rate.rank >= 22 ? 'Low' : 'Mid')})` : '';
 
             return `
                 <div class="bg-[#12161c] rounded-xl border border-[#30363d] p-4 space-y-3 font-mono">
                     <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
                         <div>
-                            <h4 class="text-xs font-bold text-slate-100 font-sans">${team} Situational Play Calling & Throw Depth</h4>
+                            <h4 class="text-xs font-bold text-slate-100 font-sans">${team} Situational Play Calling &amp; Throw Depth</h4>
                             <span class="text-[10px] text-slate-400 font-sans">Pass vs Run calling volume and 4-zone throw distribution (&lt;0 · 0–5 · 6–15 · 16+ yds) across game states</span>
                         </div>
                         <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-sky-300 border border-[#30363d]">Game-State Passing Splits</span>
@@ -3875,7 +3977,7 @@
                         ${cTrail}
                     </div>
                     <div class="bg-[#161b22] px-3.5 py-2.5 rounded-lg border border-[#21262d] text-[11px] text-slate-300 font-sans flex items-center justify-between">
-                        <span><b>Situational Volume Shift:</b> Pass calling shifts <span class="text-sky-300 font-bold font-mono">${passSign}${passShift}%</span> (${leadPass}%${leadRankStr} Ahead → ${trailPass}%${trailRankStr} Trailing), with run calling shifting <span class="text-slate-400 font-bold font-mono">${runSign}${runShift}%</span> (${leadRun}% → ${trailRun}%). Deep throws (16+) shift <span class="text-sky-300 font-bold font-mono">${deepSign}${deepShift}%</span> (${leadDeep}% → ${trailDeep}%).</span>
+                        <span><b>Situational Volume Shift:</b> Pass calling shifts <span class="text-sky-300 font-bold font-mono">${passSign}${passShift}%</span> (${leadPass}%${leadRankTier} Ahead → ${trailPass}%${trailRankTier} Trailing), with run calling shifting <span class="text-slate-400 font-bold font-mono">${runSign}${runShift}%</span> (${leadRun}% → ${trailRun}%). Deep throws (16+) shift <span class="text-sky-300 font-bold font-mono">${deepSign}${deepShift}%</span> (${leadDeep}% → ${trailDeep}%).</span>
                     </div>
                 </div>
             `;
@@ -3895,15 +3997,29 @@
             const neutRun = (100 - parseFloat(neutRate)).toFixed(1);
             const trailRun = (100 - parseFloat(trailRate)).toFixed(1);
 
-            const getDepthPct = (st, k, alt1, alt2) => {
-                const item = st.pass_depth?.[k] || st.pass_depth?.[alt1] || (alt2 ? st.pass_depth?.[alt2] : null) || {};
-                const val = item.attempts_share ?? item.frequency_pct;
-                return val != null ? parseFloat(val).toFixed(1) : null;
+            const getDepthItem = (st, k, alt1, alt2) => {
+                return st.pass_depth?.[k] || st.pass_depth?.[alt1] || (alt2 ? st.pass_depth?.[alt2] : null) || {};
             };
 
-            const leadDeep = getDepthPct(lead, 'deep', 'deep_16_plus', 'deep_20_plus') || '16.3';
-            const neutDeep = getDepthPct(neut, 'deep', 'deep_16_plus', 'deep_20_plus') || '15.4';
-            const trailDeep = getDepthPct(trail, 'deep', 'deep_16_plus', 'deep_20_plus') || '18.9';
+            const leadDeepItem = getDepthItem(lead, 'deep', 'deep_16_plus', 'deep_20_plus');
+            const neutDeepItem = getDepthItem(neut, 'deep', 'deep_16_plus', 'deep_20_plus');
+            const trailDeepItem = getDepthItem(trail, 'deep', 'deep_16_plus', 'deep_20_plus');
+
+            const leadDeep = (leadDeepItem.attempts_share ?? leadDeepItem.frequency_pct) != null ? parseFloat(leadDeepItem.attempts_share ?? leadDeepItem.frequency_pct).toFixed(1) : '16.3';
+            const neutDeep = (neutDeepItem.attempts_share ?? neutDeepItem.frequency_pct) != null ? parseFloat(neutDeepItem.attempts_share ?? neutDeepItem.frequency_pct).toFixed(1) : '15.4';
+            const trailDeep = (trailDeepItem.attempts_share ?? trailDeepItem.frequency_pct) != null ? parseFloat(trailDeepItem.attempts_share ?? trailDeepItem.frequency_pct).toFixed(1) : '18.9';
+
+            const leadPassTag = formatRankTierTag(lead.pass_rate?.rank);
+            const neutPassTag = formatRankTierTag(neut.pass_rate?.rank);
+            const trailPassTag = formatRankTierTag(trail.pass_rate?.rank);
+
+            const leadRunTag = formatRankTierTag(lead.rush_rate?.rank, { mode: 'text' });
+            const neutRunTag = formatRankTierTag(neut.rush_rate?.rank, { mode: 'text' });
+            const trailRunTag = formatRankTierTag(trail.rush_rate?.rank, { mode: 'text' });
+
+            const leadDeepTag = formatRankTierTag(leadDeepItem.rank, { mode: 'text' });
+            const neutDeepTag = formatRankTierTag(neutDeepItem.rank, { mode: 'text' });
+            const trailDeepTag = formatRankTierTag(trailDeepItem.rank, { mode: 'text' });
 
             const passShift = (parseFloat(trailRate) - parseFloat(leadRate)).toFixed(1);
             const passSign = parseFloat(passShift) >= 0 ? '+' : '';
@@ -3917,20 +4033,44 @@
                         <span>Pass / Run % · Deep (16+) %</span>
                     </div>
                     <div class="grid grid-cols-3 gap-1.5 text-[9.5px] font-mono text-center">
-                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                            <span class="text-slate-400 block text-[8.5px]">Ahead (≥+7)</span>
-                            <b class="text-sky-300">${leadRate}% Pass</b>
-                            <span class="text-slate-400 block text-[8.5px]">${leadRun}% Run · ${leadDeep}% Deep</span>
+                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between">
+                            <div class="flex items-center justify-between text-[8.5px]">
+                                <span class="text-slate-400 font-semibold">Ahead (≥+7)</span>
+                                ${leadPassTag}
+                            </div>
+                            <div class="my-0.5">
+                                <b class="text-sky-300 text-[10.5px]">${leadRate}% Pass</b>
+                            </div>
+                            <div class="text-slate-400 text-[8px] flex flex-col items-center gap-0.5 pt-1 border-t border-[#21262d]">
+                                <span>${leadRun}% Run ${leadRunTag}</span>
+                                <span>${leadDeep}% Deep ${leadDeepTag}</span>
+                            </div>
                         </div>
-                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                            <span class="text-slate-400 block text-[8.5px]">Neutral (±6)</span>
-                            <b class="text-sky-300">${neutRate}% Pass</b>
-                            <span class="text-slate-400 block text-[8.5px]">${neutRun}% Run · ${neutDeep}% Deep</span>
+                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between">
+                            <div class="flex items-center justify-between text-[8.5px]">
+                                <span class="text-slate-400 font-semibold">Neutral (±6)</span>
+                                ${neutPassTag}
+                            </div>
+                            <div class="my-0.5">
+                                <b class="text-sky-300 text-[10.5px]">${neutRate}% Pass</b>
+                            </div>
+                            <div class="text-slate-400 text-[8px] flex flex-col items-center gap-0.5 pt-1 border-t border-[#21262d]">
+                                <span>${neutRun}% Run ${neutRunTag}</span>
+                                <span>${neutDeep}% Deep ${neutDeepTag}</span>
+                            </div>
                         </div>
-                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                            <span class="text-slate-400 block text-[8.5px]">Trailing (≤-7)</span>
-                            <b class="text-sky-300 font-bold">${trailRate}% Pass</b>
-                            <span class="text-slate-400 block text-[8.5px]">${trailRun}% Run · ${trailDeep}% Deep</span>
+                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between">
+                            <div class="flex items-center justify-between text-[8.5px]">
+                                <span class="text-slate-400 font-semibold">Trailing (≤-7)</span>
+                                ${trailPassTag}
+                            </div>
+                            <div class="my-0.5">
+                                <b class="text-sky-300 text-[10.5px] font-bold">${trailRate}% Pass</b>
+                            </div>
+                            <div class="text-slate-400 text-[8px] flex flex-col items-center gap-0.5 pt-1 border-t border-[#21262d]">
+                                <span>${trailRun}% Run ${trailRunTag}</span>
+                                <span>${trailDeep}% Deep ${trailDeepTag}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="text-[9px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
@@ -3998,6 +4138,9 @@
                 : (aTopTgt.target_share || '24.0');
             const hDefPosAllowed = (homeVuln.pass_defense?.positional_targets_allowed || aCov.positional_targets_allowed || {})[aPosKey] || {};
             const hPosAllowedYpt = hDefPosAllowed.yards_per_target ? parseFloat(hDefPosAllowed.yards_per_target).toFixed(2) : '7.33';
+            const hPosRankBadge = hDefPosAllowed.rank != null 
+                ? ` <span class="${hDefPosAllowed.rank <= 10 ? 'text-emerald-400' : (hDefPosAllowed.rank >= 22 ? 'text-rose-400' : 'text-slate-300')} font-semibold">(#${hDefPosAllowed.rank} Def · ${hDefPosAllowed.rank <= 10 ? 'Low Allowed' : (hDefPosAllowed.rank >= 22 ? 'High Allowed' : 'Mid')})</span>` 
+                : '';
 
             const aPassSign = parseFloat(hDefWorstDepth.epa_per_attempt) > 0 ? '+' : '';
             const hDefRankStr = hDefWorstDepth.rank != null 
@@ -4028,7 +4171,7 @@
                 </div>
                 <div class="text-slate-400 flex items-center justify-between pt-0.5 border-t border-[#21262d]">
                     <span>Top Target Matchup:</span>
-                    <span class="text-slate-200">${aTopTgt.name} (${aPos}, ${aTgtShare}%) vs ${hPosAllowedYpt} YPT allowed</span>
+                    <span class="text-slate-200">${aTopTgt.name} (${aPos}, ${aTgtShare}%) vs ${hPosAllowedYpt} YPT allowed${hPosRankBadge}</span>
                 </div>
                 ${renderGameStatePassingMiniStrip(awayTend, d.away_team)}
             </div>`;
@@ -4057,6 +4200,9 @@
                 : (hTopTgt.target_share || '24.0');
             const aDefPosAllowed = (awayVuln.pass_defense?.positional_targets_allowed || hCov.positional_targets_allowed || {})[hPosKey] || {};
             const aPosAllowedYpt = aDefPosAllowed.yards_per_target ? parseFloat(aDefPosAllowed.yards_per_target).toFixed(2) : '7.67';
+            const aPosRankBadge = aDefPosAllowed.rank != null 
+                ? ` <span class="${aDefPosAllowed.rank <= 10 ? 'text-emerald-400' : (aDefPosAllowed.rank >= 22 ? 'text-rose-400' : 'text-slate-300')} font-semibold">(#${aDefPosAllowed.rank} Def · ${aDefPosAllowed.rank <= 10 ? 'Low Allowed' : (aDefPosAllowed.rank >= 22 ? 'High Allowed' : 'Mid')})</span>` 
+                : '';
 
             const hPassSign = parseFloat(aDefWorstDepth.epa_per_attempt) > 0 ? '+' : '';
             const aDefRankStr = aDefWorstDepth.rank != null 
@@ -4087,7 +4233,7 @@
                 </div>
                 <div class="text-slate-400 flex items-center justify-between pt-0.5 border-t border-[#21262d]">
                     <span>Top Target Matchup:</span>
-                    <span class="text-slate-200">${hTopTgt.name} (${hPos}, ${hTgtShare}%) vs ${aPosAllowedYpt} YPT allowed</span>
+                    <span class="text-slate-200">${hTopTgt.name} (${hPos}, ${hTgtShare}%) vs ${aPosAllowedYpt} YPT allowed${aPosRankBadge}</span>
                 </div>
                 ${renderGameStatePassingMiniStrip(homeTend, d.home_team)}
             </div>`;
@@ -4155,7 +4301,9 @@
                 hDefHeavyRate,
                 hDefLightYpc,
                 aOffLightYpc,
-                aOffHeavyYpc
+                aOffHeavyYpc,
+                hDefBox.light_box_rate_rank,
+                hDefBox.heavy_box_rate_rank
             );
 
             const hGroundSvg = renderGroundAlignmentSvg(
@@ -4169,7 +4317,9 @@
                 aDefHeavyRate,
                 aDefLightYpc,
                 hOffLightYpc,
-                hOffHeavyYpc
+                hOffHeavyYpc,
+                aDefBox.light_box_rate_rank,
+                aDefBox.heavy_box_rate_rank
             );
 
             const aGapRankStr = aGapRank != null ? `(#${aGapRank})` : '';
