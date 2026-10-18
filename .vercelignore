@@ -1,0 +1,29 @@
+# Tests and scratch scripts
+tests/
+scratch/
+experiments/
+scrape/
+scripts/
+
+# Documentation and agent configs
+README.md
+.agent/
+.env*
+
+# Local run scripts and tools
+*.bat
+*.ps1
+*.sh
+*.vbs
+deploy.*
+daily_update.*
+
+# Cache and local virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Large local raw data caches not needed by serverless API
+data/pbp_cache/pbp_*.parquet
