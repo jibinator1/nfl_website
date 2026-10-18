@@ -161,10 +161,10 @@ def main():
 
             # Offense pass depth: Behind LOS (<0), Short (0-5), Interim (6-15), Deep (16+)
             o_ay = o_pass[o_pass["air_yards"].notna()]
-            o_blos = len(o_ay[o_ay["air_yards"] < 0])
-            o_short = len(o_ay[(o_ay["air_yards"] >= 0) & (o_ay["air_yards"] <= 5)])
-            o_inter = len(o_ay[(o_ay["air_yards"] >= 6) & (o_ay["air_yards"] <= 15)])
-            o_deep = len(o_ay[o_ay["air_yards"] >= 16])
+            o_blos = o_ay[o_ay["air_yards"] < 0]
+            o_short = o_ay[(o_ay["air_yards"] >= 0) & (o_ay["air_yards"] <= 5)]
+            o_inter = o_ay[(o_ay["air_yards"] >= 6) & (o_ay["air_yards"] <= 15)]
+            o_deep = o_ay[o_ay["air_yards"] >= 16]
 
             # Offense situational pass depth by game state
             o_lead_ay = o_ay[o_ay["_state"] == "leading"]
@@ -296,10 +296,25 @@ def main():
                 "d_sr_deep": float(d_deep["success"].sum()),
                 
                 # Pass Depth Offense
-                "o_att_blos": o_blos,
-                "o_att_short": o_short,
-                "o_att_inter": o_inter,
-                "o_att_deep": o_deep,
+                "o_att_blos": len(o_blos),
+                "o_yds_blos": float(o_blos["yards_gained"].sum()),
+                "o_epa_blos": float(o_blos["epa"].sum()),
+                "o_sr_blos": float(o_blos["success"].sum()),
+                
+                "o_att_short": len(o_short),
+                "o_yds_short": float(o_short["yards_gained"].sum()),
+                "o_epa_short": float(o_short["epa"].sum()),
+                "o_sr_short": float(o_short["success"].sum()),
+                
+                "o_att_inter": len(o_inter),
+                "o_yds_inter": float(o_inter["yards_gained"].sum()),
+                "o_epa_inter": float(o_inter["epa"].sum()),
+                "o_sr_inter": float(o_inter["success"].sum()),
+                
+                "o_att_deep": len(o_deep),
+                "o_yds_deep": float(o_deep["yards_gained"].sum()),
+                "o_epa_deep": float(o_deep["epa"].sum()),
+                "o_sr_deep": float(o_deep["success"].sum()),
                 
                 # Positional Targets Allowed
                 "d_tgt_wr": d_tgt_wr,

@@ -703,19 +703,64 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
         o_att_i = int(t_sub['o_att_inter'].sum()) if 'o_att_inter' in t_sub.columns else 0
         o_att_d = int(t_sub['o_att_deep'].sum()) if 'o_att_deep' in t_sub.columns else 0
         o_att_tot = o_att_b + o_att_s + o_att_i + o_att_d
+
+        o_epa_b = float(t_sub['o_epa_blos'].sum()) if 'o_epa_blos' in t_sub.columns else 0.0
+        o_yds_b = float(t_sub['o_yds_blos'].sum()) if 'o_yds_blos' in t_sub.columns else 0.0
+        o_sr_b = float(t_sub['o_sr_blos'].sum()) if 'o_sr_blos' in t_sub.columns else 0.0
+
+        o_epa_s = float(t_sub['o_epa_short'].sum()) if 'o_epa_short' in t_sub.columns else 0.0
+        o_yds_s = float(t_sub['o_yds_short'].sum()) if 'o_yds_short' in t_sub.columns else 0.0
+        o_sr_s = float(t_sub['o_sr_short'].sum()) if 'o_sr_short' in t_sub.columns else 0.0
+
+        o_epa_i = float(t_sub['o_epa_inter'].sum()) if 'o_epa_inter' in t_sub.columns else 0.0
+        o_yds_i = float(t_sub['o_yds_inter'].sum()) if 'o_yds_inter' in t_sub.columns else 0.0
+        o_sr_i = float(t_sub['o_sr_inter'].sum()) if 'o_sr_inter' in t_sub.columns else 0.0
+
+        o_epa_d = float(t_sub['o_epa_deep'].sum()) if 'o_epa_deep' in t_sub.columns else 0.0
+        o_yds_d = float(t_sub['o_yds_deep'].sum()) if 'o_yds_deep' in t_sub.columns else 0.0
+        o_sr_d = float(t_sub['o_sr_deep'].sum()) if 'o_sr_deep' in t_sub.columns else 0.0
+
         if o_att_tot > 0:
             off_depth = {
-                'behind_los': {'attempts_share': round(o_att_b / o_att_tot * 100, 1), 'frequency_pct': round(o_att_b / o_att_tot * 100, 1), 'sample_attempts': o_att_b},
-                'short': {'attempts_share': round(o_att_s / o_att_tot * 100, 1), 'frequency_pct': round(o_att_s / o_att_tot * 100, 1), 'sample_attempts': o_att_s},
-                'intermediate': {'attempts_share': round(o_att_i / o_att_tot * 100, 1), 'frequency_pct': round(o_att_i / o_att_tot * 100, 1), 'sample_attempts': o_att_i},
-                'deep': {'attempts_share': round(o_att_d / o_att_tot * 100, 1), 'frequency_pct': round(o_att_d / o_att_tot * 100, 1), 'sample_attempts': o_att_d},
+                'behind_los': {
+                    'attempts_share': round(o_att_b / o_att_tot * 100, 1),
+                    'frequency_pct': round(o_att_b / o_att_tot * 100, 1),
+                    'sample_attempts': o_att_b,
+                    'epa_per_attempt': round(o_epa_b / o_att_b, 3) if o_att_b > 0 else -0.34,
+                    'yards_per_attempt': round(o_yds_b / o_att_b, 2) if o_att_b > 0 else 3.41,
+                    'success_rate': round(o_sr_b / o_att_b * 100.0, 1) if o_att_b > 0 else 31.5,
+                },
+                'short': {
+                    'attempts_share': round(o_att_s / o_att_tot * 100, 1),
+                    'frequency_pct': round(o_att_s / o_att_tot * 100, 1),
+                    'sample_attempts': o_att_s,
+                    'epa_per_attempt': round(o_epa_s / o_att_s, 3) if o_att_s > 0 else -0.10,
+                    'yards_per_attempt': round(o_yds_s / o_att_s, 2) if o_att_s > 0 else 5.47,
+                    'success_rate': round(o_sr_s / o_att_s * 100.0, 1) if o_att_s > 0 else 50.1,
+                },
+                'intermediate': {
+                    'attempts_share': round(o_att_i / o_att_tot * 100, 1),
+                    'frequency_pct': round(o_att_i / o_att_tot * 100, 1),
+                    'sample_attempts': o_att_i,
+                    'epa_per_attempt': round(o_epa_i / o_att_i, 3) if o_att_i > 0 else 0.25,
+                    'yards_per_attempt': round(o_yds_i / o_att_i, 2) if o_att_i > 0 else 8.27,
+                    'success_rate': round(o_sr_i / o_att_i * 100.0, 1) if o_att_i > 0 else 51.6,
+                },
+                'deep': {
+                    'attempts_share': round(o_att_d / o_att_tot * 100, 1),
+                    'frequency_pct': round(o_att_d / o_att_tot * 100, 1),
+                    'sample_attempts': o_att_d,
+                    'epa_per_attempt': round(o_epa_d / o_att_d, 3) if o_att_d > 0 else 0.28,
+                    'yards_per_attempt': round(o_yds_d / o_att_d, 2) if o_att_d > 0 else 12.33,
+                    'success_rate': round(o_sr_d / o_att_d * 100.0, 1) if o_att_d > 0 else 36.2,
+                },
             }
         else:
             off_depth = {
-                'behind_los': {'attempts_share': 12.0, 'frequency_pct': 12.0, 'sample_attempts': 0},
-                'short': {'attempts_share': 52.0, 'frequency_pct': 52.0, 'sample_attempts': 0},
-                'intermediate': {'attempts_share': 24.0, 'frequency_pct': 24.0, 'sample_attempts': 0},
-                'deep': {'attempts_share': 12.0, 'frequency_pct': 12.0, 'sample_attempts': 0},
+                'behind_los': {'attempts_share': 12.0, 'frequency_pct': 12.0, 'sample_attempts': 0, 'epa_per_attempt': -0.34, 'yards_per_attempt': 3.41, 'success_rate': 31.5},
+                'short': {'attempts_share': 52.0, 'frequency_pct': 52.0, 'sample_attempts': 0, 'epa_per_attempt': -0.10, 'yards_per_attempt': 5.47, 'success_rate': 50.1},
+                'intermediate': {'attempts_share': 24.0, 'frequency_pct': 24.0, 'sample_attempts': 0, 'epa_per_attempt': 0.25, 'yards_per_attempt': 8.27, 'success_rate': 51.6},
+                'deep': {'attempts_share': 12.0, 'frequency_pct': 12.0, 'sample_attempts': 0, 'epa_per_attempt': 0.28, 'yards_per_attempt': 12.33, 'success_rate': 36.2},
             }
         off_depth['short_0_to_5'] = off_depth['short']
         off_depth['intermediate_6_to_15'] = off_depth['intermediate']
@@ -803,6 +848,55 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
     rk_ins = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['ins_ypc']))}
     rk_out = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['out_ypc']))}
 
+    # Pass Depth 32-team medians and rankings across 4 depth tiers
+    depth_keys = ['behind_los', 'short', 'intermediate', 'deep']
+
+    med_def_depth_epa = {
+        k: round(float(np.median([v['pass_depth_allowed'][k]['epa_per_attempt'] for v in raw.values()])), 3)
+        for k in depth_keys
+    }
+    med_def_depth_ypa = {
+        k: round(float(np.median([v['pass_depth_allowed'][k]['yards_per_attempt'] for v in raw.values()])), 2)
+        for k in depth_keys
+    }
+    med_def_depth_sr = {
+        k: round(float(np.median([v['pass_depth_allowed'][k]['success_rate'] for v in raw.values()])), 1)
+        for k in depth_keys
+    }
+
+    # Defense pass depth ranks: #1 lowest EPA allowed, #1 lowest YPA allowed, #1 lowest SR allowed
+    rk_def_depth_epa = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['pass_depth_allowed'][k]['epa_per_attempt']))}
+        for k in depth_keys
+    }
+    rk_def_depth_ypa = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['pass_depth_allowed'][k]['yards_per_attempt']))}
+        for k in depth_keys
+    }
+    rk_def_depth_sr = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['pass_depth_allowed'][k]['success_rate']))}
+        for k in depth_keys
+    }
+
+    med_off_depth_share = {
+        k: round(float(np.median([v['off_depth'][k]['attempts_share'] for v in raw.values()])), 1)
+        for k in depth_keys
+    }
+    med_off_depth_epa = {
+        k: round(float(np.median([v['off_depth'][k]['epa_per_attempt'] for v in raw.values()])), 3)
+        for k in depth_keys
+    }
+
+    # Offense pass depth ranks: #1 highest share %, #1 highest EPA produced
+    rk_off_depth_share = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['off_depth'][k]['attempts_share'], reverse=True))}
+        for k in depth_keys
+    }
+    rk_off_depth_epa = {
+        k: {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['off_depth'][k]['epa_per_attempt'], reverse=True))}
+        for k in depth_keys
+    }
+
     compiled = {}
     for tm in teams:
         d = raw[tm]
@@ -816,6 +910,58 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                 return f"{val:.2f}{unit} (league median {med:.2f}{unit}, n={ng} games -- rank suppressed, small sample)"
             return f"Rank #{rk} (n={ng} games)"
 
+        # Enrich defense pass_depth_allowed with ranks and league medians
+        def_pda = {}
+        for k in depth_keys:
+            orig = d['pass_depth_allowed'][k]
+            rk_epa = rk_def_depth_epa[k][tm]
+            med_epa = med_def_depth_epa[k]
+            rk_ypa = rk_def_depth_ypa[k][tm]
+            med_ypa = med_def_depth_ypa[k]
+            rk_sr = rk_def_depth_sr[k][tm]
+            med_sr = med_def_depth_sr[k]
+            def_pda[k] = {
+                **orig,
+                'rank': None if is_small else rk_epa,
+                'league_median': med_epa,
+                'rank_display': make_disp(orig['epa_per_attempt'], rk_epa, med_epa, " EPA"),
+                'ypa_rank': None if is_small else rk_ypa,
+                'ypa_league_median': med_ypa,
+                'sr_rank': None if is_small else rk_sr,
+                'sr_league_median': med_sr,
+                'n_games': ng,
+            }
+        def_pda['short_0_to_5'] = def_pda['short']
+        def_pda['intermediate_6_to_15'] = def_pda['intermediate']
+        def_pda['deep_16_plus'] = def_pda['deep']
+        def_pda['short_0_to_9'] = def_pda['short']
+        def_pda['intermediate_10_to_19'] = def_pda['intermediate']
+        def_pda['deep_20_plus'] = def_pda['deep']
+
+        # Enrich offense pass_depth with ranks and league medians
+        off_pd = {}
+        for k in depth_keys:
+            orig = d['off_depth'][k]
+            rk_sh = rk_off_depth_share[k][tm]
+            med_sh = med_off_depth_share[k]
+            rk_e = rk_off_depth_epa[k][tm]
+            med_e = med_off_depth_epa[k]
+            off_pd[k] = {
+                **orig,
+                'rank': None if is_small else rk_sh,
+                'league_median': med_sh,
+                'rank_display': make_disp(orig['attempts_share'] / 100.0, rk_sh, med_sh / 100.0, is_rate=True),
+                'epa_rank': None if is_small else rk_e,
+                'epa_league_median': med_e,
+                'n_games': ng,
+            }
+        off_pd['short_0_to_5'] = off_pd['short']
+        off_pd['intermediate_6_to_15'] = off_pd['intermediate']
+        off_pd['deep_16_plus'] = off_pd['deep']
+        off_pd['short_0_to_9'] = off_pd['short']
+        off_pd['intermediate_10_to_19'] = off_pd['intermediate']
+        off_pd['deep_20_plus'] = off_pd['deep']
+
         compiled[tm] = {
             'n_games': ng,
             'is_small_sample': is_small,
@@ -828,8 +974,8 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                     'sample_attempts': d['p_att'],
                     'n_games': ng,
                 },
-                'pass_depth': d['off_depth'],
-                'pass_depth_distribution': d['off_depth'],
+                'pass_depth': off_pd,
+                'pass_depth_distribution': off_pd,
                 'box_counts': {
                     'rush_ypc_vs_light_box': d['o_ypc_lt'],
                     'rush_ypc_vs_heavy_box': d['o_ypc_hv'],
@@ -930,8 +1076,8 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                     'total_pass_snaps': d['prs_tot'],
                 },
                 'positional_targets_allowed': d['pos'],
-                'pass_depth_allowed': d['pass_depth_allowed'],
-                'target_depth_allowed': d['pass_depth_allowed'],
+                'pass_depth_allowed': def_pda,
+                'target_depth_allowed': def_pda,
                 'directional_gaps': {
                     'inside_tackles_ypc': d['ins_ypc'],
                     'inside_rank': None if is_small else rk_ins[tm],

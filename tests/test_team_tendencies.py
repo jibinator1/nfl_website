@@ -334,3 +334,49 @@ def test_dynamic_scouting_data_date_range():
     assert sheet["section_2_home_defense_vulnerabilities"]["n_games"] == 6
 
 
+def test_pass_depth_rankings_and_league_medians():
+    """Verify 32-team rankings and league medians for all 4 pass depth tiers across offense and defense."""
+    from backend.scheme_insights import get_dynamic_scouting_data, compute_scheme_insights
+
+    # Full season 2024: 17 games, all ranks populated #1 to #32
+    dyn_full = get_dynamic_scouting_data(2024)
+    jax_def = dyn_full["JAX"]["defense"]["pass_depth_allowed"]
+    hou_off = dyn_full["HOU"]["offense"]["pass_depth"]
+
+    for zone in ["behind_los", "short", "intermediate", "deep"]:
+        # Defense checks
+        d_zone = jax_def[zone]
+        assert d_zone["rank"] is not None
+        assert 1 <= d_zone["rank"] <= 32
+        assert "league_median" in d_zone
+        assert "ypa_rank" in d_zone
+        assert "sr_rank" in d_zone
+        assert "Rank #" in d_zone["rank_display"]
+
+        # Offense checks
+        o_zone = hou_off[zone]
+        assert o_zone["rank"] is not None
+        assert 1 <= o_zone["rank"] <= 32
+        assert "league_median" in o_zone
+        assert "Rank #" in o_zone["rank_display"]
+
+    # Specific 2024 stats verification
+    assert jax_def["deep"]["rank"] == 30
+    assert jax_def["deep"]["epa_per_attempt"] > jax_def["deep"]["league_median"]
+    assert hou_off["deep"]["rank"] == 11
+
+    # Small sample suppression (n < 6 games)
+    dyn_early = get_dynamic_scouting_data(2025, start_date="2025-09-04", end_date="2025-10-15")
+    hou_early_def = dyn_early["HOU"]["defense"]["pass_depth_allowed"]
+    assert hou_early_def["deep"]["rank"] is None
+    assert "small sample" in hou_early_def["deep"]["rank_display"]
+    assert hou_early_def["deep"]["league_median"] is not None
+
+    # End-to-end scheme insights matchup report contains enriched pass depth
+    res = compute_scheme_insights("JAX", "HOU", season=2024, week=6)
+    cov = res["coverage_tendencies"]["away_vs_home"]["pass_depth_allowed"]
+    assert cov["deep"]["rank"] == 30
+    assert cov["deep"]["league_median"] == jax_def["deep"]["league_median"]
+
+
+
