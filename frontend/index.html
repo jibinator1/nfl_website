@@ -2848,6 +2848,10 @@
             });
         }
 
+        function roundDec(val, dec = 3) {
+            return parseFloat(Number(val).toFixed(dec));
+        }
+
         function formatRankTierTag(rank, options = {}) {
             if (rank == null) return '';
             const r = parseInt(rank, 10);
@@ -3516,7 +3520,9 @@
             );
 
             const aGapRankStr = aGapRank != null ? `(#${aGapRank})` : '';
+            const aZoneRankStr = aZoneRank != null ? `(#${aZoneRank})` : '';
             const hGapRankStr = hGapRank != null ? `(#${hGapRank})` : '';
+            const hZoneRankStr = hZoneRank != null ? `(#${hZoneRank})` : '';
 
             const aRunCallout = `
                 <div class="space-y-2 text-[11px] font-sans">
@@ -5326,6 +5332,7 @@ function renderSchemeInsights(d) {
                 if (nG < 1) return `${(val * 100).toFixed(1)}% (league median ${(med * 100).toFixed(1)}%, n=${nG} games — rank suppressed, small sample)`;
                 return `Rank #${rank} (n=${nG} games)`;
             };
+            const roundDec = (val, dec = 3) => parseFloat(Number(val).toFixed(dec));
 
             return {
                 home_team: h,
