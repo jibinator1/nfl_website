@@ -5350,28 +5350,40 @@ function renderSchemeInsights(d) {
                             <!-- Positional Targets Allowed -->
                             ${(() => {
                                 const posT = aCov.positional_targets_allowed || homeVuln.pass_defense?.positional_targets_allowed || {};
+                                const renderCol = (label, pItem, defShare, defYpt) => {
+                                    const shareVal = pItem?.target_share != null ? fmtPct(pItem.target_share) : defShare;
+                                    const yptVal = pItem?.yards_per_target != null ? fmtDec(pItem.yards_per_target) : defYpt;
+                                    const shRankTag = formatRankTierTag(pItem?.target_share_rank);
+                                    const yptRankTag = formatRankTierTag(pItem?.ypt_rank ?? pItem?.rank, { invert: true, mode: 'text' });
+
+                                    return `
+                                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between text-left">
+                                            <div class="flex items-center justify-between text-[8.5px] mb-0.5">
+                                                <span class="text-slate-400 font-semibold">${label}</span>
+                                                ${shRankTag}
+                                            </div>
+                                            <div class="my-0.5">
+                                                <b class="text-slate-200 text-[11px]">${shareVal}</b>
+                                                <span class="text-[8px] text-slate-400 font-normal ml-0.5">Share</span>
+                                            </div>
+                                            <div class="text-[8.5px] pt-1 border-t border-[#21262d]/60 flex items-center justify-between">
+                                                <span class="text-sky-300 font-bold font-mono">${yptVal} YPT</span>
+                                                ${yptRankTag || '<span class="text-slate-500 font-mono text-[7.5px]">Mid</span>'}
+                                            </div>
+                                        </div>
+                                    `;
+                                };
+
                                 return `
                                     <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
                                         <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
                                             <span class="font-bold text-slate-300 uppercase">${d.home_team} Targets Allowed by Position</span>
-                                            <span>Share% · YPT</span>
+                                            <span>Share% · YPT Allowed</span>
                                         </div>
-                                        <div class="grid grid-cols-3 gap-1.5 text-[10.5px] font-mono text-center">
-                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                                                <span class="text-slate-400 block text-[9px] mb-0.5">WR Allowed</span>
-                                                <b class="text-slate-200">${fmtPct(posT.wr?.target_share)}</b>
-                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.wr?.yards_per_target)} YPT</span>
-                                            </div>
-                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                                                <span class="text-slate-400 block text-[9px] mb-0.5">TE Allowed</span>
-                                                <b class="text-slate-200">${fmtPct(posT.te?.target_share)}</b>
-                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.te?.yards_per_target)} YPT</span>
-                                            </div>
-                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                                                <span class="text-slate-400 block text-[9px] mb-0.5">RB Allowed</span>
-                                                <b class="text-slate-200">${fmtPct(posT.rb?.target_share)}</b>
-                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.rb?.yards_per_target)} YPT</span>
-                                            </div>
+                                        <div class="grid grid-cols-3 gap-1.5 font-mono text-center">
+                                            ${renderCol('WR Allowed', posT.wr, '60.0%', '7.33')}
+                                            ${renderCol('TE Allowed', posT.te, '22.7%', '6.65')}
+                                            ${renderCol('RB Allowed', posT.rb, '17.3%', '5.26')}
                                         </div>
                                     </div>
                                 `;
@@ -5491,28 +5503,40 @@ function renderSchemeInsights(d) {
                             <!-- Positional Targets Allowed -->
                             ${(() => {
                                 const posT = hCov.positional_targets_allowed || awayVuln.pass_defense?.positional_targets_allowed || {};
+                                const renderCol = (label, pItem, defShare, defYpt) => {
+                                    const shareVal = pItem?.target_share != null ? fmtPct(pItem.target_share) : defShare;
+                                    const yptVal = pItem?.yards_per_target != null ? fmtDec(pItem.yards_per_target) : defYpt;
+                                    const shRankTag = formatRankTierTag(pItem?.target_share_rank);
+                                    const yptRankTag = formatRankTierTag(pItem?.ypt_rank ?? pItem?.rank, { invert: true, mode: 'text' });
+
+                                    return `
+                                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between text-left">
+                                            <div class="flex items-center justify-between text-[8.5px] mb-0.5">
+                                                <span class="text-slate-400 font-semibold">${label}</span>
+                                                ${shRankTag}
+                                            </div>
+                                            <div class="my-0.5">
+                                                <b class="text-slate-200 text-[11px]">${shareVal}</b>
+                                                <span class="text-[8px] text-slate-400 font-normal ml-0.5">Share</span>
+                                            </div>
+                                            <div class="text-[8.5px] pt-1 border-t border-[#21262d]/60 flex items-center justify-between">
+                                                <span class="text-sky-300 font-bold font-mono">${yptVal} YPT</span>
+                                                ${yptRankTag || '<span class="text-slate-500 font-mono text-[7.5px]">Mid</span>'}
+                                            </div>
+                                        </div>
+                                    `;
+                                };
+
                                 return `
                                     <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
                                         <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
                                             <span class="font-bold text-slate-300 uppercase">${d.away_team} Targets Allowed by Position</span>
-                                            <span>Share% · YPT</span>
+                                            <span>Share% · YPT Allowed</span>
                                         </div>
-                                        <div class="grid grid-cols-3 gap-1.5 text-[10.5px] font-mono text-center">
-                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                                                <span class="text-slate-400 block text-[9px] mb-0.5">WR Allowed</span>
-                                                <b class="text-slate-200">${fmtPct(posT.wr?.target_share)}</b>
-                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.wr?.yards_per_target)} YPT</span>
-                                            </div>
-                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                                                <span class="text-slate-400 block text-[9px] mb-0.5">TE Allowed</span>
-                                                <b class="text-slate-200">${fmtPct(posT.te?.target_share)}</b>
-                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.te?.yards_per_target)} YPT</span>
-                                            </div>
-                                            <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
-                                                <span class="text-slate-400 block text-[9px] mb-0.5">RB Allowed</span>
-                                                <b class="text-slate-200">${fmtPct(posT.rb?.target_share)}</b>
-                                                <span class="text-slate-400 text-[9.5px] block">${fmtDec(posT.rb?.yards_per_target)} YPT</span>
-                                            </div>
+                                        <div class="grid grid-cols-3 gap-1.5 font-mono text-center">
+                                            ${renderCol('WR Allowed', posT.wr, '58.5%', '7.10')}
+                                            ${renderCol('TE Allowed', posT.te, '21.5%', '6.40')}
+                                            ${renderCol('RB Allowed', posT.rb, '20.0%', '5.05')}
                                         </div>
                                     </div>
                                 `;
@@ -6059,9 +6083,9 @@ function renderSchemeInsights(d) {
                             deep: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33 }
                         },
                         positional_targets_allowed: {
-                            wr: { target_share: 60.0, yards_per_target: 7.33 },
-                            te: { target_share: 22.7, yards_per_target: 6.65 },
-                            rb: { target_share: 17.3, yards_per_target: 5.26 }
+                            wr: { target_share: 60.0, yards_per_target: 7.33, target_share_rank: 16, ypt_rank: 14, rank: 14, league_median: 7.20 },
+                            te: { target_share: 22.7, yards_per_target: 6.65, target_share_rank: 12, ypt_rank: 17, rank: 17, league_median: 6.55 },
+                            rb: { target_share: 17.3, yards_per_target: 5.26, target_share_rank: 22, ypt_rank: 11, rank: 11, league_median: 5.40 }
                         },
                         vulnerability_note: `${h}'s defense aligns in 2 deep safeties, with historical intermediate target distribution.`,
                         offense_exploit: `${a} targets inside passes and seam concepts.`
@@ -6083,9 +6107,9 @@ function renderSchemeInsights(d) {
                             deep: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90 }
                         },
                         positional_targets_allowed: {
-                            wr: { target_share: 58.5, yards_per_target: 7.10 },
-                            te: { target_share: 21.5, yards_per_target: 6.40 },
-                            rb: { target_share: 20.0, yards_per_target: 5.05 }
+                            wr: { target_share: 58.5, yards_per_target: 7.10, target_share_rank: 19, ypt_rank: 10, rank: 10, league_median: 7.20 },
+                            te: { target_share: 21.5, yards_per_target: 6.40, target_share_rank: 17, ypt_rank: 12, rank: 12, league_median: 6.55 },
+                            rb: { target_share: 20.0, yards_per_target: 5.05, target_share_rank: 10, ypt_rank: 8, rank: 8, league_median: 5.40 }
                         },
                         vulnerability_note: `${a}'s defense aligns in 2 deep safeties, with historical intermediate target distribution.`,
                         offense_exploit: `${h} targets inside passes and seam concepts.`
@@ -6403,9 +6427,9 @@ function renderSchemeInsights(d) {
                                 deep_20_plus: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33, rank: hGames < 1 ? null : 22, league_median: 0.36, n_games: hGames }
                             },
                             positional_targets_allowed: {
-                                wr: { target_share: 60.0, yards_per_target: 7.33 },
-                                te: { target_share: 22.7, yards_per_target: 6.65 },
-                                rb: { target_share: 17.3, yards_per_target: 5.26 }
+                                wr: { target_share: 60.0, yards_per_target: 7.33, target_share_rank: hGames < 1 ? null : 16, ypt_rank: hGames < 1 ? null : 14, rank: hGames < 1 ? null : 14, league_median: 7.20 },
+                                te: { target_share: 22.7, yards_per_target: 6.65, target_share_rank: hGames < 1 ? null : 12, ypt_rank: hGames < 1 ? null : 17, rank: hGames < 1 ? null : 17, league_median: 6.55 },
+                                rb: { target_share: 17.3, yards_per_target: 5.26, target_share_rank: hGames < 1 ? null : 22, ypt_rank: hGames < 1 ? null : 11, rank: hGames < 1 ? null : 11, league_median: 5.40 }
                             }
                         }
                     },
@@ -6523,9 +6547,9 @@ function renderSchemeInsights(d) {
                                 deep_20_plus: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90, rank: aGames < 1 ? null : 9, league_median: 0.36, n_games: aGames }
                             },
                             positional_targets_allowed: {
-                                wr: { target_share: 58.5, yards_per_target: 7.10 },
-                                te: { target_share: 21.5, yards_per_target: 6.40 },
-                                rb: { target_share: 20.0, yards_per_target: 5.05 }
+                                wr: { target_share: 58.5, yards_per_target: 7.10, target_share_rank: aGames < 1 ? null : 19, ypt_rank: aGames < 1 ? null : 10, rank: aGames < 1 ? null : 10, league_median: 7.20 },
+                                te: { target_share: 21.5, yards_per_target: 6.40, target_share_rank: aGames < 1 ? null : 17, ypt_rank: aGames < 1 ? null : 12, rank: aGames < 1 ? null : 12, league_median: 6.55 },
+                                rb: { target_share: 20.0, yards_per_target: 5.05, target_share_rank: aGames < 1 ? null : 10, ypt_rank: aGames < 1 ? null : 8, rank: aGames < 1 ? null : 8, league_median: 5.40 }
                             }
                         }
                     },
