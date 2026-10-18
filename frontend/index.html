@@ -699,17 +699,37 @@
         // State variables (Defaulted dynamically to September 1st of active season through today's date)
         let startDate = getDefaultStartDateString();
         let endDate = getTodayDateString();
-        let propsDate = '2026-10-11';
-        let isPropsEnabled = true;
 
-        let currentPropsFilter = 'ALL';
-
-
-        // Sorting state for Props
-        let propsSortCol = 'edge';
-        let propsSortAsc = false;
-
-        let globalPredictions = { games: [], props: [] };
+        // Canonical numeric & percentage formatters
+        const fmtPct = (val) => {
+            if (val == null || val === '') return '--';
+            const n = parseFloat(val);
+            return isNaN(n) ? '--' : `${n.toFixed(1)}%`;
+        };
+        const fmtDec = (val, d = 2) => {
+            if (val == null || val === '') return '--';
+            const n = parseFloat(val);
+            return isNaN(n) ? '--' : n.toFixed(d);
+        };
+        const fmt1Dec = (val) => fmtDec(val, 1);
+        const fmtSigned = (val, d = 2) => {
+            if (val == null || val === '') return '--';
+            const n = parseFloat(val);
+            if (isNaN(n)) return '--';
+            return n > 0 ? `+${n.toFixed(d)}` : n.toFixed(d);
+        };
+        const fmtSignedPct = (val) => {
+            if (val == null || val === '') return '--';
+            const n = parseFloat(val);
+            if (isNaN(n)) return '--';
+            return n > 0 ? `+${n.toFixed(1)}%` : `${n.toFixed(1)}%`;
+        };
+        const fmtDiffYds = (val) => {
+            if (val == null || val === '') return '--';
+            const n = parseFloat(val);
+            if (isNaN(n)) return '--';
+            return (n > 0 ? `+${n.toFixed(1)}` : n.toFixed(1)) + ' yds';
+        };
 
         // Schedule tab state variables
         let currentScheduleSeason = 2026;
@@ -730,323 +750,11 @@
             await reloadAllData();
         });
 
-        async function onPropsDateChange(fetchData = true) {
-            propsDate = document.getElementById('input-props-date').value;
-            const dateCaption = document.getElementById('props-table-date-caption');
-            if (dateCaption) dateCaption.textContent = `Showing props for ${propsDate} • Click any header to sort`;
 
-            if (fetchData) {
-                await loadActivePredictions();
-            }
-        }
-
-        function togglePropsSwitch() {
-            isPropsEnabled = !isPropsEnabled;
-            const btn = document.getElementById('btn-toggle-props');
-            const dateContainer = document.getElementById('props-date-container');
-            const statusLabel = document.getElementById('props-status-label');
-            const sectionContainer = document.getElementById('props-section-container');
-
-            if (isPropsEnabled) {
-                btn.textContent = 'ON';
-                btn.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#30363d] text-slate-200 hover:bg-[#3d444d] transition';
-                dateContainer.classList.remove('opacity-40', 'pointer-events-none');
-                statusLabel.textContent = 'Enabled (Single Date)';
-                sectionContainer.classList.remove('hidden');
-            } else {
-                btn.textContent = 'OFF';
-                btn.className = 'px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#21262d] text-slate-500 border border-[#30363d] transition';
-                dateContainer.classList.add('opacity-40', 'pointer-events-none');
-                statusLabel.textContent = 'Disabled (Games Only)';
-                sectionContainer.classList.add('hidden');
-            }
-        }
-
-        function getHyperparams() {
-            return {
-                n_estimators: parseInt(document.getElementById('hp-n_estimators').value) || 250,
-                max_depth: parseInt(document.getElementById('hp-max_depth').value) || 4,
-                learning_rate: parseFloat(document.getElementById('hp-learning_rate').value) || 0.01,
-                subsample: parseFloat(document.getElementById('hp-subsample').value) || 0.75,
-                colsample_bytree: parseFloat(document.getElementById('hp-colsample_bytree').value) || 0.70,
-                reg_alpha: parseFloat(document.getElementById('hp-reg_alpha').value) || 0.20,
-                reg_lambda: parseFloat(document.getElementById('hp-reg_lambda').value) || 2.00,
-                gamma: parseFloat(document.getElementById('hp-gamma').value) || 0.30
-            };
-        }
-
-        function updateCvUI(mode) {
-            const banner = document.getElementById('cv-info-banner');
-            const infoText = document.getElementById('cv-info-text');
-            const badge = document.getElementById('cv-badge');
-            const hpContainer = document.getElementById('hp-grid-container');
-
-            if (mode === 'cv_auto') {
-                if (banner) banner.className = 'bg-[#161b22] border border-emerald-800/60 rounded-lg p-2.5 flex items-center justify-between text-xs text-emerald-300';
-                if (infoText) infoText.innerHTML = `<b>TimeSeries CV Active:</b> 5-Fold forward splits (strictly train on past, validate on future — 0% future data leakage). <b>No fixed values needed</b>; optimal architecture will be discovered automatically.`;
-                if (badge) {
-                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800 shrink-0';
-                    badge.textContent = 'NO SET VALUES NEEDED';
-                }
-                if (hpContainer) hpContainer.classList.add('opacity-75');
-            } else if (mode === 'cv_high') {
-                if (banner) banner.className = 'bg-[#161b22] border border-cyan-800/60 rounded-lg p-2.5 flex items-center justify-between text-xs text-cyan-300';
-                if (infoText) infoText.innerHTML = `<b>High-Compute TimeSeries CV:</b> Testing heavy architectures (750–2000 trees, depth 4–7) using forward-walk cross-validation.`;
-                if (badge) {
-                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-800 shrink-0';
-                    badge.textContent = 'HIGH COMPUTE CV';
-                }
-                if (hpContainer) hpContainer.classList.remove('opacity-75');
-            } else if (mode === 'cv_custom') {
-                if (banner) banner.className = 'bg-[#161b22] border border-indigo-800/60 rounded-lg p-2.5 flex items-center justify-between text-xs text-indigo-300';
-                if (infoText) infoText.innerHTML = `<b>Custom Knobs TimeSeries CV:</b> Cross-validation search anchored locally around the parameter values you typed below.`;
-                if (badge) {
-                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-950 text-indigo-300 border border-indigo-800 shrink-0';
-                    badge.textContent = 'ANCHORED CV';
-                }
-                if (hpContainer) hpContainer.classList.remove('opacity-75');
-            } else {
-                if (banner) banner.className = 'bg-[#161b22] border border-[#30363d] rounded-lg p-2.5 flex items-center justify-between text-xs text-slate-300';
-                if (infoText) infoText.innerHTML = `<b>Manual Knobs Mode:</b> Training directly on the exact hyperparameter values you set below. Evaluated with 5-fold TimeSeries CV.`;
-                if (badge) {
-                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono bg-[#21262d] text-slate-400 border border-[#30363d] shrink-0';
-                    badge.textContent = 'MANUAL VALUES';
-                }
-                if (hpContainer) hpContainer.classList.remove('opacity-75');
-            }
-        }
-
-
-        function onCustomParamChange() {
-            const modeSelect = document.getElementById('input-tune-mode');
-            if (modeSelect) {
-                if (modeSelect.value === 'cv_auto' || modeSelect.value === 'cv_high' || modeSelect.value === 'cv_custom') {
-                    modeSelect.value = 'cv_custom';
-                } else if (modeSelect.value !== 'custom') {
-                    modeSelect.value = 'custom';
-                }
-                updateCvUI(modeSelect.value);
-            }
-        }
-
-        function onTuneModeChange(mode) {
-            updateCvUI(mode);
-            if (mode === 'cv_high' || mode === 'high') {
-                document.getElementById('hp-n_estimators').value = 1000;
-                document.getElementById('hp-max_depth').value = 5;
-                document.getElementById('hp-learning_rate').value = 0.01;
-                document.getElementById('hp-subsample').value = 0.80;
-                document.getElementById('hp-colsample_bytree').value = 0.75;
-                document.getElementById('hp-reg_alpha').value = 0.10;
-                document.getElementById('hp-reg_lambda').value = 2.50;
-                document.getElementById('hp-gamma').value = 0.30;
-                const historyEl = document.getElementById('input-history-start-year');
-                if (historyEl && parseInt(historyEl.value) > 2021) {
-                    historyEl.value = '2021';
-                }
-            } else if (mode === 'quick') {
-                resetHyperparams();
-            }
-        }
-
-        function resetHyperparams() {
-            document.getElementById('hp-n_estimators').value = 250;
-            document.getElementById('hp-max_depth').value = 2;
-            document.getElementById('hp-learning_rate').value = 0.02;
-            document.getElementById('hp-subsample').value = 0.70;
-            document.getElementById('hp-colsample_bytree').value = 0.65;
-            document.getElementById('hp-reg_alpha').value = 0.50;
-            document.getElementById('hp-reg_lambda').value = 4.00;
-            document.getElementById('hp-gamma').value = 0.20;
-            const historyEl = document.getElementById('input-history-start-year');
-            if (historyEl) historyEl.value = '2023';
-            const modeSelect = document.getElementById('input-tune-mode');
-            if (modeSelect) {
-                modeSelect.value = 'cv_auto';
-                updateCvUI('cv_auto');
-            }
-        }
-
-        async function loadActivePredictions() {
-            const statusDot = document.getElementById('status-indicator-dot');
-            const statusText = document.getElementById('model-status-text');
-            const metricsPills = document.getElementById('model-metrics-pills');
-
-            if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-slate-400 animate-pulse';
-            if (statusText) statusText.innerHTML = `Loading optimal model predictions for <b>${propsDate}</b>...`;
-
-            try {
-                const res = await fetch(`/api/predictions?start_date=${startDate}&end_date=${endDate}&props_date=${propsDate}&include_props=${isPropsEnabled}`);
-                const data = await res.json();
-
-                if (data && (data.games || data.props)) {
-                    globalPredictions = data;
-
-                    // Fetch model status for metrics
-                    let m = {};
-                    try {
-                        const statusRes = await fetch('/api/model-status');
-                        const statusData = await statusRes.json();
-                        m = statusData.last_metrics || {};
-                    } catch (e) {}
-
-                    if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-                    if (statusText) {
-                        statusText.innerHTML = `<b>Optimal TimeSeries CV Model Active:</b> 5-Fold forward splits (2023–2026 data, 0% leakage). Predictions ready for <b>${propsDate}</b>!`;
-                    }
-
-                    let pillsHtml = `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">History: 2023–2026</span>`;
-                    if (m.rush_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">RB MAE: ${m.rush_yards.cv_mae || m.rush_yards.mae || 24.5}y</span>`;
-                    if (m.rec_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">WR MAE: ${m.rec_yards.cv_mae || m.rec_yards.mae || 22.0}y</span>`;
-                    if (m.pass_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">QB MAE: ${m.pass_yards.cv_mae || m.pass_yards.mae || 59.8}y</span>`;
-                    if (m.spread) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">Spread Win: ${m.spread.winner_accuracy || 66.7}%</span>`;
-                    if (metricsPills) metricsPills.innerHTML = pillsHtml;
-
-                    const sumGamesEl = document.getElementById('sum-games-count');
-                    if (sumGamesEl) sumGamesEl.textContent = (globalPredictions.games || []).length;
-
-                    const validProps = (globalPredictions.props || []).filter(p => !p.injured && !p.trend_flag && !p.line_dev_flag);
-                    const sumPropsEl = document.getElementById('sum-props-count');
-                    if (sumPropsEl) sumPropsEl.textContent = validProps.length;
-
-                    const highEdgeCount = validProps.filter(p => p.edge != null && p.edge >= 6.0).length;
-                    const sumHighEdgeEl = document.getElementById('sum-highedge-count') || document.getElementById('sum-high-edge');
-                    if (sumHighEdgeEl) sumHighEdgeEl.textContent = highEdgeCount;
-
-                    renderGamesCards();
-                    renderPropsTable();
-                }
-            } catch (err) {
-                console.error("Error loading active predictions:", err);
-                if (statusDot) statusDot.className = 'w-2 h-2 rounded-full bg-slate-500';
-                if (statusText) statusText.innerHTML = `Model ready. Click <b>RUN MODEL</b> to compute live predictions.`;
-            }
-        }
-
-        async function triggerRunModel() {
-            const btn = document.getElementById('btn-run-model');
-            const statusDot = document.getElementById('status-indicator-dot');
-            const statusText = document.getElementById('model-status-text');
-            const metricsPills = document.getElementById('model-metrics-pills');
-
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i><span>TRAINING...</span>`;
-            lucide.createIcons();
-
-            propsDate = document.getElementById('input-props-date').value;
-            onPropsDateChange(false);
-            const historyStartYear = parseInt(document.getElementById('input-history-start-year')?.value) || 2023;
-            const tuneMode = document.getElementById('input-tune-mode')?.value || 'cv_auto';
-            
-            let modeLabel = 'Auto TimeSeries CV (Proven Optimal)';
-            if (tuneMode === 'cv_high') modeLabel = 'High-Compute TimeSeries CV';
-            else if (tuneMode === 'cv_custom') modeLabel = 'Custom Knobs TimeSeries CV';
-            else if (tuneMode === 'custom') modeLabel = 'Direct Knobs Fit (5-Fold CV)';
-            else if (tuneMode === 'quick') modeLabel = 'Quick Baseline';
-
-            statusDot.className = 'w-2 h-2 rounded-full bg-slate-400 animate-pulse';
-            statusText.innerHTML = `Training 4 XGBoost Models [${modeLabel}]... please wait (running 5-fold forward TimeSeries CV)`;
-            metricsPills.innerHTML = '';
-
-            try {
-                const payload = {
-                    start_date: startDate,
-                    end_date: endDate,
-                    props_date: propsDate,
-                    include_props: isPropsEnabled,
-                    history_start_year: historyStartYear,
-                    tune_mode: tuneMode,
-                    model_architecture: 'level_cv',
-                    hyperparameters: getHyperparams()
-                };
-
-                const res = await fetch('/api/run-model', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await res.json();
-                if (data.status === 'success') {
-                    globalPredictions = data.predictions;
-
-                    // If CV mode, reflect discovered best params into the knob inputs
-                    const isCvMode = ['cv_auto', 'cv_high', 'cv_custom', 'full', 'high_cv'].includes(tuneMode);
-                    if (isCvMode && data.hyperparameters) {
-                        const hp = data.hyperparameters;
-                        if (hp.n_estimators) document.getElementById('hp-n_estimators').value = hp.n_estimators;
-                        if (hp.max_depth) document.getElementById('hp-max_depth').value = hp.max_depth;
-                        if (hp.learning_rate) document.getElementById('hp-learning_rate').value = hp.learning_rate;
-                        if (hp.subsample) document.getElementById('hp-subsample').value = hp.subsample;
-                        if (hp.colsample_bytree) document.getElementById('hp-colsample_bytree').value = hp.colsample_bytree;
-                        if (hp.reg_alpha) document.getElementById('hp-reg_alpha').value = hp.reg_alpha;
-                        if (hp.reg_lambda) document.getElementById('hp-reg_lambda').value = hp.reg_lambda;
-                        if (hp.gamma) document.getElementById('hp-gamma').value = hp.gamma;
-                    }
-
-                    statusDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-                    if (isCvMode && data.hyperparameters) {
-                        const hp = data.hyperparameters;
-                        statusText.innerHTML = `TimeSeries CV Complete! Auto-discovered optimal parameters: <b>${hp.n_estimators} trees, depth ${hp.max_depth}, lr ${hp.learning_rate}</b> (${historyStartYear}–2026 data, 0% future leakage). Predictions ready!`;
-                    } else {
-                        statusText.innerHTML = `Models trained with your exact hyperparameters (${historyStartYear}–2026 data) & predictions ready for ${propsDate}!`;
-                    }
-
-                    const m = data.metrics || {};
-                    let pillsHtml = `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">History: ${historyStartYear}–2026</span>`;
-                    if (data.tracker) {
-                        pillsHtml += `<a href="/api/download-excel" target="_blank" class="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-900 transition flex items-center gap-1 font-sans"><i data-lucide="check-circle" class="w-3 h-3 text-emerald-400"></i><span>predictions.xlsx Synced (${data.tracker.evaluated_count} Evaluated)</span></a>`;
-                    }
-                    if (data.odds_status && data.odds_status.warning) {
-                        const warnColor = data.odds_status.is_mismatch ? 'bg-red-950/80 text-red-300 border-red-500/50' : 'bg-amber-950/80 text-amber-300 border-amber-500/50';
-                        const warnIcon = data.odds_status.is_mismatch ? 'alert-octagon' : 'alert-triangle';
-                        pillsHtml += `<span class="px-2 py-0.5 rounded ${warnColor} border flex items-center gap-1 font-sans text-[11px] font-bold"><i data-lucide="${warnIcon}" class="w-3 h-3"></i><span>${data.odds_status.warning}</span></span>`;
-                    }
-                    if (m.rush_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">RB MAE: ${m.rush_yards.cv_mae || m.rush_yards.mae}y</span>`;
-                    if (m.rec_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">WR MAE: ${m.rec_yards.cv_mae || m.rec_yards.mae}y</span>`;
-                    if (m.pass_yards) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">QB MAE: ${m.pass_yards.cv_mae || m.pass_yards.mae}y</span>`;
-                    if (m.spread) pillsHtml += `<span class="px-2 py-0.5 rounded bg-[#161b22] text-slate-300 border border-[#30363d]">Spread Win: ${m.spread.winner_accuracy}%</span>`;
-                    metricsPills.innerHTML = pillsHtml;
-                    lucide.createIcons();
-
-                    const sumGamesEl = document.getElementById('sum-games-count');
-                    if (sumGamesEl) sumGamesEl.textContent = (globalPredictions.games || []).length;
-
-                    const validProps = (globalPredictions.props || []).filter(p => !p.injured && !p.trend_flag && !p.line_dev_flag);
-                    const sumPropsEl = document.getElementById('sum-props-count');
-                    if (sumPropsEl) sumPropsEl.textContent = validProps.length;
-
-                    const highEdgeCount = validProps.filter(p => p.edge != null && p.edge >= 6.0).length;
-                    const sumHighEdgeEl = document.getElementById('sum-highedge-count') || document.getElementById('sum-high-edge');
-                    if (sumHighEdgeEl) sumHighEdgeEl.textContent = highEdgeCount;
-
-                    renderGamesCards();
-                    renderPropsTable();
-                } else {
-                    statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
-                    statusText.innerHTML = `<span class="text-red-400">Error: ${data.detail || 'Failed to run model'}</span>`;
-                }
-            } catch (err) {
-                console.error("Model trigger error:", err);
-                statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
-                statusText.innerHTML = `<span class="text-red-400">Error: ${err.message || 'Server Connection Error'}</span>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5 fill-slate-900"></i><span>RUN MODEL</span>`;
-                lucide.createIcons();
-            }
-        }
 
         function onDateRangeChange() {
             startDate = document.getElementById('input-start-date').value;
             endDate = document.getElementById('input-end-date').value;
-
-            if (startDate === endDate) {
-                propsDate = startDate;
-                const pInput = document.getElementById('input-props-date');
-                if (pInput) pInput.value = propsDate;
-            }
-            updateGameHeaders();
             cachedInsights = {};
             reloadAllData();
 
@@ -1059,21 +767,6 @@
             const activeFloor = document.getElementById('tab-floor-streak');
             if (activeFloor && !activeFloor.classList.contains('hidden')) {
                 loadFloorStreakTab();
-            }
-        }
-
-        function updateGameHeaders() {
-            const gameLabel = document.getElementById('game-status-label');
-            const gameTitle = document.getElementById('game-section-title');
-            const dateCaption = document.getElementById('props-table-date-caption');
-            if (startDate === endDate) {
-                if (gameLabel) gameLabel.textContent = `Showing matchups for ${startDate}`;
-                if (gameTitle) gameTitle.textContent = `Projected Matchups & Spread Predictions (${startDate})`;
-                if (dateCaption) dateCaption.textContent = `Showing props for ${startDate} • Click any header to sort`;
-            } else {
-                if (gameLabel) gameLabel.textContent = `Showing matchups for ${startDate} to ${endDate}`;
-                if (gameTitle) gameTitle.textContent = `Projected Matchups & Spread Predictions (${startDate} to ${endDate})`;
-                if (dateCaption) dateCaption.textContent = `Showing props for ${propsDate} • Click any header to sort`;
             }
         }
 
@@ -1111,361 +804,6 @@
                 loadInsightsTab();
             }
             lucide.createIcons();
-        }
-
-        // ==========================================
-        // PREDICTIONS DISPLAY
-        // ==========================================
-        function renderGamesCards() {
-            const container = document.getElementById('games-container');
-            if (!container) return;
-            const allGames = globalPredictions?.games || [];
-            
-            // Filter games strictly matching active date selection
-            let games = allGames;
-            if (startDate === endDate) {
-                games = allGames.filter(g => (g.gameday || g.date) === startDate);
-            } else if (startDate && endDate) {
-                games = allGames.filter(g => (g.gameday || g.date) >= startDate && (g.gameday || g.date) <= endDate);
-            }
-
-            const sumGamesEl = document.getElementById('sum-games-count');
-            if (sumGamesEl) sumGamesEl.textContent = games.length;
-
-            if (games.length === 0) {
-                const targetDisplay = (startDate === endDate ? startDate : `${startDate} to ${endDate}`);
-                container.innerHTML = `<div class="glass-panel rounded-xl p-8 text-center text-slate-400 col-span-full border border-[#30363d]">
-                    <i data-lucide="calendar-x" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
-                    <p class="font-medium text-slate-300">No scheduled NFL matchups on ${targetDisplay}</p>
-                    <p class="text-xs text-slate-500 mt-1">Select a game day (e.g. Thursday, Sunday, or Monday) or adjust date range above.</p>
-                </div>`;
-                lucide.createIcons();
-                return;
-            }
-
-            container.innerHTML = games.slice(0, 16).map(g => {
-                const homeFavored = (g.pred_home_margin || 0) > 0;
-                const vegasSpread = g.vegas_spread != null ? g.vegas_spread : 0;
-                const spreadDiff = g.spread_edge != null ? g.spread_edge : Math.abs((g.pred_home_margin || 0) - vegasSpread);
-                const isHighEdge = spreadDiff >= 3.0;
-
-                // Format Vegas spread line: Favorite is negative, underdog is positive
-                // In nflverse: vegasSpread > 0 means home favored; vegasSpread < 0 means away favored.
-                const vegasDisplay = g.vegas_spread_str || (
-                    vegasSpread === 0 ? 'PK' :
-                    (vegasSpread > 0 ? `${g.home_team} -${vegasSpread}` : `${g.away_team} -${Math.abs(vegasSpread)}`)
-                );
-
-                // ATS Pick determination & display
-                const atsPick = g.recommended_pick || g.ats_pick || (
-                    (g.pred_home_margin || 0) > vegasSpread
-                        ? `${g.home_team} ${-vegasSpread > 0 ? '+' : ''}${-vegasSpread}`
-                        : `${g.away_team} ${vegasSpread > 0 ? '+' : ''}${vegasSpread}`
-                );
-
-                return `
-                <div class="glass-panel rounded-xl p-4 border border-[#30363d] space-y-3 relative overflow-hidden">
-                    ${isHighEdge ? `<span class="absolute top-0 right-0 bg-[#21262d] text-slate-300 border-b border-l border-[#30363d] text-[10px] font-semibold px-2 py-0.5 rounded-bl">Spread Edge +${spreadDiff.toFixed(1)}</span>` : ''}
-
-                    <div class="flex items-center justify-between text-xs text-slate-400 border-b border-[#30363d] pb-1.5">
-                        <span>${g.gameday || ''} ${g.gametime ? '• ' + g.gametime : ''}</span>
-                        <span class="font-mono text-slate-300">Total: ${g.vegas_total != null ? g.vegas_total : 'N/A'}</span>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="text-left">
-                            <p class="text-[10px] text-slate-400 font-medium">AWAY</p>
-                            <h3 class="text-base font-bold text-slate-100">${g.away_team || ''}</h3>
-                            <p class="text-xs text-slate-400">Proj: <span class="font-medium text-slate-200">${g.proj_away_score != null ? g.proj_away_score : '-'}</span></p>
-                        </div>
-                        <div class="text-center px-2">
-                            <span class="text-xs font-medium text-slate-500">VS</span>
-                            ${g.status === 'FINAL' ? `<div class="text-xs font-bold text-slate-300 mt-0.5">${g.actual_away_score} - ${g.actual_home_score}</div>` : ''}
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] text-slate-400 font-medium">HOME</p>
-                            <h3 class="text-base font-bold text-slate-100">${g.home_team || ''}</h3>
-                            <p class="text-xs text-slate-400">Proj: <span class="font-medium text-slate-200">${g.proj_home_score != null ? g.proj_home_score : '-'}</span></p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1">
-                        <div class="flex justify-between text-[11px] font-medium text-slate-400">
-                            <span>${g.away_team || 'AWAY'} ${g.away_win_prob ?? 50}%</span>
-                            <span>${g.home_team || 'HOME'} ${g.home_win_prob ?? 50}%</span>
-                        </div>
-                        <div class="w-full bg-[#21262d] h-1.5 rounded-full overflow-hidden flex">
-                            <div class="bg-slate-500 h-full" style="width: ${g.away_win_prob ?? 50}%"></div>
-                            <div class="bg-slate-300 h-full" style="width: ${g.home_win_prob ?? 50}%"></div>
-                        </div>
-                    </div>
-
-                    <div class="bg-[#21262d] rounded-lg p-2.5 text-xs flex items-center justify-between">
-                        <div>
-                            <span class="text-slate-400">Vegas:</span>
-                            <span class="font-medium ml-1 text-slate-200">${vegasDisplay}</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-400">Pick (ATS):</span>
-                            <span class="font-semibold ml-1 text-emerald-400">${atsPick}</span>
-                            <span class="text-[10px] text-slate-400 ml-1 font-mono">(Edge +${spreadDiff.toFixed(1)})</span>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        function filterProps(type) {
-            currentPropsFilter = type;
-            ['ALL', 'RB', 'WR', 'QB', 'HIGH_EDGE'].forEach(t => {
-                const btn = document.getElementById(`filter-btn-${t}`);
-                if (btn) {
-                    btn.className = t === type
-                        ? 'px-2.5 py-1 rounded bg-[#30363d] text-slate-100 font-semibold'
-                        : 'px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 font-medium';
-                }
-            });
-            renderPropsTable();
-        }
-
-        function sortProps(col) {
-            if (propsSortCol === col) {
-                propsSortAsc = !propsSortAsc;
-            } else {
-                propsSortCol = col;
-                propsSortAsc = (col === 'player' || col === 'matchup' || col === 'stat' || col === 'def_rank');
-            }
-            renderPropsTable();
-        }
-
-        function formatShapFeature(feat) {
-            const map = {
-                'passing_yards': 'Passing Yds Form',
-                'prev_avg_passing_yards': 'Passing Yds Baseline',
-                'recent_passing_yards': 'Recent Pass Yds',
-                'attempts': 'Pass Attempts Form',
-                'recent_attempts': 'Recent Attempts',
-                'prev_avg_attempts': 'Baseline Attempts',
-                'passing_epa': 'Pass EPA Efficiency',
-                'prev_avg_passing_epa_rate': 'Pass EPA Rate',
-                'passing_cpoe': 'CPOE Accuracy',
-                'prev_avg_passing_cpoe': 'CPOE Baseline',
-                'rushing_yards': 'Rushing Yds Form',
-                'prev_avg_rushing_yards': 'Rushing Yds Baseline',
-                'recent_rushing_yards': 'Recent Rush Yds',
-                'carries': 'Carries Form',
-                'recent_carries': 'Recent Carries',
-                'prev_avg_carries': 'Baseline Carries',
-                'rushing_epa': 'Rush EPA Efficiency',
-                'prev_avg_rushing_epa_rate': 'Rush EPA Rate',
-                'receiving_yards': 'Receiving Yds Form',
-                'prev_avg_receiving_yards': 'Receiving Yds Baseline',
-                'recent_receiving_yards': 'Recent Rec Yds',
-                'targets': 'Targets Form',
-                'recent_targets': 'Recent Targets',
-                'prev_avg_targets': 'Baseline Targets',
-                'receiving_epa': 'Rec EPA Efficiency',
-                'prev_avg_receiving_epa_rate': 'Rec EPA Rate',
-                'team_spread': 'Point Spread',
-                'total_line': 'Game Total',
-                'implied_team_total': 'Implied Team Total',
-                'days_rest': 'Rest Days',
-                'temp': 'Temperature',
-                'wind': 'Wind Speed',
-                'def_rank': 'Opp Def Rank',
-                'opp_def_rank': 'Opp Def Rank',
-                'opp_pass_yds_allowed': 'Opp Pass D',
-                'opp_rush_yds_allowed': 'Opp Rush D',
-                'opp_pts_allowed': 'Opp Pts D',
-                'roll_neutral_rush_share': 'Neutral Rush Share',
-                'roll_pressure_rate_allowed': 'O-Line Pressure Rate',
-                'roll_short_target_share': 'Short Target Share',
-                'roll_deep_target_share': 'Deep Target Share',
-                'roll_rec_adot': 'Target Depth (aDOT)',
-                'roll_qb_deep_att_rate': 'QB Deep Att Rate',
-                'roll_neutral_pass_rate': 'Neutral Pass Rate'
-            };
-            if (map[feat]) return map[feat];
-            return feat.replace(/^prev_avg_/, '').replace(/^recent_/, '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        }
-
-        function renderPropsTable() {
-            const tbody = document.getElementById('props-table-body');
-            if (!tbody) return;
-            const searchVal = (document.getElementById('prop-search')?.value || '').toLowerCase();
-
-            let props = [...(globalPredictions?.props || [])];
-
-            if (currentPropsFilter === 'RB') props = props.filter(p => p.pos === 'RB');
-            if (currentPropsFilter === 'WR') props = props.filter(p => p.pos === 'WR' || p.pos === 'TE');
-            if (currentPropsFilter === 'QB') props = props.filter(p => p.pos === 'QB');
-            if (currentPropsFilter === 'HIGH_EDGE') props = props.filter(p => p.edge != null && p.edge >= 6.0 && !p.injured && !p.trend_flag && !p.line_dev_flag);
-
-            if (searchVal) {
-                props = props.filter(p =>
-                    (p.player || '').toLowerCase().includes(searchVal) ||
-                    (p.team || '').toLowerCase().includes(searchVal) ||
-                    (p.opponent || '').toLowerCase().includes(searchVal)
-                );
-            }
-
-            ['player', 'matchup', 'stat', 'avg', 'pred', 'line', 'edge', 'sigma', 'risk', 'ou', 'actual'].forEach(c => {
-                const icon = document.getElementById(`sort-icon-prop-${c}`);
-                if (icon) {
-                    if (propsSortCol === c) {
-                        icon.textContent = propsSortAsc ? ' ▲' : ' ▼';
-                        icon.className = 'text-slate-200 font-bold';
-                    } else {
-                        icon.textContent = '';
-                    }
-                }
-            });
-
-            props.sort((a, b) => {
-                let vA = a[propsSortCol];
-                let vB = b[propsSortCol];
-                
-                // Keep excluded items at the bottom unless specifically filtering for them
-                const aExcluded = a.injured || a.trend_flag || a.line_dev_flag;
-                const bExcluded = b.injured || b.trend_flag || b.line_dev_flag;
-                if (aExcluded !== bExcluded) {
-                    return aExcluded ? 1 : -1;
-                }
-
-                if (vA === null || vA === undefined) vA = propsSortAsc ? 999999 : -999999;
-                if (vB === null || vB === undefined) vB = propsSortAsc ? 999999 : -999999;
-
-                if (typeof vA === 'string') {
-                    return propsSortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
-                }
-                return propsSortAsc ? vA - vB : vB - vA;
-            });
-
-            if (props.length === 0) {
-                const oddsSt = globalPredictions?.odds_status;
-                if (oddsSt && oddsSt.is_mismatch) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="11" class="py-12 text-center">
-                                <div class="inline-flex flex-col items-center gap-2 max-w-lg p-5 rounded-xl bg-red-950/40 border border-red-500/50 text-red-200">
-                                    <div class="flex items-center gap-2 text-sm font-bold tracking-wide">
-                                        <i data-lucide="alert-octagon" class="w-4 h-4 text-red-400"></i>
-                                        <span>ODDS CACHE WEEK MISMATCH (PROPS PAUSED)</span>
-                                    </div>
-                                    <p class="text-xs text-slate-300 leading-relaxed">
-                                        ${oddsSt.warning || 'Live odds cache is for a different week than target games. Scoring was blocked to prevent applying incorrect lines.'}
-                                    </p>
-                                    <div class="mt-2 px-3 py-1.5 rounded bg-black/40 border border-white/10 font-mono text-[11px] text-red-400">
-                                        python fetch_and_cache_odds.py
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    lucide.createIcons();
-                    return;
-                }
-                tbody.innerHTML = `<tr><td colspan="11" class="py-8 text-center text-slate-500">No player props found matching filters.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = props.map(p => {
-                const edge = p.edge != null ? p.edge : 0;
-                let edgeColor = 'text-slate-300';
-                if (edge >= 6.0) edgeColor = 'text-emerald-400 font-bold';
-                else if (edge >= 3.0) edgeColor = 'text-emerald-300';
-
-                let riskColor = 'bg-[#30363d] text-slate-400';
-                if (p.risk === 'LOW') riskColor = 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-                else if (p.risk === 'MED') riskColor = 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
-                else if (p.risk === 'HIGH') riskColor = 'bg-red-500/20 text-red-400 border border-red-500/30';
-
-                const isExcluded = p.injured || p.trend_flag || p.line_dev_flag;
-                let warningTags = '';
-                if (p.injured) warningTags += `<span class="px-1.5 py-0.5 bg-red-500/20 text-red-400 text-[9px] rounded uppercase border border-red-500/30">Injured (Out/Doubtful)</span>`;
-                if (p.trend_flag) warningTags += `<span class="px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9px] rounded uppercase border border-amber-500/30">Role Reduction (Trend < -20%)</span>`;
-                if (p.line_dev_flag) warningTags += `<span class="px-1.5 py-0.5 bg-amber-500/20 text-amber-400 text-[9px] rounded uppercase border border-amber-500/30">Line Dev > 40%</span>`;
-
-                const rowOpacity = isExcluded ? 'opacity-40 grayscale pointer-events-none' : '';
-
-                // SHAP attribution dropdown
-                const hasShap = p.shap_top3 && p.shap_top3.length > 0;
-                const isEstablished = (p.sample_status === 'ESTABLISHED') || (p.calibration_status === 'CALIBRATED');
-
-                return `
-                <tr class="hover:bg-[#30363d]/40 transition ${rowOpacity}">
-                    <td class="py-2.5 px-3">
-                        <div class="font-medium text-slate-200">${p.player || 'Unknown'}</div>
-                        <div class="text-[10px] text-slate-500 font-mono">${p.pos || ''} • ${p.team || ''}</div>
-                        ${warningTags ? `<div class="mt-1 flex flex-wrap gap-1">${warningTags}</div>` : ''}
-                        ${hasShap ? `
-                        <details class="mt-1 group">
-                            <summary class="text-[10px] text-slate-400 hover:text-slate-200 font-semibold cursor-pointer select-none inline-flex items-center gap-1">
-                                <span class="text-cyan-400/90 font-mono">Why ${p.ou || 'Pick'}?</span>
-                                <span class="text-[9px] text-slate-500 group-open:rotate-180 transition-transform">▾</span>
-                            </summary>
-                            <div class="mt-1.5 p-2 bg-[#12161c] border border-[#30363d] rounded-lg text-[10px] space-y-1 font-mono shadow-md min-w-[200px]">
-                                <div class="text-slate-400 font-sans font-semibold uppercase text-[9px] border-b border-[#21262d] pb-0.5 flex justify-between">
-                                    <span>Top SHAP Drivers</span>
-                                    <span>Impact</span>
-                                </div>
-                                ${p.shap_top3.map(c => {
-                                    const isPos = c.contrib >= 0;
-                                    const featLabel = formatShapFeature(c.feature);
-                                    return `
-                                    <div class="flex items-center justify-between text-[10px]">
-                                        <span class="text-slate-300 truncate max-w-[130px]" title="${c.feature}">${featLabel}</span>
-                                        <span class="${isPos ? 'text-emerald-400' : 'text-rose-400'} font-bold">${isPos ? '+' : ''}${c.contrib.toFixed(1)}</span>
-                                    </div>
-                                    `;
-                                }).join('')}
-                                ${p.shap_bias != null ? `<div class="text-slate-500 text-[9px] pt-0.5 border-t border-[#21262d] flex justify-between"><span>Model Base</span><span>${p.shap_bias.toFixed(1)} yds</span></div>` : ''}
-                                ${p.baseline_bias_pct != null && Math.abs(p.baseline_bias_pct) > 10 ? `<div class="text-amber-400/90 text-[9px] pt-0.5">Partic. Filter Delta: ${p.baseline_bias_pct > 0 ? '+' : ''}${p.baseline_bias_pct}%</div>` : ''}
-                            </div>
-                        </details>
-                        ` : ''}
-                    </td>
-                    <td class="py-2.5 px-3">
-                        <div class="text-slate-300">${p.matchup || ''}</div>
-                        <div class="text-[10px] text-slate-500">Def Rank: ${p.def_rank || '-'}/32</div>
-                    </td>
-                    <td class="py-2.5 px-3">
-                        <div class="bg-[#161b22] border border-[#30363d] rounded px-2 py-1 inline-block text-[11px] font-medium">${p.stat || ''}</div>
-                    </td>
-                    <td class="py-2.5 px-3 text-right text-slate-400 font-mono">${p.avg != null ? Number(p.avg).toFixed(1) : '-'}</td>
-                    <td class="py-2.5 px-3 text-right font-bold text-slate-100 font-mono text-sm">${p.pred != null ? Number(p.pred).toFixed(1) : '-'}</td>
-                    <td class="py-2.5 px-3 text-right font-mono">
-                        ${p.line != null
-                            ? `<span class="${p.live_line ? 'text-blue-400 font-semibold' : 'text-slate-300'}">${Number(p.line).toFixed(1)}</span>
-                               <div class="text-[9px] text-blue-500/70 uppercase">Live DK</div>`
-                            : `<span class="text-slate-500 font-medium">N/A</span>
-                               <div class="text-[9px] text-slate-600 uppercase">No Odds</div>`}
-                    </td>
-                    <td class="py-2.5 px-3 text-right font-mono ${p.edge != null ? edgeColor : 'text-slate-600'} text-sm">${p.edge != null ? Number(p.edge).toFixed(1) : '<span class="text-slate-600 font-normal">N/A</span>'}</td>
-                    <td class="py-2.5 px-3 text-right font-mono text-slate-400">${p.sigma != null ? Number(p.sigma).toFixed(1) : '-'}</td>
-                    <td class="py-2.5 px-3 text-center">
-                        ${p.risk ? `<span class="px-2 py-1 text-[10px] font-bold rounded-md ${riskColor}">${p.risk}</span>` : `<span class="text-slate-600 text-xs">N/A</span>`}
-                    </td>
-                    <td class="py-2.5 px-3 text-center">
-                        ${p.ou ? `
-                            <div class="inline-flex flex-col items-center">
-                                <span class="font-black text-sm ${p.ou === 'OVER' ? 'text-emerald-400' : 'text-rose-400'}">${p.ou}</span>
-                                ${p.win_prob != null ? `
-                                    <div class="flex items-center space-x-1 mt-0.5" title="${isEstablished ? 'Established sample (n>=4 games in season)' : 'Provisional sample (n<4 games)'}">
-                                        <span class="w-1.5 h-1.5 rounded-full ${isEstablished ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
-                                        <span class="text-[10px] font-mono text-slate-300 font-semibold">${(p.win_prob * 100).toFixed(0)}%</span>
-                                        <span class="text-[8px] px-1 rounded font-mono font-bold ${isEstablished ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}">${isEstablished ? 'EST' : 'PROV'}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        ` : `<span class="text-slate-600 text-xs">N/A</span>`}
-                    </td>
-                    <td class="py-2.5 px-3 text-center text-sm font-mono">
-                        ${p.actual !== null && p.actual !== undefined ? `<div class="inline-flex items-center gap-1.5"><span class="${p.correct === true ? 'text-emerald-400 font-bold' : (p.correct === false ? 'text-rose-400 font-bold' : 'text-slate-300')}">${p.actual}</span><span class="text-[10px] font-sans font-bold px-1.5 py-0.5 rounded ${p.correct === true ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40' : (p.correct === false ? 'bg-rose-950/80 text-rose-300 border border-rose-500/40' : 'bg-slate-800 text-slate-400')}">${p.correct === true ? 'HIT' : (p.correct === false ? 'MISS' : 'PUSH')}</span></div>` : `<span class="text-slate-600">-</span>`}
-                    </td>
-                </tr>`;
-            }).join('');
         }
 
 
@@ -1763,47 +1101,7 @@
             const rushEdgeAway = (a.rush_yds_per_game || 0) > (h.rush_yds_per_game || 0);
             const ptsEdgeAway = (a.pts_per_game || 0) > (h.pts_per_game || 0);
 
-            // Helpers for consistent numeric & unit formatting
-            const fmt1Dec = (val) => {
-                if (val == null || val === '') return '--';
-                const n = parseFloat(val);
-                return isNaN(n) ? val : n.toFixed(1);
-            };
 
-            const fmtDiffYds = (val) => {
-                if (val == null || val === '') return '--';
-                const n = parseFloat(val);
-                if (isNaN(n)) return val;
-                return (n > 0 ? `+${n.toFixed(1)}` : n.toFixed(1)) + ' yds';
-            };
-
-            const fmtYds = (val) => {
-                if (val == null || val === '') return '--';
-                const n = parseFloat(val);
-                if (isNaN(n)) return val;
-                return `${n.toFixed(1)} yds`;
-            };
-
-            const fmtMargin = (val) => {
-                if (val == null || val === '') return '--';
-                const n = parseInt(val);
-                if (isNaN(n)) return val;
-                return n > 0 ? `+${n}` : `${n}`;
-            };
-
-            const fmtPct = (val) => {
-                if (val == null || val === '') return '--';
-                const n = parseFloat(val);
-                if (isNaN(n)) return val;
-                return `${n.toFixed(1)}%`;
-            };
-
-            const fmtSignedPct = (val) => {
-                if (val == null || val === '') return '--';
-                const n = parseFloat(val);
-                if (isNaN(n)) return val;
-                return (n > 0 ? `+${n.toFixed(1)}%` : `${n.toFixed(1)}%`);
-            };
 
             const STAT_EXPLANATIONS = {
                 'Vegas Implied Total': 'Projected points based on consensus sportsbook spread and over/under total.',
@@ -3963,103 +3261,6 @@
             `;
         }
 
-        function renderGameStatePassingMiniStrip(tend, team) {
-            const splits = tend?.game_state_splits || {};
-            const lead = splits.leading || {};
-            const neut = splits.neutral || {};
-            const trail = splits.trailing || {};
-
-            const leadRate = lead.pass_rate?.raw_value != null ? (lead.pass_rate.raw_value * 100).toFixed(1) : '50.7';
-            const neutRate = neut.pass_rate?.raw_value != null ? (neut.pass_rate.raw_value * 100).toFixed(1) : '57.0';
-            const trailRate = trail.pass_rate?.raw_value != null ? (trail.pass_rate.raw_value * 100).toFixed(1) : '73.3';
-
-            const leadRun = (100 - parseFloat(leadRate)).toFixed(1);
-            const neutRun = (100 - parseFloat(neutRate)).toFixed(1);
-            const trailRun = (100 - parseFloat(trailRate)).toFixed(1);
-
-            const getDepthItem = (st, k, alt1, alt2) => {
-                return st.pass_depth?.[k] || st.pass_depth?.[alt1] || (alt2 ? st.pass_depth?.[alt2] : null) || {};
-            };
-
-            const leadDeepItem = getDepthItem(lead, 'deep', 'deep_16_plus', 'deep_20_plus');
-            const neutDeepItem = getDepthItem(neut, 'deep', 'deep_16_plus', 'deep_20_plus');
-            const trailDeepItem = getDepthItem(trail, 'deep', 'deep_16_plus', 'deep_20_plus');
-
-            const leadDeep = (leadDeepItem.attempts_share ?? leadDeepItem.frequency_pct) != null ? parseFloat(leadDeepItem.attempts_share ?? leadDeepItem.frequency_pct).toFixed(1) : '16.3';
-            const neutDeep = (neutDeepItem.attempts_share ?? neutDeepItem.frequency_pct) != null ? parseFloat(neutDeepItem.attempts_share ?? neutDeepItem.frequency_pct).toFixed(1) : '15.4';
-            const trailDeep = (trailDeepItem.attempts_share ?? trailDeepItem.frequency_pct) != null ? parseFloat(trailDeepItem.attempts_share ?? trailDeepItem.frequency_pct).toFixed(1) : '18.9';
-
-            const leadPassTag = formatRankTierTag(lead.pass_rate?.rank);
-            const neutPassTag = formatRankTierTag(neut.pass_rate?.rank);
-            const trailPassTag = formatRankTierTag(trail.pass_rate?.rank);
-
-            const leadRunTag = formatRankTierTag(lead.rush_rate?.rank, { mode: 'text' });
-            const neutRunTag = formatRankTierTag(neut.rush_rate?.rank, { mode: 'text' });
-            const trailRunTag = formatRankTierTag(trail.rush_rate?.rank, { mode: 'text' });
-
-            const leadDeepTag = formatRankTierTag(leadDeepItem.rank, { mode: 'text' });
-            const neutDeepTag = formatRankTierTag(neutDeepItem.rank, { mode: 'text' });
-            const trailDeepTag = formatRankTierTag(trailDeepItem.rank, { mode: 'text' });
-
-            const passShift = (parseFloat(trailRate) - parseFloat(leadRate)).toFixed(1);
-            const passSign = parseFloat(passShift) >= 0 ? '+' : '';
-            const deepShift = (parseFloat(trailDeep) - parseFloat(leadDeep)).toFixed(1);
-            const deepSign = parseFloat(deepShift) >= 0 ? '+' : '';
-
-            return `
-                <div class="pt-1.5 border-t border-[#21262d] space-y-1">
-                    <div class="flex items-center justify-between text-[9.5px] font-mono text-slate-400">
-                        <span class="font-bold text-slate-300 uppercase">Situational Play Calling</span>
-                        <span>Pass / Run % · Deep (16+) %</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-1.5 text-[9.5px] font-mono text-center">
-                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between">
-                            <div class="flex items-center justify-between text-[8.5px]">
-                                <span class="text-slate-400 font-semibold">Ahead (≥+7)</span>
-                                ${leadPassTag}
-                            </div>
-                            <div class="my-0.5">
-                                <b class="text-sky-300 text-[10.5px]">${leadRate}% Pass</b>
-                            </div>
-                            <div class="text-slate-400 text-[8px] flex flex-col items-center gap-0.5 pt-1 border-t border-[#21262d]">
-                                <span>${leadRun}% Run ${leadRunTag}</span>
-                                <span>${leadDeep}% Deep ${leadDeepTag}</span>
-                            </div>
-                        </div>
-                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between">
-                            <div class="flex items-center justify-between text-[8.5px]">
-                                <span class="text-slate-400 font-semibold">Neutral (±6)</span>
-                                ${neutPassTag}
-                            </div>
-                            <div class="my-0.5">
-                                <b class="text-sky-300 text-[10.5px]">${neutRate}% Pass</b>
-                            </div>
-                            <div class="text-slate-400 text-[8px] flex flex-col items-center gap-0.5 pt-1 border-t border-[#21262d]">
-                                <span>${neutRun}% Run ${neutRunTag}</span>
-                                <span>${neutDeep}% Deep ${neutDeepTag}</span>
-                            </div>
-                        </div>
-                        <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d] flex flex-col justify-between">
-                            <div class="flex items-center justify-between text-[8.5px]">
-                                <span class="text-slate-400 font-semibold">Trailing (≤-7)</span>
-                                ${trailPassTag}
-                            </div>
-                            <div class="my-0.5">
-                                <b class="text-sky-300 text-[10.5px] font-bold">${trailRate}% Pass</b>
-                            </div>
-                            <div class="text-slate-400 text-[8px] flex flex-col items-center gap-0.5 pt-1 border-t border-[#21262d]">
-                                <span>${trailRun}% Run ${trailRunTag}</span>
-                                <span>${trailDeep}% Deep ${trailDeepTag}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-[9px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
-                        <span>Trailing Shift:</span>
-                        <span class="text-slate-300 font-semibold">${passSign}${passShift}% Pass (${leadRate}% → ${trailRate}%), ${deepSign}${deepShift}% Deep (${leadDeep}% → ${trailDeep}%)</span>
-                    </div>
-                </div>
-            `;
-        }
 
         function buildSchemeWrapUp(d) {
             const aCov = d.coverage_tendencies?.away_vs_home || {};
@@ -4156,9 +3357,6 @@
                             <span><b class="text-slate-200">Alignment:</b> ${d.away_team} targets ${hDefWorstDepth.label} (<span class="font-mono text-slate-400 text-[10px]">${hDefWorstDepth.range}</span>) <b class="text-slate-100">${parseFloat(aOffShare).toFixed(1)}%</b> of attempts${aOffRankStr}</span>
                         </li>
                     </ul>
-                    <div class="pt-1.5 border-t border-[#21262d]">
-                        ${renderGameStatePassingMiniStrip(awayTend, d.away_team)}
-                    </div>
                 </div>
             `;
 
@@ -4224,9 +3422,6 @@
                             <span><b class="text-slate-200">Alignment:</b> ${d.home_team} targets ${aDefWorstDepth.label} (<span class="font-mono text-slate-400 text-[10px]">${aDefWorstDepth.range}</span>) <b class="text-slate-100">${parseFloat(hOffShare).toFixed(1)}%</b> of attempts${hOffRankStr}</span>
                         </li>
                     </ul>
-                    <div class="pt-1.5 border-t border-[#21262d]">
-                        ${renderGameStatePassingMiniStrip(homeTend, d.home_team)}
-                    </div>
                 </div>
             `;
 
@@ -5018,13 +4213,6 @@ function renderSchemeInsights(d) {
             const h2h = sheet.section_6_head_to_head || {};
             const personnel = sheet.section_7_key_personnel || {};
 
-            const fmtPct = (v) => (v != null && !isNaN(v)) ? `${parseFloat(v).toFixed(1)}%` : '--';
-            const fmtDec = (v) => (v != null && !isNaN(v)) ? parseFloat(v).toFixed(2) : '--';
-            const fmtSigned = (v) => {
-                if (v == null || isNaN(v)) return '--';
-                const n = parseFloat(v);
-                return n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
-            };
 
             // Injury scanner for unit badges
             const secInjAlert = getUnitInjuryAlert(injuries, 'secondary');
