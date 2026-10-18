@@ -365,6 +365,12 @@ def run():
                     "deep": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 0, "epa_per_attempt": 0.40, "success_rate": 35.0, "yards_per_attempt": 11.5},
                 }
 
+            rush_v = round(1.0 - raw_v, 3)
+            med_rush = round(1.0 - med, 3)
+            diff_rush_m = round(rush_v - med_rush, 3)
+            diff_rush_pct = round((diff_rush_m / med_rush) * 100.0, 1) if med_rush > 0 else 0.0
+            rush_rk = (33 - rk) if rk is not None else None
+
             g_splits[st] = {
                 "pass_rate": {
                     "raw_value": raw_v,
@@ -379,6 +385,21 @@ def run():
                     "rank_direction": "higher is better",
                     "diff_from_median": diff_m,
                     "diff_pct": diff_pct,
+                    "sample_size": cnt,
+                    "is_small_sample": bool(cnt < 40),
+                    "unit": "rate",
+                },
+                "rush_rate": {
+                    "raw_value": rush_v,
+                    "league_median": med_rush,
+                    "rank": rush_rk if n_games >= 6 else None,
+                    "rank_display": f"Rank #{rush_rk} (n={n_games} games)" if rush_rk and n_games >= 6 else f"{rush_v*100:.1f}%",
+                    "rank_suppressed": bool(n_games < 6),
+                    "n_games": n_games,
+                    "total_teams": 32,
+                    "rank_direction": "higher is better",
+                    "diff_from_median": diff_rush_m,
+                    "diff_pct": diff_rush_pct,
                     "sample_size": cnt,
                     "is_small_sample": bool(cnt < 40),
                     "unit": "rate",

@@ -1035,6 +1035,7 @@
             cachedInsights = {};
             reloadAllData();
 
+            populateInsightsMatchupDropdown(currentInsightsMatchup?.home, currentInsightsMatchup?.away, currentInsightsMatchup?.week);
             const activeInsights = document.getElementById('tab-insights');
             if (activeInsights && !activeInsights.classList.contains('hidden') && currentInsightsMatchup) {
                 loadSchemeInsights(currentInsightsMatchup.home, currentInsightsMatchup.away, currentInsightsMatchup.week);
@@ -2565,6 +2566,14 @@
                     { home_team: 'DET', away_team: 'LA', week: 1, gameday: '2026-09-08' },
                     { home_team: 'SF', away_team: 'NYJ', week: 1, gameday: '2026-09-09' }
                 ];
+            } else if (startDate && endDate) {
+                const dateFiltered = games.filter(g => {
+                    const gd = g.gameday || g.date;
+                    return gd && gd >= startDate && gd <= endDate;
+                });
+                if (dateFiltered.length > 0) {
+                    games = dateFiltered;
+                }
             }
 
             if (selectedHome && selectedAway) {
@@ -3607,6 +3616,9 @@
             const lightW = Math.min(148, Math.max(20, (lightBoxRate / 100) * frontW));
             const heavyW = Math.max(8, frontW - lightW);
 
+            const gapRankStr = gapRank != null ? `(#${gapRank})` : '(n<6)';
+            const zoneRankStr = zoneRank != null ? `(#${zoneRank})` : '(n<6)';
+
             return `
                 <svg viewBox="0 0 340 ${height}" width="100%" height="auto" class="overflow-visible font-sans" preserveAspectRatio="xMidYMid meet">
                     <!-- Chart A: Scheme Fit -->
@@ -3614,12 +3626,12 @@
                     <rect x="2" y="13" width="156" height="22" rx="3" fill="#161b22" stroke="#21262d" stroke-width="1"/>
                     <rect x="2" y="13" width="${gapBarW}" height="22" rx="3" fill="rgba(14, 165, 233, 0.75)" stroke="#38bdf8" stroke-width="0.8"/>
                     <text x="8" y="27" fill="#f8fafc" font-size="9" font-weight="bold" font-family="monospace">Gap ${gapPct}%</text>
-                    <text x="152" y="27" text-anchor="end" fill="#f1f5f9" font-size="8.5" font-family="monospace">${gapYpc} YPC (#${gapRank})</text>
+                    <text x="152" y="27" text-anchor="end" fill="#f1f5f9" font-size="8.5" font-family="monospace">${gapYpc} YPC ${gapRankStr}</text>
 
                     <rect x="2" y="38" width="156" height="22" rx="3" fill="#161b22" stroke="#21262d" stroke-width="1"/>
                     <rect x="2" y="38" width="${zoneBarW}" height="22" rx="3" fill="rgba(99, 102, 241, 0.75)" stroke="#818cf8" stroke-width="0.8"/>
                     <text x="8" y="52" fill="#f8fafc" font-size="9" font-weight="bold" font-family="monospace">Zone ${zonePct}%</text>
-                    <text x="152" y="52" text-anchor="end" fill="#f1f5f9" font-size="8.5" font-family="monospace">${zoneYpc} YPC (#${zoneRank})</text>
+                    <text x="152" y="52" text-anchor="end" fill="#f1f5f9" font-size="8.5" font-family="monospace">${zoneYpc} YPC ${zoneRankStr}</text>
 
                     <!-- Divider -->
                     <line x1="168" y1="6" x2="168" y2="62" stroke="#30363d" stroke-width="1" stroke-dasharray="2,2"/>
@@ -3643,14 +3655,14 @@
         }
 
         function renderGameScriptMeterSvg(leadRate, neutRate, trailRate, leadRank, neutRank, trailRank, team) {
-            const height = 66;
+            const height = 74;
             const xLead = 48;
             const xNeut = 170;
             const xTrail = 292;
 
             const getY = (r) => {
                 const clamped = Math.max(0.38, Math.min(0.82, r));
-                return 50 - ((clamped - 0.40) / 0.40) * 34;
+                return 48 - ((clamped - 0.40) / 0.40) * 32;
             };
 
             const yMedL = getY(0.489).toFixed(1);
@@ -3664,38 +3676,58 @@
             const isTopTrail = trailRank != null && trailRank <= 5;
             const trailDotColor = isTopTrail ? '#34d399' : '#38bdf8';
 
+            const leadRun = (100 - leadRate * 100).toFixed(1);
+            const neutRun = (100 - neutRate * 100).toFixed(1);
+            const trailRun = (100 - trailRate * 100).toFixed(1);
+
+            const leadRankStr = leadRank != null ? `#${leadRank}` : 'n<6';
+            const neutRankStr = neutRank != null ? `#${neutRank}` : 'n<6';
+            const trailRankStr = trailRank != null ? `#${trailRank}` : 'n<6';
+
             return `
                 <svg viewBox="0 0 340 ${height}" width="100%" height="auto" class="overflow-visible font-sans" preserveAspectRatio="xMidYMid meet">
-                    <line x1="${xLead}" y1="12" x2="${xLead}" y2="52" stroke="#21262d" stroke-width="1" stroke-dasharray="2,2"/>
-                    <line x1="${xNeut}" y1="12" x2="${xNeut}" y2="52" stroke="#21262d" stroke-width="1" stroke-dasharray="2,2"/>
-                    <line x1="${xTrail}" y1="12" x2="${xTrail}" y2="52" stroke="#21262d" stroke-width="1" stroke-dasharray="2,2"/>
+                    <line x1="${xLead}" y1="12" x2="${xLead}" y2="50" stroke="#21262d" stroke-width="1" stroke-dasharray="2,2"/>
+                    <line x1="${xNeut}" y1="12" x2="${xNeut}" y2="50" stroke="#21262d" stroke-width="1" stroke-dasharray="2,2"/>
+                    <line x1="${xTrail}" y1="12" x2="${xTrail}" y2="50" stroke="#21262d" stroke-width="1" stroke-dasharray="2,2"/>
 
                     <path d="M ${xLead},${yMedL} L ${xNeut},${yMedN} L ${xTrail},${yMedT}" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="3,3"/>
                     <text x="336" y="${parseFloat(yMedT) + 3}" text-anchor="end" fill="#64748b" font-size="7.5" font-family="monospace">Med</text>
 
                     <path d="M ${xLead},${yOffL} L ${xNeut},${yOffN} L ${xTrail},${yOffT}" fill="none" stroke="#38bdf8" stroke-width="2.5"/>
 
+                    <!-- Ahead / Lead Node -->
                     <circle cx="${xLead}" cy="${yOffL}" r="4" fill="#38bdf8" stroke="#0f172a" stroke-width="1.5"/>
-                    <text x="${xLead}" y="${parseFloat(yOffL) - 6}" text-anchor="middle" fill="#f8fafc" font-size="8.5" font-weight="bold" font-family="monospace">${(leadRate * 100).toFixed(1)}%</text>
-                    <text x="${xLead}" y="61" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="monospace">Lead (#${leadRank})</text>
+                    <text x="${xLead}" y="${parseFloat(yOffL) - 5}" text-anchor="middle" fill="#f8fafc" font-size="8.5" font-weight="bold" font-family="monospace">${(leadRate * 100).toFixed(1)}% P</text>
+                    <text x="${xLead}" y="59" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-family="monospace">Ahead (${leadRankStr})</text>
+                    <text x="${xLead}" y="69" text-anchor="middle" fill="#fbbf24" font-size="7.5" font-family="monospace">${leadRun}% Run</text>
 
+                    <!-- Neutral Node -->
                     <circle cx="${xNeut}" cy="${yOffN}" r="4" fill="#38bdf8" stroke="#0f172a" stroke-width="1.5"/>
-                    <text x="${xNeut}" y="${parseFloat(yOffN) - 6}" text-anchor="middle" fill="#f8fafc" font-size="8.5" font-weight="bold" font-family="monospace">${(neutRate * 100).toFixed(1)}%</text>
-                    <text x="${xNeut}" y="61" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="monospace">Neut (#${neutRank})</text>
+                    <text x="${xNeut}" y="${parseFloat(yOffN) - 5}" text-anchor="middle" fill="#f8fafc" font-size="8.5" font-weight="bold" font-family="monospace">${(neutRate * 100).toFixed(1)}% P</text>
+                    <text x="${xNeut}" y="59" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-family="monospace">Neut (${neutRankStr})</text>
+                    <text x="${xNeut}" y="69" text-anchor="middle" fill="#fbbf24" font-size="7.5" font-family="monospace">${neutRun}% Run</text>
 
+                    <!-- Trailing Node -->
                     <circle cx="${xTrail}" cy="${yOffT}" r="4.5" fill="${trailDotColor}" stroke="#0f172a" stroke-width="1.5"/>
-                    <text x="${xTrail}" y="${parseFloat(yOffT) - 6}" text-anchor="middle" fill="${trailDotColor}" font-size="9" font-weight="bold" font-family="monospace">${(trailRate * 100).toFixed(1)}%</text>
-                    <text x="${xTrail}" y="61" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="monospace">Trail (#${trailRank})</text>
+                    <text x="${xTrail}" y="${parseFloat(yOffT) - 5}" text-anchor="middle" fill="${trailDotColor}" font-size="9" font-weight="bold" font-family="monospace">${(trailRate * 100).toFixed(1)}% P</text>
+                    <text x="${xTrail}" y="59" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-family="monospace">Trail (${trailRankStr})</text>
+                    <text x="${xTrail}" y="69" text-anchor="middle" fill="#fbbf24" font-size="7.5" font-family="monospace">${trailRun}% Run</text>
                 </svg>
             `;
         }
 
         function renderGameStatePassingCard(stKey, stLabel, stColor, stData, team) {
             const pr = stData?.pass_rate || {};
+            const rr = stData?.rush_rate || {};
             const pd = stData?.pass_depth || {};
 
-            const passPct = pr.raw_value != null ? (pr.raw_value * 100).toFixed(1) + '%' : '--';
-            const rankDisp = pr.rank != null ? `Rank #${pr.rank}` : (pr.sample_size != null ? `n=${pr.sample_size} plays` : '');
+            const passVal = pr.raw_value != null ? (pr.raw_value <= 1.0 ? pr.raw_value * 100 : pr.raw_value) : null;
+            const runVal = rr.raw_value != null ? (rr.raw_value <= 1.0 ? rr.raw_value * 100 : rr.raw_value) : (passVal != null ? (100 - passVal) : null);
+
+            const passPct = passVal != null ? passVal.toFixed(1) + '%' : '--';
+            const runPct = runVal != null ? runVal.toFixed(1) + '%' : '--';
+            const passRankDisp = pr.rank != null ? `Pass #${pr.rank}` : (pr.sample_size != null ? `n=${pr.sample_size}` : '');
+            const rushRankDisp = rr.rank != null ? `Run #${rr.rank}` : '';
             const nPlays = pr.sample_size != null ? `${pr.sample_size} plays` : '';
 
             const getShare = (k, defVal) => {
@@ -3730,29 +3762,44 @@
                         <span class="text-xs font-bold text-slate-100 ${stColor}">${stLabel}</span>
                         <span class="text-[9.5px] font-mono text-slate-400">${nPlays}</span>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-[9px] text-slate-400 block font-mono">Pass Calling Rate</span>
-                            <span class="text-sm font-bold font-mono text-slate-100">${passPct}</span>
-                        </div>
-                        ${rankDisp ? `<span class="px-1.5 py-0.5 rounded bg-[#21262d] text-slate-300 border border-[#30363d] text-[9.5px] font-mono">${rankDisp}</span>` : ''}
-                    </div>
 
-                    <!-- Visual Proportion Bar -->
-                    <div class="space-y-1">
-                        <div class="w-full bg-[#12161c] h-1.5 rounded-full overflow-hidden flex">
-                            <div class="bg-indigo-400 h-full" style="width: ${bW}%" title="Behind LOS: ${bLos}%"></div>
-                            <div class="bg-sky-400 h-full" style="width: ${sW}%" title="Short (0-9): ${sh}%"></div>
-                            <div class="bg-amber-400 h-full" style="width: ${iW}%" title="Interm (10-19): ${inter}%"></div>
-                            <div class="bg-rose-400 h-full" style="width: ${dW}%" title="Deep (20+): ${dp}%"></div>
+                    <!-- Pass % vs Run % Calling Split -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between font-mono">
+                            <div class="flex items-baseline space-x-3">
+                                <div>
+                                    <span class="text-[9px] text-slate-400 block">Pass Rate</span>
+                                    <span class="text-sm font-bold text-slate-100">${passPct}</span>
+                                </div>
+                                <div class="border-l border-[#21262d] pl-3">
+                                    <span class="text-[9px] text-slate-400 block">Run Rate</span>
+                                    <span class="text-sm font-bold text-amber-300">${runPct}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end text-[9px] text-slate-400">
+                                ${passRankDisp ? `<span class="px-1.5 py-0.2 rounded bg-[#21262d] text-slate-300 border border-[#30363d]">${passRankDisp}</span>` : ''}
+                                ${rushRankDisp ? `<span class="text-amber-400/90 text-[8.5px] pt-0.5">${rushRankDisp}</span>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Pass vs Run Call Bar -->
+                        <div class="w-full bg-[#12161c] h-1.5 rounded-full overflow-hidden flex" title="Play Call: ${passPct} Pass / ${runPct} Run">
+                            <div class="bg-sky-400 h-full" style="width: ${passVal || 50}%"></div>
+                            <div class="bg-amber-400 h-full" style="width: ${runVal || 50}%"></div>
                         </div>
                     </div>
 
                     <!-- 4-Zone Depth Breakdown -->
-                    <div class="space-y-1">
+                    <div class="space-y-1 pt-1 border-t border-[#21262d]">
                         <div class="flex items-center justify-between text-[9px] text-slate-400 font-mono">
                             <span>Pass Depth Distribution</span>
                             <span>Share% · Volume</span>
+                        </div>
+                        <div class="w-full bg-[#12161c] h-1 rounded-full overflow-hidden flex">
+                            <div class="bg-indigo-400 h-full" style="width: ${bW}%" title="Behind LOS: ${bLos}%"></div>
+                            <div class="bg-sky-400 h-full" style="width: ${sW}%" title="Short (0-9): ${sh}%"></div>
+                            <div class="bg-amber-400 h-full" style="width: ${iW}%" title="Interm (10-19): ${inter}%"></div>
+                            <div class="bg-rose-400 h-full" style="width: ${dW}%" title="Deep (20+): ${dp}%"></div>
                         </div>
                         <div class="grid grid-cols-4 gap-1 text-center font-mono text-[9px]">
                             <div class="bg-[#12161c] p-1 rounded border border-[#21262d]">
@@ -3816,6 +3863,11 @@
             const passShift = (parseFloat(trailPass) - parseFloat(leadPass)).toFixed(1);
             const passSign = parseFloat(passShift) >= 0 ? '+' : '';
 
+            const leadRun = (100 - parseFloat(leadPass)).toFixed(1);
+            const trailRun = (100 - parseFloat(trailPass)).toFixed(1);
+            const runShift = (parseFloat(trailRun) - parseFloat(leadRun)).toFixed(1);
+            const runSign = parseFloat(runShift) >= 0 ? '+' : '';
+
             const leadRankStr = lead.pass_rate?.rank != null ? ` #${lead.pass_rate.rank}` : '';
             const trailRankStr = trail.pass_rate?.rank != null ? ` #${trail.pass_rate.rank}` : '';
 
@@ -3824,7 +3876,7 @@
                     <div class="flex items-center justify-between border-b border-[#21262d] pb-2">
                         <div>
                             <h4 class="text-xs font-bold text-slate-100 font-sans">${team} Passing Tendencies Across 3 Game States</h4>
-                            <span class="text-[10px] text-slate-400 font-sans">Pass calling rate and 4-zone throw depth allocation when Ahead vs Neutral vs Trailing</span>
+                            <span class="text-[10px] text-slate-400 font-sans">Pass calling rate, run calling rate, and 4-zone throw depth allocation when Ahead vs Neutral vs Trailing</span>
                         </div>
                         <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#21262d] text-sky-300 border border-[#30363d]">Game-State Passing Splits</span>
                     </div>
@@ -3834,7 +3886,7 @@
                         ${cTrail}
                     </div>
                     <div class="bg-[#161b22] px-3 py-2 rounded-lg border border-[#21262d] text-[10.5px] text-slate-300 font-sans flex items-center justify-between">
-                        <span><b>Situational Passing Shift:</b> Pass calling shifts by <b class="text-emerald-400">${passSign}${passShift}%</b> (${leadPass}%${leadRankStr} Ahead → ${trailPass}%${trailRankStr} Trailing). Deep target rate shifts by <b class="text-sky-300">${deepSign}${deepShift}%</b> (${leadDeep}% Ahead → ${trailDeep}% Trailing), while screen/behind LOS rate shifts by <b class="text-amber-300">${losShift}%</b> (${leadLos}% → ${trailLos}%).</span>
+                        <span><b>Situational Play Calling Shift:</b> Pass calling shifts by <b class="text-emerald-400">${passSign}${passShift}%</b> (${leadPass}%${leadRankStr} Ahead → ${trailPass}%${trailRankStr} Trailing), with run calling shifting by <b class="text-amber-300">${runSign}${runShift}%</b> (${leadRun}% Ahead → ${trailRun}% Trailing). Deep target rate shifts by <b class="text-sky-300">${deepSign}${deepShift}%</b> (${leadDeep}% Ahead → ${trailDeep}% Trailing), while screen/behind LOS rate shifts by <b class="text-slate-300">${losShift}%</b> (${leadLos}% → ${trailLos}%).</span>
                     </div>
                 </div>
             `;
@@ -3849,6 +3901,10 @@
             const leadRate = lead.pass_rate?.raw_value != null ? (lead.pass_rate.raw_value * 100).toFixed(1) : '50.7';
             const neutRate = neut.pass_rate?.raw_value != null ? (neut.pass_rate.raw_value * 100).toFixed(1) : '57.0';
             const trailRate = trail.pass_rate?.raw_value != null ? (trail.pass_rate.raw_value * 100).toFixed(1) : '73.3';
+
+            const leadRun = (100 - parseFloat(leadRate)).toFixed(1);
+            const neutRun = (100 - parseFloat(neutRate)).toFixed(1);
+            const trailRun = (100 - parseFloat(trailRate)).toFixed(1);
 
             const leadRank = lead.pass_rate?.rank != null ? `#${lead.pass_rate.rank}` : '';
             const neutRank = neut.pass_rate?.rank != null ? `#${neut.pass_rate.rank}` : '';
@@ -3866,35 +3922,40 @@
 
             const passShift = (parseFloat(trailRate) - parseFloat(leadRate)).toFixed(1);
             const passSign = parseFloat(passShift) >= 0 ? '+' : '';
+            const runShift = (parseFloat(trailRun) - parseFloat(leadRun)).toFixed(1);
+            const runSign = parseFloat(runShift) >= 0 ? '+' : '';
             const deepShift = (parseFloat(trailDeep) - parseFloat(leadDeep)).toFixed(1);
             const deepSign = parseFloat(deepShift) >= 0 ? '+' : '';
 
             return `
                 <div class="pt-1.5 border-t border-[#21262d] space-y-1">
                     <div class="flex items-center justify-between text-[9.5px] font-mono text-slate-400">
-                        <span class="font-bold text-slate-300 uppercase">Game-State Passing Tendencies</span>
-                        <span>Pass % (Rank) · Deep %</span>
+                        <span class="font-bold text-slate-300 uppercase">Game-State Play Calling Tendencies</span>
+                        <span>Pass / Run % · Deep %</span>
                     </div>
                     <div class="grid grid-cols-3 gap-1 text-[9.5px] font-mono text-center">
                         <div class="bg-[#161b22] p-1 rounded border border-[#21262d]">
                             <span class="text-slate-400 block text-[8px]">Ahead (≥+7)</span>
-                            <b class="text-slate-200">${leadRate}%</b> ${leadRank ? `<span class="text-slate-400 text-[8px]">${leadRank}</span>` : ''}
-                            <span class="text-sky-300 block text-[8.5px]">${leadDeep}% Deep</span>
+                            <b class="text-slate-200">${leadRate}% Pass</b>
+                            <span class="text-amber-300 block text-[8.5px]">${leadRun}% Run</span>
+                            <span class="text-sky-300 block text-[8px]">${leadDeep}% Deep</span>
                         </div>
                         <div class="bg-[#161b22] p-1 rounded border border-[#21262d]">
                             <span class="text-slate-400 block text-[8px]">Neutral (±6)</span>
-                            <b class="text-slate-200">${neutRate}%</b> ${neutRank ? `<span class="text-slate-400 text-[8px]">${neutRank}</span>` : ''}
-                            <span class="text-sky-300 block text-[8.5px]">${neutDeep}% Deep</span>
+                            <b class="text-slate-200">${neutRate}% Pass</b>
+                            <span class="text-amber-300 block text-[8.5px]">${neutRun}% Run</span>
+                            <span class="text-sky-300 block text-[8px]">${neutDeep}% Deep</span>
                         </div>
                         <div class="bg-[#161b22] p-1 rounded border border-[#21262d] ${parseFloat(trailRate) >= 70 ? 'border-emerald-700/60 bg-emerald-950/20' : ''}">
                             <span class="text-slate-400 block text-[8px]">Trailing (≤-7)</span>
-                            <b class="${parseFloat(trailRate) >= 70 ? 'text-emerald-400' : 'text-slate-200'} font-bold">${trailRate}%</b> ${trailRank ? `<span class="text-slate-400 text-[8px]">${trailRank}</span>` : ''}
-                            <span class="text-sky-300 block text-[8.5px] font-bold">${trailDeep}% Deep</span>
+                            <b class="${parseFloat(trailRate) >= 70 ? 'text-emerald-400' : 'text-slate-200'} font-bold">${trailRate}% Pass</b>
+                            <span class="text-amber-300 block text-[8.5px]">${trailRun}% Run</span>
+                            <span class="text-sky-300 block text-[8px] font-bold">${trailDeep}% Deep</span>
                         </div>
                     </div>
                     <div class="text-[9px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
                         <span>Trailing Shift:</span>
-                        <span class="text-slate-200 font-bold">${passSign}${passShift}% Pass Rate (${leadRate}% → ${trailRate}%), ${deepSign}${deepShift}% Deep (${leadDeep}% → ${trailDeep}%)</span>
+                        <span class="text-slate-200 font-bold">${passSign}${passShift}% Pass (${leadRate}% → ${trailRate}%), ${runSign}${runShift}% Run (${leadRun}% → ${trailRun}%)</span>
                     </div>
                 </div>
             `;
@@ -4099,10 +4160,13 @@
                 hOffHeavyYpc
             );
 
+            const aGapRankStr = aGapRank != null ? `(#${aGapRank})` : '(n<6)';
+            const hGapRankStr = hGapRank != null ? `(#${hGapRank})` : '(n<6)';
+
             const aRunCallout = `<div class="space-y-1 font-mono text-[10px] text-slate-300">
                 <div class="flex items-center justify-between text-slate-400">
                     <span>Scheme Fit:</span>
-                    <span class="text-slate-200">${d.away_team} runs ${aOffGapPct.toFixed(0)}% Gap; ${d.home_team} allows ${aGapYpc} Gap YPC (#${aGapRank})</span>
+                    <span class="text-slate-200">${d.away_team} runs ${aOffGapPct.toFixed(0)}% Gap; ${d.home_team} allows ${aGapYpc} Gap YPC ${aGapRankStr}</span>
                 </div>
                 <div class="flex items-center justify-between text-slate-400">
                     <span>Box Usage Alignment:</span>
@@ -4113,7 +4177,7 @@
             const hRunCallout = `<div class="space-y-1 font-mono text-[10px] text-slate-300">
                 <div class="flex items-center justify-between text-slate-400">
                     <span>Scheme Fit:</span>
-                    <span class="text-slate-200">${d.home_team} runs ${hOffGapPct.toFixed(0)}% Gap; ${d.away_team} allows ${hGapYpc} Gap YPC (#${hGapRank})</span>
+                    <span class="text-slate-200">${d.home_team} runs ${hOffGapPct.toFixed(0)}% Gap; ${d.away_team} allows ${hGapYpc} Gap YPC ${hGapRankStr}</span>
                 </div>
                 <div class="flex items-center justify-between text-slate-400">
                     <span>Box Usage Alignment:</span>
@@ -4159,16 +4223,21 @@
             const aLeadRate = parseFloat(aLeadSplit?.raw_value || 0.493);
             const aNeutRate = parseFloat(aNeutSplit?.raw_value || 0.570);
             const aTrailRate = parseFloat(aTrailSplit?.raw_value || 0.733);
-            const aLeadRank = aLeadSplit?.rank ?? 15;
-            const aNeutRank = aNeutSplit?.rank ?? 12;
-            const aTrailRank = aTrailSplit?.rank ?? 1;
+            const aLeadRank = aLeadSplit?.rank ?? null;
+            const aNeutRank = aNeutSplit?.rank ?? null;
+            const aTrailRank = aTrailSplit?.rank ?? null;
 
             const hLeadRate = parseFloat(hLeadSplit?.raw_value || 0.498);
             const hNeutRate = parseFloat(hNeutSplit?.raw_value || 0.564);
             const hTrailRate = parseFloat(hTrailSplit?.raw_value || 0.652);
-            const hLeadRank = hLeadSplit?.rank ?? 13;
-            const hNeutRank = hNeutSplit?.rank ?? 14;
-            const hTrailRank = hTrailSplit?.rank ?? 14;
+            const hLeadRank = hLeadSplit?.rank ?? null;
+            const hNeutRank = hNeutSplit?.rank ?? null;
+            const hTrailRank = hTrailSplit?.rank ?? null;
+
+            const aLeadRankStr = aLeadRank != null ? `#${aLeadRank}` : 'n<6';
+            const aTrailRankStr = aTrailRank != null ? `#${aTrailRank}` : 'n<6';
+            const hLeadRankStr = hLeadRank != null ? `#${hLeadRank}` : 'n<6';
+            const hTrailRankStr = hTrailRank != null ? `#${hTrailRank}` : 'n<6';
 
             const aScriptSvg = renderGameScriptMeterSvg(aLeadRate, aNeutRate, aTrailRate, aLeadRank, aNeutRank, aTrailRank, d.away_team);
             const hScriptSvg = renderGameScriptMeterSvg(hLeadRate, hNeutRate, hTrailRate, hLeadRank, hNeutRank, hTrailRank, d.home_team);
@@ -4187,7 +4256,7 @@
                         ${aScriptSvg}
                         <div class="font-mono text-[10px] text-slate-300 flex items-center justify-between">
                             <span class="text-slate-400">Trailing Shift:</span>
-                            <span class="text-emerald-400 font-bold">+${((aTrailRate - aLeadRate) * 100).toFixed(1)}% (${(aLeadRate * 100).toFixed(1)}% #9 → ${(aTrailRate * 100).toFixed(1)}% #${aTrailRank})</span>
+                            <span class="text-emerald-400 font-bold">+${((aTrailRate - aLeadRate) * 100).toFixed(1)}% Pass (${(aLeadRate * 100).toFixed(1)}% ${aLeadRankStr} → ${(aTrailRate * 100).toFixed(1)}% ${aTrailRankStr}), ${((100 - aTrailRate * 100) - (100 - aLeadRate * 100)).toFixed(1)}% Run (${(100 - aLeadRate * 100).toFixed(1)}% → ${(100 - aTrailRate * 100).toFixed(1)}%)</span>
                         </div>
                     </div>
                     <div class="space-y-1.5 pt-2 border-t border-[#21262d]">
@@ -4198,7 +4267,7 @@
                         ${hScriptSvg}
                         <div class="font-mono text-[10px] text-slate-300 flex items-center justify-between">
                             <span class="text-slate-400">Trailing Shift:</span>
-                            <span class="text-slate-200 font-bold">+${((hTrailRate - hLeadRate) * 100).toFixed(1)}% (${(hLeadRate * 100).toFixed(1)}% #13 → ${(hTrailRate * 100).toFixed(1)}% #${hTrailRank})</span>
+                            <span class="text-slate-200 font-bold">+${((hTrailRate - hLeadRate) * 100).toFixed(1)}% Pass (${(hLeadRate * 100).toFixed(1)}% ${hLeadRankStr} → ${(hTrailRate * 100).toFixed(1)}% ${hTrailRankStr}), ${((100 - hTrailRate * 100) - (100 - hLeadRate * 100)).toFixed(1)}% Run (${(100 - hLeadRate * 100).toFixed(1)}% → ${(100 - hTrailRate * 100).toFixed(1)}%)</span>
                         </div>
                     </div>
                 </div>
@@ -5758,11 +5827,29 @@ function renderSchemeInsights(d) {
             const aRoster = TEAM_ROSTERS_2026[a] || { qb: `${a} QB`, qb_mobile: false, wr1: `${a} WR1`, wr2: `${a} WR2`, te: `${a} TE`, rb: `${a} RB` };
             const hRoster = TEAM_ROSTERS_2026[h] || { qb: `${h} QB`, qb_mobile: false, wr1: `${h} WR1`, wr2: `${h} WR2`, te: `${h} TE`, rb: `${h} RB` };
 
-            const hGames = effSeason === 2026 ? 5 : 17;
-            const aGames = effSeason === 2026 ? 5 : 17;
+            let hGames = effSeason === 2026 ? 5 : 17;
+            let aGames = effSeason === 2026 ? 5 : 17;
+            if (startDate && endDate) {
+                const d1 = new Date(startDate);
+                const d2 = new Date(endDate);
+                if (!isNaN(d1) && !isNaN(d2) && d2 >= d1) {
+                    const diffDays = (d2 - d1) / (1000 * 3600 * 24);
+                    const diffWeeks = Math.max(1, Math.min(18, Math.round(diffDays / 7)));
+                    hGames = diffWeeks;
+                    aGames = diffWeeks;
+                }
+            }
 
             const formatDefRank = (val, rank, nG) => {
                 if (nG < 6) return `${val.toFixed(2)} YPC (league median 4.12, n=${nG} games — rank suppressed, small sample)`;
+                return `Rank #${rank} (n=${nG} games)`;
+            };
+            const formatPassRank = (val, rank, nG) => {
+                if (nG < 6) return `${val.toFixed(2)} YPA (league median 6.12, n=${nG} games — rank suppressed, small sample)`;
+                return `Rank #${rank} (n=${nG} games)`;
+            };
+            const formatRateRank = (val, rank, med, nG) => {
+                if (nG < 6) return `${(val * 100).toFixed(1)}% (league median ${(med * 100).toFixed(1)}%, n=${nG} games — rank suppressed, small sample)`;
                 return `Rank #${rank} (n=${nG} games)`;
             };
 
@@ -6038,7 +6125,10 @@ function renderSchemeInsights(d) {
                         passing_offense: {
                             raw_value: parseFloat((6.1 + ((seed % 5) * 0.15)).toFixed(2)),
                             league_median: 6.03,
-                            rank: 10 + (seed % 10)
+                            rank: aGames < 6 ? null : (10 + (seed % 10)),
+                            rank_display: formatPassRank(parseFloat((6.1 + ((seed % 5) * 0.15)).toFixed(2)), 10 + (seed % 10), aGames),
+                            sample_attempts: Math.round(34 * aGames),
+                            n_games: aGames
                         },
                         pass_depth: {
                             behind_los: { attempts_share: 14.5, epa_per_attempt: -0.22, success_rate: 35.0, yards_per_attempt: 4.10 },
@@ -6052,7 +6142,8 @@ function renderSchemeInsights(d) {
                         },
                         game_state_splits: {
                             leading: {
-                                pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: 10 + (seed % 10), n_games: aGames, sample_size: 152, rank_display: `Rank #${10 + (seed % 10)} (n=${aGames}g)` },
+                                pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: aGames < 6 ? null : (10 + (seed % 10)), n_games: aGames, sample_size: Math.round(15 * aGames), rank_display: formatRateRank((0.47 + ((seed % 7) * 0.01)), 10 + (seed % 10), 0.489, aGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.47 + ((seed % 7) * 0.01)), 3), league_median: 0.511, rank: aGames < 6 ? null : (23 - (seed % 10)), n_games: aGames, sample_size: Math.round(15 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.47 + ((seed % 7) * 0.01)), 3), 23 - (seed % 10), 0.511, aGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 15.1, frequency_pct: 15.1, sample_attempts: 23, epa_per_attempt: -0.21, success_rate: 36.4, yards_per_attempt: 3.64 },
                                     short: { attempts_share: 55.5, frequency_pct: 55.5, sample_attempts: 84, epa_per_attempt: 0.12, success_rate: 54.3, yards_per_attempt: 5.96 },
@@ -6061,7 +6152,8 @@ function renderSchemeInsights(d) {
                                 }
                             },
                             neutral: {
-                                pass_rate: { raw_value: (0.55 + ((seed * 2) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 2) % 6) * 0.01 - 0.010), diff_pct: 1.5, rank: 12 + (seed % 8), n_games: aGames, sample_size: 544, rank_display: `Rank #${12 + (seed % 8)} (n=${aGames}g)` },
+                                pass_rate: { raw_value: (0.55 + ((seed * 2) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 2) % 6) * 0.01 - 0.010), diff_pct: 1.5, rank: aGames < 6 ? null : (12 + (seed % 8)), n_games: aGames, sample_size: Math.round(35 * aGames), rank_display: formatRateRank((0.55 + ((seed * 2) % 6) * 0.01), 12 + (seed % 8), 0.560, aGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.55 + ((seed * 2) % 6) * 0.01), 3), league_median: 0.440, rank: aGames < 6 ? null : (21 - (seed % 8)), n_games: aGames, sample_size: Math.round(35 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.55 + ((seed * 2) % 6) * 0.01), 3), 21 - (seed % 8), 0.440, aGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 10.8, frequency_pct: 10.8, sample_attempts: 59, epa_per_attempt: -0.54, success_rate: 18.2, yards_per_attempt: 2.62 },
                                     short: { attempts_share: 52.6, frequency_pct: 52.6, sample_attempts: 286, epa_per_attempt: 0.09, success_rate: 51.3, yards_per_attempt: 6.07 },
@@ -6070,7 +6162,8 @@ function renderSchemeInsights(d) {
                                 }
                             },
                             trailing: {
-                                pass_rate: { raw_value: (0.64 + ((seed * 3) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 3) % 10) * 0.01 - 0.010), diff_pct: 4.8, rank: 8 + (seed % 12), n_games: aGames, sample_size: 200, rank_display: `Rank #${8 + (seed % 12)} (n=${aGames}g)` },
+                                pass_rate: { raw_value: (0.64 + ((seed * 3) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 3) % 10) * 0.01 - 0.010), diff_pct: 4.8, rank: aGames < 6 ? null : (8 + (seed % 12)), n_games: aGames, sample_size: Math.round(16 * aGames), rank_display: formatRateRank((0.64 + ((seed * 3) % 10) * 0.01), 8 + (seed % 12), 0.650, aGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.64 + ((seed * 3) % 10) * 0.01), 3), league_median: 0.350, rank: aGames < 6 ? null : (25 - (seed % 12)), n_games: aGames, sample_size: Math.round(16 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.64 + ((seed * 3) % 10) * 0.01), 3), 25 - (seed % 12), 0.350, aGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 7.0, frequency_pct: 7.0, sample_attempts: 14, epa_per_attempt: -0.37, success_rate: 23.1, yards_per_attempt: 2.38 },
                                     short: { attempts_share: 55.9, frequency_pct: 55.9, sample_attempts: 112, epa_per_attempt: 0.14, success_rate: 55.8, yards_per_attempt: 5.40 },
@@ -6101,7 +6194,13 @@ function renderSchemeInsights(d) {
                         },
                         pass_defense: {
                             overall_dropbacks: {
-                                yards_per_attempt: { raw_value: 5.92, league_median: 6.14, rank: 14 }
+                                yards_per_attempt: {
+                                    raw_value: 5.92,
+                                    league_median: 6.14,
+                                    rank: hGames < 6 ? null : 14,
+                                    rank_display: formatPassRank(5.92, 14, hGames),
+                                    n_games: hGames
+                                }
                             },
                             target_depth_allowed: {
                                 behind_los: { epa_per_attempt: -0.34, success_rate: 31.5, yards_per_attempt: 3.41 },
@@ -6128,7 +6227,10 @@ function renderSchemeInsights(d) {
                         passing_offense: {
                             raw_value: parseFloat((6.3 + (((seed * 2) % 5) * 0.15)).toFixed(2)),
                             league_median: 6.03,
-                            rank: 8 + ((seed * 2) % 10)
+                            rank: hGames < 6 ? null : (8 + ((seed * 2) % 10)),
+                            rank_display: formatPassRank(parseFloat((6.3 + (((seed * 2) % 5) * 0.15)).toFixed(2)), 8 + ((seed * 2) % 10), hGames),
+                            sample_attempts: Math.round(34 * hGames),
+                            n_games: hGames
                         },
                         pass_depth: {
                             behind_los: { attempts_share: 13.5, epa_per_attempt: -0.20, success_rate: 36.0, yards_per_attempt: 4.25 },
@@ -6142,30 +6244,33 @@ function renderSchemeInsights(d) {
                         },
                         game_state_splits: {
                             leading: {
-                                pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: 11 + ((seed * 2) % 10), n_games: hGames, sample_size: 231, rank_display: `Rank #${11 + ((seed * 2) % 10)} (n=${hGames}g)` },
+                                pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: hGames < 6 ? null : (11 + ((seed * 2) % 10)), n_games: hGames, sample_size: Math.round(15 * hGames), rank_display: formatRateRank((0.48 + ((seed * 2) % 7) * 0.01), 11 + ((seed * 2) % 10), 0.489, hGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.48 + ((seed * 2) % 7) * 0.01), 3), league_median: 0.511, rank: hGames < 6 ? null : (22 - ((seed * 2) % 10)), n_games: hGames, sample_size: Math.round(15 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.48 + ((seed * 2) % 7) * 0.01), 3), 22 - ((seed * 2) % 10), 0.511, hGames) },
                                 pass_depth: {
-                                    behind_los: { attempts_share: 17.4, frequency_pct: 17.4, sample_attempts: 40, epa_per_attempt: -0.18, success_rate: 38.0, yards_per_attempt: 4.12 },
-                                    short: { attempts_share: 41.7, frequency_pct: 41.7, sample_attempts: 96, epa_per_attempt: 0.06, success_rate: 50.0, yards_per_attempt: 5.80 },
-                                    intermediate: { attempts_share: 28.0, frequency_pct: 28.0, sample_attempts: 65, epa_per_attempt: 0.22, success_rate: 49.0, yards_per_attempt: 8.50 },
-                                    deep: { attempts_share: 12.8, frequency_pct: 12.8, sample_attempts: 30, epa_per_attempt: 0.38, success_rate: 35.0, yards_per_attempt: 12.40 }
+                                    behind_los: { attempts_share: 17.4, frequency_pct: 17.4, sample_attempts: Math.round(8 * (hGames / 5)), epa_per_attempt: -0.18, success_rate: 38.0, yards_per_attempt: 4.12 },
+                                    short: { attempts_share: 41.7, frequency_pct: 41.7, sample_attempts: Math.round(19 * (hGames / 5)), epa_per_attempt: 0.06, success_rate: 50.0, yards_per_attempt: 5.80 },
+                                    intermediate: { attempts_share: 28.0, frequency_pct: 28.0, sample_attempts: Math.round(13 * (hGames / 5)), epa_per_attempt: 0.22, success_rate: 49.0, yards_per_attempt: 8.50 },
+                                    deep: { attempts_share: 12.8, frequency_pct: 12.8, sample_attempts: Math.round(6 * (hGames / 5)), epa_per_attempt: 0.38, success_rate: 35.0, yards_per_attempt: 12.40 }
                                 }
                             },
                             neutral: {
-                                pass_rate: { raw_value: (0.56 + ((seed * 3) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 3) % 6) * 0.01), diff_pct: 0.8, rank: 14 + ((seed * 3) % 8), n_games: hGames, sample_size: 434, rank_display: `Rank #${14 + ((seed * 3) % 8)} (n=${hGames}g)` },
+                                pass_rate: { raw_value: (0.56 + ((seed * 3) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 3) % 6) * 0.01), diff_pct: 0.8, rank: hGames < 6 ? null : (14 + ((seed * 3) % 8)), n_games: hGames, sample_size: Math.round(35 * hGames), rank_display: formatRateRank((0.56 + ((seed * 3) % 6) * 0.01), 14 + ((seed * 3) % 8), 0.560, hGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.56 + ((seed * 3) % 6) * 0.01), 3), league_median: 0.440, rank: hGames < 6 ? null : (19 - ((seed * 3) % 8)), n_games: hGames, sample_size: Math.round(35 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.56 + ((seed * 3) % 6) * 0.01), 3), 19 - ((seed * 3) % 8), 0.440, hGames) },
                                 pass_depth: {
-                                    behind_los: { attempts_share: 13.9, frequency_pct: 13.9, sample_attempts: 60, epa_per_attempt: -0.32, success_rate: 28.0, yards_per_attempt: 3.10 },
-                                    short: { attempts_share: 49.0, frequency_pct: 49.0, sample_attempts: 213, epa_per_attempt: 0.08, success_rate: 52.0, yards_per_attempt: 6.10 },
-                                    intermediate: { attempts_share: 24.8, frequency_pct: 24.8, sample_attempts: 108, epa_per_attempt: 0.40, success_rate: 54.0, yards_per_attempt: 9.80 },
-                                    deep: { attempts_share: 12.4, frequency_pct: 12.4, sample_attempts: 54, epa_per_attempt: 0.35, success_rate: 34.0, yards_per_attempt: 11.20 }
+                                    behind_los: { attempts_share: 13.9, frequency_pct: 13.9, sample_attempts: Math.round(12 * (hGames / 5)), epa_per_attempt: -0.32, success_rate: 28.0, yards_per_attempt: 3.10 },
+                                    short: { attempts_share: 49.0, frequency_pct: 49.0, sample_attempts: Math.round(43 * (hGames / 5)), epa_per_attempt: 0.08, success_rate: 52.0, yards_per_attempt: 6.10 },
+                                    intermediate: { attempts_share: 24.8, frequency_pct: 24.8, sample_attempts: Math.round(22 * (hGames / 5)), epa_per_attempt: 0.40, success_rate: 54.0, yards_per_attempt: 9.80 },
+                                    deep: { attempts_share: 12.4, frequency_pct: 12.4, sample_attempts: Math.round(11 * (hGames / 5)), epa_per_attempt: 0.35, success_rate: 34.0, yards_per_attempt: 11.20 }
                                 }
                             },
                             trailing: {
-                                pass_rate: { raw_value: (0.65 + ((seed * 4) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 4) % 10) * 0.01), diff_pct: 1.2, rank: 10 + ((seed * 4) % 12), n_games: hGames, sample_size: 122, rank_display: `Rank #${10 + ((seed * 4) % 12)} (n=${hGames}g)` },
+                                pass_rate: { raw_value: (0.65 + ((seed * 4) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 4) % 10) * 0.01), diff_pct: 1.2, rank: hGames < 6 ? null : (10 + ((seed * 4) % 12)), n_games: hGames, sample_size: Math.round(16 * hGames), rank_display: formatRateRank((0.65 + ((seed * 4) % 10) * 0.01), 10 + ((seed * 4) % 12), 0.650, hGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.65 + ((seed * 4) % 10) * 0.01), 3), league_median: 0.350, rank: hGames < 6 ? null : (23 - ((seed * 4) % 12)), n_games: hGames, sample_size: Math.round(16 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.65 + ((seed * 4) % 10) * 0.01), 3), 23 - ((seed * 4) % 12), 0.350, hGames) },
                                 pass_depth: {
-                                    behind_los: { attempts_share: 16.4, frequency_pct: 16.4, sample_attempts: 20, epa_per_attempt: -0.25, success_rate: 30.0, yards_per_attempt: 3.40 },
-                                    short: { attempts_share: 44.5, frequency_pct: 44.5, sample_attempts: 54, epa_per_attempt: 0.11, success_rate: 52.0, yards_per_attempt: 5.60 },
-                                    intermediate: { attempts_share: 24.5, frequency_pct: 24.5, sample_attempts: 30, epa_per_attempt: 0.15, success_rate: 40.0, yards_per_attempt: 7.90 },
-                                    deep: { attempts_share: 14.5, frequency_pct: 14.5, sample_attempts: 18, epa_per_attempt: 0.28, success_rate: 33.0, yards_per_attempt: 11.50 }
+                                    behind_los: { attempts_share: 16.4, frequency_pct: 16.4, sample_attempts: Math.round(4 * (hGames / 5)), epa_per_attempt: -0.25, success_rate: 30.0, yards_per_attempt: 3.40 },
+                                    short: { attempts_share: 44.5, frequency_pct: 44.5, sample_attempts: Math.round(11 * (hGames / 5)), epa_per_attempt: 0.11, success_rate: 52.0, yards_per_attempt: 5.60 },
+                                    intermediate: { attempts_share: 24.5, frequency_pct: 24.5, sample_attempts: Math.round(6 * (hGames / 5)), epa_per_attempt: 0.15, success_rate: 40.0, yards_per_attempt: 7.90 },
+                                    deep: { attempts_share: 14.5, frequency_pct: 14.5, sample_attempts: Math.round(4 * (hGames / 5)), epa_per_attempt: 0.28, success_rate: 33.0, yards_per_attempt: 11.50 }
                                 }
                             }
                         }
@@ -6191,7 +6296,13 @@ function renderSchemeInsights(d) {
                         },
                         pass_defense: {
                             overall_dropbacks: {
-                                yards_per_attempt: { raw_value: 5.33, league_median: 6.14, rank: 3 }
+                                yards_per_attempt: {
+                                    raw_value: 5.33,
+                                    league_median: 6.14,
+                                    rank: aGames < 6 ? null : 3,
+                                    rank_display: formatPassRank(5.33, 3, aGames),
+                                    n_games: aGames
+                                }
                             },
                             target_depth_allowed: {
                                 behind_los: { epa_per_attempt: -0.38, success_rate: 29.5, yards_per_attempt: 3.25 },

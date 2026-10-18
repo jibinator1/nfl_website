@@ -11,10 +11,14 @@ Implements deep film-room & scheme analytics cross-referencing:
 
 import os
 import json
+import logging
 from typing import Dict, Any, List, Optional, Tuple
 import math
 import copy
 import pandas as pd
+import numpy as np
+
+logger = logging.getLogger(__name__)
 
 from backend.matchup_sheet import build_matchup_stat_sheet
 from backend.coverage_matchup import compute_team_coverage_profile, evaluate_coverage_matchup
@@ -498,16 +502,20 @@ _SCHEDULES_DF = None
 _WEEKLY_DF = None
 _TEAM_PBP_SUMMARY_DF = None
 _TEAM_SITUATIONAL_DF = None
+_SCOUTING_FEATURES_DF = None
 _PARQUET_LOADED = False
 
 def _ensure_parquet_loaded():
-    global _PARQUET_LOADED, _SCHEDULES_DF, _WEEKLY_DF, _TEAM_PBP_SUMMARY_DF, _TEAM_SITUATIONAL_DF
+    global _PARQUET_LOADED, _SCHEDULES_DF, _WEEKLY_DF, _TEAM_PBP_SUMMARY_DF, _TEAM_SITUATIONAL_DF, _SCOUTING_FEATURES_DF
     if not _PARQUET_LOADED:
         data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
         sched_p = os.path.join(data_dir, 'schedules_cache.parquet')
         week_p = os.path.join(data_dir, 'weekly_cache.parquet')
         pbp_p = os.path.join(data_dir, 'pbp_cache', 'team_pbp_summary.parquet')
         sit_p = os.path.join(data_dir, 'pbp_cache', 'team_situational_game.parquet')
+        feat_p = os.path.join(data_dir, 'game_scouting_features.parquet')
+        if not os.path.exists(feat_p):
+            feat_p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'api', 'data', 'game_scouting_features.parquet')
         if not os.path.exists(sit_p):
             sit_p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'api', 'data', 'pbp_cache', 'team_situational_game.parquet')
 
@@ -520,9 +528,347 @@ def _ensure_parquet_loaded():
                     _TEAM_PBP_SUMMARY_DF = pd.read_parquet(pbp_p)
                 if os.path.exists(sit_p):
                     _TEAM_SITUATIONAL_DF = pd.read_parquet(sit_p)
+                if os.path.exists(feat_p):
+                    _SCOUTING_FEATURES_DF = pd.read_parquet(feat_p)
             except Exception:
                 pass
         _PARQUET_LOADED = True
+
+
+_DYNAMIC_SCOUTING_CACHE: Dict[Tuple, Dict[str, Any]] = {}
+
+def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = None, end_date: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Computes genuine descriptive scouting metrics across all 32 teams for the specified
+    date range or season, using the game-level scouting feature store.
+    Includes small-sample rank suppression (n < 6 games).
+    """
+    _ensure_parquet_loaded()
+    global _SCOUTING_FEATURES_DF, _DYNAMIC_SCOUTING_CACHE
+
+    cache_key = (season, start_date, end_date)
+    if cache_key in _DYNAMIC_SCOUTING_CACHE:
+        return _DYNAMIC_SCOUTING_CACHE[cache_key]
+
+    if _SCOUTING_FEATURES_DF is None or _SCOUTING_FEATURES_DF.empty:
+        return _load_32_team_scouting_data()
+
+    df = _SCOUTING_FEATURES_DF
+    is_custom_date = bool(start_date and end_date)
+    if is_custom_date:
+        sub = df[(df['gameday'] >= start_date) & (df['gameday'] <= end_date)]
+    elif start_date:
+        sub = df[df['gameday'] >= start_date]
+    elif end_date:
+        sub = df[df['gameday'] <= end_date]
+    else:
+        eff_season = int(season if season else 2026)
+        sub = df[df['season'] == eff_season]
+
+    if sub.empty:
+        eff_season = int(season if season else 2026)
+        sub = df[df['season'] == eff_season]
+        if sub.empty:
+            sub = df
+
+    teams = sorted([t for t in df['team'].unique() if pd.notna(t)])
+
+    raw = {}
+    for tm in teams:
+        t_sub = sub[sub['team'] == tm]
+        ng = len(t_sub)
+
+        p_att = int(t_sub['pass_att'].sum())
+        p_yds = float(t_sub['pass_yds'].sum())
+        r_att = int(t_sub['rush_att'].sum())
+        r_yds = float(t_sub['rush_yds'].sum())
+
+        d_p_att = int(t_sub['def_pass_att'].sum())
+        d_p_yds = float(t_sub['def_pass_yds'].sum())
+        d_r_att = int(t_sub['def_rush_att'].sum())
+        d_r_yds = float(t_sub['def_rush_yds'].sum())
+
+        off_ypa = round(p_yds / p_att, 2) if p_att > 0 else 6.30
+        off_ypc = round(r_yds / r_att, 2) if r_att > 0 else 4.20
+        def_ypa = round(d_p_yds / d_p_att, 2) if d_p_att > 0 else 6.10
+        def_ypc = round(d_r_yds / d_r_att, 2) if d_r_att > 0 else 4.20
+
+        # Game State
+        lp = int(t_sub['lead_pass'].sum())
+        lr = int(t_sub['lead_rush'].sum())
+        lt = lp + lr
+        l_pr = round(lp / lt, 3) if lt > 0 else 0.489
+        l_rr = round(1.0 - l_pr, 3)
+
+        np_p = int(t_sub['neut_pass'].sum())
+        nr = int(t_sub['neut_rush'].sum())
+        nt = np_p + nr
+        n_pr = round(np_p / nt, 3) if nt > 0 else 0.560
+        n_rr = round(1.0 - n_pr, 3)
+
+        tp = int(t_sub['trail_pass'].sum())
+        tr = int(t_sub['trail_rush'].sum())
+        tt = tp + tr
+        t_pr = round(tp / tt, 3) if tt > 0 else 0.650
+        t_rr = round(1.0 - t_pr, 3)
+
+        # Box Counts (Def)
+        d_c_lt = int(t_sub['d_c_light'].sum())
+        d_y_lt = float(t_sub['d_y_light'].sum())
+        d_c_hv = int(t_sub['d_c_heavy'].sum())
+        d_y_hv = float(t_sub['d_y_heavy'].sum())
+        d_box_tot = int(t_sub['d_box_total'].sum())
+
+        d_lt_rate = round(d_c_lt / d_box_tot * 100.0, 1) if d_box_tot > 0 else 55.0
+        d_hv_rate = round(d_c_hv / d_box_tot * 100.0, 1) if d_box_tot > 0 else 8.0
+        d_ypc_lt = round(d_y_lt / d_c_lt, 2) if d_c_lt > 0 else 4.30
+        d_ypc_hv = round(d_y_hv / d_c_hv, 2) if d_c_hv > 0 else 3.10
+
+        # Box Counts (Off)
+        o_c_lt = int(t_sub['o_c_light'].sum())
+        o_y_lt = float(t_sub['o_y_light'].sum())
+        o_c_hv = int(t_sub['o_c_heavy'].sum())
+        o_y_hv = float(t_sub['o_y_heavy'].sum())
+        o_ypc_lt = round(o_y_lt / o_c_lt, 2) if o_c_lt > 0 else 4.30
+        o_ypc_hv = round(o_y_hv / o_c_hv, 2) if o_c_hv > 0 else 3.10
+
+        # Pressure
+        prs_tot = int(t_sub['d_pass_rush_snaps'].sum())
+        prs_nb = int(t_sub['d_no_blitz_snaps'].sum())
+        prs_blitz = int(t_sub['d_blitz_snaps'].sum())
+        pnb_cnt = int(t_sub['d_pressure_no_blitz'].sum())
+        pnb_rate = round(pnb_cnt / prs_nb * 100.0, 1) if prs_nb > 0 else 24.5
+        blitz_rate = round(prs_blitz / prs_tot * 100.0, 1) if prs_tot > 0 else 26.0
+
+        # Gaps
+        d_c_ins = int(t_sub['d_c_ins'].sum())
+        d_y_ins = float(t_sub['d_y_ins'].sum())
+        d_c_out = int(t_sub['d_c_out'].sum())
+        d_y_out = float(t_sub['d_y_out'].sum())
+        ins_ypc = round(d_y_ins / d_c_ins, 2) if d_c_ins > 0 else 3.86
+        out_ypc = round(d_y_out / d_c_out, 2) if d_c_out > 0 else 4.55
+
+        # Positional targets
+        t_wr = int(t_sub['d_tgt_wr'].sum())
+        y_wr = float(t_sub['d_yds_wr'].sum())
+        t_te = int(t_sub['d_tgt_te'].sum())
+        y_te = float(t_sub['d_yds_te'].sum())
+        t_rb = int(t_sub['d_tgt_rb'].sum())
+        y_rb = float(t_sub['d_yds_rb'].sum())
+        pos_tot = t_wr + t_te + t_rb
+
+        # Pass depth allowed
+        att_b = int(t_sub['d_att_blos'].sum())
+        att_s = int(t_sub['d_att_short'].sum())
+        att_i = int(t_sub['d_att_inter'].sum())
+        att_d = int(t_sub['d_att_deep'].sum())
+
+        raw[tm] = {
+            'n_games': ng,
+            'p_att': p_att, 'off_ypa': off_ypa,
+            'r_att': r_att, 'off_ypc': off_ypc,
+            'd_p_att': d_p_att, 'def_ypa': def_ypa,
+            'd_r_att': d_r_att, 'def_ypc': def_ypc,
+            'lp': lp, 'lr': lr, 'lt': lt, 'l_pr': l_pr, 'l_rr': l_rr,
+            'np': np_p, 'nr': nr, 'nt': nt, 'n_pr': n_pr, 'n_rr': n_rr,
+            'tp': tp, 'tr': tr, 'tt': tt, 't_pr': t_pr, 't_rr': t_rr,
+            'd_lt_rate': d_lt_rate, 'd_hv_rate': d_hv_rate, 'd_ypc_lt': d_ypc_lt, 'd_ypc_hv': d_ypc_hv,
+            'o_c_lt': o_c_lt, 'o_c_hv': o_c_hv, 'o_ypc_lt': o_ypc_lt, 'o_ypc_hv': o_ypc_hv,
+            'pnb_rate': pnb_rate, 'blitz_rate': blitz_rate, 'prs_nb': prs_nb, 'prs_tot': prs_tot,
+            'ins_ypc': ins_ypc, 'out_ypc': out_ypc, 'd_c_ins': d_c_ins, 'd_c_out': d_c_out,
+            'pos': {
+                'wr': {'target_share': round(t_wr/pos_tot*100, 1) if pos_tot>0 else 60.0, 'yards_per_target': round(y_wr/t_wr, 2) if t_wr>0 else 7.33, 'sample_targets': t_wr},
+                'te': {'target_share': round(t_te/pos_tot*100, 1) if pos_tot>0 else 22.7, 'yards_per_target': round(y_te/t_te, 2) if t_te>0 else 6.65, 'sample_targets': t_te},
+                'rb': {'target_share': round(t_rb/pos_tot*100, 1) if pos_tot>0 else 17.3, 'yards_per_target': round(y_rb/t_rb, 2) if t_rb>0 else 5.26, 'sample_targets': t_rb},
+            },
+            'pass_depth_allowed': {
+                'behind_los': {
+                    'epa_per_attempt': round(float(t_sub['d_epa_blos'].sum() / att_b), 3) if att_b > 0 else -0.34,
+                    'success_rate': round(float(t_sub['d_sr_blos'].sum() / att_b * 100.0), 1) if att_b > 0 else 31.5,
+                    'yards_per_attempt': round(float(t_sub['d_yds_blos'].sum() / att_b), 2) if att_b > 0 else 3.41,
+                    'sample_attempts': att_b,
+                },
+                'short': {
+                    'epa_per_attempt': round(float(t_sub['d_epa_short'].sum() / att_s), 3) if att_s > 0 else -0.10,
+                    'success_rate': round(float(t_sub['d_sr_short'].sum() / att_s * 100.0), 1) if att_s > 0 else 50.1,
+                    'yards_per_attempt': round(float(t_sub['d_yds_short'].sum() / att_s), 2) if att_s > 0 else 5.47,
+                    'sample_attempts': att_s,
+                },
+                'intermediate': {
+                    'epa_per_attempt': round(float(t_sub['d_epa_inter'].sum() / att_i), 3) if att_i > 0 else 0.25,
+                    'success_rate': round(float(t_sub['d_sr_inter'].sum() / att_i * 100.0), 1) if att_i > 0 else 51.6,
+                    'yards_per_attempt': round(float(t_sub['d_yds_inter'].sum() / att_i), 2) if att_i > 0 else 8.27,
+                    'sample_attempts': att_i,
+                },
+                'deep': {
+                    'epa_per_attempt': round(float(t_sub['d_epa_deep'].sum() / att_d), 3) if att_d > 0 else 0.28,
+                    'success_rate': round(float(t_sub['d_sr_deep'].sum() / att_d * 100.0), 1) if att_d > 0 else 36.2,
+                    'yards_per_attempt': round(float(t_sub['d_yds_deep'].sum() / att_d), 2) if att_d > 0 else 12.33,
+                    'sample_attempts': att_d,
+                },
+            }
+        }
+
+    # League medians
+    med_off_ypa = round(float(np.median([v['off_ypa'] for v in raw.values()])), 2)
+    med_def_ypa = round(float(np.median([v['def_ypa'] for v in raw.values()])), 2)
+    med_off_ypc = round(float(np.median([v['off_ypc'] for v in raw.values()])), 2)
+    med_def_ypc = round(float(np.median([v['def_ypc'] for v in raw.values()])), 2)
+    med_l_pr = round(float(np.median([v['l_pr'] for v in raw.values()])), 3)
+    med_n_pr = round(float(np.median([v['n_pr'] for v in raw.values()])), 3)
+    med_t_pr = round(float(np.median([v['t_pr'] for v in raw.values()])), 3)
+    med_l_rr = round(1.0 - med_l_pr, 3)
+    med_n_rr = round(1.0 - med_n_pr, 3)
+    med_t_rr = round(1.0 - med_t_pr, 3)
+    med_ins_ypc = round(float(np.median([v['ins_ypc'] for v in raw.values()])), 2)
+    med_out_ypc = round(float(np.median([v['out_ypc'] for v in raw.values()])), 2)
+
+    rk_off_ypa = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['off_ypa'], reverse=True))}
+    rk_def_ypa = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['def_ypa']))}
+    rk_off_ypc = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['off_ypc'], reverse=True))}
+    rk_def_ypc = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['def_ypc']))}
+    rk_l_pr = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['l_pr'], reverse=True))}
+    rk_n_pr = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['n_pr'], reverse=True))}
+    rk_t_pr = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['t_pr'], reverse=True))}
+    rk_l_rr = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['l_rr'], reverse=True))}
+    rk_n_rr = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['n_rr'], reverse=True))}
+    rk_t_rr = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['t_rr'], reverse=True))}
+    rk_ins = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['ins_ypc']))}
+    rk_out = {tm: r + 1 for r, (tm, _) in enumerate(sorted(raw.items(), key=lambda x: x[1]['out_ypc']))}
+
+    compiled = {}
+    for tm in teams:
+        d = raw[tm]
+        ng = d['n_games']
+        is_small = bool(ng < 6)
+
+        def make_disp(val, rk, med, unit="", is_rate=False):
+            if is_small:
+                if is_rate:
+                    return f"{val*100:.1f}% (league median {med*100:.1f}%, n={ng} games -- rank suppressed, small sample)"
+                return f"{val:.2f}{unit} (league median {med:.2f}{unit}, n={ng} games -- rank suppressed, small sample)"
+            return f"Rank #{rk} (n={ng} games)"
+
+        compiled[tm] = {
+            'n_games': ng,
+            'is_small_sample': is_small,
+            'offense': {
+                'passing_ypa': {
+                    'raw_value': d['off_ypa'],
+                    'league_median': med_off_ypa,
+                    'rank': None if is_small else rk_off_ypa[tm],
+                    'rank_display': make_disp(d['off_ypa'], rk_off_ypa[tm], med_off_ypa, " YPA"),
+                    'sample_attempts': d['p_att'],
+                    'n_games': ng,
+                },
+                'box_counts': {
+                    'rush_ypc_vs_light_box': d['o_ypc_lt'],
+                    'rush_ypc_vs_heavy_box': d['o_ypc_hv'],
+                    'carries_light': d['o_c_lt'],
+                    'carries_heavy': d['o_c_hv'],
+                },
+                'game_state_splits': {
+                    'leading': {
+                        'pass_rate': {
+                            'raw_value': d['l_pr'],
+                            'league_median': med_l_pr,
+                            'rank': None if is_small else rk_l_pr[tm],
+                            'rank_display': make_disp(d['l_pr'], rk_l_pr[tm], med_l_pr, is_rate=True),
+                            'n_games': ng,
+                            'sample_size': d['lt'],
+                            'is_small_sample': bool(d['lt'] < 40),
+                            'unit': 'rate'
+                        },
+                        'rush_rate': {
+                            'raw_value': d['l_rr'],
+                            'league_median': med_l_rr,
+                            'rank': None if is_small else rk_l_rr[tm],
+                            'rank_display': make_disp(d['l_rr'], rk_l_rr[tm], med_l_rr, is_rate=True),
+                            'n_games': ng,
+                            'sample_size': d['lt'],
+                            'is_small_sample': bool(d['lt'] < 40),
+                            'unit': 'rate'
+                        },
+                    },
+                    'neutral': {
+                        'pass_rate': {
+                            'raw_value': d['n_pr'],
+                            'league_median': med_n_pr,
+                            'rank': None if is_small else rk_n_pr[tm],
+                            'rank_display': make_disp(d['n_pr'], rk_n_pr[tm], med_n_pr, is_rate=True),
+                            'n_games': ng,
+                            'sample_size': d['nt'],
+                            'is_small_sample': bool(d['nt'] < 40),
+                            'unit': 'rate'
+                        },
+                        'rush_rate': {
+                            'raw_value': d['n_rr'],
+                            'league_median': med_n_rr,
+                            'rank': None if is_small else rk_n_rr[tm],
+                            'rank_display': make_disp(d['n_rr'], rk_n_rr[tm], med_n_rr, is_rate=True),
+                            'n_games': ng,
+                            'sample_size': d['nt'],
+                            'is_small_sample': bool(d['nt'] < 40),
+                            'unit': 'rate'
+                        },
+                    },
+                    'trailing': {
+                        'pass_rate': {
+                            'raw_value': d['t_pr'],
+                            'league_median': med_t_pr,
+                            'rank': None if is_small else rk_t_pr[tm],
+                            'rank_display': make_disp(d['t_pr'], rk_t_pr[tm], med_t_pr, is_rate=True),
+                            'n_games': ng,
+                            'sample_size': d['tt'],
+                            'is_small_sample': bool(d['tt'] < 40),
+                            'unit': 'rate'
+                        },
+                        'rush_rate': {
+                            'raw_value': d['t_rr'],
+                            'league_median': med_t_rr,
+                            'rank': None if is_small else rk_t_rr[tm],
+                            'rank_display': make_disp(d['t_rr'], rk_t_rr[tm], med_t_rr, is_rate=True),
+                            'n_games': ng,
+                            'sample_size': d['tt'],
+                            'is_small_sample': bool(d['tt'] < 40),
+                            'unit': 'rate'
+                        },
+                    }
+                }
+            },
+            'defense': {
+                'passing_ypa_allowed': {
+                    'raw_value': d['def_ypa'],
+                    'league_median': med_def_ypa,
+                    'rank': None if is_small else rk_def_ypa[tm],
+                    'rank_display': make_disp(d['def_ypa'], rk_def_ypa[tm], med_def_ypa, " YPA"),
+                    'sample_attempts': d['d_p_att'],
+                    'n_games': ng,
+                },
+                'box_counts': {
+                    'light_box_rate': d['d_lt_rate'],
+                    'heavy_box_rate': d['d_hv_rate'],
+                    'ypc_vs_light_box': d['d_ypc_lt'],
+                    'ypc_vs_heavy_box': d['d_ypc_hv'],
+                },
+                'pressure_without_blitz': {
+                    'pressure_no_blitz_pct': d['pnb_rate'],
+                    'blitz_pct': d['blitz_rate'],
+                    'no_blitz_snaps': d['prs_nb'],
+                    'total_pass_snaps': d['prs_tot'],
+                },
+                'positional_targets_allowed': d['pos'],
+                'pass_depth_allowed': d['pass_depth_allowed'],
+                'directional_gaps': {
+                    'inside_tackles_ypc': d['ins_ypc'],
+                    'inside_rank': None if is_small else rk_ins[tm],
+                    'outside_tackles_ypc': d['out_ypc'],
+                    'outside_rank': None if is_small else rk_out[tm],
+                }
+            }
+        }
+    _DYNAMIC_SCOUTING_CACHE[cache_key] = compiled
+    return compiled
 
 _PLAYER_LATEST_TEAM: Dict[str, str] = {}
 
@@ -986,13 +1332,17 @@ def compute_scheme_insights(
             if a_team in ctx['team_situational']:
                 a_profile['tempo_situational'] = ctx['team_situational'][a_team]
 
-    scouting_32 = _load_32_team_scouting_data()
+    scouting_32 = get_dynamic_scouting_data(season=season, start_date=start_date, end_date=end_date)
     h_scout_def = scouting_32.get(h_team, {}).get('defense', {})
     a_scout_def = scouting_32.get(a_team, {}).get('defense', {})
+    if h_team in scouting_32:
+        h_games = scouting_32[h_team].get('n_games', h_games)
+    if a_team in scouting_32:
+        a_games = scouting_32[a_team].get('n_games', a_games)
     if h_games == 0:
-        h_games = scouting_32.get(h_team, {}).get('n_games', 22 if season >= 2026 else 17)
+        h_games = 22 if season >= 2026 else 17
     if a_games == 0:
-        a_games = scouting_32.get(a_team, {}).get('n_games', 22 if season >= 2026 else 17)
+        a_games = 22 if season >= 2026 else 17
 
     sample_window = {
         'season': season,
@@ -1401,21 +1751,22 @@ def compute_scheme_insights(
     )
 
     try:
-        stat_sheet = build_matchup_stat_sheet(a_team, h_team, season=season, up_to_week=week)
+        stat_sheet = build_matchup_stat_sheet(a_team, h_team, season=season, up_to_week=week, start_date=start_date, end_date=end_date)
     except Exception as e:
         logger.warning(f"Failed building primary matchup stat sheet: {e}")
         try:
             from backend.matchup_sheet import _build_fallback_tendency_profile, _build_fallback_vulnerability_profile
+            ng_sheet = max(h_games, a_games)
             stat_sheet = {
                 "matchup": f"{a_team} @ {h_team}",
                 "season": season,
                 "up_to_week": week,
-                "sample_label": "Combined baseline sample",
-                "sample_window": {"season": season, "n_games": 22},
-                "section_1_away_offense_tendencies": _build_fallback_tendency_profile(a_team, season=season, up_to_week=week),
-                "section_2_home_defense_vulnerabilities": _build_fallback_vulnerability_profile(h_team, season=season, up_to_week=week),
-                "section_3_home_offense_tendencies": _build_fallback_tendency_profile(h_team, season=season, up_to_week=week),
-                "section_4_away_defense_vulnerabilities": _build_fallback_vulnerability_profile(a_team, season=season, up_to_week=week),
+                "sample_label": sample_label,
+                "sample_window": {"season": season, "start_date": start_date, "end_date": end_date, "is_custom_date": is_custom_date, "n_games": ng_sheet},
+                "section_1_away_offense_tendencies": _build_fallback_tendency_profile(a_team, season=season, up_to_week=week, start_date=start_date, end_date=end_date),
+                "section_2_home_defense_vulnerabilities": _build_fallback_vulnerability_profile(h_team, season=season, up_to_week=week, start_date=start_date, end_date=end_date),
+                "section_3_home_offense_tendencies": _build_fallback_tendency_profile(h_team, season=season, up_to_week=week, start_date=start_date, end_date=end_date),
+                "section_4_away_defense_vulnerabilities": _build_fallback_vulnerability_profile(a_team, season=season, up_to_week=week, start_date=start_date, end_date=end_date),
                 "section_5_similar_opponents": {"home_defense_vs_opponents_like_away": {"similar_games": []}},
                 "section_6_head_to_head": {"played_recently": False},
                 "section_7_key_personnel": {"away_team_injuries": [], "home_team_injuries": []},

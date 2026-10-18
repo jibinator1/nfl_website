@@ -29,6 +29,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.451,
+            "league_median": 0.511,
+            "rank": 32,
+            "rank_display": "Rank #32 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.06,
+            "diff_pct": -11.7,
+            "sample_size": 184,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 20.5,
@@ -82,6 +97,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.367,
+            "league_median": 0.44,
+            "rank": 31,
+            "rank_display": "Rank #31 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.073,
+            "diff_pct": -16.6,
+            "sample_size": 626,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.4,
@@ -131,6 +161,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.063,
             "diff_pct": 9.7,
+            "sample_size": 593,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.287,
+            "league_median": 0.35,
+            "rank": 31,
+            "rank_display": "Rank #31 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.063,
+            "diff_pct": -18.0,
             "sample_size": 593,
             "is_small_sample": false,
             "unit": "rate"
@@ -355,6 +400,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.641,
+            "league_median": 0.511,
+            "rank": 3,
+            "rank_display": "Rank #3 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.13,
+            "diff_pct": 25.4,
+            "sample_size": 259,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 26.7,
@@ -408,6 +468,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.443,
+            "league_median": 0.44,
+            "rank": 13,
+            "rank_display": "Rank #13 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.003,
+            "diff_pct": 0.7,
+            "sample_size": 734,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 23.1,
@@ -457,6 +532,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.036,
             "diff_pct": -5.5,
+            "sample_size": 350,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.386,
+            "league_median": 0.35,
+            "rank": 7,
+            "rank_display": "Rank #7 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.036,
+            "diff_pct": 10.3,
             "sample_size": 350,
             "is_small_sample": false,
             "unit": "rate"
@@ -681,6 +771,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.556,
+            "league_median": 0.511,
+            "rank": 9,
+            "rank_display": "Rank #9 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.045,
+            "diff_pct": 8.8,
+            "sample_size": 324,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 18.3,
@@ -734,6 +839,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.525,
+            "league_median": 0.44,
+            "rank": 1,
+            "rank_display": "Rank #1 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.085,
+            "diff_pct": 19.3,
+            "sample_size": 648,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 13.2,
@@ -783,6 +903,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.091,
             "diff_pct": -14.0,
+            "sample_size": 288,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.441,
+            "league_median": 0.35,
+            "rank": 2,
+            "rank_display": "Rank #2 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.091,
+            "diff_pct": 26.0,
             "sample_size": 288,
             "is_small_sample": false,
             "unit": "rate"
@@ -1007,6 +1142,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.54,
+            "league_median": 0.511,
+            "rank": 12,
+            "rank_display": "Rank #12 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.029,
+            "diff_pct": 5.7,
+            "sample_size": 324,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.9,
@@ -1060,6 +1210,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.471,
+            "league_median": 0.44,
+            "rank": 7,
+            "rank_display": "Rank #7 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.031,
+            "diff_pct": 7.0,
+            "sample_size": 692,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 20.4,
@@ -1109,6 +1274,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.091,
             "diff_pct": -14.0,
+            "sample_size": 422,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.441,
+            "league_median": 0.35,
+            "rank": 3,
+            "rank_display": "Rank #3 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.091,
+            "diff_pct": 26.0,
             "sample_size": 422,
             "is_small_sample": false,
             "unit": "rate"
@@ -1333,6 +1513,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.512,
+            "league_median": 0.511,
+            "rank": 16,
+            "rank_display": "Rank #16 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.001,
+            "diff_pct": 0.2,
+            "sample_size": 170,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 18.2,
@@ -1386,6 +1581,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.441,
+            "league_median": 0.44,
+            "rank": 16,
+            "rank_display": "Rank #16 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.001,
+            "diff_pct": 0.2,
+            "sample_size": 700,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 19.2,
@@ -1435,6 +1645,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.009,
             "diff_pct": -1.4,
+            "sample_size": 454,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.359,
+            "league_median": 0.35,
+            "rank": 13,
+            "rank_display": "Rank #13 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.009,
+            "diff_pct": 2.6,
             "sample_size": 454,
             "is_small_sample": false,
             "unit": "rate"
@@ -1659,6 +1884,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.53,
+            "league_median": 0.511,
+            "rank": 13,
+            "rank_display": "Rank #13 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.019,
+            "diff_pct": 3.7,
+            "sample_size": 330,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.2,
@@ -1712,6 +1952,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.473,
+            "league_median": 0.44,
+            "rank": 5,
+            "rank_display": "Rank #5 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.033,
+            "diff_pct": 7.5,
+            "sample_size": 810,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 21.0,
@@ -1761,6 +2016,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.035,
             "diff_pct": -5.4,
+            "sample_size": 475,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.385,
+            "league_median": 0.35,
+            "rank": 8,
+            "rank_display": "Rank #8 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.035,
+            "diff_pct": 10.0,
             "sample_size": 475,
             "is_small_sample": false,
             "unit": "rate"
@@ -1985,6 +2255,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.484,
+            "league_median": 0.511,
+            "rank": 28,
+            "rank_display": "Rank #28 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.027,
+            "diff_pct": -5.3,
+            "sample_size": 244,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 25.4,
@@ -2038,6 +2323,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.351,
+            "league_median": 0.44,
+            "rank": 32,
+            "rank_display": "Rank #32 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.089,
+            "diff_pct": -20.2,
+            "sample_size": 672,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 16.0,
@@ -2087,6 +2387,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.06,
             "diff_pct": 9.2,
+            "sample_size": 441,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.29,
+            "league_median": 0.35,
+            "rank": 30,
+            "rank_display": "Rank #30 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.06,
+            "diff_pct": -17.1,
             "sample_size": 441,
             "is_small_sample": false,
             "unit": "rate"
@@ -2311,6 +2626,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.485,
+            "league_median": 0.511,
+            "rank": 26,
+            "rank_display": "Rank #26 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.026,
+            "diff_pct": -5.1,
+            "sample_size": 132,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 32.3,
@@ -2364,6 +2694,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.438,
+            "league_median": 0.44,
+            "rank": 18,
+            "rank_display": "Rank #18 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.002,
+            "diff_pct": -0.5,
+            "sample_size": 687,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 23.3,
@@ -2413,6 +2758,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.001,
             "diff_pct": 0.2,
+            "sample_size": 498,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.349,
+            "league_median": 0.35,
+            "rank": 17,
+            "rank_display": "Rank #17 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.001,
+            "diff_pct": -0.3,
             "sample_size": 498,
             "is_small_sample": false,
             "unit": "rate"
@@ -2637,6 +2997,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.475,
+            "league_median": 0.511,
+            "rank": 30,
+            "rank_display": "Rank #30 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.036,
+            "diff_pct": -7.0,
+            "sample_size": 217,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 21.5,
@@ -2690,6 +3065,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.394,
+            "league_median": 0.44,
+            "rank": 29,
+            "rank_display": "Rank #29 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.046,
+            "diff_pct": -10.5,
+            "sample_size": 690,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 18.6,
@@ -2739,6 +3129,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.009,
             "diff_pct": -1.4,
+            "sample_size": 504,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.359,
+            "league_median": 0.35,
+            "rank": 12,
+            "rank_display": "Rank #12 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.009,
+            "diff_pct": 2.6,
             "sample_size": 504,
             "is_small_sample": false,
             "unit": "rate"
@@ -2963,6 +3368,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.484,
+            "league_median": 0.511,
+            "rank": 27,
+            "rank_display": "Rank #27 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.027,
+            "diff_pct": -5.3,
+            "sample_size": 254,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 31.1,
@@ -3016,6 +3436,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.401,
+            "league_median": 0.44,
+            "rank": 27,
+            "rank_display": "Rank #27 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.039,
+            "diff_pct": -8.9,
+            "sample_size": 915,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 23.3,
@@ -3065,6 +3500,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.009,
             "diff_pct": 1.4,
+            "sample_size": 320,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.341,
+            "league_median": 0.35,
+            "rank": 23,
+            "rank_display": "Rank #23 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.009,
+            "diff_pct": -2.6,
             "sample_size": 320,
             "is_small_sample": false,
             "unit": "rate"
@@ -3289,6 +3739,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.499,
+            "league_median": 0.511,
+            "rank": 23,
+            "rank_display": "Rank #23 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.012,
+            "diff_pct": -2.3,
+            "sample_size": 387,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 20.7,
@@ -3342,6 +3807,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.415,
+            "league_median": 0.44,
+            "rank": 24,
+            "rank_display": "Rank #24 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.025,
+            "diff_pct": -5.7,
+            "sample_size": 559,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 19.1,
@@ -3391,6 +3871,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.04,
             "diff_pct": 6.2,
+            "sample_size": 435,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.31,
+            "league_median": 0.35,
+            "rank": 29,
+            "rank_display": "Rank #29 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.04,
+            "diff_pct": -11.4,
             "sample_size": 435,
             "is_small_sample": false,
             "unit": "rate"
@@ -3615,6 +4110,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.49,
+            "league_median": 0.511,
+            "rank": 25,
+            "rank_display": "Rank #25 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.021,
+            "diff_pct": -4.1,
+            "sample_size": 296,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 18.8,
@@ -3668,6 +4178,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.442,
+            "league_median": 0.44,
+            "rank": 15,
+            "rank_display": "Rank #15 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.002,
+            "diff_pct": 0.5,
+            "sample_size": 821,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 18.6,
@@ -3717,6 +4242,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.002,
             "diff_pct": -0.3,
+            "sample_size": 236,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.352,
+            "league_median": 0.35,
+            "rank": 15,
+            "rank_display": "Rank #15 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.002,
+            "diff_pct": 0.6,
             "sample_size": 236,
             "is_small_sample": false,
             "unit": "rate"
@@ -3941,6 +4481,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.493,
+            "league_median": 0.511,
+            "rank": 24,
+            "rank_display": "Rank #24 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.018,
+            "diff_pct": -3.5,
+            "sample_size": 300,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 15.1,
@@ -3994,6 +4549,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.43,
+            "league_median": 0.44,
+            "rank": 22,
+            "rank_display": "Rank #22 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.01,
+            "diff_pct": -2.3,
+            "sample_size": 954,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 10.8,
@@ -4043,6 +4613,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.083,
             "diff_pct": 12.8,
+            "sample_size": 273,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.267,
+            "league_median": 0.35,
+            "rank": 32,
+            "rank_display": "Rank #32 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.083,
+            "diff_pct": -23.7,
             "sample_size": 273,
             "is_small_sample": false,
             "unit": "rate"
@@ -4267,6 +4852,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.475,
+            "league_median": 0.511,
+            "rank": 29,
+            "rank_display": "Rank #29 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.036,
+            "diff_pct": -7.0,
+            "sample_size": 244,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 18.5,
@@ -4320,6 +4920,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.437,
+            "league_median": 0.44,
+            "rank": 20,
+            "rank_display": "Rank #20 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.003,
+            "diff_pct": -0.7,
+            "sample_size": 792,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.3,
@@ -4369,6 +4984,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.003,
             "diff_pct": -0.5,
+            "sample_size": 295,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.353,
+            "league_median": 0.35,
+            "rank": 14,
+            "rank_display": "Rank #14 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.003,
+            "diff_pct": 0.9,
             "sample_size": 295,
             "is_small_sample": false,
             "unit": "rate"
@@ -4593,6 +5223,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.499,
+            "league_median": 0.511,
+            "rank": 21,
+            "rank_display": "Rank #21 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.012,
+            "diff_pct": -2.3,
+            "sample_size": 461,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.4,
@@ -4646,6 +5291,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.436,
+            "league_median": 0.44,
+            "rank": 21,
+            "rank_display": "Rank #21 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.004,
+            "diff_pct": -0.9,
+            "sample_size": 769,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 13.9,
@@ -4695,6 +5355,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.006,
             "diff_pct": 0.9,
+            "sample_size": 186,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.344,
+            "league_median": 0.35,
+            "rank": 19,
+            "rank_display": "Rank #19 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.006,
+            "diff_pct": -1.7,
             "sample_size": 186,
             "is_small_sample": false,
             "unit": "rate"
@@ -4919,6 +5594,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.511,
+            "league_median": 0.511,
+            "rank": 17,
+            "rank_display": "Rank #17 (n=21 games)",
+            "rank_suppressed": false,
+            "n_games": 21,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.0,
+            "diff_pct": 0.0,
+            "sample_size": 231,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 29.2,
@@ -4972,6 +5662,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.403,
+            "league_median": 0.44,
+            "rank": 26,
+            "rank_display": "Rank #26 (n=21 games)",
+            "rank_suppressed": false,
+            "n_games": 21,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.037,
+            "diff_pct": -8.4,
+            "sample_size": 791,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 24.3,
@@ -5021,6 +5726,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.008,
             "diff_pct": 1.2,
+            "sample_size": 275,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.342,
+            "league_median": 0.35,
+            "rank": 22,
+            "rank_display": "Rank #22 (n=21 games)",
+            "rank_suppressed": false,
+            "n_games": 21,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.008,
+            "diff_pct": -2.3,
             "sample_size": 275,
             "is_small_sample": false,
             "unit": "rate"
@@ -5245,6 +5965,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.499,
+            "league_median": 0.511,
+            "rank": 22,
+            "rank_display": "Rank #22 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.012,
+            "diff_pct": -2.3,
+            "sample_size": 457,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 8.6,
@@ -5298,6 +6033,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.37,
+            "league_median": 0.44,
+            "rank": 30,
+            "rank_display": "Rank #30 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.07,
+            "diff_pct": -15.9,
+            "sample_size": 803,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 9.3,
@@ -5347,6 +6097,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.001,
             "diff_pct": -0.2,
+            "sample_size": 268,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.351,
+            "league_median": 0.35,
+            "rank": 16,
+            "rank_display": "Rank #16 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.001,
+            "diff_pct": 0.3,
             "sample_size": 268,
             "is_small_sample": false,
             "unit": "rate"
@@ -5571,6 +6336,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.56,
+            "league_median": 0.511,
+            "rank": 8,
+            "rank_display": "Rank #8 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.049,
+            "diff_pct": 9.6,
+            "sample_size": 284,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 16.4,
@@ -5624,6 +6404,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.448,
+            "league_median": 0.44,
+            "rank": 10,
+            "rank_display": "Rank #10 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.008,
+            "diff_pct": 1.8,
+            "sample_size": 676,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 16.9,
@@ -5673,6 +6468,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.017,
             "diff_pct": 2.6,
+            "sample_size": 486,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.333,
+            "league_median": 0.35,
+            "rank": 24,
+            "rank_display": "Rank #24 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.017,
+            "diff_pct": -4.9,
             "sample_size": 486,
             "is_small_sample": false,
             "unit": "rate"
@@ -5897,6 +6707,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.528,
+            "league_median": 0.511,
+            "rank": 14,
+            "rank_display": "Rank #14 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.017,
+            "diff_pct": 3.3,
+            "sample_size": 123,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 20.4,
@@ -5950,6 +6775,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.418,
+            "league_median": 0.44,
+            "rank": 23,
+            "rank_display": "Rank #23 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.022,
+            "diff_pct": -5.0,
+            "sample_size": 595,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.2,
@@ -5999,6 +6839,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.019,
             "diff_pct": 2.9,
+            "sample_size": 541,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.331,
+            "league_median": 0.35,
+            "rank": 25,
+            "rank_display": "Rank #25 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.019,
+            "diff_pct": -5.4,
             "sample_size": 541,
             "is_small_sample": false,
             "unit": "rate"
@@ -6223,6 +7078,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.578,
+            "league_median": 0.511,
+            "rank": 4,
+            "rank_display": "Rank #4 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.067,
+            "diff_pct": 13.1,
+            "sample_size": 249,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 24.5,
@@ -6276,6 +7146,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.457,
+            "league_median": 0.44,
+            "rank": 9,
+            "rank_display": "Rank #9 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.017,
+            "diff_pct": 3.9,
+            "sample_size": 403,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 24.0,
@@ -6325,6 +7210,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.051,
             "diff_pct": -7.8,
+            "sample_size": 564,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.401,
+            "league_median": 0.35,
+            "rank": 4,
+            "rank_display": "Rank #4 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.051,
+            "diff_pct": 14.6,
             "sample_size": 564,
             "is_small_sample": false,
             "unit": "rate"
@@ -6549,6 +7449,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.568,
+            "league_median": 0.511,
+            "rank": 7,
+            "rank_display": "Rank #7 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.057,
+            "diff_pct": 11.2,
+            "sample_size": 192,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 23.5,
@@ -6602,6 +7517,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.442,
+            "league_median": 0.44,
+            "rank": 14,
+            "rank_display": "Rank #14 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.002,
+            "diff_pct": 0.5,
+            "sample_size": 703,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 23.3,
@@ -6651,6 +7581,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.006,
             "diff_pct": 0.9,
+            "sample_size": 346,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.344,
+            "league_median": 0.35,
+            "rank": 20,
+            "rank_display": "Rank #20 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.006,
+            "diff_pct": -1.7,
             "sample_size": 346,
             "is_small_sample": false,
             "unit": "rate"
@@ -6875,6 +7820,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.506,
+            "league_median": 0.511,
+            "rank": 19,
+            "rank_display": "Rank #19 (n=26 games)",
+            "rank_suppressed": false,
+            "n_games": 26,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.005,
+            "diff_pct": -1.0,
+            "sample_size": 498,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 15.6,
@@ -6928,6 +7888,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.459,
+            "league_median": 0.44,
+            "rank": 8,
+            "rank_display": "Rank #8 (n=26 games)",
+            "rank_suppressed": false,
+            "n_games": 26,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.019,
+            "diff_pct": 4.3,
+            "sample_size": 801,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 15.5,
@@ -6977,6 +7952,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.002,
             "diff_pct": 0.3,
+            "sample_size": 282,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.348,
+            "league_median": 0.35,
+            "rank": 18,
+            "rank_display": "Rank #18 (n=26 games)",
+            "rank_suppressed": false,
+            "n_games": 26,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.002,
+            "diff_pct": -0.6,
             "sample_size": 282,
             "is_small_sample": false,
             "unit": "rate"
@@ -7201,6 +8191,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.643,
+            "league_median": 0.511,
+            "rank": 2,
+            "rank_display": "Rank #2 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.132,
+            "diff_pct": 25.8,
+            "sample_size": 42,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 14.3,
@@ -7254,6 +8259,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.414,
+            "league_median": 0.44,
+            "rank": 25,
+            "rank_display": "Rank #25 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.026,
+            "diff_pct": -5.9,
+            "sample_size": 541,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 15.3,
@@ -7303,6 +8323,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.011,
             "diff_pct": -1.7,
+            "sample_size": 815,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.361,
+            "league_median": 0.35,
+            "rank": 11,
+            "rank_display": "Rank #11 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.011,
+            "diff_pct": 3.1,
             "sample_size": 815,
             "is_small_sample": false,
             "unit": "rate"
@@ -7527,6 +8562,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.55,
+            "league_median": 0.511,
+            "rank": 10,
+            "rank_display": "Rank #10 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.039,
+            "diff_pct": 7.6,
+            "sample_size": 260,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 22.1,
@@ -7580,6 +8630,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.48,
+            "league_median": 0.44,
+            "rank": 4,
+            "rank_display": "Rank #4 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.04,
+            "diff_pct": 9.1,
+            "sample_size": 689,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 20.6,
@@ -7629,6 +8694,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.03,
             "diff_pct": -4.6,
+            "sample_size": 453,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.38,
+            "league_median": 0.35,
+            "rank": 9,
+            "rank_display": "Rank #9 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.03,
+            "diff_pct": 8.6,
             "sample_size": 453,
             "is_small_sample": false,
             "unit": "rate"
@@ -7853,6 +8933,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.574,
+            "league_median": 0.511,
+            "rank": 5,
+            "rank_display": "Rank #5 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.063,
+            "diff_pct": 12.3,
+            "sample_size": 61,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 25.0,
@@ -7906,6 +9001,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.519,
+            "league_median": 0.44,
+            "rank": 2,
+            "rank_display": "Rank #2 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.079,
+            "diff_pct": 18.0,
+            "sample_size": 557,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.3,
@@ -7955,6 +9065,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.024,
             "diff_pct": -3.7,
+            "sample_size": 681,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.374,
+            "league_median": 0.35,
+            "rank": 10,
+            "rank_display": "Rank #10 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.024,
+            "diff_pct": 6.9,
             "sample_size": 681,
             "is_small_sample": false,
             "unit": "rate"
@@ -8179,6 +9304,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.543,
+            "league_median": 0.511,
+            "rank": 11,
+            "rank_display": "Rank #11 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.032,
+            "diff_pct": 6.3,
+            "sample_size": 328,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 14.7,
@@ -8232,6 +9372,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.438,
+            "league_median": 0.44,
+            "rank": 19,
+            "rank_display": "Rank #19 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.002,
+            "diff_pct": -0.5,
+            "sample_size": 800,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 13.4,
@@ -8281,6 +9436,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.048,
             "diff_pct": -7.4,
+            "sample_size": 226,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.398,
+            "league_median": 0.35,
+            "rank": 5,
+            "rank_display": "Rank #5 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.048,
+            "diff_pct": 13.7,
             "sample_size": 226,
             "is_small_sample": false,
             "unit": "rate"
@@ -8505,6 +9675,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.457,
+            "league_median": 0.511,
+            "rank": 31,
+            "rank_display": "Rank #31 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.054,
+            "diff_pct": -10.6,
+            "sample_size": 219,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 30.1,
@@ -8558,6 +9743,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.397,
+            "league_median": 0.44,
+            "rank": 28,
+            "rank_display": "Rank #28 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.043,
+            "diff_pct": -9.8,
+            "sample_size": 740,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 24.6,
@@ -8607,6 +9807,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.026,
             "diff_pct": 4.0,
+            "sample_size": 374,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.324,
+            "league_median": 0.35,
+            "rank": 27,
+            "rank_display": "Rank #27 (n=23 games)",
+            "rank_suppressed": false,
+            "n_games": 23,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.026,
+            "diff_pct": -7.4,
             "sample_size": 374,
             "is_small_sample": false,
             "unit": "rate"
@@ -8831,6 +10046,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.571,
+            "league_median": 0.511,
+            "rank": 6,
+            "rank_display": "Rank #6 (n=25 games)",
+            "rank_suppressed": false,
+            "n_games": 25,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.06,
+            "diff_pct": 11.7,
+            "sample_size": 576,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 17.2,
@@ -8884,6 +10114,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.444,
+            "league_median": 0.44,
+            "rank": 12,
+            "rank_display": "Rank #12 (n=25 games)",
+            "rank_suppressed": false,
+            "n_games": 25,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.004,
+            "diff_pct": 0.9,
+            "sample_size": 662,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 15.3,
@@ -8933,6 +10178,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.044,
             "diff_pct": -6.8,
+            "sample_size": 241,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.394,
+            "league_median": 0.35,
+            "rank": 6,
+            "rank_display": "Rank #6 (n=25 games)",
+            "rank_suppressed": false,
+            "n_games": 25,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.044,
+            "diff_pct": 12.6,
             "sample_size": 241,
             "is_small_sample": false,
             "unit": "rate"
@@ -9157,6 +10417,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.518,
+            "league_median": 0.511,
+            "rank": 15,
+            "rank_display": "Rank #15 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.007,
+            "diff_pct": 1.4,
+            "sample_size": 396,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 11.0,
@@ -9210,6 +10485,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.444,
+            "league_median": 0.44,
+            "rank": 11,
+            "rank_display": "Rank #11 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.004,
+            "diff_pct": 0.9,
+            "sample_size": 770,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 16.3,
@@ -9259,6 +10549,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.02,
             "diff_pct": 3.1,
+            "sample_size": 291,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.33,
+            "league_median": 0.35,
+            "rank": 26,
+            "rank_display": "Rank #26 (n=24 games)",
+            "rank_suppressed": false,
+            "n_games": 24,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.02,
+            "diff_pct": -5.7,
             "sample_size": 291,
             "is_small_sample": false,
             "unit": "rate"
@@ -9483,6 +10788,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.5,
+            "league_median": 0.511,
+            "rank": 20,
+            "rank_display": "Rank #20 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.011,
+            "diff_pct": -2.2,
+            "sample_size": 154,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 19.7,
@@ -9536,6 +10856,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.473,
+            "league_median": 0.44,
+            "rank": 6,
+            "rank_display": "Rank #6 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.033,
+            "diff_pct": 7.5,
+            "sample_size": 802,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 24.1,
@@ -9585,6 +10920,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.006,
             "diff_pct": 0.9,
+            "sample_size": 410,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.344,
+            "league_median": 0.35,
+            "rank": 21,
+            "rank_display": "Rank #21 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.006,
+            "diff_pct": -1.7,
             "sample_size": 410,
             "is_small_sample": false,
             "unit": "rate"
@@ -9809,6 +11159,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.673,
+            "league_median": 0.511,
+            "rank": 1,
+            "rank_display": "Rank #1 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.162,
+            "diff_pct": 31.7,
+            "sample_size": 52,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 46.7,
@@ -9862,6 +11227,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.438,
+            "league_median": 0.44,
+            "rank": 17,
+            "rank_display": "Rank #17 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.002,
+            "diff_pct": -0.5,
+            "sample_size": 504,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 22.6,
@@ -9911,6 +11291,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": 0.036,
             "diff_pct": 5.5,
+            "sample_size": 713,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.314,
+            "league_median": 0.35,
+            "rank": 28,
+            "rank_display": "Rank #28 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.036,
+            "diff_pct": -10.3,
             "sample_size": 713,
             "is_small_sample": false,
             "unit": "rate"
@@ -10135,6 +11530,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.51,
+            "league_median": 0.511,
+            "rank": 18,
+            "rank_display": "Rank #18 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": -0.001,
+            "diff_pct": -0.2,
+            "sample_size": 155,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 22.9,
@@ -10188,6 +11598,21 @@
             "is_small_sample": false,
             "unit": "rate"
           },
+          "rush_rate": {
+            "raw_value": 0.493,
+            "league_median": 0.44,
+            "rank": 3,
+            "rank_display": "Rank #3 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.053,
+            "diff_pct": 12.0,
+            "sample_size": 560,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
           "pass_depth": {
             "behind_los": {
               "attempts_share": 16.4,
@@ -10237,6 +11662,21 @@
             "rank_direction": "higher is better",
             "diff_from_median": -0.105,
             "diff_pct": -16.2,
+            "sample_size": 583,
+            "is_small_sample": false,
+            "unit": "rate"
+          },
+          "rush_rate": {
+            "raw_value": 0.455,
+            "league_median": 0.35,
+            "rank": 1,
+            "rank_display": "Rank #1 (n=22 games)",
+            "rank_suppressed": false,
+            "n_games": 22,
+            "total_teams": 32,
+            "rank_direction": "higher is better",
+            "diff_from_median": 0.105,
+            "diff_pct": 30.0,
             "sample_size": 583,
             "is_small_sample": false,
             "unit": "rate"

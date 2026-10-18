@@ -145,8 +145,18 @@ def _load_32_team_scouting_data() -> Dict[str, Any]:
 # -----------------------------------------------------------------------------
 # Assembly: Full Matchup Stat Sheet
 # -----------------------------------------------------------------------------
-def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: Optional[int] = None) -> Dict[str, Any]:
-    scouting = _load_32_team_scouting_data()
+def _build_fallback_tendency_profile(
+    team: str,
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+) -> Dict[str, Any]:
+    try:
+        from backend.scheme_insights import get_dynamic_scouting_data
+        scouting = get_dynamic_scouting_data(season=season, start_date=start_date, end_date=end_date)
+    except Exception:
+        scouting = _load_32_team_scouting_data()
     t_entry = scouting.get(team, {})
     t_off = t_entry.get("offense", {})
     n_games = t_entry.get("n_games", 22 if season >= 2026 else 17)
@@ -159,6 +169,7 @@ def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: 
         game_state_splits = {
             "leading": {
                 "pass_rate": {"raw_value": base_leading, "league_median": 0.489, "rank": 12, "n_games": n_games, "sample_size": 200, "is_small_sample": False, "unit": "rate"},
+                "rush_rate": {"raw_value": round(1.0 - base_leading, 3), "league_median": 0.511, "rank": 21, "n_games": n_games, "sample_size": 200, "is_small_sample": False, "unit": "rate"},
                 "pass_depth": {
                     "behind_los": {"attempts_share": 15.0, "frequency_pct": 15.0, "sample_attempts": 30, "epa_per_attempt": -0.20, "success_rate": 35.0},
                     "short": {"attempts_share": 55.0, "frequency_pct": 55.0, "sample_attempts": 110, "epa_per_attempt": 0.10, "success_rate": 53.0},
@@ -168,6 +179,7 @@ def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: 
             },
             "neutral": {
                 "pass_rate": {"raw_value": base_neutral, "league_median": 0.560, "rank": 12, "n_games": n_games, "sample_size": 400, "is_small_sample": False, "unit": "rate"},
+                "rush_rate": {"raw_value": round(1.0 - base_neutral, 3), "league_median": 0.440, "rank": 21, "n_games": n_games, "sample_size": 400, "is_small_sample": False, "unit": "rate"},
                 "pass_depth": {
                     "behind_los": {"attempts_share": 11.0, "frequency_pct": 11.0, "sample_attempts": 50, "epa_per_attempt": -0.40, "success_rate": 22.0},
                     "short": {"attempts_share": 52.0, "frequency_pct": 52.0, "sample_attempts": 250, "epa_per_attempt": 0.10, "success_rate": 51.0},
@@ -177,6 +189,7 @@ def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: 
             },
             "trailing": {
                 "pass_rate": {"raw_value": base_trailing, "league_median": 0.650, "rank": 12, "n_games": n_games, "sample_size": 250, "is_small_sample": False, "unit": "rate"},
+                "rush_rate": {"raw_value": round(1.0 - base_trailing, 3), "league_median": 0.350, "rank": 21, "n_games": n_games, "sample_size": 250, "is_small_sample": False, "unit": "rate"},
                 "pass_depth": {
                     "behind_los": {"attempts_share": 7.0, "frequency_pct": 7.0, "sample_attempts": 18, "epa_per_attempt": -0.35, "success_rate": 24.0},
                     "short": {"attempts_share": 56.0, "frequency_pct": 56.0, "sample_attempts": 140, "epa_per_attempt": 0.12, "success_rate": 55.0},
@@ -222,8 +235,18 @@ def _build_fallback_tendency_profile(team: str, season: int = 2026, up_to_week: 
     }
 
 
-def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_week: Optional[int] = None) -> Dict[str, Any]:
-    scouting = _load_32_team_scouting_data()
+def _build_fallback_vulnerability_profile(
+    team: str,
+    season: int = 2026,
+    up_to_week: Optional[int] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+) -> Dict[str, Any]:
+    try:
+        from backend.scheme_insights import get_dynamic_scouting_data
+        scouting = get_dynamic_scouting_data(season=season, start_date=start_date, end_date=end_date)
+    except Exception:
+        scouting = _load_32_team_scouting_data()
     t_entry = scouting.get(team, {})
     t_def = t_entry.get("defense", {})
     n_games = t_entry.get("n_games", 22 if season >= 2026 else 17)
@@ -233,14 +256,26 @@ def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_w
     run_s = prof.get("run_scheme", {})
     gap_ypc = float(run_s.get("def_gap_ypc_allowed", 4.20))
     zone_ypc = float(run_s.get("def_zone_ypc_allowed", 4.40))
-    gap_rk = int(run_s.get("def_gap_rank", 16))
-    zone_rk = int(run_s.get("def_zone_rank", 16))
+    gap_rk = run_s.get("def_gap_rank")
+    if gap_rk is not None:
+        try: gap_rk = int(gap_rk)
+        except Exception: gap_rk = None
+    zone_rk = run_s.get("def_zone_rank")
+    if zone_rk is not None:
+        try: zone_rk = int(zone_rk)
+        except Exception: zone_rk = None
 
     tg = t_def.get("directional_gaps", {})
     inside_ypc = float(tg.get("inside_tackles_ypc", round(gap_ypc * 0.98, 2)))
     outside_ypc = float(tg.get("outside_tackles_ypc", round(zone_ypc * 1.02, 2)))
-    inside_rk = int(tg.get("inside_rank", gap_rk))
-    outside_rk = int(tg.get("outside_rank", zone_rk))
+    inside_rk = tg.get("inside_rank", gap_rk)
+    if inside_rk is not None:
+        try: inside_rk = int(inside_rk)
+        except Exception: inside_rk = None
+    outside_rk = tg.get("outside_rank", zone_rk)
+    if outside_rk is not None:
+        try: outside_rk = int(outside_rk)
+        except Exception: outside_rk = None
 
     pass_ypa_info = t_def.get("passing_ypa_allowed", {
         "raw_value": 6.10,
@@ -294,7 +329,7 @@ def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_w
                     "diff_from_median": round(((inside_ypc + outside_ypc) / 2) - 4.30, 2),
                     "diff_pct": round(((((inside_ypc + outside_ypc) / 2) - 4.30) / 4.30) * 100, 1),
                     "rank": gap_rk,
-                    "rank_display": f"Rank #{gap_rk} (n={n_games} games)",
+                    "rank_display": f"Rank #{gap_rk} (n={n_games} games)" if gap_rk is not None else f"{round((inside_ypc + outside_ypc) / 2, 2)} YPC (league median 4.30, n={n_games} games -- rank suppressed, small sample)",
                     "n_games": n_games,
                     "unit": "yards",
                 }
@@ -307,7 +342,7 @@ def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_w
                         "diff_from_median": round(inside_ypc - 3.86, 2),
                         "diff_pct": round(((inside_ypc - 3.86) / 3.86) * 100, 1),
                         "rank": inside_rk,
-                        "rank_display": f"Rank #{inside_rk} (n={n_games} games)",
+                        "rank_display": f"Rank #{inside_rk} (n={n_games} games)" if inside_rk is not None else f"{inside_ypc:.2f} YPC (league median 3.86, n={n_games} games -- rank suppressed, small sample)",
                         "n_games": n_games,
                         "unit": "yards",
                     }
@@ -319,7 +354,7 @@ def _build_fallback_vulnerability_profile(team: str, season: int = 2026, up_to_w
                         "diff_from_median": round(outside_ypc - 4.55, 2),
                         "diff_pct": round(((outside_ypc - 4.55) / 4.55) * 100, 1),
                         "rank": outside_rk,
-                        "rank_display": f"Rank #{outside_rk} (n={n_games} games)",
+                        "rank_display": f"Rank #{outside_rk} (n={n_games} games)" if outside_rk is not None else f"{outside_ypc:.2f} YPC (league median 4.55, n={n_games} games -- rank suppressed, small sample)",
                         "n_games": n_games,
                         "unit": "yards",
                     }
@@ -346,39 +381,46 @@ def build_matchup_stat_sheet(
     season: int = 2026,
     up_to_week: Optional[int] = None,
     include_prior_season: bool = True,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Assembles the complete descriptive matchup stat sheet for away_team @ home_team.
     Contains zero projections, probabilities, or pick recommendations.
     """
     # 1. Team A (Away) Offense Tendencies & Team B (Home) Defense Vulnerabilities
-    scouting = _load_32_team_scouting_data()
+    try:
+        from backend.scheme_insights import get_dynamic_scouting_data
+        scouting = get_dynamic_scouting_data(season=season, start_date=start_date, end_date=end_date)
+    except Exception:
+        scouting = _load_32_team_scouting_data()
+
     if away_team in scouting and home_team in scouting:
-        away_off_tendencies = _build_fallback_tendency_profile(away_team, season=season, up_to_week=up_to_week)
-        home_def_vulnerabilities = _build_fallback_vulnerability_profile(home_team, season=season, up_to_week=up_to_week)
-        home_off_tendencies = _build_fallback_tendency_profile(home_team, season=season, up_to_week=up_to_week)
-        away_def_vulnerabilities = _build_fallback_vulnerability_profile(away_team, season=season, up_to_week=up_to_week)
+        away_off_tendencies = _build_fallback_tendency_profile(away_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
+        home_def_vulnerabilities = _build_fallback_vulnerability_profile(home_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
+        home_off_tendencies = _build_fallback_tendency_profile(home_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
+        away_def_vulnerabilities = _build_fallback_vulnerability_profile(away_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
     else:
         try:
             away_off_tendencies = compute_team_tendency_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
         except Exception:
-            away_off_tendencies = _build_fallback_tendency_profile(away_team, season=season, up_to_week=up_to_week)
+            away_off_tendencies = _build_fallback_tendency_profile(away_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
 
         try:
             home_def_vulnerabilities = compute_opponent_vulnerability_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
         except Exception:
-            home_def_vulnerabilities = _build_fallback_vulnerability_profile(home_team, season=season, up_to_week=up_to_week)
+            home_def_vulnerabilities = _build_fallback_vulnerability_profile(home_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
 
         # 2. Team B (Home) Offense Tendencies & Team A (Away) Defense Vulnerabilities
         try:
             home_off_tendencies = compute_team_tendency_profile(home_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
         except Exception:
-            home_off_tendencies = _build_fallback_tendency_profile(home_team, season=season, up_to_week=up_to_week)
+            home_off_tendencies = _build_fallback_tendency_profile(home_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
 
         try:
             away_def_vulnerabilities = compute_opponent_vulnerability_profile(away_team, season=season, up_to_week=up_to_week, include_prior_season=include_prior_season)
         except Exception:
-            away_def_vulnerabilities = _build_fallback_vulnerability_profile(away_team, season=season, up_to_week=up_to_week)
+            away_def_vulnerabilities = _build_fallback_vulnerability_profile(away_team, season=season, up_to_week=up_to_week, start_date=start_date, end_date=end_date)
 
     # 3. Similar Opponent Historical Comparison
     try:
@@ -432,7 +474,9 @@ def build_matchup_stat_sheet(
 
     ng = max(away_off_tendencies.get("n_games") or 0, home_off_tendencies.get("n_games") or 0)
     week_n = max(1, (up_to_week - 1) if up_to_week is not None else 1)
-    if include_prior_season:
+    if start_date and end_date:
+        sample_label = f"Custom Date Range ({start_date} to {end_date}, n={ng} games)"
+    elif include_prior_season:
         sample_label = f"2025 season + {season} through week {week_n} (n={ng} games)"
     else:
         sample_label = f"{season} Weeks 1-{week_n} (n={ng} games)"
@@ -444,8 +488,13 @@ def build_matchup_stat_sheet(
         "sample_label": sample_label,
         "sample_window": {
             "season": season,
+            "start_date": start_date,
+            "end_date": end_date,
+            "is_custom_date": bool(start_date and end_date),
             "sample_label": sample_label,
             "n_games": ng,
+            "home_games_in_sample": home_off_tendencies.get("n_games") or ng,
+            "away_games_in_sample": away_off_tendencies.get("n_games") or ng,
             "include_prior_season": include_prior_season,
         },
         "report_type": "Descriptive Team Tendency & Vulnerability Stat Sheet",

@@ -290,3 +290,47 @@ def test_player_historical_red_zone_touches():
     assert st is not None
     assert st["rz_20"] > 0
     assert st["rz_10"] > 0
+
+
+def test_dynamic_scouting_data_date_range():
+    """Verify dynamic scouting features recalculate when date range changes and properly suppress ranks for n < 6 games."""
+    from backend.scheme_insights import get_dynamic_scouting_data, compute_scheme_insights
+
+    # 1. Custom 6-week window in 2025
+    dyn_early = get_dynamic_scouting_data(2025, start_date="2025-09-04", end_date="2025-10-15")
+    assert "HOU" in dyn_early
+    assert "JAX" in dyn_early
+    assert len(dyn_early) == 32
+
+    hou_early = dyn_early["HOU"]
+    jax_early = dyn_early["JAX"]
+
+    # HOU played 5 games by Oct 15 -> rank suppressed
+    assert hou_early["n_games"] == 5
+    assert hou_early["offense"]["passing_ypa"]["rank"] is None
+    assert hou_early["offense"]["game_state_splits"]["leading"]["pass_rate"]["rank"] is None
+
+    # JAX played 6 games by Oct 15 -> rank computed
+    assert jax_early["n_games"] == 6
+    assert jax_early["defense"]["passing_ypa_allowed"]["rank"] is not None
+    assert 1 <= jax_early["defense"]["passing_ypa_allowed"]["rank"] <= 32
+
+    # 2. Full 2025 season (17 games) -> all ranks active
+    dyn_full = get_dynamic_scouting_data(2025, start_date="2025-09-01", end_date="2026-01-15")
+    hou_full = dyn_full["HOU"]
+    jax_full = dyn_full["JAX"]
+
+    assert hou_full["n_games"] == 17
+    assert hou_full["offense"]["passing_ypa"]["rank"] == 17
+    assert jax_full["n_games"] == 17
+    assert jax_full["defense"]["passing_ypa_allowed"]["rank"] == 7
+
+    # 3. Scheme insights output incorporates date range dynamically
+    res = compute_scheme_insights("JAX", "HOU", season=2025, start_date="2025-09-04", end_date="2025-10-15")
+    assert res["sample_window"]["home_games_in_sample"] == 6
+    assert res["sample_window"]["away_games_in_sample"] == 5
+    sheet = res["matchup_stat_sheet"]
+    assert sheet["section_1_away_offense_tendencies"]["n_games"] == 5
+    assert sheet["section_2_home_defense_vulnerabilities"]["n_games"] == 6
+
+
