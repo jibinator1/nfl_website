@@ -152,19 +152,39 @@ def main():
             d_blitz = d_rushers[d_rushers["number_of_pass_rushers"] >= 5]
             d_pnb = int((d_nb["was_pressure"] == 1).sum()) if len(d_nb) > 0 else 0
 
-            # Pass depth allowed (defense)
+            # Pass depth allowed (defense): Behind LOS (<0), Short (0-5), Interim (6-15), Deep (16+)
             d_ay = d_pass[d_pass["air_yards"].notna()]
             d_blos = d_ay[d_ay["air_yards"] < 0]
-            d_short = d_ay[(d_ay["air_yards"] >= 0) & (d_ay["air_yards"] < 10)]
-            d_inter = d_ay[(d_ay["air_yards"] >= 10) & (d_ay["air_yards"] < 20)]
-            d_deep = d_ay[d_ay["air_yards"] >= 20]
+            d_short = d_ay[(d_ay["air_yards"] >= 0) & (d_ay["air_yards"] <= 5)]
+            d_inter = d_ay[(d_ay["air_yards"] >= 6) & (d_ay["air_yards"] <= 15)]
+            d_deep = d_ay[d_ay["air_yards"] >= 16]
 
-            # Offense pass depth
+            # Offense pass depth: Behind LOS (<0), Short (0-5), Interim (6-15), Deep (16+)
             o_ay = o_pass[o_pass["air_yards"].notna()]
             o_blos = len(o_ay[o_ay["air_yards"] < 0])
-            o_short = len(o_ay[(o_ay["air_yards"] >= 0) & (o_ay["air_yards"] < 10)])
-            o_inter = len(o_ay[(o_ay["air_yards"] >= 10) & (o_ay["air_yards"] < 20)])
-            o_deep = len(o_ay[o_ay["air_yards"] >= 20])
+            o_short = len(o_ay[(o_ay["air_yards"] >= 0) & (o_ay["air_yards"] <= 5)])
+            o_inter = len(o_ay[(o_ay["air_yards"] >= 6) & (o_ay["air_yards"] <= 15)])
+            o_deep = len(o_ay[o_ay["air_yards"] >= 16])
+
+            # Offense situational pass depth by game state
+            o_lead_ay = o_ay[o_ay["_state"] == "leading"]
+            o_neut_ay = o_ay[o_ay["_state"] == "neutral"]
+            o_trail_ay = o_ay[o_ay["_state"] == "trailing"]
+
+            lead_att_blos = len(o_lead_ay[o_lead_ay["air_yards"] < 0])
+            lead_att_short = len(o_lead_ay[(o_lead_ay["air_yards"] >= 0) & (o_lead_ay["air_yards"] <= 5)])
+            lead_att_inter = len(o_lead_ay[(o_lead_ay["air_yards"] >= 6) & (o_lead_ay["air_yards"] <= 15)])
+            lead_att_deep = len(o_lead_ay[o_lead_ay["air_yards"] >= 16])
+
+            neut_att_blos = len(o_neut_ay[o_neut_ay["air_yards"] < 0])
+            neut_att_short = len(o_neut_ay[(o_neut_ay["air_yards"] >= 0) & (o_neut_ay["air_yards"] <= 5)])
+            neut_att_inter = len(o_neut_ay[(o_neut_ay["air_yards"] >= 6) & (o_neut_ay["air_yards"] <= 15)])
+            neut_att_deep = len(o_neut_ay[o_neut_ay["air_yards"] >= 16])
+
+            trail_att_blos = len(o_trail_ay[o_trail_ay["air_yards"] < 0])
+            trail_att_short = len(o_trail_ay[(o_trail_ay["air_yards"] >= 0) & (o_trail_ay["air_yards"] <= 5)])
+            trail_att_inter = len(o_trail_ay[(o_trail_ay["air_yards"] >= 6) & (o_trail_ay["air_yards"] <= 15)])
+            trail_att_deep = len(o_trail_ay[o_trail_ay["air_yards"] >= 16])
 
             # Positional targets allowed
             d_tgt_wr = len(d_pass[d_pass["pos"] == "WR"])
@@ -222,6 +242,20 @@ def main():
                 "neut_rush": neut_rush,
                 "trail_pass": trail_pass,
                 "trail_rush": trail_rush,
+
+                # Game State Pass Depth (Offense)
+                "lead_att_blos": lead_att_blos,
+                "lead_att_short": lead_att_short,
+                "lead_att_inter": lead_att_inter,
+                "lead_att_deep": lead_att_deep,
+                "neut_att_blos": neut_att_blos,
+                "neut_att_short": neut_att_short,
+                "neut_att_inter": neut_att_inter,
+                "neut_att_deep": neut_att_deep,
+                "trail_att_blos": trail_att_blos,
+                "trail_att_short": trail_att_short,
+                "trail_att_inter": trail_att_inter,
+                "trail_att_deep": trail_att_deep,
                 
                 # Box Counts
                 "o_c_light": o_c_light,

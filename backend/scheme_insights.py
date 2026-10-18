@@ -663,6 +663,94 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
         att_i = int(t_sub['d_att_inter'].sum())
         att_d = int(t_sub['d_att_deep'].sum())
 
+        pda_dict = {
+            'behind_los': {
+                'epa_per_attempt': round(float(t_sub['d_epa_blos'].sum() / att_b), 3) if att_b > 0 else -0.34,
+                'success_rate': round(float(t_sub['d_sr_blos'].sum() / att_b * 100.0), 1) if att_b > 0 else 31.5,
+                'yards_per_attempt': round(float(t_sub['d_yds_blos'].sum() / att_b), 2) if att_b > 0 else 3.41,
+                'sample_attempts': att_b,
+            },
+            'short': {
+                'epa_per_attempt': round(float(t_sub['d_epa_short'].sum() / att_s), 3) if att_s > 0 else -0.10,
+                'success_rate': round(float(t_sub['d_sr_short'].sum() / att_s * 100.0), 1) if att_s > 0 else 50.1,
+                'yards_per_attempt': round(float(t_sub['d_yds_short'].sum() / att_s), 2) if att_s > 0 else 5.47,
+                'sample_attempts': att_s,
+            },
+            'intermediate': {
+                'epa_per_attempt': round(float(t_sub['d_epa_inter'].sum() / att_i), 3) if att_i > 0 else 0.25,
+                'success_rate': round(float(t_sub['d_sr_inter'].sum() / att_i * 100.0), 1) if att_i > 0 else 51.6,
+                'yards_per_attempt': round(float(t_sub['d_yds_inter'].sum() / att_i), 2) if att_i > 0 else 8.27,
+                'sample_attempts': att_i,
+            },
+            'deep': {
+                'epa_per_attempt': round(float(t_sub['d_epa_deep'].sum() / att_d), 3) if att_d > 0 else 0.28,
+                'success_rate': round(float(t_sub['d_sr_deep'].sum() / att_d * 100.0), 1) if att_d > 0 else 36.2,
+                'yards_per_attempt': round(float(t_sub['d_yds_deep'].sum() / att_d), 2) if att_d > 0 else 12.33,
+                'sample_attempts': att_d,
+            },
+        }
+        # Add range and legacy aliases
+        pda_dict['short_0_to_5'] = pda_dict['short']
+        pda_dict['intermediate_6_to_15'] = pda_dict['intermediate']
+        pda_dict['deep_16_plus'] = pda_dict['deep']
+        pda_dict['short_0_to_9'] = pda_dict['short']
+        pda_dict['intermediate_10_to_19'] = pda_dict['intermediate']
+        pda_dict['deep_20_plus'] = pda_dict['deep']
+
+        # Offense Overall Pass Depth
+        o_att_b = int(t_sub['o_att_blos'].sum()) if 'o_att_blos' in t_sub.columns else 0
+        o_att_s = int(t_sub['o_att_short'].sum()) if 'o_att_short' in t_sub.columns else 0
+        o_att_i = int(t_sub['o_att_inter'].sum()) if 'o_att_inter' in t_sub.columns else 0
+        o_att_d = int(t_sub['o_att_deep'].sum()) if 'o_att_deep' in t_sub.columns else 0
+        o_att_tot = o_att_b + o_att_s + o_att_i + o_att_d
+        if o_att_tot > 0:
+            off_depth = {
+                'behind_los': {'attempts_share': round(o_att_b / o_att_tot * 100, 1), 'frequency_pct': round(o_att_b / o_att_tot * 100, 1), 'sample_attempts': o_att_b},
+                'short': {'attempts_share': round(o_att_s / o_att_tot * 100, 1), 'frequency_pct': round(o_att_s / o_att_tot * 100, 1), 'sample_attempts': o_att_s},
+                'intermediate': {'attempts_share': round(o_att_i / o_att_tot * 100, 1), 'frequency_pct': round(o_att_i / o_att_tot * 100, 1), 'sample_attempts': o_att_i},
+                'deep': {'attempts_share': round(o_att_d / o_att_tot * 100, 1), 'frequency_pct': round(o_att_d / o_att_tot * 100, 1), 'sample_attempts': o_att_d},
+            }
+        else:
+            off_depth = {
+                'behind_los': {'attempts_share': 12.0, 'frequency_pct': 12.0, 'sample_attempts': 0},
+                'short': {'attempts_share': 52.0, 'frequency_pct': 52.0, 'sample_attempts': 0},
+                'intermediate': {'attempts_share': 24.0, 'frequency_pct': 24.0, 'sample_attempts': 0},
+                'deep': {'attempts_share': 12.0, 'frequency_pct': 12.0, 'sample_attempts': 0},
+            }
+        off_depth['short_0_to_5'] = off_depth['short']
+        off_depth['intermediate_6_to_15'] = off_depth['intermediate']
+        off_depth['deep_16_plus'] = off_depth['deep']
+        off_depth['short_0_to_9'] = off_depth['short']
+        off_depth['intermediate_10_to_19'] = off_depth['intermediate']
+        off_depth['deep_20_plus'] = off_depth['deep']
+
+        # Offense Situational Pass Depth (by game state)
+        def _calc_state_depth(pfx):
+            b = int(t_sub[f'{pfx}_att_blos'].sum()) if f'{pfx}_att_blos' in t_sub.columns else 0
+            s = int(t_sub[f'{pfx}_att_short'].sum()) if f'{pfx}_att_short' in t_sub.columns else 0
+            i = int(t_sub[f'{pfx}_att_inter'].sum()) if f'{pfx}_att_inter' in t_sub.columns else 0
+            d_cnt = int(t_sub[f'{pfx}_att_deep'].sum()) if f'{pfx}_att_deep' in t_sub.columns else 0
+            tot = b + s + i + d_cnt
+            if tot > 0:
+                res = {
+                    'behind_los': {'attempts_share': round(b / tot * 100, 1), 'frequency_pct': round(b / tot * 100, 1), 'sample_attempts': b},
+                    'short': {'attempts_share': round(s / tot * 100, 1), 'frequency_pct': round(s / tot * 100, 1), 'sample_attempts': s},
+                    'intermediate': {'attempts_share': round(i / tot * 100, 1), 'frequency_pct': round(i / tot * 100, 1), 'sample_attempts': i},
+                    'deep': {'attempts_share': round(d_cnt / tot * 100, 1), 'frequency_pct': round(d_cnt / tot * 100, 1), 'sample_attempts': d_cnt},
+                }
+                res['short_0_to_5'] = res['short']
+                res['intermediate_6_to_15'] = res['intermediate']
+                res['deep_16_plus'] = res['deep']
+                res['short_0_to_9'] = res['short']
+                res['intermediate_10_to_19'] = res['intermediate']
+                res['deep_20_plus'] = res['deep']
+                return res
+            return off_depth
+
+        lead_depth = _calc_state_depth('lead')
+        neut_depth = _calc_state_depth('neut')
+        trail_depth = _calc_state_depth('trail')
+
         raw[tm] = {
             'n_games': ng,
             'p_att': p_att, 'off_ypa': off_ypa,
@@ -681,32 +769,11 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                 'te': {'target_share': round(t_te/pos_tot*100, 1) if pos_tot>0 else 22.7, 'yards_per_target': round(y_te/t_te, 2) if t_te>0 else 6.65, 'sample_targets': t_te},
                 'rb': {'target_share': round(t_rb/pos_tot*100, 1) if pos_tot>0 else 17.3, 'yards_per_target': round(y_rb/t_rb, 2) if t_rb>0 else 5.26, 'sample_targets': t_rb},
             },
-            'pass_depth_allowed': {
-                'behind_los': {
-                    'epa_per_attempt': round(float(t_sub['d_epa_blos'].sum() / att_b), 3) if att_b > 0 else -0.34,
-                    'success_rate': round(float(t_sub['d_sr_blos'].sum() / att_b * 100.0), 1) if att_b > 0 else 31.5,
-                    'yards_per_attempt': round(float(t_sub['d_yds_blos'].sum() / att_b), 2) if att_b > 0 else 3.41,
-                    'sample_attempts': att_b,
-                },
-                'short': {
-                    'epa_per_attempt': round(float(t_sub['d_epa_short'].sum() / att_s), 3) if att_s > 0 else -0.10,
-                    'success_rate': round(float(t_sub['d_sr_short'].sum() / att_s * 100.0), 1) if att_s > 0 else 50.1,
-                    'yards_per_attempt': round(float(t_sub['d_yds_short'].sum() / att_s), 2) if att_s > 0 else 5.47,
-                    'sample_attempts': att_s,
-                },
-                'intermediate': {
-                    'epa_per_attempt': round(float(t_sub['d_epa_inter'].sum() / att_i), 3) if att_i > 0 else 0.25,
-                    'success_rate': round(float(t_sub['d_sr_inter'].sum() / att_i * 100.0), 1) if att_i > 0 else 51.6,
-                    'yards_per_attempt': round(float(t_sub['d_yds_inter'].sum() / att_i), 2) if att_i > 0 else 8.27,
-                    'sample_attempts': att_i,
-                },
-                'deep': {
-                    'epa_per_attempt': round(float(t_sub['d_epa_deep'].sum() / att_d), 3) if att_d > 0 else 0.28,
-                    'success_rate': round(float(t_sub['d_sr_deep'].sum() / att_d * 100.0), 1) if att_d > 0 else 36.2,
-                    'yards_per_attempt': round(float(t_sub['d_yds_deep'].sum() / att_d), 2) if att_d > 0 else 12.33,
-                    'sample_attempts': att_d,
-                },
-            }
+            'pass_depth_allowed': pda_dict,
+            'off_depth': off_depth,
+            'lead_depth': lead_depth,
+            'neut_depth': neut_depth,
+            'trail_depth': trail_depth,
         }
 
     # League medians
@@ -761,6 +828,8 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                     'sample_attempts': d['p_att'],
                     'n_games': ng,
                 },
+                'pass_depth': d['off_depth'],
+                'pass_depth_distribution': d['off_depth'],
                 'box_counts': {
                     'rush_ypc_vs_light_box': d['o_ypc_lt'],
                     'rush_ypc_vs_heavy_box': d['o_ypc_hv'],
@@ -789,6 +858,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'is_small_sample': bool(d['lt'] < 40),
                             'unit': 'rate'
                         },
+                        'pass_depth': d['lead_depth'],
                     },
                     'neutral': {
                         'pass_rate': {
@@ -811,6 +881,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'is_small_sample': bool(d['nt'] < 40),
                             'unit': 'rate'
                         },
+                        'pass_depth': d['neut_depth'],
                     },
                     'trailing': {
                         'pass_rate': {
@@ -833,6 +904,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'is_small_sample': bool(d['tt'] < 40),
                             'unit': 'rate'
                         },
+                        'pass_depth': d['trail_depth'],
                     }
                 }
             },
@@ -859,6 +931,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                 },
                 'positional_targets_allowed': d['pos'],
                 'pass_depth_allowed': d['pass_depth_allowed'],
+                'target_depth_allowed': d['pass_depth_allowed'],
                 'directional_gaps': {
                     'inside_tackles_ypc': d['ins_ypc'],
                     'inside_rank': None if is_small else rk_ins[tm],

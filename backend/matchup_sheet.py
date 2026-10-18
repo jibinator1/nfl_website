@@ -172,9 +172,15 @@ def _build_fallback_tendency_profile(
                 "rush_rate": {"raw_value": round(1.0 - base_leading, 3), "league_median": 0.511, "rank": 21, "n_games": n_games, "sample_size": 200, "is_small_sample": False, "unit": "rate"},
                 "pass_depth": {
                     "behind_los": {"attempts_share": 15.0, "frequency_pct": 15.0, "sample_attempts": 30, "epa_per_attempt": -0.20, "success_rate": 35.0},
-                    "short": {"attempts_share": 55.0, "frequency_pct": 55.0, "sample_attempts": 110, "epa_per_attempt": 0.10, "success_rate": 53.0},
-                    "intermediate": {"attempts_share": 21.0, "frequency_pct": 21.0, "sample_attempts": 42, "epa_per_attempt": 0.28, "success_rate": 47.0},
-                    "deep": {"attempts_share": 9.0, "frequency_pct": 9.0, "sample_attempts": 18, "epa_per_attempt": 0.45, "success_rate": 31.0},
+                    "short": {"attempts_share": 42.0, "frequency_pct": 42.0, "sample_attempts": 84, "epa_per_attempt": 0.10, "success_rate": 53.0},
+                    "intermediate": {"attempts_share": 31.0, "frequency_pct": 31.0, "sample_attempts": 62, "epa_per_attempt": 0.28, "success_rate": 47.0},
+                    "deep": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 24, "epa_per_attempt": 0.45, "success_rate": 31.0},
+                    "short_0_to_5": {"attempts_share": 42.0, "frequency_pct": 42.0, "sample_attempts": 84, "epa_per_attempt": 0.10, "success_rate": 53.0},
+                    "intermediate_6_to_15": {"attempts_share": 31.0, "frequency_pct": 31.0, "sample_attempts": 62, "epa_per_attempt": 0.28, "success_rate": 47.0},
+                    "deep_16_plus": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 24, "epa_per_attempt": 0.45, "success_rate": 31.0},
+                    "short_0_to_9": {"attempts_share": 42.0, "frequency_pct": 42.0, "sample_attempts": 84, "epa_per_attempt": 0.10, "success_rate": 53.0},
+                    "intermediate_10_to_19": {"attempts_share": 31.0, "frequency_pct": 31.0, "sample_attempts": 62, "epa_per_attempt": 0.28, "success_rate": 47.0},
+                    "deep_20_plus": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 24, "epa_per_attempt": 0.45, "success_rate": 31.0},
                 }
             },
             "neutral": {
@@ -182,9 +188,15 @@ def _build_fallback_tendency_profile(
                 "rush_rate": {"raw_value": round(1.0 - base_neutral, 3), "league_median": 0.440, "rank": 21, "n_games": n_games, "sample_size": 400, "is_small_sample": False, "unit": "rate"},
                 "pass_depth": {
                     "behind_los": {"attempts_share": 11.0, "frequency_pct": 11.0, "sample_attempts": 50, "epa_per_attempt": -0.40, "success_rate": 22.0},
-                    "short": {"attempts_share": 52.0, "frequency_pct": 52.0, "sample_attempts": 250, "epa_per_attempt": 0.10, "success_rate": 51.0},
-                    "intermediate": {"attempts_share": 25.0, "frequency_pct": 25.0, "sample_attempts": 120, "epa_per_attempt": 0.45, "success_rate": 54.0},
-                    "deep": {"attempts_share": 12.0, "frequency_pct": 12.0, "sample_attempts": 60, "epa_per_attempt": 0.40, "success_rate": 35.0},
+                    "short": {"attempts_share": 40.0, "frequency_pct": 40.0, "sample_attempts": 190, "epa_per_attempt": 0.10, "success_rate": 51.0},
+                    "intermediate": {"attempts_share": 33.0, "frequency_pct": 33.0, "sample_attempts": 155, "epa_per_attempt": 0.45, "success_rate": 54.0},
+                    "deep": {"attempts_share": 16.0, "frequency_pct": 16.0, "sample_attempts": 75, "epa_per_attempt": 0.40, "success_rate": 35.0},
+                    "short_0_to_5": {"attempts_share": 40.0, "frequency_pct": 40.0, "sample_attempts": 190, "epa_per_attempt": 0.10, "success_rate": 51.0},
+                    "intermediate_6_to_15": {"attempts_share": 33.0, "frequency_pct": 33.0, "sample_attempts": 155, "epa_per_attempt": 0.45, "success_rate": 54.0},
+                    "deep_16_plus": {"attempts_share": 16.0, "frequency_pct": 16.0, "sample_attempts": 75, "epa_per_attempt": 0.40, "success_rate": 35.0},
+                    "short_0_to_9": {"attempts_share": 40.0, "frequency_pct": 40.0, "sample_attempts": 190, "epa_per_attempt": 0.10, "success_rate": 51.0},
+                    "intermediate_10_to_19": {"attempts_share": 33.0, "frequency_pct": 33.0, "sample_attempts": 155, "epa_per_attempt": 0.45, "success_rate": 54.0},
+                    "deep_20_plus": {"attempts_share": 16.0, "frequency_pct": 16.0, "sample_attempts": 75, "epa_per_attempt": 0.40, "success_rate": 35.0},
                 }
             },
             "trailing": {
@@ -192,9 +204,15 @@ def _build_fallback_tendency_profile(
                 "rush_rate": {"raw_value": round(1.0 - base_trailing, 3), "league_median": 0.350, "rank": 21, "n_games": n_games, "sample_size": 250, "is_small_sample": False, "unit": "rate"},
                 "pass_depth": {
                     "behind_los": {"attempts_share": 7.0, "frequency_pct": 7.0, "sample_attempts": 18, "epa_per_attempt": -0.35, "success_rate": 24.0},
-                    "short": {"attempts_share": 56.0, "frequency_pct": 56.0, "sample_attempts": 140, "epa_per_attempt": 0.12, "success_rate": 55.0},
-                    "intermediate": {"attempts_share": 20.0, "frequency_pct": 20.0, "sample_attempts": 50, "epa_per_attempt": -0.20, "success_rate": 30.0},
-                    "deep": {"attempts_share": 17.0, "frequency_pct": 17.0, "sample_attempts": 42, "epa_per_attempt": 0.28, "success_rate": 38.0},
+                    "short": {"attempts_share": 43.0, "frequency_pct": 43.0, "sample_attempts": 108, "epa_per_attempt": 0.12, "success_rate": 55.0},
+                    "intermediate": {"attempts_share": 29.0, "frequency_pct": 29.0, "sample_attempts": 73, "epa_per_attempt": -0.20, "success_rate": 30.0},
+                    "deep": {"attempts_share": 21.0, "frequency_pct": 21.0, "sample_attempts": 53, "epa_per_attempt": 0.28, "success_rate": 38.0},
+                    "short_0_to_5": {"attempts_share": 43.0, "frequency_pct": 43.0, "sample_attempts": 108, "epa_per_attempt": 0.12, "success_rate": 55.0},
+                    "intermediate_6_to_15": {"attempts_share": 29.0, "frequency_pct": 29.0, "sample_attempts": 73, "epa_per_attempt": -0.20, "success_rate": 30.0},
+                    "deep_16_plus": {"attempts_share": 21.0, "frequency_pct": 21.0, "sample_attempts": 53, "epa_per_attempt": 0.28, "success_rate": 38.0},
+                    "short_0_to_9": {"attempts_share": 43.0, "frequency_pct": 43.0, "sample_attempts": 108, "epa_per_attempt": 0.12, "success_rate": 55.0},
+                    "intermediate_10_to_19": {"attempts_share": 29.0, "frequency_pct": 29.0, "sample_attempts": 73, "epa_per_attempt": -0.20, "success_rate": 30.0},
+                    "deep_20_plus": {"attempts_share": 21.0, "frequency_pct": 21.0, "sample_attempts": 53, "epa_per_attempt": 0.28, "success_rate": 38.0},
                 }
             },
         }
@@ -216,9 +234,15 @@ def _build_fallback_tendency_profile(
 
     pass_depth = t_off.get("pass_depth", {
         "behind_los": {"frequency_pct": 12.0, "attempts_share": 12.0, "epa_per_attempt": -0.30, "yards_per_attempt": 3.5, "sample_attempts": 100},
-        "short": {"frequency_pct": 50.0, "attempts_share": 50.0, "epa_per_attempt": 0.10, "yards_per_attempt": 6.0, "sample_attempts": 400},
-        "intermediate": {"frequency_pct": 25.0, "attempts_share": 25.0, "epa_per_attempt": 0.35, "yards_per_attempt": 9.0, "sample_attempts": 190},
-        "deep": {"frequency_pct": 13.0, "attempts_share": 13.0, "epa_per_attempt": 0.40, "yards_per_attempt": 11.5, "sample_attempts": 100},
+        "short": {"frequency_pct": 40.0, "attempts_share": 40.0, "epa_per_attempt": 0.10, "yards_per_attempt": 6.0, "sample_attempts": 320},
+        "intermediate": {"frequency_pct": 32.0, "attempts_share": 32.0, "epa_per_attempt": 0.35, "yards_per_attempt": 9.0, "sample_attempts": 250},
+        "deep": {"frequency_pct": 16.0, "attempts_share": 16.0, "epa_per_attempt": 0.40, "yards_per_attempt": 11.5, "sample_attempts": 130},
+        "short_0_to_5": {"frequency_pct": 40.0, "attempts_share": 40.0, "epa_per_attempt": 0.10, "yards_per_attempt": 6.0, "sample_attempts": 320},
+        "intermediate_6_to_15": {"frequency_pct": 32.0, "attempts_share": 32.0, "epa_per_attempt": 0.35, "yards_per_attempt": 9.0, "sample_attempts": 250},
+        "deep_16_plus": {"frequency_pct": 16.0, "attempts_share": 16.0, "epa_per_attempt": 0.40, "yards_per_attempt": 11.5, "sample_attempts": 130},
+        "short_0_to_9": {"frequency_pct": 40.0, "attempts_share": 40.0, "epa_per_attempt": 0.10, "yards_per_attempt": 6.0, "sample_attempts": 320},
+        "intermediate_10_to_19": {"frequency_pct": 32.0, "attempts_share": 32.0, "epa_per_attempt": 0.35, "yards_per_attempt": 9.0, "sample_attempts": 250},
+        "deep_20_plus": {"frequency_pct": 16.0, "attempts_share": 16.0, "epa_per_attempt": 0.40, "yards_per_attempt": 11.5, "sample_attempts": 130},
     })
 
     return {
@@ -296,6 +320,12 @@ def _build_fallback_vulnerability_profile(
     if not pass_depth:
         pass_depth = {
             "behind_los": {"epa_per_attempt": -0.35, "success_rate": 28.0, "yards_per_attempt": 3.3, "sample_attempts": 100},
+            "short": {"epa_per_attempt": -0.07, "success_rate": 48.0, "yards_per_attempt": 5.4, "sample_attempts": 250},
+            "intermediate": {"epa_per_attempt": 0.25, "success_rate": 52.0, "yards_per_attempt": 8.8, "sample_attempts": 120},
+            "deep": {"epa_per_attempt": 0.35, "success_rate": 35.0, "yards_per_attempt": 12.0, "sample_attempts": 60},
+            "short_0_to_5": {"epa_per_attempt": -0.07, "success_rate": 48.0, "yards_per_attempt": 5.4, "sample_attempts": 250},
+            "intermediate_6_to_15": {"epa_per_attempt": 0.25, "success_rate": 52.0, "yards_per_attempt": 8.8, "sample_attempts": 120},
+            "deep_16_plus": {"epa_per_attempt": 0.35, "success_rate": 35.0, "yards_per_attempt": 12.0, "sample_attempts": 60},
             "short_0_to_9": {"epa_per_attempt": -0.07, "success_rate": 48.0, "yards_per_attempt": 5.4, "sample_attempts": 250},
             "intermediate_10_to_19": {"epa_per_attempt": 0.25, "success_rate": 52.0, "yards_per_attempt": 8.8, "sample_attempts": 120},
             "deep_20_plus": {"epa_per_attempt": 0.35, "success_rate": 35.0, "yards_per_attempt": 12.0, "sample_attempts": 60},
