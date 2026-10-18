@@ -3557,10 +3557,10 @@
                 const dItem = getVal(defDepth, lvl.key, lvl.altKey, lvl.altKey2);
 
                 const share = oItem.attempts_share != null ? parseFloat(oItem.attempts_share) : (oItem.frequency_pct != null ? parseFloat(oItem.frequency_pct) : 0);
-                const oRank = oItem.rank != null ? `#${oItem.rank} Vol` : (oItem.n_games < 6 ? 'n<6' : '');
+                const oRank = oItem.rank != null ? `#${oItem.rank} Vol` : (oItem.n_games < 1 ? 'n<1' : '');
                 
                 const epa = dItem.epa_per_attempt != null ? (typeof dItem.epa_per_attempt === 'object' ? parseFloat(dItem.epa_per_attempt.raw_value) : parseFloat(dItem.epa_per_attempt)) : 0;
-                const dRank = dItem.rank != null ? `#${dItem.rank} Def` : (dItem.n_games < 6 ? 'n<6' : '');
+                const dRank = dItem.rank != null ? `#${dItem.rank} Def` : (dItem.n_games < 1 ? 'n<1' : '');
                 const dMed = dItem.league_median != null ? parseFloat(dItem.league_median) : lvl.defBaseline;
 
                 // Offense intensity (sky blue theme)
@@ -3595,7 +3595,7 @@
                         defSubText = '#94a3b8';
                     }
                 } else {
-                    // Small sample (n < 6): evaluate delta vs league median baseline
+                    // Small sample (n < 1): evaluate delta vs league median baseline
                     const diff = epa - dMed;
                     if (diff <= -0.08) {
                         defBg = 'rgba(6, 78, 59, 0.85)';
@@ -3645,8 +3645,8 @@
             const lightW = Math.min(148, Math.max(20, (lightBoxRate / 100) * frontW));
             const heavyW = Math.max(8, frontW - lightW);
 
-            const gapRankStr = gapRank != null ? `(#${gapRank})` : '(n<6)';
-            const zoneRankStr = zoneRank != null ? `(#${zoneRank})` : '(n<6)';
+            const gapRankStr = gapRank != null ? `(#${gapRank})` : '';
+            const zoneRankStr = zoneRank != null ? `(#${zoneRank})` : '';
 
             return `
                 <svg viewBox="0 0 340 ${height}" width="100%" height="auto" class="overflow-visible font-sans" preserveAspectRatio="xMidYMid meet">
@@ -3709,9 +3709,9 @@
             const neutRun = (100 - neutRate * 100).toFixed(1);
             const trailRun = (100 - trailRate * 100).toFixed(1);
 
-            const leadRankStr = leadRank != null ? `#${leadRank}` : 'n<6';
-            const neutRankStr = neutRank != null ? `#${neutRank}` : 'n<6';
-            const trailRankStr = trailRank != null ? `#${trailRank}` : 'n<6';
+            const leadRankStr = leadRank != null ? `#${leadRank}` : '';
+            const neutRankStr = neutRank != null ? `#${neutRank}` : '';
+            const trailRankStr = trailRank != null ? `#${trailRank}` : '';
 
             return `
                 <svg viewBox="0 0 340 ${height}" width="100%" height="auto" class="overflow-visible font-sans" preserveAspectRatio="xMidYMid meet">
@@ -4002,7 +4002,7 @@
             const aPassSign = parseFloat(hDefWorstDepth.epa_per_attempt) > 0 ? '+' : '';
             const hDefRankStr = hDefWorstDepth.rank != null 
                 ? ` (#${hDefWorstDepth.rank} in NFL, lg med ${hDefWorstDepth.league_median != null ? (parseFloat(hDefWorstDepth.league_median) > 0 ? '+' : '') + parseFloat(hDefWorstDepth.league_median).toFixed(2) : '--'})` 
-                : (hDefWorstDepth.n_games < 6 ? ` (n<6 games, lg med ${hDefWorstDepth.league_median != null ? (parseFloat(hDefWorstDepth.league_median) > 0 ? '+' : '') + parseFloat(hDefWorstDepth.league_median).toFixed(2) : '--'})` : '');
+                : (hDefWorstDepth.league_median != null ? ` (lg med ${parseFloat(hDefWorstDepth.league_median) > 0 ? '+' : ''}${parseFloat(hDefWorstDepth.league_median).toFixed(2)})` : '');
             const aOffRankStr = aOffDepthItem?.rank != null 
                 ? ` (#${aOffDepthItem.rank} Vol, lg med ${aOffDepthItem.league_median != null ? parseFloat(aOffDepthItem.league_median).toFixed(1) + '%' : '--'})` 
                 : '';
@@ -4061,7 +4061,7 @@
             const hPassSign = parseFloat(aDefWorstDepth.epa_per_attempt) > 0 ? '+' : '';
             const aDefRankStr = aDefWorstDepth.rank != null 
                 ? ` (#${aDefWorstDepth.rank} in NFL, lg med ${aDefWorstDepth.league_median != null ? (parseFloat(aDefWorstDepth.league_median) > 0 ? '+' : '') + parseFloat(aDefWorstDepth.league_median).toFixed(2) : '--'})` 
-                : (aDefWorstDepth.n_games < 6 ? ` (n<6 games, lg med ${aDefWorstDepth.league_median != null ? (parseFloat(aDefWorstDepth.league_median) > 0 ? '+' : '') + parseFloat(aDefWorstDepth.league_median).toFixed(2) : '--'})` : '');
+                : (aDefWorstDepth.league_median != null ? ` (lg med ${parseFloat(aDefWorstDepth.league_median) > 0 ? '+' : ''}${parseFloat(aDefWorstDepth.league_median).toFixed(2)})` : '');
             const hOffRankStr = hOffDepthItem?.rank != null 
                 ? ` (#${hOffDepthItem.rank} Vol, lg med ${hOffDepthItem.league_median != null ? parseFloat(hOffDepthItem.league_median).toFixed(1) + '%' : '--'})` 
                 : '';
@@ -4172,8 +4172,8 @@
                 hOffHeavyYpc
             );
 
-            const aGapRankStr = aGapRank != null ? `(#${aGapRank})` : '(n<6)';
-            const hGapRankStr = hGapRank != null ? `(#${hGapRank})` : '(n<6)';
+            const aGapRankStr = aGapRank != null ? `(#${aGapRank})` : '';
+            const hGapRankStr = hGapRank != null ? `(#${hGapRank})` : '';
 
             const aRunCallout = `<div class="space-y-1 font-mono text-[10px] text-slate-300">
                 <div class="flex items-center justify-between text-slate-400">
@@ -4246,10 +4246,10 @@
             const hNeutRank = hNeutSplit?.rank ?? null;
             const hTrailRank = hTrailSplit?.rank ?? null;
 
-            const aLeadRankStr = aLeadRank != null ? `#${aLeadRank}` : 'n<6';
-            const aTrailRankStr = aTrailRank != null ? `#${aTrailRank}` : 'n<6';
-            const hLeadRankStr = hLeadRank != null ? `#${hLeadRank}` : 'n<6';
-            const hTrailRankStr = hTrailRank != null ? `#${hTrailRank}` : 'n<6';
+            const aLeadRankStr = aLeadRank != null ? `#${aLeadRank}` : '';
+            const aTrailRankStr = aTrailRank != null ? `#${aTrailRank}` : '';
+            const hLeadRankStr = hLeadRank != null ? `#${hLeadRank}` : '';
+            const hTrailRankStr = hTrailRank != null ? `#${hTrailRank}` : '';
 
             const aScriptSvg = renderGameScriptMeterSvg(aLeadRate, aNeutRate, aTrailRate, aLeadRank, aNeutRank, aTrailRank, d.away_team);
             const hScriptSvg = renderGameScriptMeterSvg(hLeadRate, hNeutRate, hTrailRate, hLeadRank, hNeutRank, hTrailRank, d.home_team);
@@ -4331,9 +4331,9 @@
 
             let rkDisplay = stat.rank_display || '';
             if (!rkDisplay) {
-                if (stat.rank != null && (nGames == null || nGames >= 6)) {
+                if (stat.rank != null && (nGames == null || nGames >= 1)) {
                     rkDisplay = `Rank #${stat.rank}${nGames != null ? ` (n=${nGames}g)` : ''}`;
-                } else if (nGames != null && nGames < 6) {
+                } else if (nGames != null && nGames < 1) {
                     rkDisplay = `n=${nGames}g (Low Sample)`;
                 }
             }
@@ -4347,7 +4347,7 @@
                     <div class="flex items-center justify-between text-[9.5px]">
                         <span class="${(diffVal != null ? diffVal : stat.diff_from_median) >= 0 ? 'text-emerald-400 font-semibold' : 'text-slate-400'}">${diff ? `${diff}${unit ? unit : ''} (${diffPct})` : ''}</span>
                         <div class="flex items-center space-x-1">
-                            ${rkDisplay ? `<span class="px-1 py-0.2 rounded bg-[#21262d] text-slate-300 border border-[#30363d] text-[9px] cursor-help" title="${nGames != null && nGames < 6 ? `Rank suppressed until 6+ games (currently ${nGames} games evaluated)` : ''}">${rkDisplay}</span>` : ''}
+                            ${rkDisplay ? `<span class="px-1 py-0.2 rounded bg-[#21262d] text-slate-300 border border-[#30363d] text-[9px] cursor-help" title="${nGames != null && nGames < 1 ? `No games evaluated yet` : ''}">${rkDisplay}</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -5171,25 +5171,25 @@ function renderSchemeInsights(d) {
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Behind LOS (&lt;0)</span>
                                                 <b class="text-slate-200">${fmtSigned(bLos.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${bLos.rank != null ? '#' + bLos.rank + ' Def' : (bLos.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${bLos.rank != null ? '#' + bLos.rank + ' Def' : (bLos.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(bLos.success_rate)} Succ · Med ${bLos.league_median != null ? fmtSigned(bLos.league_median) : '--'}</span>
                                             </div>
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Short (0–5)</span>
                                                 <b class="text-slate-200">${fmtSigned(sh.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${sh.rank != null ? '#' + sh.rank + ' Def' : (sh.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${sh.rank != null ? '#' + sh.rank + ' Def' : (sh.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(sh.success_rate)} Succ · Med ${sh.league_median != null ? fmtSigned(sh.league_median) : '--'}</span>
                                             </div>
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Interim (6–15)</span>
                                                 <b class="text-slate-200">${fmtSigned(inter.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${inter.rank != null ? '#' + inter.rank + ' Def' : (inter.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${inter.rank != null ? '#' + inter.rank + ' Def' : (inter.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(inter.success_rate)} Succ · Med ${inter.league_median != null ? fmtSigned(inter.league_median) : '--'}</span>
                                             </div>
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Deep (16+)</span>
                                                 <b class="text-slate-200">${fmtSigned(dp.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${dp.rank != null ? '#' + dp.rank + ' Def' : (dp.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${dp.rank != null ? '#' + dp.rank + ' Def' : (dp.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(dp.success_rate)} Succ · Med ${dp.league_median != null ? fmtSigned(dp.league_median) : '--'}</span>
                                             </div>
                                         </div>
@@ -5312,25 +5312,25 @@ function renderSchemeInsights(d) {
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Behind LOS (&lt;0)</span>
                                                 <b class="text-slate-200">${fmtSigned(bLos.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${bLos.rank != null ? '#' + bLos.rank + ' Def' : (bLos.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${bLos.rank != null ? '#' + bLos.rank + ' Def' : (bLos.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(bLos.success_rate)} Succ · Med ${bLos.league_median != null ? fmtSigned(bLos.league_median) : '--'}</span>
                                             </div>
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Short (0–5)</span>
                                                 <b class="text-slate-200">${fmtSigned(sh.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${sh.rank != null ? '#' + sh.rank + ' Def' : (sh.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${sh.rank != null ? '#' + sh.rank + ' Def' : (sh.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(sh.success_rate)} Succ · Med ${sh.league_median != null ? fmtSigned(sh.league_median) : '--'}</span>
                                             </div>
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Interim (6–15)</span>
                                                 <b class="text-slate-200">${fmtSigned(inter.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${inter.rank != null ? '#' + inter.rank + ' Def' : (inter.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${inter.rank != null ? '#' + inter.rank + ' Def' : (inter.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(inter.success_rate)} Succ · Med ${inter.league_median != null ? fmtSigned(inter.league_median) : '--'}</span>
                                             </div>
                                             <div class="bg-[#161b22] p-1.5 rounded border border-[#21262d]">
                                                 <span class="text-slate-400 block text-[9px] mb-0.5">Deep (16+)</span>
                                                 <b class="text-slate-200">${fmtSigned(dp.epa_per_attempt)} EPA</b>
-                                                <span class="text-sky-400 text-[8.5px] font-bold block">${dp.rank != null ? '#' + dp.rank + ' Def' : (dp.n_games < 6 ? '(n<6)' : '')}</span>
+                                                <span class="text-sky-400 text-[8.5px] font-bold block">${dp.rank != null ? '#' + dp.rank + ' Def' : (dp.n_games < 1 ? '(n<1)' : '')}</span>
                                                 <span class="text-slate-400 text-[8px] block">${fmtPct(dp.success_rate)} Succ · Med ${dp.league_median != null ? fmtSigned(dp.league_median) : '--'}</span>
                                             </div>
                                         </div>
@@ -5861,15 +5861,15 @@ function renderSchemeInsights(d) {
             }
 
             const formatDefRank = (val, rank, nG) => {
-                if (nG < 6) return `${val.toFixed(2)} YPC (league median 4.12, n=${nG} games — rank suppressed, small sample)`;
+                if (nG < 1) return `${val.toFixed(2)} YPC (league median 4.12, n=${nG} games — rank suppressed, small sample)`;
                 return `Rank #${rank} (n=${nG} games)`;
             };
             const formatPassRank = (val, rank, nG) => {
-                if (nG < 6) return `${val.toFixed(2)} YPA (league median 6.12, n=${nG} games — rank suppressed, small sample)`;
+                if (nG < 1) return `${val.toFixed(2)} YPA (league median 6.12, n=${nG} games — rank suppressed, small sample)`;
                 return `Rank #${rank} (n=${nG} games)`;
             };
             const formatRateRank = (val, rank, med, nG) => {
-                if (nG < 6) return `${(val * 100).toFixed(1)}% (league median ${(med * 100).toFixed(1)}%, n=${nG} games — rank suppressed, small sample)`;
+                if (nG < 1) return `${(val * 100).toFixed(1)}% (league median ${(med * 100).toFixed(1)}%, n=${nG} games — rank suppressed, small sample)`;
                 return `Rank #${rank} (n=${nG} games)`;
             };
 
@@ -5949,10 +5949,10 @@ function renderSchemeInsights(d) {
                         zone_ypc: 4.6,
                         gap_ypc: 4.2,
                         opp_def_zone_ypc_allowed: parseFloat((hOppDefGapYpc * 1.02).toFixed(2)),
-                        opp_def_zone_rank: hGames < 6 ? null : hOppDefGapRank,
+                        opp_def_zone_rank: hGames < 1 ? null : hOppDefGapRank,
                         opp_def_zone_rank_display: formatDefRank(hOppDefGapYpc * 1.02, hOppDefGapRank, hGames),
                         opp_def_gap_ypc_allowed: hOppDefGapYpc,
-                        opp_def_gap_rank: hGames < 6 ? null : hOppDefGapRank,
+                        opp_def_gap_rank: hGames < 1 ? null : hOppDefGapRank,
                         opp_def_gap_rank_display: formatDefRank(hOppDefGapYpc, hOppDefGapRank, hGames),
                         opp_box_counts: {
                             light_box_rate: 58.5,
@@ -5974,10 +5974,10 @@ function renderSchemeInsights(d) {
                         zone_ypc: 4.1,
                         gap_ypc: 4.7,
                         opp_def_zone_ypc_allowed: parseFloat((aOppDefGapYpc * 1.02).toFixed(2)),
-                        opp_def_zone_rank: aGames < 6 ? null : aOppDefGapRank,
+                        opp_def_zone_rank: aGames < 1 ? null : aOppDefGapRank,
                         opp_def_zone_rank_display: formatDefRank(aOppDefGapYpc * 1.02, aOppDefGapRank, aGames),
                         opp_def_gap_ypc_allowed: aOppDefGapYpc,
-                        opp_def_gap_rank: aGames < 6 ? null : aOppDefGapRank,
+                        opp_def_gap_rank: aGames < 1 ? null : aOppDefGapRank,
                         opp_def_gap_rank_display: formatDefRank(aOppDefGapYpc, aOppDefGapRank, aGames),
                         opp_box_counts: {
                             light_box_rate: 53.2,
@@ -6145,7 +6145,7 @@ function renderSchemeInsights(d) {
                         passing_offense: {
                             raw_value: parseFloat((6.1 + ((seed % 5) * 0.15)).toFixed(2)),
                             league_median: 6.03,
-                            rank: aGames < 6 ? null : (10 + (seed % 10)),
+                            rank: aGames < 1 ? null : (10 + (seed % 10)),
                             rank_display: formatPassRank(parseFloat((6.1 + ((seed % 5) * 0.15)).toFixed(2)), 10 + (seed % 10), aGames),
                             sample_attempts: Math.round(34 * aGames),
                             n_games: aGames
@@ -6168,8 +6168,8 @@ function renderSchemeInsights(d) {
                         },
                         game_state_splits: {
                             leading: {
-                                pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: aGames < 6 ? null : (10 + (seed % 10)), n_games: aGames, sample_size: Math.round(15 * aGames), rank_display: formatRateRank((0.47 + ((seed % 7) * 0.01)), 10 + (seed % 10), 0.489, aGames) },
-                                rush_rate: { raw_value: roundDec(1.0 - (0.47 + ((seed % 7) * 0.01)), 3), league_median: 0.511, rank: aGames < 6 ? null : (23 - (seed % 10)), n_games: aGames, sample_size: Math.round(15 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.47 + ((seed % 7) * 0.01)), 3), 23 - (seed % 10), 0.511, aGames) },
+                                pass_rate: { raw_value: (0.47 + ((seed % 7) * 0.01)), league_median: 0.489, diff_from_median: (((seed % 7) * 0.01) - 0.019), diff_pct: 3.2, rank: aGames < 1 ? null : (10 + (seed % 10)), n_games: aGames, sample_size: Math.round(15 * aGames), rank_display: formatRateRank((0.47 + ((seed % 7) * 0.01)), 10 + (seed % 10), 0.489, aGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.47 + ((seed % 7) * 0.01)), 3), league_median: 0.511, rank: aGames < 1 ? null : (23 - (seed % 10)), n_games: aGames, sample_size: Math.round(15 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.47 + ((seed % 7) * 0.01)), 3), 23 - (seed % 10), 0.511, aGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 15.1, frequency_pct: 15.1, sample_attempts: 23, epa_per_attempt: -0.21, success_rate: 36.4, yards_per_attempt: 3.64 },
                                     short: { attempts_share: 55.5, frequency_pct: 55.5, sample_attempts: 84, epa_per_attempt: 0.12, success_rate: 54.3, yards_per_attempt: 5.96 },
@@ -6178,8 +6178,8 @@ function renderSchemeInsights(d) {
                                 }
                             },
                             neutral: {
-                                pass_rate: { raw_value: (0.55 + ((seed * 2) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 2) % 6) * 0.01 - 0.010), diff_pct: 1.5, rank: aGames < 6 ? null : (12 + (seed % 8)), n_games: aGames, sample_size: Math.round(35 * aGames), rank_display: formatRateRank((0.55 + ((seed * 2) % 6) * 0.01), 12 + (seed % 8), 0.560, aGames) },
-                                rush_rate: { raw_value: roundDec(1.0 - (0.55 + ((seed * 2) % 6) * 0.01), 3), league_median: 0.440, rank: aGames < 6 ? null : (21 - (seed % 8)), n_games: aGames, sample_size: Math.round(35 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.55 + ((seed * 2) % 6) * 0.01), 3), 21 - (seed % 8), 0.440, aGames) },
+                                pass_rate: { raw_value: (0.55 + ((seed * 2) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 2) % 6) * 0.01 - 0.010), diff_pct: 1.5, rank: aGames < 1 ? null : (12 + (seed % 8)), n_games: aGames, sample_size: Math.round(35 * aGames), rank_display: formatRateRank((0.55 + ((seed * 2) % 6) * 0.01), 12 + (seed % 8), 0.560, aGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.55 + ((seed * 2) % 6) * 0.01), 3), league_median: 0.440, rank: aGames < 1 ? null : (21 - (seed % 8)), n_games: aGames, sample_size: Math.round(35 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.55 + ((seed * 2) % 6) * 0.01), 3), 21 - (seed % 8), 0.440, aGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 10.8, frequency_pct: 10.8, sample_attempts: 59, epa_per_attempt: -0.54, success_rate: 18.2, yards_per_attempt: 2.62 },
                                     short: { attempts_share: 52.6, frequency_pct: 52.6, sample_attempts: 286, epa_per_attempt: 0.09, success_rate: 51.3, yards_per_attempt: 6.07 },
@@ -6188,8 +6188,8 @@ function renderSchemeInsights(d) {
                                 }
                             },
                             trailing: {
-                                pass_rate: { raw_value: (0.64 + ((seed * 3) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 3) % 10) * 0.01 - 0.010), diff_pct: 4.8, rank: aGames < 6 ? null : (8 + (seed % 12)), n_games: aGames, sample_size: Math.round(16 * aGames), rank_display: formatRateRank((0.64 + ((seed * 3) % 10) * 0.01), 8 + (seed % 12), 0.650, aGames) },
-                                rush_rate: { raw_value: roundDec(1.0 - (0.64 + ((seed * 3) % 10) * 0.01), 3), league_median: 0.350, rank: aGames < 6 ? null : (25 - (seed % 12)), n_games: aGames, sample_size: Math.round(16 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.64 + ((seed * 3) % 10) * 0.01), 3), 25 - (seed % 12), 0.350, aGames) },
+                                pass_rate: { raw_value: (0.64 + ((seed * 3) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 3) % 10) * 0.01 - 0.010), diff_pct: 4.8, rank: aGames < 1 ? null : (8 + (seed % 12)), n_games: aGames, sample_size: Math.round(16 * aGames), rank_display: formatRateRank((0.64 + ((seed * 3) % 10) * 0.01), 8 + (seed % 12), 0.650, aGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.64 + ((seed * 3) % 10) * 0.01), 3), league_median: 0.350, rank: aGames < 1 ? null : (25 - (seed % 12)), n_games: aGames, sample_size: Math.round(16 * aGames), rank_display: formatRateRank(roundDec(1.0 - (0.64 + ((seed * 3) % 10) * 0.01), 3), 25 - (seed % 12), 0.350, aGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 7.0, frequency_pct: 7.0, sample_attempts: 14, epa_per_attempt: -0.37, success_rate: 23.1, yards_per_attempt: 2.38 },
                                     short: { attempts_share: 55.9, frequency_pct: 55.9, sample_attempts: 112, epa_per_attempt: 0.14, success_rate: 55.8, yards_per_attempt: 5.40 },
@@ -6223,7 +6223,7 @@ function renderSchemeInsights(d) {
                                 yards_per_attempt: {
                                     raw_value: 5.92,
                                     league_median: 6.14,
-                                    rank: hGames < 6 ? null : 14,
+                                    rank: hGames < 1 ? null : 14,
                                     rank_display: formatPassRank(5.92, 14, hGames),
                                     n_games: hGames
                                 }
@@ -6241,16 +6241,16 @@ function renderSchemeInsights(d) {
                                 deep_20_plus: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33 }
                             },
                             pass_depth_allowed: {
-                                behind_los: { epa_per_attempt: -0.34, success_rate: 31.5, yards_per_attempt: 3.41, rank: hGames < 6 ? null : 12, league_median: -0.34, n_games: hGames },
-                                short: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47, rank: hGames < 6 ? null : 15, league_median: -0.10, n_games: hGames },
-                                intermediate: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27, rank: hGames < 6 ? null : 18, league_median: 0.25, n_games: hGames },
-                                deep: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33, rank: hGames < 6 ? null : 22, league_median: 0.36, n_games: hGames },
-                                short_0_to_5: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47, rank: hGames < 6 ? null : 15, league_median: -0.10, n_games: hGames },
-                                intermediate_6_to_15: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27, rank: hGames < 6 ? null : 18, league_median: 0.25, n_games: hGames },
-                                deep_16_plus: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33, rank: hGames < 6 ? null : 22, league_median: 0.36, n_games: hGames },
-                                short_0_to_9: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47, rank: hGames < 6 ? null : 15, league_median: -0.10, n_games: hGames },
-                                intermediate_10_to_19: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27, rank: hGames < 6 ? null : 18, league_median: 0.25, n_games: hGames },
-                                deep_20_plus: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33, rank: hGames < 6 ? null : 22, league_median: 0.36, n_games: hGames }
+                                behind_los: { epa_per_attempt: -0.34, success_rate: 31.5, yards_per_attempt: 3.41, rank: hGames < 1 ? null : 12, league_median: -0.34, n_games: hGames },
+                                short: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47, rank: hGames < 1 ? null : 15, league_median: -0.10, n_games: hGames },
+                                intermediate: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27, rank: hGames < 1 ? null : 18, league_median: 0.25, n_games: hGames },
+                                deep: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33, rank: hGames < 1 ? null : 22, league_median: 0.36, n_games: hGames },
+                                short_0_to_5: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47, rank: hGames < 1 ? null : 15, league_median: -0.10, n_games: hGames },
+                                intermediate_6_to_15: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27, rank: hGames < 1 ? null : 18, league_median: 0.25, n_games: hGames },
+                                deep_16_plus: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33, rank: hGames < 1 ? null : 22, league_median: 0.36, n_games: hGames },
+                                short_0_to_9: { epa_per_attempt: -0.10, success_rate: 50.1, yards_per_attempt: 5.47, rank: hGames < 1 ? null : 15, league_median: -0.10, n_games: hGames },
+                                intermediate_10_to_19: { epa_per_attempt: 0.25, success_rate: 51.6, yards_per_attempt: 8.27, rank: hGames < 1 ? null : 18, league_median: 0.25, n_games: hGames },
+                                deep_20_plus: { epa_per_attempt: 0.28, success_rate: 36.2, yards_per_attempt: 12.33, rank: hGames < 1 ? null : 22, league_median: 0.36, n_games: hGames }
                             },
                             positional_targets_allowed: {
                                 wr: { target_share: 60.0, yards_per_target: 7.33 },
@@ -6265,7 +6265,7 @@ function renderSchemeInsights(d) {
                         passing_offense: {
                             raw_value: parseFloat((6.3 + (((seed * 2) % 5) * 0.15)).toFixed(2)),
                             league_median: 6.03,
-                            rank: hGames < 6 ? null : (8 + ((seed * 2) % 10)),
+                            rank: hGames < 1 ? null : (8 + ((seed * 2) % 10)),
                             rank_display: formatPassRank(parseFloat((6.3 + (((seed * 2) % 5) * 0.15)).toFixed(2)), 8 + ((seed * 2) % 10), hGames),
                             sample_attempts: Math.round(34 * hGames),
                             n_games: hGames
@@ -6288,8 +6288,8 @@ function renderSchemeInsights(d) {
                         },
                         game_state_splits: {
                             leading: {
-                                pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: hGames < 6 ? null : (11 + ((seed * 2) % 10)), n_games: hGames, sample_size: Math.round(15 * hGames), rank_display: formatRateRank((0.48 + ((seed * 2) % 7) * 0.01), 11 + ((seed * 2) % 10), 0.489, hGames) },
-                                rush_rate: { raw_value: roundDec(1.0 - (0.48 + ((seed * 2) % 7) * 0.01), 3), league_median: 0.511, rank: hGames < 6 ? null : (22 - ((seed * 2) % 10)), n_games: hGames, sample_size: Math.round(15 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.48 + ((seed * 2) % 7) * 0.01), 3), 22 - ((seed * 2) % 10), 0.511, hGames) },
+                                pass_rate: { raw_value: (0.48 + ((seed * 2) % 7) * 0.01), league_median: 0.489, diff_from_median: (((seed * 2) % 7) * 0.01 - 0.009), diff_pct: 2.1, rank: hGames < 1 ? null : (11 + ((seed * 2) % 10)), n_games: hGames, sample_size: Math.round(15 * hGames), rank_display: formatRateRank((0.48 + ((seed * 2) % 7) * 0.01), 11 + ((seed * 2) % 10), 0.489, hGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.48 + ((seed * 2) % 7) * 0.01), 3), league_median: 0.511, rank: hGames < 1 ? null : (22 - ((seed * 2) % 10)), n_games: hGames, sample_size: Math.round(15 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.48 + ((seed * 2) % 7) * 0.01), 3), 22 - ((seed * 2) % 10), 0.511, hGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 17.4, frequency_pct: 17.4, sample_attempts: Math.round(8 * (hGames / 5)), epa_per_attempt: -0.18, success_rate: 38.0, yards_per_attempt: 4.12 },
                                     short: { attempts_share: 41.7, frequency_pct: 41.7, sample_attempts: Math.round(19 * (hGames / 5)), epa_per_attempt: 0.06, success_rate: 50.0, yards_per_attempt: 5.80 },
@@ -6298,8 +6298,8 @@ function renderSchemeInsights(d) {
                                 }
                             },
                             neutral: {
-                                pass_rate: { raw_value: (0.56 + ((seed * 3) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 3) % 6) * 0.01), diff_pct: 0.8, rank: hGames < 6 ? null : (14 + ((seed * 3) % 8)), n_games: hGames, sample_size: Math.round(35 * hGames), rank_display: formatRateRank((0.56 + ((seed * 3) % 6) * 0.01), 14 + ((seed * 3) % 8), 0.560, hGames) },
-                                rush_rate: { raw_value: roundDec(1.0 - (0.56 + ((seed * 3) % 6) * 0.01), 3), league_median: 0.440, rank: hGames < 6 ? null : (19 - ((seed * 3) % 8)), n_games: hGames, sample_size: Math.round(35 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.56 + ((seed * 3) % 6) * 0.01), 3), 19 - ((seed * 3) % 8), 0.440, hGames) },
+                                pass_rate: { raw_value: (0.56 + ((seed * 3) % 6) * 0.01), league_median: 0.560, diff_from_median: (((seed * 3) % 6) * 0.01), diff_pct: 0.8, rank: hGames < 1 ? null : (14 + ((seed * 3) % 8)), n_games: hGames, sample_size: Math.round(35 * hGames), rank_display: formatRateRank((0.56 + ((seed * 3) % 6) * 0.01), 14 + ((seed * 3) % 8), 0.560, hGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.56 + ((seed * 3) % 6) * 0.01), 3), league_median: 0.440, rank: hGames < 1 ? null : (19 - ((seed * 3) % 8)), n_games: hGames, sample_size: Math.round(35 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.56 + ((seed * 3) % 6) * 0.01), 3), 19 - ((seed * 3) % 8), 0.440, hGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 13.9, frequency_pct: 13.9, sample_attempts: Math.round(12 * (hGames / 5)), epa_per_attempt: -0.32, success_rate: 28.0, yards_per_attempt: 3.10 },
                                     short: { attempts_share: 49.0, frequency_pct: 49.0, sample_attempts: Math.round(43 * (hGames / 5)), epa_per_attempt: 0.08, success_rate: 52.0, yards_per_attempt: 6.10 },
@@ -6308,8 +6308,8 @@ function renderSchemeInsights(d) {
                                 }
                             },
                             trailing: {
-                                pass_rate: { raw_value: (0.65 + ((seed * 4) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 4) % 10) * 0.01), diff_pct: 1.2, rank: hGames < 6 ? null : (10 + ((seed * 4) % 12)), n_games: hGames, sample_size: Math.round(16 * hGames), rank_display: formatRateRank((0.65 + ((seed * 4) % 10) * 0.01), 10 + ((seed * 4) % 12), 0.650, hGames) },
-                                rush_rate: { raw_value: roundDec(1.0 - (0.65 + ((seed * 4) % 10) * 0.01), 3), league_median: 0.350, rank: hGames < 6 ? null : (23 - ((seed * 4) % 12)), n_games: hGames, sample_size: Math.round(16 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.65 + ((seed * 4) % 10) * 0.01), 3), 23 - ((seed * 4) % 12), 0.350, hGames) },
+                                pass_rate: { raw_value: (0.65 + ((seed * 4) % 10) * 0.01), league_median: 0.650, diff_from_median: (((seed * 4) % 10) * 0.01), diff_pct: 1.2, rank: hGames < 1 ? null : (10 + ((seed * 4) % 12)), n_games: hGames, sample_size: Math.round(16 * hGames), rank_display: formatRateRank((0.65 + ((seed * 4) % 10) * 0.01), 10 + ((seed * 4) % 12), 0.650, hGames) },
+                                rush_rate: { raw_value: roundDec(1.0 - (0.65 + ((seed * 4) % 10) * 0.01), 3), league_median: 0.350, rank: hGames < 1 ? null : (23 - ((seed * 4) % 12)), n_games: hGames, sample_size: Math.round(16 * hGames), rank_display: formatRateRank(roundDec(1.0 - (0.65 + ((seed * 4) % 10) * 0.01), 3), 23 - ((seed * 4) % 12), 0.350, hGames) },
                                 pass_depth: {
                                     behind_los: { attempts_share: 16.4, frequency_pct: 16.4, sample_attempts: Math.round(4 * (hGames / 5)), epa_per_attempt: -0.25, success_rate: 30.0, yards_per_attempt: 3.40 },
                                     short: { attempts_share: 44.5, frequency_pct: 44.5, sample_attempts: Math.round(11 * (hGames / 5)), epa_per_attempt: 0.11, success_rate: 52.0, yards_per_attempt: 5.60 },
@@ -6343,7 +6343,7 @@ function renderSchemeInsights(d) {
                                 yards_per_attempt: {
                                     raw_value: 5.33,
                                     league_median: 6.14,
-                                    rank: aGames < 6 ? null : 3,
+                                    rank: aGames < 1 ? null : 3,
                                     rank_display: formatPassRank(5.33, 3, aGames),
                                     n_games: aGames
                                 }
@@ -6361,16 +6361,16 @@ function renderSchemeInsights(d) {
                                 deep_20_plus: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90 }
                             },
                             pass_depth_allowed: {
-                                behind_los: { epa_per_attempt: -0.38, success_rate: 29.5, yards_per_attempt: 3.25, rank: aGames < 6 ? null : 8, league_median: -0.34, n_games: aGames },
-                                short: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20, rank: aGames < 6 ? null : 11, league_median: -0.10, n_games: aGames },
-                                intermediate: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10, rank: aGames < 6 ? null : 14, league_median: 0.25, n_games: aGames },
-                                deep: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90, rank: aGames < 6 ? null : 9, league_median: 0.36, n_games: aGames },
-                                short_0_to_5: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20, rank: aGames < 6 ? null : 11, league_median: -0.10, n_games: aGames },
-                                intermediate_6_to_15: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10, rank: aGames < 6 ? null : 14, league_median: 0.25, n_games: aGames },
-                                deep_16_plus: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90, rank: aGames < 6 ? null : 9, league_median: 0.36, n_games: aGames },
-                                short_0_to_9: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20, rank: aGames < 6 ? null : 11, league_median: -0.10, n_games: aGames },
-                                intermediate_10_to_19: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10, rank: aGames < 6 ? null : 14, league_median: 0.25, n_games: aGames },
-                                deep_20_plus: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90, rank: aGames < 6 ? null : 9, league_median: 0.36, n_games: aGames }
+                                behind_los: { epa_per_attempt: -0.38, success_rate: 29.5, yards_per_attempt: 3.25, rank: aGames < 1 ? null : 8, league_median: -0.34, n_games: aGames },
+                                short: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20, rank: aGames < 1 ? null : 11, league_median: -0.10, n_games: aGames },
+                                intermediate: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10, rank: aGames < 1 ? null : 14, league_median: 0.25, n_games: aGames },
+                                deep: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90, rank: aGames < 1 ? null : 9, league_median: 0.36, n_games: aGames },
+                                short_0_to_5: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20, rank: aGames < 1 ? null : 11, league_median: -0.10, n_games: aGames },
+                                intermediate_6_to_15: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10, rank: aGames < 1 ? null : 14, league_median: 0.25, n_games: aGames },
+                                deep_16_plus: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90, rank: aGames < 1 ? null : 9, league_median: 0.36, n_games: aGames },
+                                short_0_to_9: { epa_per_attempt: -0.08, success_rate: 49.0, yards_per_attempt: 5.20, rank: aGames < 1 ? null : 11, league_median: -0.10, n_games: aGames },
+                                intermediate_10_to_19: { epa_per_attempt: 0.22, success_rate: 50.0, yards_per_attempt: 8.10, rank: aGames < 1 ? null : 14, league_median: 0.25, n_games: aGames },
+                                deep_20_plus: { epa_per_attempt: 0.25, success_rate: 34.0, yards_per_attempt: 11.90, rank: aGames < 1 ? null : 9, league_median: 0.36, n_games: aGames }
                             },
                             positional_targets_allowed: {
                                 wr: { target_share: 58.5, yards_per_target: 7.10 },

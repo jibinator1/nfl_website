@@ -293,7 +293,7 @@ def test_player_historical_red_zone_touches():
 
 
 def test_dynamic_scouting_data_date_range():
-    """Verify dynamic scouting features recalculate when date range changes and properly suppress ranks for n < 6 games."""
+    """Verify dynamic scouting features recalculate when date range changes and rankings are active for n >= 1 games."""
     from backend.scheme_insights import get_dynamic_scouting_data, compute_scheme_insights
 
     # 1. Custom 6-week window in 2025
@@ -305,10 +305,12 @@ def test_dynamic_scouting_data_date_range():
     hou_early = dyn_early["HOU"]
     jax_early = dyn_early["JAX"]
 
-    # HOU played 5 games by Oct 15 -> rank suppressed
+    # HOU played 5 games by Oct 15 -> rank active
     assert hou_early["n_games"] == 5
-    assert hou_early["offense"]["passing_ypa"]["rank"] is None
-    assert hou_early["offense"]["game_state_splits"]["leading"]["pass_rate"]["rank"] is None
+    assert hou_early["offense"]["passing_ypa"]["rank"] is not None
+    assert 1 <= hou_early["offense"]["passing_ypa"]["rank"] <= 32
+    assert hou_early["offense"]["game_state_splits"]["leading"]["pass_rate"]["rank"] is not None
+    assert 1 <= hou_early["offense"]["game_state_splits"]["leading"]["pass_rate"]["rank"] <= 32
 
     # JAX played 6 games by Oct 15 -> rank computed
     assert jax_early["n_games"] == 6
@@ -365,12 +367,14 @@ def test_pass_depth_rankings_and_league_medians():
     assert jax_def["deep"]["epa_per_attempt"] > jax_def["deep"]["league_median"]
     assert hou_off["deep"]["rank"] == 11
 
-    # Small sample suppression (n < 6 games)
-    dyn_early = get_dynamic_scouting_data(2025, start_date="2025-09-04", end_date="2025-10-15")
-    hou_early_def = dyn_early["HOU"]["defense"]["pass_depth_allowed"]
-    assert hou_early_def["deep"]["rank"] is None
-    assert "small sample" in hou_early_def["deep"]["rank_display"]
-    assert hou_early_def["deep"]["league_median"] is not None
+    # 2026 season stats verification (5 games played, ranks fully active)
+    dyn_2026 = get_dynamic_scouting_data(2026)
+    hou_2026_off = dyn_2026["HOU"]["offense"]["pass_depth"]
+    jax_2026_def = dyn_2026["JAX"]["defense"]["pass_depth_allowed"]
+    assert hou_2026_off["deep"]["rank"] == 6
+    assert "Rank #6" in hou_2026_off["deep"]["rank_display"]
+    assert jax_2026_def["deep"]["rank"] == 25
+    assert "Rank #25" in jax_2026_def["deep"]["rank_display"]
 
     # End-to-end scheme insights matchup report contains enriched pass depth
     res = compute_scheme_insights("JAX", "HOU", season=2024, week=6)

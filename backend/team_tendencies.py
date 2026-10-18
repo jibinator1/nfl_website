@@ -133,7 +133,7 @@ def format_stat_comparison(
 ) -> Dict[str, Any]:
     """
     Computes league median, percentiles, rank, differences, and sample size flag.
-    If n_games < 6, rank is suppressed to prevent misleading small-sample claims.
+    If n_games < 1, rank is suppressed.
     """
     if isinstance(league_series, dict):
         vals = pd.Series(list(league_series.values())).dropna()
@@ -181,7 +181,7 @@ def format_stat_comparison(
 
     rank_suppressed = False
     if n_games is not None:
-        if n_games < 6:
+        if n_games < 1:
             rank_suppressed = True
             rank_out = None
             rank_display = f"{team_val:.2f} {unit} (league median {median:.2f}, n={n_games} games -- rank suppressed, small sample)"

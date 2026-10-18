@@ -541,7 +541,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
     """
     Computes genuine descriptive scouting metrics across all 32 teams for the specified
     date range or season, using the game-level scouting feature store.
-    Includes small-sample rank suppression (n < 6 games).
+    Includes small-sample rank suppression (n < 1 games).
     """
     _ensure_parquet_loaded()
     global _SCOUTING_FEATURES_DF, _DYNAMIC_SCOUTING_CACHE
@@ -901,7 +901,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
     for tm in teams:
         d = raw[tm]
         ng = d['n_games']
-        is_small = bool(ng < 6)
+        is_small = bool(ng < 1)
 
         def make_disp(val, rk, med, unit="", is_rate=False):
             if is_small:
@@ -991,7 +991,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'rank_display': make_disp(d['l_pr'], rk_l_pr[tm], med_l_pr, is_rate=True),
                             'n_games': ng,
                             'sample_size': d['lt'],
-                            'is_small_sample': bool(d['lt'] < 40),
+                            'is_small_sample': bool(d['lt'] < 1),
                             'unit': 'rate'
                         },
                         'rush_rate': {
@@ -1001,7 +1001,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'rank_display': make_disp(d['l_rr'], rk_l_rr[tm], med_l_rr, is_rate=True),
                             'n_games': ng,
                             'sample_size': d['lt'],
-                            'is_small_sample': bool(d['lt'] < 40),
+                            'is_small_sample': bool(d['lt'] < 1),
                             'unit': 'rate'
                         },
                         'pass_depth': d['lead_depth'],
@@ -1014,7 +1014,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'rank_display': make_disp(d['n_pr'], rk_n_pr[tm], med_n_pr, is_rate=True),
                             'n_games': ng,
                             'sample_size': d['nt'],
-                            'is_small_sample': bool(d['nt'] < 40),
+                            'is_small_sample': bool(d['nt'] < 1),
                             'unit': 'rate'
                         },
                         'rush_rate': {
@@ -1024,7 +1024,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'rank_display': make_disp(d['n_rr'], rk_n_rr[tm], med_n_rr, is_rate=True),
                             'n_games': ng,
                             'sample_size': d['nt'],
-                            'is_small_sample': bool(d['nt'] < 40),
+                            'is_small_sample': bool(d['nt'] < 1),
                             'unit': 'rate'
                         },
                         'pass_depth': d['neut_depth'],
@@ -1037,7 +1037,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'rank_display': make_disp(d['t_pr'], rk_t_pr[tm], med_t_pr, is_rate=True),
                             'n_games': ng,
                             'sample_size': d['tt'],
-                            'is_small_sample': bool(d['tt'] < 40),
+                            'is_small_sample': bool(d['tt'] < 1),
                             'unit': 'rate'
                         },
                         'rush_rate': {
@@ -1047,7 +1047,7 @@ def get_dynamic_scouting_data(season: int = 2026, start_date: Optional[str] = No
                             'rank_display': make_disp(d['t_rr'], rk_t_rr[tm], med_t_rr, is_rate=True),
                             'n_games': ng,
                             'sample_size': d['tt'],
-                            'is_small_sample': bool(d['tt'] < 40),
+                            'is_small_sample': bool(d['tt'] < 1),
                             'unit': 'rate'
                         },
                         'pass_depth': d['trail_depth'],
@@ -1559,9 +1559,15 @@ def compute_scheme_insights(
     if a_team in scouting_32:
         a_games = scouting_32[a_team].get('n_games', a_games)
     if h_games == 0:
-        h_games = 22 if season >= 2026 else 17
+        h_games = 5 if season >= 2026 else 17
     if a_games == 0:
-        a_games = 22 if season >= 2026 else 17
+        a_games = 5 if season >= 2026 else 17
+
+    if not is_custom_date:
+        eff_wk = (week - 1) if (week is not None and week > 1) else (max(h_games, a_games) if max(h_games, a_games) > 0 else 5)
+        sample_label = f"{season} Season Analysis (Weeks 1-{eff_wk}, n={max(h_games, a_games)} games)"
+    elif ctx is not None and ctx.get('sample_label'):
+        sample_label = ctx['sample_label']
 
     sample_window = {
         'season': season,
@@ -1644,7 +1650,7 @@ def compute_scheme_insights(
     # Pillar 2: Run-Scheme Splits & Defensive Vulnerabilities
     # -------------------------------------------------------------
     def _format_def_rank(val: float, rank: Optional[int], n_g: int) -> Tuple[Optional[int], str]:
-        if n_g < 6:
+        if n_g < 1:
             med_note = f" (league median {league_med_ypc:.2f}, n={n_g} games -- rank suppressed, small sample)" if league_med_ypc is not None else f" (n={n_g} games -- rank suppressed, small sample)"
             return None, f"{val:.2f} YPC{med_note}"
         return rank, f"Rank #{rank} (n={n_g} games)"
@@ -1847,7 +1853,7 @@ def compute_scheme_insights(
             usage_prof = compute_player_usage_profile(disp_name, team_code, season=season, up_to_week=week)
 
             if focus == 'Rushing Yards':
-                if opp_n_games < 6:
+                if opp_n_games < 1:
                     med_note = f"league median {league_med_ypc:.2f}, " if league_med_ypc is not None else ""
                     ctx_str = f"{opp_code} Rush Def Allowed: {def_gap_ypc:.2f} YPC ({med_note}n={opp_n_games} games — rank suppressed, small sample)"
                 else:

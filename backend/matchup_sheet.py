@@ -159,7 +159,7 @@ def _build_fallback_tendency_profile(
         scouting = _load_32_team_scouting_data()
     t_entry = scouting.get(team, {})
     t_off = t_entry.get("offense", {})
-    n_games = t_entry.get("n_games", 22 if season >= 2026 else 17)
+    n_games = t_entry.get("n_games", 5 if season >= 2026 else 17)
 
     game_state_splits = t_off.get("game_state_splits")
     if not game_state_splits:
@@ -273,7 +273,7 @@ def _build_fallback_vulnerability_profile(
         scouting = _load_32_team_scouting_data()
     t_entry = scouting.get(team, {})
     t_def = t_entry.get("defense", {})
-    n_games = t_entry.get("n_games", 22 if season >= 2026 else 17)
+    n_games = t_entry.get("n_games", 5 if season >= 2026 else 17)
 
     from backend.scheme_insights import get_team_scheme_profile
     prof = get_team_scheme_profile(team)
@@ -410,7 +410,7 @@ def build_matchup_stat_sheet(
     home_team: str,
     season: int = 2026,
     up_to_week: Optional[int] = None,
-    include_prior_season: bool = True,
+    include_prior_season: bool = False,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
 ) -> Dict[str, Any]:
@@ -503,7 +503,7 @@ def build_matchup_stat_sheet(
     }
 
     ng = max(away_off_tendencies.get("n_games") or 0, home_off_tendencies.get("n_games") or 0)
-    week_n = max(1, (up_to_week - 1) if up_to_week is not None else 1)
+    week_n = (up_to_week - 1) if (up_to_week is not None and up_to_week > 1) else (ng if ng > 0 else 1)
     if start_date and end_date:
         sample_label = f"Custom Date Range ({start_date} to {end_date}, n={ng} games)"
     elif include_prior_season:
